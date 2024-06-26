@@ -3,3 +3,6 @@ msgstr "Thoth Plugin"
 
 msgid "plugins.generic.thoth.description"
 msgstr "Integrate OMP with Thoth for communication and synchronization of book data between the two platforms."
+
+msgid "plugins.generic.thoth.settings.apiKey"
+msgstr "API Key"
