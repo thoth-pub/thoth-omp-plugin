@@ -1,0 +1,5 @@
+msgid "plugins.generic.thoth.name"
+msgstr "Plugin Thoth"
+
+msgid "plugins.generic.thoth.description"
+msgstr "Integra o OMP com o Thoth para comunicação e sincronização de dados de livros entre as duas plataformas."

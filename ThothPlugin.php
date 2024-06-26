@@ -16,11 +16,11 @@ class ThothPlugin extends GenericPlugin
 
     public function getDisplayName()
     {
-        return 'Thoth';
+        return __('plugins.generic.thoth.name');
     }
 
     public function getDescription()
     {
-        return 'Integration of OMP and Thoth for communication and synchronization of book data between the two platforms.';
+        return __('plugins.generic.thoth.description');
     }
 }
