@@ -29,13 +29,6 @@ class ThothSettingsForm extends Form
 
         parent::__construct($plugin->getTemplateResource('settingsForm.tpl'));
 
-        $this->addCheck(new FormValidator(
-            $this,
-            'apiKey',
-            'required',
-            'plugins.generic.googleAnalytics.manager.settings.googleAnalyticsSiteIdRequired'
-        ));
-
         $this->addCheck(new FormValidatorPost($this));
         $this->addCheck(new FormValidatorCSRF($this));
     }
@@ -43,13 +36,14 @@ class ThothSettingsForm extends Form
     public function initData()
     {
         $this->_data = [
-            'apiKey' => $this->plugin->getSetting($this->contextId, 'apiKey')
+            'email' => $this->plugin->getSetting($this->contextId, 'email'),
+            'password' => $this->plugin->getSetting($this->contextId, 'password')
         ];
     }
 
     public function readInputData()
     {
-        $this->readUserVars(['apiKey']);
+        $this->readUserVars(['email', 'password']);
     }
 
     public function fetch($request, $template = null, $display = false)
@@ -61,7 +55,8 @@ class ThothSettingsForm extends Form
 
     public function execute(...$functionArgs)
     {
-        $this->plugin->updateSetting($this->contextId, 'apiKey', trim($this->getData('apiKey')), 'string');
+        $this->plugin->updateSetting($this->contextId, 'email', trim($this->getData('email')), 'string');
+        $this->plugin->updateSetting($this->contextId, 'password', trim($this->getData('password')), 'string');
         parent::execute(...$functionArgs);
     }
 }

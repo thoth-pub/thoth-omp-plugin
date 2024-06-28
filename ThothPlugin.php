@@ -26,7 +26,7 @@ class ThothPlugin extends GenericPlugin
 
     public function getActions($request, $verb)
     {
-        $parentActions = parent::getActions($request, $actionArgs);
+        $parentActions = parent::getActions($request, $verb);
 
         if (!$this->getEnabled()) {
             return $parentActions;

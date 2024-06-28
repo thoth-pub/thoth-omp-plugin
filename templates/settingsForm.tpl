@@ -26,9 +26,12 @@
 
 	{include file="controllers/notification/inPlaceNotification.tpl" notificationId="thothSettingsFormNotification"}
 
-    {fbvFormSection label="plugins.generic.thoth.settings.apiKey"}
-		{fbvElement type="text" password="true" id="apiKey" value=$apiKey}
-	{/fbvFormSection}
+	{fbvFormArea id="thothSettings" title="plugins.generic.thoth.settings.authentication"}
+		{fbvFormSection label=""}
+			{fbvElement type="email" id="email" value=$email label="plugins.generic.thoth.settings.email" required="true"}
+			{fbvElement type="text" password="true" id="password" value=$password label="plugins.generic.thoth.settings.password" required="true"}
+		{/fbvFormSection}
+	{/fbvFormArea}
 
 	{fbvFormButtons}
 
