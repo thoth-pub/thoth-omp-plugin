@@ -1,6 +1,5 @@
 <?php
 
-use GuzzleHttp\Psr7;
 use GuzzleHttp\Exception\ClientException;
 
 class ThothAuthenticator
@@ -22,7 +21,13 @@ class ThothAuthenticator
 
     public function getToken()
     {
-        $response = $this->httpClient->request('GET', $this->thothAuthUrl, ['json' => $this->json]);
+        try {
+            $response = $this->httpClient->request('POST', $this->thothAuthUrl, ['json' => $this->json]);
+        } catch (ClientException $e) {
+            if ($e->getCode() == 401) {
+                throw new Exception('Invalid credentials', 401);
+            }
+        }
 
         return json_decode($response->getBody())->token;
     }
