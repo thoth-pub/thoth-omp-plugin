@@ -15,6 +15,7 @@
  */
 
 import('lib.pkp.classes.form.Form');
+import('plugins.generic.thoth.thoth.ThothClient');
 
 class ThothSettingsForm extends Form
 {
@@ -28,6 +29,27 @@ class ThothSettingsForm extends Form
         $this->plugin = $plugin;
 
         parent::__construct($plugin->getTemplateResource('settingsForm.tpl'));
+
+        $form = $this;
+        $this->addCheck(new FormValidatorCustom(
+            $this,
+            'password',
+            'required',
+            'plugins.generic.thoth.settings.invalidCredentials',
+            function ($password) use ($form) {
+                $email = trim($this->getData('email'));
+                $thothClient = new ThothClient();
+                try {
+                    $thothClient->login(
+                        $email,
+                        $password
+                    );
+                } catch (Exception $e) {
+                    return false;
+                }
+                return true;
+            }
+        ));
 
         $this->addCheck(new FormValidatorPost($this));
         $this->addCheck(new FormValidatorCSRF($this));
@@ -58,5 +80,23 @@ class ThothSettingsForm extends Form
         $this->plugin->updateSetting($this->contextId, 'email', trim($this->getData('email')), 'string');
         $this->plugin->updateSetting($this->contextId, 'password', trim($this->getData('password')), 'string');
         parent::execute(...$functionArgs);
+    }
+
+    public function validateAPICredentials(): bool
+    {
+        $email = trim($this->getData('email'));
+        $password = trim($this->getData('password'));
+
+        $thothClient = new ThothClient();
+
+        try {
+            $thothClient->login(
+                $email,
+                $password
+            );
+        } catch (Exception $e) {
+            return false;
+        }
+        return true;
     }
 }

@@ -12,3 +12,6 @@ msgstr "Email"
 
 msgid "plugins.generic.thoth.settings.password"
 msgstr "Senha"
+
+msgid "plugins.generic.thoth.settings.invalidCredentials"
+msgstr "Credenciais inválidas"
