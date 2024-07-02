@@ -15,3 +15,6 @@ msgstr "Senha"
 
 msgid "plugins.generic.thoth.settings.invalidCredentials"
 msgstr "Credenciais inválidas"
+
+msgid "plugins.generic.thoth.settings.secretKeyEmpty"
+msgstr "O administrador do seu site deve definir um segredo no arquivo de configuração ('api_key_secret')."

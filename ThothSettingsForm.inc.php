@@ -15,6 +15,7 @@
  */
 
 import('lib.pkp.classes.form.Form');
+import('plugins.generic.thoth.lib.APIKeyEncryption.APIKeyEncryption');
 import('plugins.generic.thoth.thoth.ThothClient');
 
 class ThothSettingsForm extends Form
@@ -28,7 +29,8 @@ class ThothSettingsForm extends Form
         $this->journalId = $journalId;
         $this->plugin = $plugin;
 
-        parent::__construct($plugin->getTemplateResource('settingsForm.tpl'));
+        $template = APIKeyEncryption::secretConfigExists() ? 'settingsForm.tpl' : 'tokenError.tpl';
+        parent::__construct($plugin->getTemplateResource($template));
 
         $form = $this;
         $this->addCheck(new FormValidatorCustom(
