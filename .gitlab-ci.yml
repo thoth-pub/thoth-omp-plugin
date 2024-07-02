@@ -6,4 +6,3 @@ include:
     ref: main
     file:
       - 'templates/groups/omp_plugins_unit_tests_model.yml'
-      - 'templates/groups/omp_plugins_cypress_tests_model.yml'
