@@ -1,5 +1,19 @@
 <?php
 
+/**
+ * @file plugins/generic/thoth/ThothPlugin.php
+ *
+ * Copyright (c) 2014-2020 Simon Fraser University
+ * Copyright (c) 2003-2020 John Willinsky
+ * Copyright (c) 2024 Lepidus Tecnologia
+ * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ *
+ * @class ThothPlugin
+ * @ingroup plugins_generic_thoth
+ *
+ * @brief Plugin for integration with Thoth for communication and synchronization of book data between the two platforms
+ */
+
 import('lib.pkp.classes.plugins.GenericPlugin');
 
 class ThothPlugin extends GenericPlugin

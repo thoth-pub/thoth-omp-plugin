@@ -1,5 +1,18 @@
 <?php
 
+/**
+ * @file plugins/generic/thoth/tests/thoth/ThothClientTest.php
+ *
+ * Copyright (c) 2024 Lepidus Tecnologia
+ * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ *
+ * @class ThothClientTest
+ * @ingroup plugins_generic_thoth_tests
+ * @see ThothClient
+ *
+ * @brief Test class for the ThothClient class
+ */
+
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Handler\MockHandler;

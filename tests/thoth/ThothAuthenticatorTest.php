@@ -1,5 +1,18 @@
 <?php
 
+/**
+ * @file plugins/generic/thoth/tests/thoth/ThothAuthenticatorTest.php
+ *
+ * Copyright (c) 2024 Lepidus Tecnologia
+ * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ *
+ * @class ThothAuthenticatorTest
+ * @ingroup plugins_generic_thoth_tests
+ * @see ThothAuthenticator
+ *
+ * @brief Test class for the ThothAuthenticator class
+ */
+
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;

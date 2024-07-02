@@ -1,5 +1,17 @@
 <?php
 
+/**
+ * @file plugins/generic/thoth/thoth/ThothAuthenticator.inc.php
+ *
+ * Copyright (c) 2024 Lepidus Tecnologia
+ * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ *
+ * @class ThothAuthenticator
+ * @ingroup plugins_generic_thoth
+ *
+ * @brief Authenticate with Thoth API
+ */
+
 use GuzzleHttp\Exception\ClientException;
 
 class ThothAuthenticator
