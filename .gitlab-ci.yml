@@ -1,0 +1,9 @@
+variables:
+    PLUGIN_NAME : 'thoth'
+
+include: 
+  - project: 'documentacao-e-tarefas/modelosparaintegracaocontinua'
+    ref: main
+    file:
+      - 'templates/groups/omp_plugins_unit_tests_model.yml'
+      - 'templates/groups/omp_plugins_cypress_tests_model.yml'
