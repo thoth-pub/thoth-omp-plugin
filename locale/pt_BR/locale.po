@@ -1,0 +1,20 @@
+msgid "plugins.generic.thoth.name"
+msgstr "Plugin Thoth"
+
+msgid "plugins.generic.thoth.description"
+msgstr "Integra o OMP com o Thoth para comunicação e sincronização de dados de livros entre as duas plataformas."
+
+msgid "plugins.generic.thoth.settings.authentication"
+msgstr "Autenticação Thoth"
+
+msgid "plugins.generic.thoth.settings.email"
+msgstr "Email"
+
+msgid "plugins.generic.thoth.settings.password"
+msgstr "Senha"
+
+msgid "plugins.generic.thoth.settings.invalidCredentials"
+msgstr "Credenciais inválidas"
+
+msgid "plugins.generic.thoth.settings.secretKeyEmpty"
+msgstr "O administrador do seu site deve definir um segredo no arquivo de configuração ('api_key_secret')."
