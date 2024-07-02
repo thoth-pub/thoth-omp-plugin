@@ -10,7 +10,7 @@ This plugin is compatible with the following PKP applications:
 
 ## Requirements
 
-### Journal Requirements
+### Press Requirements
 
 1. **api_key_secret**
 
