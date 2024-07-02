@@ -79,8 +79,9 @@ class ThothSettingsForm extends Form
 
     public function execute(...$functionArgs)
     {
+        $encryptedPassword = APIKeyEncryption::encryptString(trim($this->getData('password')));
         $this->plugin->updateSetting($this->contextId, 'email', trim($this->getData('email')), 'string');
-        $this->plugin->updateSetting($this->contextId, 'password', trim($this->getData('password')), 'string');
+        $this->plugin->updateSetting($this->contextId, 'password', $encryptedPassword, 'string');
         parent::execute(...$functionArgs);
     }
 
@@ -92,10 +93,7 @@ class ThothSettingsForm extends Form
         $thothClient = new ThothClient();
 
         try {
-            $thothClient->login(
-                $email,
-                $password
-            );
+            $thothClient->login($email, $password);
         } catch (Exception $e) {
             return false;
         }
