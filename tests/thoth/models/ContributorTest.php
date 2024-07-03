@@ -1,0 +1,58 @@
+<?php
+
+/**
+ * @file plugins/generic/thoth/tests/thoth/models/ContributorTest.php
+ *
+ * Copyright (c) 2024 Lepidus Tecnologia
+ * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ *
+ * @class ContributorTest
+ * @ingroup plugins_generic_thoth_tests
+ * @see Contributor
+ *
+ * @brief Test class for the Contributor class
+ */
+
+import('lib.pkp.tests.PKPTestCase');
+import('plugins.generic.thoth.thoth.models.Contributor');
+
+class ContributorTest extends PKPTestCase
+{
+    public function testGettersAndSetters()
+    {
+        $contributor = new Contributor();
+        $contributor->setFirstName('John');
+        $contributor->setLastName('Doe');
+        $contributor->setFullName('John Doe');
+        $contributor->setOrcid('https://orcid.org/0000-0001-8735-7990');
+        $contributor->setWebsite('https://sites.google.com/site/johndoe');
+
+        $this->assertEquals('John', $contributor->getFirstName());
+        $this->assertEquals('Doe', $contributor->getLastName());
+        $this->assertEquals('John Doe', $contributor->getFullName());
+        $this->assertEquals('https://orcid.org/0000-0001-8735-7990', $contributor->getOrcid());
+        $this->assertEquals('https://sites.google.com/site/johndoe', $contributor->getWebsite());
+        $this->assertEquals('contributorId', $contributor->getReturnValue());
+    }
+
+    public function testGetContributorData()
+    {
+        $contributor = new Contributor();
+        $contributor->setFirstName('Adriana Laura');
+        $contributor->setLastName('Massidda');
+        $contributor->setFullName('Adriana Laura Massidda');
+        $contributor->setOrcid('https://orcid.org/0000-0001-8735-7990');
+        $contributor->setWebsite('https://sites.google.com/site/adrianamassidda');
+
+        $this->assertEquals(
+            [
+                'firstName' => 'Adriana Laura',
+                'lastName' => 'Massidda',
+                'fullName' => 'Adriana Laura Massidda',
+                'orcid' => 'https://orcid.org/0000-0001-8735-7990',
+                'website' => 'https://sites.google.com/site/adrianamassidda',
+            ],
+            $contributor->getData()
+        );
+    }
+}
