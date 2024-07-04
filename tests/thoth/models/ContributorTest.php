@@ -20,24 +20,29 @@ class ContributorTest extends PKPTestCase
 {
     public function testGettersAndSetters()
     {
+        $uuid = \Ramsey\Uuid\Uuid::uuid4()->toString();
         $contributor = new Contributor();
+        $contributor->setId($uuid);
         $contributor->setFirstName('John');
         $contributor->setLastName('Doe');
         $contributor->setFullName('John Doe');
-        $contributor->setOrcid('https://orcid.org/0000-0001-8735-7990');
+        $contributor->setOrcid('https://orcid.org/0000-0001-2345-6789');
         $contributor->setWebsite('https://sites.google.com/site/johndoe');
 
+        $this->assertEquals($uuid, $contributor->getId());
         $this->assertEquals('John', $contributor->getFirstName());
         $this->assertEquals('Doe', $contributor->getLastName());
         $this->assertEquals('John Doe', $contributor->getFullName());
-        $this->assertEquals('https://orcid.org/0000-0001-8735-7990', $contributor->getOrcid());
+        $this->assertEquals('https://orcid.org/0000-0001-2345-6789', $contributor->getOrcid());
         $this->assertEquals('https://sites.google.com/site/johndoe', $contributor->getWebsite());
         $this->assertEquals('contributorId', $contributor->getReturnValue());
     }
 
     public function testGetContributorData()
     {
+        $uuid = \Ramsey\Uuid\Uuid::uuid4()->toString();
         $contributor = new Contributor();
+        $contributor->setId($uuid);
         $contributor->setFirstName('Adriana Laura');
         $contributor->setLastName('Massidda');
         $contributor->setFullName('Adriana Laura Massidda');
@@ -46,6 +51,7 @@ class ContributorTest extends PKPTestCase
 
         $this->assertEquals(
             [
+                'contributorId' => $uuid,
                 'firstName' => 'Adriana Laura',
                 'lastName' => 'Massidda',
                 'fullName' => 'Adriana Laura Massidda',

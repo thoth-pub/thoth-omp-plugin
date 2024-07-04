@@ -14,6 +14,10 @@
 
 abstract class ThothModel
 {
+    abstract public function getId();
+
+    abstract public function setId($id);
+
     abstract public function getReturnValue();
 
     public function getData()
@@ -25,7 +29,10 @@ abstract class ThothModel
 
         foreach ($properties as $property) {
             $property->setAccessible(true);
-            $attributes[$property->getName()] = $property->getValue($this);
+            if (!$value = $property->getValue($this)) {
+                continue;
+            }
+            $attributes[$property->getName()] = $value;
         }
 
         return $attributes;

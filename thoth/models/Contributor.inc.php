@@ -16,6 +16,8 @@ import('plugins.generic.thoth.thoth.models.ThothModel');
 
 class Contributor extends ThothModel
 {
+    private $contributorId;
+
     private $firstName;
 
     private $lastName;
@@ -29,6 +31,16 @@ class Contributor extends ThothModel
     public function getReturnValue()
     {
         return 'contributorId';
+    }
+
+    public function getId()
+    {
+        return $this->contributorId;
+    }
+
+    public function setId($id)
+    {
+        $this->contributorId = $id;
     }
 
     public function getFirstName()
