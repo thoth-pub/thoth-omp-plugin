@@ -29,13 +29,13 @@ class ThothClientTest extends PKPTestCase
         $mockHandler = new MockHandler([
             new ClientException(
                 'Error Communicating with Server',
-                new Request('POST', 'https://api.thoth.pub/account/login'),
+                new Request('POST', 'https://api.thoth.test.pub/account/login'),
                 new Response(401, [], 'Invalid credentials')
             )
         ]);
         $guzzleClient = new Client(['handler' => $mockHandler]);
 
-        $this->expectException(Exception::class);
+        $this->expectException(ThothException::class);
         $this->expectExceptionCode(401);
         $this->expectExceptionMessage('Invalid credentials');
 
