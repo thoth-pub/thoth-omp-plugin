@@ -39,7 +39,11 @@ class ThothGraphQLTest extends PKPTestCase
         $query = '
             mutation {
                 createContributor(
-                    data: {firstName: "Abdullah",lastName: "Mirzoev",fullName: "Abdullah Mirzoev"}
+                    data: {
+                        firstName: "Abdullah",
+                        lastName: "Mirzoev",
+                        fullName: "Abdullah Mirzoev"
+                    }
                 ) {
                     contributorId
                 }
@@ -76,7 +80,56 @@ class ThothGraphQLTest extends PKPTestCase
         $query = '
             mutation {
                 createContributor(
-                    data: {givenName: "Abdullah","lastName": "Mirzoev","fullName": "Abdullah Mirzoev"}
+                    data: {
+                        givenName: "Abdullah",
+                        "lastName": "Mirzoev",
+                        "fullName": "Abdullah Mirzoev"
+                    }
+                ) {
+                    contributorId
+                }
+            }
+        ';
+
+        $thothGraphQL = new ThothGraphQL('https://api.thoth.test.pub/', 'secret_token', $guzzleClient);
+        $returnValue = $thothGraphQL->execute($query);
+    }
+
+    public function testResponseWithError()
+    {
+        $mockHandler = new MockHandler([
+            new RequestException(
+                'Client error',
+                new Request('POST', 'https://api.thoth.test.pub/graphql'),
+                new Response(
+                    200,
+                    [],
+                    '{
+                        "data":null,
+                        "errors":[
+                            {"message":"Invalid ORCID ID.",
+                            "locations":[{"line":2,"column":17}],
+                            "path":["createContributor"]}
+                        ]
+                    }'
+                )
+            )
+        ]);
+        $guzzleClient = new Client(['handler' => $mockHandler]);
+
+        $this->expectException(ThothException::class);
+        $this->expectExceptionCode(200);
+        $this->expectExceptionMessage('Failed to send the request to Thoth: Invalid ORCID ID.');
+
+        $query = '
+            mutation {
+                createContributor(
+                    data: {
+                        givenName: "Abdullah",
+                        lastName: "Mirzoev",
+                        fullName: "Abdullah Mirzoev",
+                        orcid: "0000-0000-1245-5678"
+                    }
                 ) {
                     contributorId
                 }

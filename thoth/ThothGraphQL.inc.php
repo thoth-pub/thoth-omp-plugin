@@ -55,7 +55,13 @@ class ThothGraphQL
             throw new ThothException($this->getReturnMessage($e), $e->getCode());
         }
 
-        return json_decode($response->getBody()->getContents(), true)['data'];
+        $responseBody = json_decode($response->getBody()->getContents(), true);
+
+        if ($error = $this->getResponseError($responseBody)) {
+            throw new ThothException($error, $response->getStatusCode());
+        }
+
+        return $responseBody['data'];
     }
 
     private function getReturnMessage($exception)
@@ -67,5 +73,16 @@ class ThothGraphQL
             $returnMessage = $error->message;
         }
         return $returnMessage;
+    }
+
+    private function getResponseError($responseBody)
+    {
+        if (!array_key_exists('errors', $responseBody)) {
+            return null;
+        }
+
+        $error = array_shift($responseBody['errors']);
+
+        return $error['message'];
     }
 }
