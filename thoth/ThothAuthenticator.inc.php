@@ -12,33 +12,37 @@
  * @brief Authenticate with Thoth API
  */
 
-use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\RequestException;
+
+import('plugins.generic.thoth.thoth.exceptions.ThothException');
 
 class ThothAuthenticator
 {
     private $httpClient;
 
-    private $thothAuthUrl;
+    private $endpoint;
 
-    private $json;
+    private $payload;
 
     public const THOTH_AUTH_ENDPOINT = 'account/login';
 
-    public function __construct($httpClient, $thothApiUrl, $email, $password)
+    public function __construct($thothEndpoint, $email, $password, $httpClient = null)
     {
-        $this->httpClient = $httpClient;
-        $this->thothAuthUrl = $thothApiUrl . self::THOTH_AUTH_ENDPOINT;
-        $this->json = ['email' => $email, 'password' => $password];
+        $this->httpClient = $httpClient ?? Application::get()->getHttpClient();
+        $this->endpoint = $thothEndpoint . self::THOTH_AUTH_ENDPOINT;
+        $this->payload = ['email' => $email, 'password' => $password];
     }
 
     public function getToken()
     {
         try {
-            $response = $this->httpClient->request('POST', $this->thothAuthUrl, ['json' => $this->json]);
-        } catch (ClientException $e) {
-            if ($e->getCode() == 401) {
-                throw new Exception('Invalid credentials', 401);
+            $response = $this->httpClient->post($this->endpoint, ['json' => $this->payload]);
+        } catch (RequestException $e) {
+            $returnMessage = $e->getMessage();
+            if ($e->hasResponse()) {
+                $returnMessage = $e->getResponse()->getBody()->getContents();
             }
+            throw new ThothException($returnMessage, $e->getCode());
         }
 
         return json_decode($response->getBody())->token;

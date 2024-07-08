@@ -16,6 +16,8 @@
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Exception\RequestException;
 
 import('lib.pkp.tests.PKPTestCase');
 import('plugins.generic.thoth.thoth.ThothAuthenticator');
@@ -30,13 +32,37 @@ class ThothAuthenticatorTest extends PKPTestCase
         $guzzleClient = new Client(['handler' => $mockHandler]);
 
         $authenticator = new ThothAuthenticator(
-            $guzzleClient,
             'https://api.thoth.test.pub',
             'johndoe@mailinator.com',
-            'secret123'
+            'secret123',
+            $guzzleClient
         );
         $token = $authenticator->getToken();
 
         $this->assertEquals('xxxxx.yyyyy.zzzzz', $token);
+    }
+
+    public function testGetTokenWithInvalidCredentials()
+    {
+        $this->expectException(ThothException::class);
+        $this->expectExceptionCode(401);
+        $this->expectExceptionMessage('Failed to send the request to Thoth: Invalid credentials');
+
+        $mockHandler = new MockHandler([
+            new RequestException(
+                'Invalid credentials',
+                new Request('POST', 'https://api.thoth.test.pub/account/login'),
+                new Response(401, [], 'Invalid credentials')
+            )
+        ]);
+        $guzzleClient = new Client(['handler' => $mockHandler]);
+
+        $authenticator = new ThothAuthenticator(
+            'https://api.thoth.test.pub',
+            'botuser@mailinator.com',
+            'wrong_password',
+            $guzzleClient
+        );
+        $token = $authenticator->getToken();
     }
 }

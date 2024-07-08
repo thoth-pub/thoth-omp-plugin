@@ -16,20 +16,27 @@ import('plugins.generic.thoth.thoth.ThothAuthenticator');
 
 class ThothClient
 {
-    private $httpClient;
-
     private $token;
 
-    public const THOTH_API_URL = 'https://api.thoth.pub';
+    private $endpoint;
 
-    public function __construct($httpClient = null)
+    public const THOTH_ENDPOINT = 'https://api.thoth.pub/';
+
+    public function __construct($endpoint = self::THOTH_ENDPOINT)
     {
-        $this->httpClient = $httpClient ?? Application::get()->getHttpClient();
+        $this->endpoint = $endpoint;
     }
 
     public function login($email, $password)
     {
-        $authenticator = new ThothAuthenticator($this->httpClient, self::THOTH_API_URL, $email, $password);
+        $authenticator = new ThothAuthenticator($this->endpoint, $email, $password);
         $this->token = $authenticator->getToken();
+    }
+
+    public function createContributor($contributor)
+    {
+        $mutation = new ThothMutation('createContributor', $contributor);
+        $graphQl = new ThothGraphQL($this->endpoint, $this->token);
+        return $mutation->run($graphQl);
     }
 }

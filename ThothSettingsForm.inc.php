@@ -84,19 +84,4 @@ class ThothSettingsForm extends Form
         $this->plugin->updateSetting($this->contextId, 'password', $encryptedPassword, 'string');
         parent::execute(...$functionArgs);
     }
-
-    public function validateAPICredentials(): bool
-    {
-        $email = trim($this->getData('email'));
-        $password = trim($this->getData('password'));
-
-        $thothClient = new ThothClient();
-
-        try {
-            $thothClient->login($email, $password);
-        } catch (Exception $e) {
-            return false;
-        }
-        return true;
-    }
 }
