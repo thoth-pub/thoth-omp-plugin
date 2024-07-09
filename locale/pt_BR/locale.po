@@ -4,8 +4,14 @@ msgstr "Plugin Thoth"
 msgid "plugins.generic.thoth.description"
 msgstr "Integra o OMP com o Thoth para comunicação e sincronização de dados de livros entre as duas plataformas."
 
-msgid "plugins.generic.thoth.settings.authentication"
-msgstr "Autenticação Thoth"
+msgid "plugins.generic.thoth.settings.apiUrl"
+msgstr "URL da API Thoth"
+
+msgid "plugins.generic.thoth.settings.apiUrl.placeholder"
+msgstr "https://api.thoth.pub/"
+
+msgid "plugins.generic.thoth.settings.imprintId"
+msgstr "ID da Marca"
 
 msgid "plugins.generic.thoth.settings.email"
 msgstr "Email"
