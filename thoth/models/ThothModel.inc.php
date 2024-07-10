@@ -20,6 +20,11 @@ abstract class ThothModel
 
     abstract public function getReturnValue();
 
+    public function getEnclosedValues()
+    {
+        return [];
+    }
+
     public function getData()
     {
         $reflector = new ReflectionClass($this);
