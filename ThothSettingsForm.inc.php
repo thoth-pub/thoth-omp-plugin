@@ -31,9 +31,9 @@ class ThothSettingsForm extends Form
         'password'
     ];
 
-    public function __construct($plugin, $journalId)
+    public function __construct($plugin, $contextId)
     {
-        $this->journalId = $journalId;
+        $this->contextId = $contextId;
         $this->plugin = $plugin;
 
         $template = APIKeyEncryption::secretConfigExists() ? 'settingsForm.tpl' : 'tokenError.tpl';
@@ -70,7 +70,7 @@ class ThothSettingsForm extends Form
         foreach (self::SETTINGS as $setting) {
             if ($setting == 'password') {
                 $password = $this->plugin->getSetting($this->contextId, $setting);
-                $this->_data[$setting] = APIKeyEncryption::decryptString($password);
+                $this->_data[$setting] = $password ? APIKeyEncryption::decryptString($password) : null;
                 continue;
             }
             $this->_data[$setting] = $this->plugin->getSetting($this->contextId, $setting);
