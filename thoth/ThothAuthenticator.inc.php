@@ -26,9 +26,9 @@ class ThothAuthenticator
 
     public const THOTH_AUTH_ENDPOINT = 'account/login';
 
-    public function __construct($thothEndpoint, $email, $password, $httpClient = null)
+    public function __construct($thothEndpoint, $httpClient, $email, $password)
     {
-        $this->httpClient = $httpClient ?? Application::get()->getHttpClient();
+        $this->httpClient = $httpClient;
         $this->endpoint = $thothEndpoint . self::THOTH_AUTH_ENDPOINT;
         $this->payload = ['email' => $email, 'password' => $password];
     }

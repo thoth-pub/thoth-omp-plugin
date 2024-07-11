@@ -33,9 +33,9 @@ class ThothAuthenticatorTest extends PKPTestCase
 
         $authenticator = new ThothAuthenticator(
             'https://api.thoth.test.pub',
+            $guzzleClient,
             'johndoe@mailinator.com',
-            'secret123',
-            $guzzleClient
+            'secret123'
         );
         $token = $authenticator->getToken();
 
@@ -59,9 +59,9 @@ class ThothAuthenticatorTest extends PKPTestCase
 
         $authenticator = new ThothAuthenticator(
             'https://api.thoth.test.pub',
+            $guzzleClient,
             'botuser@mailinator.com',
-            'wrong_password',
-            $guzzleClient
+            'wrong_password'
         );
         $token = $authenticator->getToken();
     }

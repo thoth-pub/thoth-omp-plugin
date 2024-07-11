@@ -14,7 +14,7 @@
  */
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Request;
@@ -27,11 +27,24 @@ class ThothClientTest extends PKPTestCase
 {
     public function testLoginWithInvalidCredentials()
     {
+        $mockHandler = new MockHandler([
+            new RequestException(
+                'Client error',
+                new Request('POST', 'https://api.thoth.test.pub/account/login'),
+                new Response(
+                    401,
+                    [],
+                    'Invalid credentials.'
+                )
+            )
+        ]);
+        $guzzleClient = new Client(['handler' => $mockHandler]);
+
         $this->expectException(ThothException::class);
         $this->expectExceptionCode(401);
-        $this->expectExceptionMessage('Invalid credentials');
+        $this->expectExceptionMessage('Failed to send the request to Thoth: Invalid credentials.');
 
-        $thothClient = new ThothClient();
+        $thothClient = new ThothClient('https://api.thoth.test.pub/', $guzzleClient);
         $thothClient->login('user72581@mailinator.com', 'uys9ag9s');
     }
 }
