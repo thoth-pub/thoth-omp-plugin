@@ -72,7 +72,7 @@ class Work extends ThothModel
             'license',
             'copyrightHolder',
             'landingPage',
-            'landingPage',
+            'longAbstract',
             'coverUrl',
         ];
     }
