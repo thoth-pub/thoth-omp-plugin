@@ -13,6 +13,8 @@
  */
 
 import('plugins.generic.thoth.thoth.ThothAuthenticator');
+import('plugins.generic.thoth.thoth.ThothMutation');
+import('plugins.generic.thoth.thoth.ThothGraphQL');
 
 class ThothClient
 {
@@ -36,10 +38,17 @@ class ThothClient
         $this->token = $authenticator->getToken();
     }
 
+    public function createWork($work)
+    {
+        $mutation = new ThothMutation('createWork', $work);
+        $graphql = new ThothGraphQL($this->endpoint, $this->httpClient, $this->token);
+        return $mutation->run($graphql);
+    }
+
     public function createContributor($contributor)
     {
         $mutation = new ThothMutation('createContributor', $contributor);
-        $graphQl = new ThothGraphQL($this->endpoint, $this->httpClient, $this->token);
-        return $mutation->run($graphQl);
+        $graphql = new ThothGraphQL($this->endpoint, $this->httpClient, $this->token);
+        return $mutation->run($graphql);
     }
 }
