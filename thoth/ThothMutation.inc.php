@@ -18,20 +18,27 @@ class ThothMutation
 
     private $data;
 
+    private $enclosedValues;
+
     private $returnValue;
 
     public function __construct($mutationName, $mutationObject)
     {
         $this->mutationName = $mutationName;
         $this->data = $mutationObject->getData();
+        $this->enclosedValues = $mutationObject->getEnclosedValues();
         $this->returnValue = $mutationObject->getReturnValue();
     }
 
     private function prepare()
     {
         $fields = [];
-        foreach ($this->data as $key => $value) {
-            $fields[] = sprintf('%s: %s', $key, json_encode($value));
+        foreach ($this->data as $attribute => $value) {
+            $fields[] = sprintf(
+                in_array($attribute, $this->enclosedValues) ? '%s: "%s"' : '%s: %s',
+                $attribute,
+                $value
+            );
         }
 
         $mutation = sprintf(
@@ -43,7 +50,7 @@ class ThothMutation
                 }
             }',
             $this->mutationName,
-            implode(',', $fields),
+            implode("\n", $fields),
             $this->returnValue
         );
 
