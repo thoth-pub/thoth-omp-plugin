@@ -24,3 +24,11 @@ msgstr "Invalid credentials"
 
 msgid "plugins.generic.thoth.settings.secretKeyEmpty"
 msgstr "Your site administrator must set a secret in the config file ('api_key_secret')."
+
+msgid "plugins.generic.thoth.settings.registerMetadata"
+msgstr "Submission metadata successfully sent to Thoth."
+
+msgid "plugins.generic.thoth.settings.registerMetadata.error"
+msgstr ""
+"There was a problem sending the submission metadata to Thoth. Please try again later, or "
+"contact your system administrator.

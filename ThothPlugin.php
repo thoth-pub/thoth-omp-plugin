@@ -23,6 +23,9 @@ class ThothPlugin extends GenericPlugin
         $success = parent::register($category, $path);
 
         if ($success && $this->getEnabled()) {
+            import('plugins.generic.thoth.classes.HookCallbacks');
+            $hookCallbacks = new HookCallbacks($this);
+            HookRegistry::register('Publication::publish', [$hookCallbacks, 'createWork']);
         }
 
         return $success;
