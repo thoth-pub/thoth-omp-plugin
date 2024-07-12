@@ -50,7 +50,7 @@ class ThothGraphQLTest extends PKPTestCase
             }
         ';
 
-        $thothGraphQL = new ThothGraphQL('https://api.thoth.test.pub/', 'secret_token', $httpClient);
+        $thothGraphQL = new ThothGraphQL('https://api.thoth.test.pub/', $httpClient, 'secret_token');
         $returnValue = $thothGraphQL->execute($query);
         $this->assertEquals(json_decode($body, true)['data'], $returnValue);
     }
@@ -91,7 +91,7 @@ class ThothGraphQLTest extends PKPTestCase
             }
         ';
 
-        $thothGraphQL = new ThothGraphQL('https://api.thoth.test.pub/', 'secret_token', $guzzleClient);
+        $thothGraphQL = new ThothGraphQL('https://api.thoth.test.pub/', $guzzleClient, 'secret_token');
         $returnValue = $thothGraphQL->execute($query);
     }
 
@@ -136,7 +136,7 @@ class ThothGraphQLTest extends PKPTestCase
             }
         ';
 
-        $thothGraphQL = new ThothGraphQL('https://api.thoth.test.pub/', 'secret_token', $guzzleClient);
+        $thothGraphQL = new ThothGraphQL('https://api.thoth.test.pub/', $guzzleClient, 'secret_token');
         $returnValue = $thothGraphQL->execute($query);
     }
 }

@@ -24,9 +24,16 @@ class ThothSettingsForm extends Form
 
     private $plugin;
 
-    public function __construct($plugin, $journalId)
+    private const SETTINGS = [
+        'apiUrl',
+        'imprintId',
+        'email',
+        'password'
+    ];
+
+    public function __construct($plugin, $contextId)
     {
-        $this->journalId = $journalId;
+        $this->contextId = $contextId;
         $this->plugin = $plugin;
 
         $template = APIKeyEncryption::secretConfigExists() ? 'settingsForm.tpl' : 'tokenError.tpl';
@@ -40,13 +47,14 @@ class ThothSettingsForm extends Form
             'plugins.generic.thoth.settings.invalidCredentials',
             function ($password) use ($form) {
                 $email = trim($this->getData('email'));
-                $thothClient = new ThothClient();
+                $apiUrl = trim($this->getData('apiUrl'));
+                $thothClient = $apiUrl ? new ThothClient($apiUrl) : new ThothClient();
                 try {
                     $thothClient->login(
                         $email,
                         $password
                     );
-                } catch (Exception $e) {
+                } catch (ThothException $e) {
                     return false;
                 }
                 return true;
@@ -59,15 +67,19 @@ class ThothSettingsForm extends Form
 
     public function initData()
     {
-        $this->_data = [
-            'email' => $this->plugin->getSetting($this->contextId, 'email'),
-            'password' => $this->plugin->getSetting($this->contextId, 'password')
-        ];
+        foreach (self::SETTINGS as $setting) {
+            if ($setting == 'password') {
+                $password = $this->plugin->getSetting($this->contextId, $setting);
+                $this->_data[$setting] = $password ? APIKeyEncryption::decryptString($password) : null;
+                continue;
+            }
+            $this->_data[$setting] = $this->plugin->getSetting($this->contextId, $setting);
+        }
     }
 
     public function readInputData()
     {
-        $this->readUserVars(['email', 'password']);
+        $this->readUserVars(self::SETTINGS);
     }
 
     public function fetch($request, $template = null, $display = false)
@@ -79,9 +91,14 @@ class ThothSettingsForm extends Form
 
     public function execute(...$functionArgs)
     {
-        $encryptedPassword = APIKeyEncryption::encryptString(trim($this->getData('password')));
-        $this->plugin->updateSetting($this->contextId, 'email', trim($this->getData('email')), 'string');
-        $this->plugin->updateSetting($this->contextId, 'password', $encryptedPassword, 'string');
+        foreach (self::SETTINGS as $setting) {
+            if ($setting == 'password') {
+                $encryptedPassword = APIKeyEncryption::encryptString(trim($this->getData($setting)));
+                $this->plugin->updateSetting($this->contextId, $setting, $encryptedPassword, 'string');
+                continue;
+            }
+            $this->plugin->updateSetting($this->contextId, $setting, trim($this->getData($setting)), 'string');
+        }
         parent::execute(...$functionArgs);
     }
 }

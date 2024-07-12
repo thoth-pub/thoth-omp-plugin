@@ -24,9 +24,9 @@ class ThothGraphQL
 
     public const THOTH_GRAPHQL_ENDPOINT = 'graphql';
 
-    public function __construct($thothEndpoint, $token = null, $httpClient = null)
+    public function __construct($thothEndpoint, $httpClient, $token = null)
     {
-        $this->httpClient = $httpClient ?? Application::get()->getHttpClient();
+        $this->httpClient = $httpClient;
         $this->endpoint = $thothEndpoint . self::THOTH_GRAPHQL_ENDPOINT;
         $this->token = $token;
     }

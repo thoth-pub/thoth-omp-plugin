@@ -4,8 +4,14 @@ msgstr "Plugin Thoth"
 msgid "plugins.generic.thoth.description"
 msgstr "Integra o OMP com o Thoth para comunicação e sincronização de dados de livros entre as duas plataformas."
 
-msgid "plugins.generic.thoth.settings.authentication"
-msgstr "Autenticação Thoth"
+msgid "plugins.generic.thoth.settings.apiUrl"
+msgstr "URL da API Thoth"
+
+msgid "plugins.generic.thoth.settings.apiUrl.placeholder"
+msgstr "https://api.thoth.pub/"
+
+msgid "plugins.generic.thoth.settings.imprintId"
+msgstr "ID da Marca"
 
 msgid "plugins.generic.thoth.settings.email"
 msgstr "Email"
@@ -18,3 +24,11 @@ msgstr "Credenciais inválidas"
 
 msgid "plugins.generic.thoth.settings.secretKeyEmpty"
 msgstr "O administrador do seu site deve definir um segredo no arquivo de configuração ('api_key_secret')."
+
+msgid "plugins.generic.thoth.settings.registerMetadata"
+msgstr "Metadados da submissão enviados para Thoth com sucesso."
+
+msgid "plugins.generic.thoth.settings.registerMetadata.error"
+msgstr ""
+"Houve um problema ao enviar os metadados da submissão para Thoth. Por favor tente mais "
+"tarde, ou contate o administrador do sistema."

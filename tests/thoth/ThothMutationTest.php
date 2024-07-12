@@ -44,7 +44,7 @@ class ThothMutationTest extends PKPTestCase
         $handlerStack = HandlerStack::create($mock);
         $httpClient = new Client(['handler' => $handlerStack]);
 
-        $graphQl = new ThothGraphQl('https://api.thoth.test.pub/', 'secret_token', $httpClient);
+        $graphQl = new ThothGraphQl('https://api.thoth.test.pub/', $httpClient, 'secret_token');
 
         $contributorId = $thothMutation->run($graphQl);
 

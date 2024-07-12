@@ -13,6 +13,8 @@
  */
 
 import('plugins.generic.thoth.thoth.ThothAuthenticator');
+import('plugins.generic.thoth.thoth.ThothMutation');
+import('plugins.generic.thoth.thoth.ThothGraphQL');
 
 class ThothClient
 {
@@ -20,23 +22,33 @@ class ThothClient
 
     private $endpoint;
 
+    private $httpClient;
+
     public const THOTH_ENDPOINT = 'https://api.thoth.pub/';
 
-    public function __construct($endpoint = self::THOTH_ENDPOINT)
+    public function __construct($endpoint = self::THOTH_ENDPOINT, $httpClient = null)
     {
         $this->endpoint = $endpoint;
+        $this->httpClient = $httpClient ?? Application::get()->getHttpClient();
     }
 
     public function login($email, $password)
     {
-        $authenticator = new ThothAuthenticator($this->endpoint, $email, $password);
+        $authenticator = new ThothAuthenticator($this->endpoint, $this->httpClient, $email, $password);
         $this->token = $authenticator->getToken();
+    }
+
+    public function createWork($work)
+    {
+        $mutation = new ThothMutation('createWork', $work);
+        $graphql = new ThothGraphQL($this->endpoint, $this->httpClient, $this->token);
+        return $mutation->run($graphql);
     }
 
     public function createContributor($contributor)
     {
         $mutation = new ThothMutation('createContributor', $contributor);
-        $graphQl = new ThothGraphQL($this->endpoint, $this->token);
-        return $mutation->run($graphQl);
+        $graphql = new ThothGraphQL($this->endpoint, $this->httpClient, $this->token);
+        return $mutation->run($graphql);
     }
 }
