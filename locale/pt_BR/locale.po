@@ -26,7 +26,7 @@ msgid "plugins.generic.thoth.settings.secretKeyEmpty"
 msgstr "O administrador do seu site deve definir um segredo no arquivo de configuração ('api_key_secret')."
 
 msgid "plugins.generic.thoth.settings.registerMetadata"
-msgstr "Metadados da submissão enviados com sucesso para Thoth."
+msgstr "Metadados da submissão enviados para Thoth com sucesso."
 
 msgid "plugins.generic.thoth.settings.registerMetadata.error"
 msgstr ""

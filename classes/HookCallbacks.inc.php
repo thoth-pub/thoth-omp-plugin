@@ -21,6 +21,17 @@ class HookCallbacks
         $this->plugin = $plugin;
     }
 
+    public function addWorkIdToSchema($hookName, $args)
+    {
+        $schema = & $args[0];
+        $schema->properties->{'thothWorkId'} = (object) [
+            'type' => 'string',
+            'apiSummary' => true,
+            'validation' => ['nullable'],
+        ];
+        return false;
+    }
+
     public function createWork($hookName, $args)
     {
         $publication = $args[0];
@@ -28,6 +39,10 @@ class HookCallbacks
         $request = Application::get()->getRequest();
         $context = $request->getContext();
         $dispatcher = $request->getDispatcher();
+
+        if ($submission->getData('thothWorkId')) {
+            return false;
+        }
 
         import('plugins.generic.thoth.thoth.models.Work');
         $work = new Work();
@@ -70,6 +85,7 @@ class HookCallbacks
         try {
             $thothClient->login($email, $password);
             $workId = $thothClient->createWork($work);
+            $submission = Services::get('submission')->edit($submission, ['thothWorkId' => $workId], $request);
 
             $this->notify(
                 $request,

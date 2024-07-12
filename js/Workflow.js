@@ -9,6 +9,7 @@
  *
  * @brief Show notifications when submission is published
  */
+
 (function () {
     if (typeof pkp === 'undefined' || typeof pkp.eventBus === 'undefined') {
         return;
