@@ -109,7 +109,7 @@ class WorkTest extends PKPTestCase
     public function testWorkTypeMapping()
     {
         $work = new Work();
-        $this->assertEquals(work::WORK_TYPE_EDITED_BOOK, $work->getSubmissionWorkType(WORK_TYPE_EDITED_VOLUME));
-        $this->assertEquals(work::WORK_TYPE_MONOGRAPH, $work->getSubmissionWorkType(WORK_TYPE_AUTHORED_WORK));
+        $this->assertEquals(Work::WORK_TYPE_EDITED_BOOK, $work->getSubmissionWorkType(WORK_TYPE_EDITED_VOLUME));
+        $this->assertEquals(Work::WORK_TYPE_MONOGRAPH, $work->getSubmissionWorkType(WORK_TYPE_AUTHORED_WORK));
     }
 }
