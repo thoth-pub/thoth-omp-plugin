@@ -34,7 +34,7 @@ abstract class ThothModel
 
         foreach ($properties as $property) {
             $property->setAccessible(true);
-            if (!$value = $property->getValue($this)) {
+            if (is_null($value = $property->getValue($this))) {
                 continue;
             }
             $attributes[$property->getName()] = $value;
