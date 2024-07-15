@@ -1,6 +1,6 @@
 # Thoth
 
-Integration of OMP and Thoth for communication and synchronization of book data between the two platforms.
+Work in Progress Integration of OMP and [Thoth](https://thoth.pub/) for communication and synchronization of book data between the two platforms.
 
 ## Compatibility
 
@@ -19,6 +19,8 @@ The OMP instance must have the `api_key_secret` configuration set up, you may co
 This is required to use the API credentials provided, that are stored encrypted in the OMP database.
 
 ## Credits
+
+This plugin was idealized and sponsored by [Thoth](https://thoth.pub/).
 
 Developed by [Lepidus Tecnologia](https://github.com/lepidus).
 
