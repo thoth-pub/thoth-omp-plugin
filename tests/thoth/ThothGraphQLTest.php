@@ -75,7 +75,9 @@ class ThothGraphQLTest extends PKPTestCase
 
         $this->expectException(ThothException::class);
         $this->expectExceptionCode(400);
-        $this->expectExceptionMessage('Failed to send the request to Thoth: Invalid value for argument "data", expected type "NewContributor!"');
+        $this->expectExceptionMessage(
+            'Failed to send the request to Thoth: Invalid value for argument "data", expected type "NewContributor!"'
+        );
 
         $query = '
             mutation {
