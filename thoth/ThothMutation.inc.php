@@ -18,7 +18,7 @@ class ThothMutation
 
     private $data;
 
-    private $enclosedValues;
+    private $enumeratedValues;
 
     private $returnValue;
 
@@ -26,7 +26,7 @@ class ThothMutation
     {
         $this->mutationName = $mutationName;
         $this->data = $mutationObject->getData();
-        $this->enclosedValues = $mutationObject->getEnclosedValues();
+        $this->enumeratedValues = $mutationObject->getEnumeratedValues();
         $this->returnValue = $mutationObject->getReturnValue();
     }
 
@@ -35,9 +35,9 @@ class ThothMutation
         $fields = [];
         foreach ($this->data as $attribute => $value) {
             $fields[] = sprintf(
-                in_array($attribute, $this->enclosedValues) ? '%s: "%s"' : '%s: %s',
+                '%s: %s',
                 $attribute,
-                $value
+                $this->sanitize($attribute, $value)
             );
         }
 
@@ -55,6 +55,11 @@ class ThothMutation
         );
 
         return $mutation;
+    }
+
+    private function sanitize($attribute, $value)
+    {
+        return in_array($attribute, $this->enumeratedValues) ? $value : json_encode($value);
     }
 
     public function run($graphQlClient)

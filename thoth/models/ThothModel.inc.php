@@ -20,7 +20,7 @@ abstract class ThothModel
 
     abstract public function getReturnValue();
 
-    public function getEnclosedValues()
+    public function getEnumeratedValues()
     {
         return [];
     }
@@ -34,7 +34,8 @@ abstract class ThothModel
 
         foreach ($properties as $property) {
             $property->setAccessible(true);
-            if (!$value = $property->getValue($this)) {
+            $value = $property->getValue($this);
+            if ($value === null || (is_string($value) && trim($value) === '')) {
                 continue;
             }
             $attributes[$property->getName()] = $value;

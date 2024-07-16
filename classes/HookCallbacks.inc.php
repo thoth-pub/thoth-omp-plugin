@@ -12,6 +12,12 @@
  * @brief Manage callback functions for the plugin hooks
  */
 
+import('plugins.generic.thoth.lib.APIKeyEncryption.APIKeyEncryption');
+import('plugins.generic.thoth.thoth.models.Contributor');
+import('plugins.generic.thoth.thoth.models.Contribution');
+import('plugins.generic.thoth.thoth.models.Work');
+import('plugins.generic.thoth.thoth.ThothClient');
+
 class HookCallbacks
 {
     private $plugin;
@@ -44,7 +50,6 @@ class HookCallbacks
             return false;
         }
 
-        import('plugins.generic.thoth.thoth.models.Work');
         $work = new Work();
 
         $submissionWorkType = $work->getSubmissionWorkType($submission->getData('workType'));
@@ -76,15 +81,43 @@ class HookCallbacks
         $email = $this->plugin->getSetting($context->getId(), 'email');
         $password = $this->plugin->getSetting($context->getId(), 'password');
 
-        import('plugins.generic.thoth.lib.APIKeyEncryption.APIKeyEncryption');
+        if (!$email || !$password) {
+            return false;
+        }
+
         $password = APIKeyEncryption::decryptString($password);
 
-        import('plugins.generic.thoth.thoth.ThothClient');
-        $thothClient = new ThothClient($thothEndpoint);
-
         try {
+            $thothClient = new ThothClient($thothEndpoint);
             $thothClient->login($email, $password);
             $workId = $thothClient->createWork($work);
+
+            foreach ($publication->getData('authors') as $order => $author) {
+                $contributor = new Contributor();
+                $contributor->setFirstName($author->getLocalizedGivenName());
+                $contributor->setLastName($author->getLocalizedFamilyName());
+                $contributor->setFullName($author->getFullName(false));
+                $contributor->setOrcid($author->getOrcid());
+                $contributor->setWebsite($author->getUrl());
+
+                $contributorId = $thothClient->createContributor($contributor);
+
+                $contribution = new Contribution();
+                $contributorType = $contribution->getContributionTypeByUserGroup($author->getUserGroup());
+                $mainContribution = $publication->getData('primaryContactId') == $author->getId();
+                $contribution->setWorkId($workId);
+                $contribution->setContributorId($contributorId);
+                $contribution->setContributionType($contributorType);
+                $contribution->setMainContribution($mainContribution);
+                $contribution->setContributionOrdinal($order + 1);
+                $contribution->setFirstName($author->getLocalizedGivenName());
+                $contribution->setLastName($author->getLocalizedFamilyName());
+                $contribution->setFullName($author->getFullName(false));
+                $contribution->setBiography($author->getLocalizedBiography());
+
+                $contributorId = $thothClient->createContribution($contribution);
+            }
+
             $submission = Services::get('submission')->edit($submission, ['thothWorkId' => $workId], $request);
 
             $this->notify(

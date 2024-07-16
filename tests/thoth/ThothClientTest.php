@@ -23,6 +23,7 @@ use GuzzleHttp\Psr7\Response;
 import('lib.pkp.tests.PKPTestCase');
 import('plugins.generic.thoth.thoth.models.Work');
 import('plugins.generic.thoth.thoth.models.Contributor');
+import('plugins.generic.thoth.thoth.models.Contribution');
 import('plugins.generic.thoth.thoth.ThothClient');
 
 class ThothClientTest extends PKPTestCase
@@ -99,5 +100,37 @@ class ThothClientTest extends PKPTestCase
         $contributorId = $client->createContributor($contributor);
 
         $this->assertEquals('454d55ec-6c4c-42b9-bbf9-fa08b70d7f1d', $contributorId);
+    }
+
+    public function testContributionCreation()
+    {
+        $contribution = new Contribution();
+        $contribution->setWorkId('e763a10c-1e2b-4b10-84c4-ac3f95236a97');
+        $contribution->setContributorId('e1de541c-e84b-4092-941f-dab9b5dac865');
+        $contribution->setContributionType(Contribution::CONTRIBUTION_TYPE_EDITOR);
+        $contribution->setMainContribution(false);
+        $contribution->setContributionOrdinal(1);
+        $contribution->setFirstName('Thomas');
+        $contribution->setLastName('Pringle');
+        $contribution->setFullName('Thomas Patrick Pringle');
+        $contribution->setBiography(
+            'Thomas Pringle is an SSHRC doctoral and presidential fellow at Brown University, ' .
+            'where he is a PhD candidate in the Department of Modern Culture and Media.'
+        );
+
+        $mock = new MockHandler([
+            new Response(
+                200,
+                [],
+                '{"data":{"createContribution":{"contributionId":"bd59feee-53bd-403d-a1a9-db01c0edf10b"}}}'
+            )
+        ]);
+        $handlerStack = HandlerStack::create($mock);
+        $httpClient = new Client(['handler' => $handlerStack]);
+
+        $client = new ThothClient('https://api.thoth.test.pub/', $httpClient);
+        $contributionId = $client->createContribution($contribution);
+
+        $this->assertEquals('bd59feee-53bd-403d-a1a9-db01c0edf10b', $contributionId);
     }
 }
