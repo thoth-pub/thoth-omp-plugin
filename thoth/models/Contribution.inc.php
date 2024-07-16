@@ -45,15 +45,10 @@ class Contribution extends ThothModel
         return 'contributionId';
     }
 
-    public function getEnclosedValues()
+    public function getEnumeratedValues()
     {
-        return parent::getEnclosedValues() + [
-            'workId',
-            'contributorId',
-            'firstName',
-            'lastName',
-            'fullName',
-            'biography'
+        return parent::getEnumeratedValues() + [
+            'contributionType'
         ];
     }
 

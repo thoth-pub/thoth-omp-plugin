@@ -33,17 +33,6 @@ class Contributor extends ThothModel
         return 'contributorId';
     }
 
-    public function getEnclosedValues()
-    {
-        return parent::getEnclosedValues() + [
-            'firstName',
-            'lastName',
-            'fullName',
-            'orcid',
-            'website',
-        ];
-    }
-
     public function getId()
     {
         return $this->contributorId;

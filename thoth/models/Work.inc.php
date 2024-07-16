@@ -60,20 +60,11 @@ class Work extends ThothModel
         return 'workId';
     }
 
-    public function getEnclosedValues()
+    public function getEnumeratedValues()
     {
-        return parent::getEnclosedValues() + [
-            'fullTitle',
-            'title',
-            'subtitle',
-            'imprintId',
-            'doi',
-            'publicationDate',
-            'license',
-            'copyrightHolder',
-            'landingPage',
-            'longAbstract',
-            'coverUrl',
+        return parent::getEnumeratedValues() + [
+            'workType',
+            'workStatus'
         ];
     }
 
