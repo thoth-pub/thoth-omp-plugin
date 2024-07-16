@@ -102,15 +102,13 @@ class HookCallbacks
 
                 $contributorId = $thothClient->createContributor($contributor);
 
-                $contributionType = ($submissionWorkType == Work::WORK_TYPE_MONOGRAPH) ?
-                    Contribution::CONTRIBUTION_TYPE_AUTHOR :
-                    Contribution::CONTRIBUTION_TYPE_EDITOR;
-
                 $contribution = new Contribution();
+                $contributorType = $contribution->getContributionTypeByUserGroup($author->getUserGroup());
+                $mainContribution = $publication->getData('primaryContactId') == $author->getId();
                 $contribution->setWorkId($workId);
                 $contribution->setContributorId($contributorId);
-                $contribution->setContributionType($contributionType);
-                $contribution->setMainContribution((bool) $author->getPrimaryContact());
+                $contribution->setContributionType($contributorType);
+                $contribution->setMainContribution($mainContribution);
                 $contribution->setContributionOrdinal($order + 1);
                 $contribution->setFirstName($author->getLocalizedGivenName());
                 $contribution->setLastName($author->getLocalizedFamilyName());
