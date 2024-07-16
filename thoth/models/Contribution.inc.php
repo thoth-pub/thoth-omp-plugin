@@ -40,6 +40,8 @@ class Contribution extends ThothModel
 
     public const CONTRIBUTION_TYPE_EDITOR = 'EDITOR';
 
+    public const CONTRIBUTION_TYPE_TRANSLATOR = 'TRANSLATOR';
+
     public function getReturnValue()
     {
         return 'contributionId';
@@ -150,5 +152,18 @@ class Contribution extends ThothModel
     public function setBiography($biography)
     {
         $this->biography = $biography;
+    }
+
+    public function getContributionTypeByUserGroup($userGroup)
+    {
+        $contributionTypeMapping = [
+            'default.groups.name.author' => self::CONTRIBUTION_TYPE_AUTHOR,
+            'default.groups.name.chapterAuthor' => self::CONTRIBUTION_TYPE_AUTHOR,
+            'default.groups.name.volumeEditor' => self::CONTRIBUTION_TYPE_EDITOR,
+            'default.groups.name.translator' => self::CONTRIBUTION_TYPE_TRANSLATOR,
+        ];
+
+        $userGroupLocaleKey = $userGroup->getData('nameLocaleKey');
+        return $contributionTypeMapping[$userGroupLocaleKey];
     }
 }

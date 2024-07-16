@@ -83,4 +83,31 @@ class ContributionTest extends PKPTestCase
                 'where he is a PhD candidate in the Department of Modern Culture and Media.'
         ], $contribution->getData());
     }
+
+    public function testGettingContributionTypeByUserGroup()
+    {
+        import('lib.pkp.classes.security.UserGroup');
+        $contribution = new Contribution();
+        $userGroup = new UserGroup();
+        $userGroup->setData('nameLocaleKey', 'default.groups.name.author');
+        $this->assertEquals(
+            Contribution::CONTRIBUTION_TYPE_AUTHOR,
+            $contribution->getContributionTypeByUserGroup($userGroup)
+        );
+        $userGroup->setData('nameLocaleKey', 'default.groups.name.chapterAuthor');
+        $this->assertEquals(
+            Contribution::CONTRIBUTION_TYPE_AUTHOR,
+            $contribution->getContributionTypeByUserGroup($userGroup)
+        );
+        $userGroup->setData('nameLocaleKey', 'default.groups.name.volumeEditor');
+        $this->assertEquals(
+            Contribution::CONTRIBUTION_TYPE_EDITOR,
+            $contribution->getContributionTypeByUserGroup($userGroup)
+        );
+        $userGroup->setData('nameLocaleKey', 'default.groups.name.translator');
+        $this->assertEquals(
+            Contribution::CONTRIBUTION_TYPE_TRANSLATOR,
+            $contribution->getContributionTypeByUserGroup($userGroup)
+        );
+    }
 }
