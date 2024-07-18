@@ -27,6 +27,11 @@ class ContributionServiceTest extends PKPTestCase
         $this->setUpMockEnvironment();
     }
 
+    protected function getMockedDAOs()
+    {
+        return ['UserGroupDAO', 'PublicationDAO'];
+    }
+
     private function setUpMockEnvironment()
     {
         $userGroupMockDao = $this->getMockBuilder(UserGroupDAO::class)
