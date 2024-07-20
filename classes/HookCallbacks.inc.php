@@ -12,11 +12,7 @@
  * @brief Manage callback functions for the plugin hooks
  */
 
-import('plugins.generic.thoth.lib.APIKeyEncryption.APIKeyEncryption');
-import('plugins.generic.thoth.thoth.models.Contributor');
-import('plugins.generic.thoth.thoth.models.Contribution');
-import('plugins.generic.thoth.thoth.models.Work');
-import('plugins.generic.thoth.thoth.ThothClient');
+import('plugins.generic.thoth.classes.services.ThothService');
 
 class HookCallbacks
 {
@@ -40,85 +36,18 @@ class HookCallbacks
 
     public function createWork($hookName, $args)
     {
-        $publication = $args[0];
-        $submission = $args[2];
         $request = Application::get()->getRequest();
         $context = $request->getContext();
-        $dispatcher = $request->getDispatcher();
+        $submission = $args[2];
 
         if ($submission->getData('thothWorkId')) {
             return false;
         }
 
-        $work = new Work();
-
-        $submissionWorkType = $work->getSubmissionWorkType($submission->getData('workType'));
-        $urlPublished = $dispatcher->url(
-            $request,
-            ROUTE_PAGE,
-            $context->getPath(),
-            'catalog',
-            'book',
-            $submission->getBestId()
-        );
-
-        $work->setWorkType($submissionWorkType);
-        $work->setWorkStatus(Work::WORK_STATUS_ACTIVE);
-        $work->setFullTitle($submission->getLocalizedFullTitle());
-        $work->setTitle($submission->getLocalizedTitle());
-        $work->setSubtitle($submission->getLocalizedData('subtitle'));
-        $work->setEdition($publication->getData('version'));
-        $work->setImprintId($this->plugin->getSetting($context->getId(), 'imprintId'));
-        $work->setDoi($publication->getStoredPubId('doi'));
-        $work->setPublicationDate($publication->getData('datePublished'));
-        $work->setLicense($context->getData('licenseUrl'));
-        $work->setCopyrightHolder($publication->getLocalizedData('copyrightHolder'));
-        $work->setLandingPage($urlPublished);
-        $work->setLongAbstract(strip_tags($publication->getLocalizedData('abstract')));
-        $work->setCoverUrl($publication->getLocalizedCoverImageUrl($context->getId()));
-
-        $thothEndpoint = $this->plugin->getSetting($context->getId(), 'apiUrl');
-        $email = $this->plugin->getSetting($context->getId(), 'email');
-        $password = $this->plugin->getSetting($context->getId(), 'password');
-
-        if (!$email || !$password) {
-            return false;
-        }
-
-        $password = APIKeyEncryption::decryptString($password);
-
         try {
-            $thothClient = new ThothClient($thothEndpoint);
-            $thothClient->login($email, $password);
-            $workId = $thothClient->createWork($work);
-
-            foreach ($publication->getData('authors') as $order => $author) {
-                $contributor = new Contributor();
-                $contributor->setFirstName($author->getLocalizedGivenName());
-                $contributor->setLastName($author->getLocalizedFamilyName());
-                $contributor->setFullName($author->getFullName(false));
-                $contributor->setOrcid($author->getOrcid());
-                $contributor->setWebsite($author->getUrl());
-
-                $contributorId = $thothClient->createContributor($contributor);
-
-                $contribution = new Contribution();
-                $contributorType = $contribution->getContributionTypeByUserGroup($author->getUserGroup());
-                $mainContribution = $publication->getData('primaryContactId') == $author->getId();
-                $contribution->setWorkId($workId);
-                $contribution->setContributorId($contributorId);
-                $contribution->setContributionType($contributorType);
-                $contribution->setMainContribution($mainContribution);
-                $contribution->setContributionOrdinal($order + 1);
-                $contribution->setFirstName($author->getLocalizedGivenName());
-                $contribution->setLastName($author->getLocalizedFamilyName());
-                $contribution->setFullName($author->getFullName(false));
-                $contribution->setBiography($author->getLocalizedBiography());
-
-                $contributorId = $thothClient->createContribution($contribution);
-            }
-
-            $submission = Services::get('submission')->edit($submission, ['thothWorkId' => $workId], $request);
+            $thothService = new ThothService($this->plugin, $context->getId());
+            $book = $thothService->registerBook($submission);
+            $submission = Services::get('submission')->edit($submission, ['thothWorkId' => $book->getId()], $request);
 
             $this->notify(
                 $request,
