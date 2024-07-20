@@ -17,6 +17,6 @@
  * @ingroup plugins_generic_thoth
  */
 
-require_once('ThothPlugin.php');
+require_once('ThothPlugin.inc.php');
 
 return new ThothPlugin();
