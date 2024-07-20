@@ -35,6 +35,11 @@ class WorkServiceTest extends PKPTestCase
         parent::tearDown();
     }
 
+    protected function getMockedRegistryKeys()
+    {
+        return ['application', 'request'];
+    }
+
     private function setUpMockEnvironment()
     {
         $press = new Press();
@@ -70,8 +75,6 @@ class WorkServiceTest extends PKPTestCase
             ->method('getBaseUrl')
             ->will($this->returnValue('https://omp.publicknowledgeproject.org'));
         Registry::set('request', $mockRequest);
-
-        return $mockRequest;
     }
 
     public function testGetWorkTypeBySubmissionWorkType()
@@ -155,9 +158,9 @@ class WorkServiceTest extends PKPTestCase
         $submission->setData('currentPublicationId', 4);
         $submission->setData('publications', [$publication]);
 
-        $request = $this->setUpMockEnvironment();
+        $this->setUpMockEnvironment();
 
-        $workProps = $this->workService->getPropertiesBySubmission($submission, $request);
+        $workProps = $this->workService->getPropertiesBySubmission($submission);
         $this->assertEquals($expectedProps, $workProps);
     }
 

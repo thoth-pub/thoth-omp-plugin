@@ -16,8 +16,9 @@ import('plugins.generic.thoth.thoth.models.Work');
 
 class WorkService
 {
-    public function getPropertiesBySubmission($submission, $request)
+    public function getPropertiesBySubmission($submission)
     {
+        $request = Application::get()->getRequest();
         $dispatcher = $request->getDispatcher();
         $context = $request->getContext();
         $publication = $submission->getCurrentPublication();
