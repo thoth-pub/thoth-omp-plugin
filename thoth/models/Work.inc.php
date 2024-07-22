@@ -227,14 +227,4 @@ class Work extends ThothModel
     {
         $this->coverUrl = $coverUrl;
     }
-
-    public function getSubmissionWorkType($submissionWorkType)
-    {
-        $workTypeMapping = [
-            WORK_TYPE_EDITED_VOLUME => self::WORK_TYPE_EDITED_BOOK,
-            WORK_TYPE_AUTHORED_WORK => self::WORK_TYPE_MONOGRAPH
-        ];
-
-        return $workTypeMapping[$submissionWorkType];
-    }
 }

@@ -1,7 +1,8 @@
 variables:
     PLUGIN_NAME : 'thoth'
+    GIT_SUBMODULE_STRATEGY: recursive
 
-include: 
+include:
   - project: 'documentacao-e-tarefas/modelosparaintegracaocontinua'
     ref: stable-3_3_0
     file:
