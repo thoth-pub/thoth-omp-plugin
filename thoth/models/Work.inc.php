@@ -12,7 +12,6 @@
  * @brief Class for a Thoth work.
  */
 
-import('classes.submission.Submission');
 import('plugins.generic.thoth.thoth.models.ThothModel');
 
 class Work extends ThothModel
@@ -52,6 +51,8 @@ class Work extends ThothModel
     public const WORK_TYPE_MONOGRAPH = 'MONOGRAPH';
 
     public const WORK_TYPE_EDITED_BOOK = 'EDITED_BOOK';
+
+    public const WORK_TYPE_BOOK_CHAPTER = 'BOOK_CHAPTER';
 
     public const WORK_STATUS_ACTIVE = 'ACTIVE';
 

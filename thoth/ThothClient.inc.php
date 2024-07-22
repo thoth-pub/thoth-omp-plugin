@@ -58,4 +58,11 @@ class ThothClient
         $graphql = new ThothGraphQL($this->endpoint, $this->httpClient, $this->token);
         return $mutation->run($graphql);
     }
+
+    public function createWorkRelation($workRelation)
+    {
+        $mutation = new ThothMutation('createWorkRelation', $workRelation);
+        $graphql = new ThothGraphQL($this->endpoint, $this->httpClient, $this->token);
+        return $mutation->run($graphql);
+    }
 }

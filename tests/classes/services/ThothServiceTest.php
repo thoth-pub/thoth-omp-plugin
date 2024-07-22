@@ -22,9 +22,10 @@ import('lib.pkp.classes.core.PKPRequest');
 import('lib.pkp.classes.core.PKPRouter');
 import('lib.pkp.tests.PKPTestCase');
 import('plugins.generic.thoth.classes.services.ThothService');
-import('plugins.generic.thoth.thoth.models.Work');
-import('plugins.generic.thoth.thoth.models.Contributor');
 import('plugins.generic.thoth.thoth.models.Contribution');
+import('plugins.generic.thoth.thoth.models.Contributor');
+import('plugins.generic.thoth.thoth.models.Work');
+import('plugins.generic.thoth.thoth.models.WorkRelation');
 import('plugins.generic.thoth.thoth.ThothClient');
 import('plugins.generic.thoth.ThothPlugin');
 
@@ -109,17 +110,20 @@ class ThothServiceTest extends PKPTestCase
             ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['createWork', 'createContributor', 'createContribution'])
+            ->setMethods(['createWork', 'createContributor', 'createContribution', 'createWorkRelation'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('createWork')
-            ->will($this->returnValue('74fde3e2-ca4e-4597-bb0c-aee90648f5a5'));
+            ->will($this->onConsecutiveCalls('74fde3e2-ca4e-4597-bb0c-aee90648f5a5'));
         $mockThothClient->expects($this->any())
             ->method('createContributor')
             ->will($this->returnValue('f70f709e-2137-4c87-a2e5-d52b263759ec'));
         $mockThothClient->expects($this->any())
             ->method('createContribution')
             ->will($this->returnValue('67afac83-b015-4f32-9576-60b665a9e685'));
+        $mockThothClient->expects($this->any())
+            ->method('createWorkRelation')
+            ->will($this->returnValue('3e587b61-58f1-4064-bf80-e40e5c924d27'));
 
         $thothService = $this->getMockBuilder(ThothService::class)
             ->setMethods(['getThothClient'])
@@ -206,5 +210,41 @@ class ThothServiceTest extends PKPTestCase
 
         $contribution = $this->thothService->registerContribution($author, '45a6622c-a306-4559-bb77-25367dc881b8');
         $this->assertEquals($expectedContribution, $contribution);
+    }
+
+    public function testRegisterChapter()
+    {
+        $expectedChapter = new Work();
+        $expectedChapter->setId('74fde3e2-ca4e-4597-bb0c-aee90648f5a5');
+        $expectedChapter->setImprintId('f02786d4-3bcc-473e-8d43-3da66c7e877c');
+        $expectedChapter->setWorkType(Work::WORK_TYPE_BOOK_CHAPTER);
+        $expectedChapter->setWorkStatus(Work::WORK_STATUS_ACTIVE);
+        $expectedChapter->setFullTitle('Chapter 2: Classical Music and the Classical Mind');
+        $expectedChapter->setTitle('Chapter 2: Classical Music and the Classical Mind');
+
+        $chapter = DAORegistry::getDAO('ChapterDAO')->newDataObject();
+        $chapter->setTitle('Chapter 2: Classical Music and the Classical Mind');
+
+        $chapter = $this->thothService->registerChapter($chapter);
+        $this->assertEquals($expectedChapter, $chapter);
+    }
+
+    public function testRegisterRelation()
+    {
+        $relatedWorkId = '7d861db5-22f6-4ef8-abbb-b56ab8397624';
+
+        $expectedRelation = new WorkRelation();
+        $expectedRelation->setId('3e587b61-58f1-4064-bf80-e40e5c924d27');
+        $expectedRelation->setRelatorWorkId('74fde3e2-ca4e-4597-bb0c-aee90648f5a5');
+        $expectedRelation->setRelatedWorkId($relatedWorkId);
+        $expectedRelation->setRelationType(WorkRelation::RELATION_TYPE_IS_CHILD_OF);
+        $expectedRelation->setRelationOrdinal(5);
+
+        $chapter = DAORegistry::getDAO('ChapterDAO')->newDataObject();
+        $chapter->setTitle('Epilogue');
+        $chapter->setSequence(4);
+
+        $relation = $this->thothService->registerRelation($chapter, $relatedWorkId);
+        $this->assertEquals($expectedRelation, $relation);
     }
 }
