@@ -53,6 +53,8 @@ class Work extends ThothModel
 
     public const WORK_TYPE_EDITED_BOOK = 'EDITED_BOOK';
 
+    public const WORK_TYPE_BOOK_CHAPTER = 'BOOK_CHAPTER';
+
     public const WORK_STATUS_ACTIVE = 'ACTIVE';
 
     public function getReturnValue()

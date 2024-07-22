@@ -48,6 +48,22 @@ class WorkService
         return $props;
     }
 
+    public function getPropertiesByChapter($chapter)
+    {
+        $props = [];
+        $props['workType'] = Work::WORK_TYPE_BOOK_CHAPTER;
+        $props['workStatus'] = Work::WORK_STATUS_ACTIVE;
+        $props['fullTitle'] = $chapter->getLocalizedFullTitle();
+        $props['title'] = $chapter->getLocalizedTitle();
+        $props['subtitle'] = $chapter->getLocalizedData('subtitle');
+        $props['longAbstract'] = $chapter->getLocalizedData('abstract');
+        $props['pageCount'] = $chapter->getPages();
+        $props['publicationDate'] = $chapter->getDatePublished();
+        $props['doi'] = $chapter->getStoredPubId('doi');
+
+        return $props;
+    }
+
     public function new($params)
     {
         $work = new Work();

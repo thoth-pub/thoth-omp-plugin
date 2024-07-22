@@ -164,6 +164,30 @@ class WorkServiceTest extends PKPTestCase
         $this->assertEquals($expectedProps, $workProps);
     }
 
+    public function testGetWorkPropsByChapter()
+    {
+        $expectedProps = [
+            'workType' => Work::WORK_TYPE_BOOK_CHAPTER,
+            'workStatus' => Work::WORK_STATUS_ACTIVE,
+            'fullTitle' => 'Chapter 1: Interactions Affording Distance Science Education',
+            'title' => 'Chapter 1: Interactions Affording Distance Science Education',
+            'subtitle' => null,
+            'longAbstract' => null,
+            'publicationDate' => '2024-03-21',
+            'pageCount' => '27',
+            'doi' => 'https://doi.org/10.1234/jpk.14.c54'
+        ];
+
+        $chapter = DAORegistry::getDAO('ChapterDAO')->newDataObject();
+        $chapter->setTitle('Chapter 1: Interactions Affording Distance Science Education', 'en_US');
+        $chapter->setDatePublished('2024-03-21');
+        $chapter->setPages(27);
+        $chapter->setStoredPubId('doi', 'https://doi.org/10.1234/jpk.14.c54');
+
+        $workProps = $this->workService->getPropertiesByChapter($chapter);
+        $this->assertEquals($expectedProps, $workProps);
+    }
+
     public function testCreateNewWork()
     {
         $expectedWork = new Work();
