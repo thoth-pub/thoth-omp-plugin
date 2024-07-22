@@ -12,7 +12,6 @@
  * @brief Class for a Thoth work.
  */
 
-import('classes.submission.Submission');
 import('plugins.generic.thoth.thoth.models.ThothModel');
 
 class Work extends ThothModel
