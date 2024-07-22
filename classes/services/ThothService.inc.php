@@ -17,6 +17,7 @@ import('plugins.generic.thoth.classes.services.ContributorService');
 import('plugins.generic.thoth.classes.services.ContributionService');
 import('plugins.generic.thoth.lib.APIKeyEncryption.APIKeyEncryption');
 import('plugins.generic.thoth.thoth.ThothClient');
+import('plugins.generic.thoth.thoth.models.WorkRelation');
 
 class ThothService
 {
@@ -59,9 +60,17 @@ class ThothService
         $bookId = $this->getThothClient()->createWork($book);
         $book->setId($bookId);
 
-        $authors = DAORegistry::getDAO('AuthorDAO')->getByPublicationId($submission->getData('currentPublicationId'));
+        $authors = DAORegistry::getDAO('AuthorDAO')
+            ->getByPublicationId($submission->getData('currentPublicationId'));
         foreach ($authors as $author) {
             $this->registerContribution($author, $bookId);
+        }
+
+        $chapters = DAORegistry::getDAO('ChapterDAO')
+            ->getByPublicationId($submission->getData('currentPublicationId'))
+            ->toArray();
+        foreach ($chapters as $chapter) {
+            $this->registerRelation($chapter, $bookId);
         }
 
         return $book;
@@ -108,6 +117,27 @@ class ThothService
         $chapterId = $this->getThothClient()->createWork($thothChapter);
         $thothChapter->setId($chapterId);
 
+        $authors = $chapter->getAuthors()->toArray();
+        foreach ($authors as $author) {
+            $this->registerContribution($author, $chapterId);
+        }
+
         return $thothChapter;
+    }
+
+    public function registerRelation($chapter, $relatedWorkId)
+    {
+        $thothChapter = $this->registerChapter($chapter);
+
+        $relation = new WorkRelation();
+        $relation->setRelatorWorkId($thothChapter->getId());
+        $relation->setRelatedWorkId($relatedWorkId);
+        $relation->setRelationType(WorkRelation::RELATION_TYPE_IS_CHILD_OF);
+        $relation->setRelationOrdinal($chapter->getSequence() + 1);
+
+        $relationId = $this->getThothClient()->createWorkRelation($relation);
+        $relation->setId($relationId);
+
+        return $relation;
     }
 }

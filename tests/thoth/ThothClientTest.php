@@ -21,9 +21,10 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 
 import('lib.pkp.tests.PKPTestCase');
-import('plugins.generic.thoth.thoth.models.Work');
-import('plugins.generic.thoth.thoth.models.Contributor');
 import('plugins.generic.thoth.thoth.models.Contribution');
+import('plugins.generic.thoth.thoth.models.Contributor');
+import('plugins.generic.thoth.thoth.models.Work');
+import('plugins.generic.thoth.thoth.models.WorkRelation');
 import('plugins.generic.thoth.thoth.ThothClient');
 
 class ThothClientTest extends PKPTestCase
@@ -132,5 +133,30 @@ class ThothClientTest extends PKPTestCase
         $contributionId = $client->createContribution($contribution);
 
         $this->assertEquals('bd59feee-53bd-403d-a1a9-db01c0edf10b', $contributionId);
+    }
+
+    public function testRelationCreation()
+    {
+        $workRelation = new WorkRelation();
+        $workRelation->setId('3e587b61-58f1-4064-bf80-e40e5c924d27');
+        $workRelation->setRelatorWorkId('991f1070-67fa-4e6e-8519-114006043492');
+        $workRelation->setRelatedWorkId('7d861db5-22f6-4ef8-abbb-b56ab8397624');
+        $workRelation->setRelationType(WorkRelation::RELATION_TYPE_IS_CHILD_OF);
+        $workRelation->setRelationOrdinal(1);
+
+        $mock = new MockHandler([
+            new Response(
+                200,
+                [],
+                '{"data":{"createWorkRelation":{"workRelationId":"07253e79-e02f-4350-b4b5-e5fd27866ee2"}}}'
+            )
+        ]);
+        $handlerStack = HandlerStack::create($mock);
+        $httpClient = new Client(['handler' => $handlerStack]);
+
+        $client = new ThothClient('https://api.thoth.test.pub/', $httpClient);
+        $workRelationId = $client->createWorkRelation($workRelation);
+
+        $this->assertEquals('07253e79-e02f-4350-b4b5-e5fd27866ee2', $workRelationId);
     }
 }

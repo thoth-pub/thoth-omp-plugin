@@ -47,6 +47,10 @@ class ContributionService
 
     private function isMainContribution($author)
     {
+        if ($author instanceof ChapterAuthor) {
+            return (bool) $author->getPrimaryContact();
+        }
+
         $publication = Services::get('publication')->get($author->getData('publicationId'));
         return $publication->getData('primaryContactId') == $author->getId();
     }
