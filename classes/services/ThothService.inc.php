@@ -96,4 +96,18 @@ class ThothService
 
         return $contribution;
     }
+
+    public function registerChapter($chapter)
+    {
+        $workService = new WorkService();
+        $thothChapterProps = $workService->getPropertiesByChapter($chapter);
+
+        $thothChapter = $workService->new($thothChapterProps);
+        $thothChapter->setImprintId($this->plugin->getSetting($this->contextId, 'imprintId'));
+
+        $chapterId = $this->getThothClient()->createWork($thothChapter);
+        $thothChapter->setId($chapterId);
+
+        return $thothChapter;
+    }
 }

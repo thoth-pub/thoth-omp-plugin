@@ -113,7 +113,7 @@ class ThothServiceTest extends PKPTestCase
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('createWork')
-            ->will($this->returnValue('74fde3e2-ca4e-4597-bb0c-aee90648f5a5'));
+            ->will($this->onConsecutiveCalls('74fde3e2-ca4e-4597-bb0c-aee90648f5a5'));
         $mockThothClient->expects($this->any())
             ->method('createContributor')
             ->will($this->returnValue('f70f709e-2137-4c87-a2e5-d52b263759ec'));
@@ -206,5 +206,22 @@ class ThothServiceTest extends PKPTestCase
 
         $contribution = $this->thothService->registerContribution($author, '45a6622c-a306-4559-bb77-25367dc881b8');
         $this->assertEquals($expectedContribution, $contribution);
+    }
+
+    public function testRegisterChapter()
+    {
+        $expectedChapter = new Work();
+        $expectedChapter->setId('74fde3e2-ca4e-4597-bb0c-aee90648f5a5');
+        $expectedChapter->setImprintId('f02786d4-3bcc-473e-8d43-3da66c7e877c');
+        $expectedChapter->setWorkType(Work::WORK_TYPE_BOOK_CHAPTER);
+        $expectedChapter->setWorkStatus(Work::WORK_STATUS_ACTIVE);
+        $expectedChapter->setFullTitle('Chapter 2: Classical Music and the Classical Mind');
+        $expectedChapter->setTitle('Chapter 2: Classical Music and the Classical Mind');
+
+        $chapter = DAORegistry::getDAO('ChapterDAO')->newDataObject();
+        $chapter->setTitle('Chapter 2: Classical Music and the Classical Mind');
+
+        $chapter = $this->thothService->registerChapter($chapter);
+        $this->assertEquals($expectedChapter, $chapter);
     }
 }
