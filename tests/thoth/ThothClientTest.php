@@ -159,4 +159,27 @@ class ThothClientTest extends PKPTestCase
 
         $this->assertEquals('07253e79-e02f-4350-b4b5-e5fd27866ee2', $workRelationId);
     }
+
+    public function testPublicationCreation()
+    {
+        $publication = new ThothPublication();
+        $publication->setWorkId('991f1070-67fa-4e6e-8519-114006043492');
+        $publication->setPublicationType(ThothPublication::PUBLICATION_TYPE_EPUB);
+        $publication->setIsbn('978-1-78374-032-1');
+
+        $mock = new MockHandler([
+            new Response(
+                200,
+                [],
+                '{"data":{"createPublication":{"publicationId":"4f51514b-5d45-42fc-a757-185cd5cee7b1"}}}'
+            )
+        ]);
+        $handlerStack = HandlerStack::create($mock);
+        $httpClient = new Client(['handler' => $handlerStack]);
+
+        $client = new ThothClient('https://api.thoth.test.pub/', $httpClient);
+        $publicationId = $client->createPublication($publication);
+
+        $this->assertEquals('4f51514b-5d45-42fc-a757-185cd5cee7b1', $publicationId);
+    }
 }

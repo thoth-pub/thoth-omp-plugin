@@ -15,6 +15,7 @@
 import('plugins.generic.thoth.classes.services.WorkService');
 import('plugins.generic.thoth.classes.services.ContributorService');
 import('plugins.generic.thoth.classes.services.ContributionService');
+import('plugins.generic.thoth.classes.services.ThothPublicationService');
 import('plugins.generic.thoth.lib.APIKeyEncryption.APIKeyEncryption');
 import('plugins.generic.thoth.thoth.ThothClient');
 import('plugins.generic.thoth.thoth.models.WorkRelation');
@@ -71,6 +72,13 @@ class ThothService
             ->toArray();
         foreach ($chapters as $chapter) {
             $this->registerRelation($chapter, $bookId);
+        }
+
+        $publicationFormats = Application::getRepresentationDao()
+            ->getByPublicationId($submission->getData('currentPublicationId'))
+            ->toArray();
+        foreach ($publicationFormats as $publicationFormat) {
+            $this->registerPublication($publicationFormat, $bookId);
         }
 
         return $book;
@@ -139,5 +147,19 @@ class ThothService
         $relation->setId($relationId);
 
         return $relation;
+    }
+
+    public function registerPublication($publicationFormat, $workId)
+    {
+        $publicationService = new ThothPublicationService();
+        $publicationProps = $publicationService->getPropertiesByPublicationFormat($publicationFormat);
+
+        $publication = $publicationService->new($publicationProps);
+        $publication->setWorkId($workId);
+
+        $publicationId = $this->getThothClient()->createPublication($publication);
+        $publication->setId($publicationId);
+
+        return $publication;
     }
 }

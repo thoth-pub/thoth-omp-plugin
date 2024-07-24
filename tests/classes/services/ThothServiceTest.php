@@ -110,11 +110,17 @@ class ThothServiceTest extends PKPTestCase
             ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['createWork', 'createContributor', 'createContribution', 'createWorkRelation'])
+            ->setMethods([
+                'createWork',
+                'createContributor',
+                'createContribution',
+                'createWorkRelation',
+                'createPublication'
+            ])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('createWork')
-            ->will($this->onConsecutiveCalls('74fde3e2-ca4e-4597-bb0c-aee90648f5a5'));
+            ->will($this->returnValue('74fde3e2-ca4e-4597-bb0c-aee90648f5a5'));
         $mockThothClient->expects($this->any())
             ->method('createContributor')
             ->will($this->returnValue('f70f709e-2137-4c87-a2e5-d52b263759ec'));
@@ -124,6 +130,9 @@ class ThothServiceTest extends PKPTestCase
         $mockThothClient->expects($this->any())
             ->method('createWorkRelation')
             ->will($this->returnValue('3e587b61-58f1-4064-bf80-e40e5c924d27'));
+        $mockThothClient->expects($this->any())
+            ->method('createPublication')
+            ->will($this->returnValue('80359118-9b33-4cf4-a4b4-8784e6d4375a'));
 
         $thothService = $this->getMockBuilder(ThothService::class)
             ->setMethods(['getThothClient'])
@@ -246,5 +255,40 @@ class ThothServiceTest extends PKPTestCase
 
         $relation = $this->thothService->registerRelation($chapter, $relatedWorkId);
         $this->assertEquals($expectedRelation, $relation);
+    }
+
+    public function testRegisterPublication()
+    {
+        $workId = '2a065323-76cd-4f54-b83b-19f2a925f426';
+
+        $expectedPublication = new ThothPublication();
+        $expectedPublication->setId('80359118-9b33-4cf4-a4b4-8784e6d4375a');
+        $expectedPublication->setWorkId($workId);
+        $expectedPublication->setPublicationType(ThothPublication::PUBLICATION_TYPE_HTML);
+        $expectedPublication->setIsbn('978-1-912656-00-4');
+
+        $identificationCode = DAORegistry::getDAO('IdentificationCodeDAO')->newDataObject();
+        $identificationCode->setCode('15');
+        $identificationCode->setValue('978-1-912656-00-4');
+
+        $mockResult = $this->getMockBuilder(DAOResultFactory::class)
+            ->setMethods(['toArray'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $mockResult->expects($this->any())
+            ->method('toArray')
+            ->will($this->returnValue([$identificationCode]));
+
+        $publicationFormat = $mockRequest = $this->getMockBuilder(PublicationFormat::class)
+            ->setMethods(['getIdentificationCodes'])
+            ->getMock();
+        $publicationFormat->expects($this->any())
+            ->method('getIdentificationCodes')
+            ->will($this->returnValue($mockResult));
+        $publicationFormat->setEntryKey('DA');
+        $publicationFormat->setName('HTML', 'en_US');
+
+        $publication = $this->thothService->registerPublication($publicationFormat, $workId);
+        $this->assertEquals($expectedPublication, $publication);
     }
 }
