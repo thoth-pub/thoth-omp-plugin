@@ -15,6 +15,8 @@
 import('plugins.generic.thoth.classes.services.WorkService');
 import('plugins.generic.thoth.classes.services.ContributorService');
 import('plugins.generic.thoth.classes.services.ContributionService');
+import('plugins.generic.thoth.classes.services.ThothPublicationService');
+import('plugins.generic.thoth.classes.services.ThothLocationService');
 import('plugins.generic.thoth.lib.APIKeyEncryption.APIKeyEncryption');
 import('plugins.generic.thoth.thoth.ThothClient');
 import('plugins.generic.thoth.thoth.models.WorkRelation');
@@ -73,6 +75,15 @@ class ThothService
             $this->registerRelation($chapter, $bookId);
         }
 
+        $publicationFormats = Application::getRepresentationDao()
+            ->getApprovedByPublicationId($submission->getData('currentPublicationId'))
+            ->toArray();
+        foreach ($publicationFormats as $publicationFormat) {
+            if ($publicationFormat->getIsAvailable()) {
+                $this->registerPublication($publicationFormat, $bookId);
+            }
+        }
+
         return $book;
     }
 
@@ -122,6 +133,24 @@ class ThothService
             $this->registerContribution($author, $chapterId);
         }
 
+        $publication = Services::get('publication')->get($chapter->getData('publicationId'));
+        $files = array_filter(
+            iterator_to_array(Services::get('submissionFile')->getMany([
+                'assocTypes' => [ASSOC_TYPE_PUBLICATION_FORMAT],
+                'submissionIds' => [$publication->getData('submissionId')],
+            ])),
+            function ($a) use ($chapter) {
+                return $a->getData('chapterId') == $chapter->getId();
+            }
+        );
+        $publicationFormatDao = DAORegistry::getDAO('PublicationFormatDAO');
+        foreach ($files as $file) {
+            $publicationFormat = $publicationFormatDao->getById($file->getData('assocId'));
+            if ($publicationFormat->getIsAvailable()) {
+                $this->registerPublication($publicationFormat, $chapterId, $chapter->getId());
+            }
+        }
+
         return $thothChapter;
     }
 
@@ -139,5 +168,58 @@ class ThothService
         $relation->setId($relationId);
 
         return $relation;
+    }
+
+    public function registerPublication($publicationFormat, $workId, $chapterId = null)
+    {
+        $publicationService = new ThothPublicationService();
+        $publicationProps = $publicationService->getPropertiesByPublicationFormat($publicationFormat);
+
+        $publication = $publicationService->new($publicationProps);
+        $publication->setWorkId($workId);
+
+        $publicationId = $this->getThothClient()->createPublication($publication);
+        $publication->setId($publicationId);
+
+        if ($publicationFormat->getRemoteUrl()) {
+            $this->registerLocation($publicationFormat, $publicationId);
+        } else {
+            $files = iterator_to_array(Services::get('submissionFile')->getMany([
+                'assocTypes' => [ASSOC_TYPE_PUBLICATION_FORMAT],
+                'assocIds' => [$publicationFormat->getId()],
+            ]));
+            $files = array_filter(
+                iterator_to_array(Services::get('submissionFile')->getMany([
+                    'assocTypes' => [ASSOC_TYPE_PUBLICATION_FORMAT],
+                    'assocIds' => [$publicationFormat->getId()],
+                ])),
+                function ($a) use ($chapterId) {
+                    return $a->getData('chapterId') == $chapterId;
+                }
+            );
+
+            $canonical = true;
+            foreach ($files as $file) {
+                $this->registerLocation($publicationFormat, $publicationId, $file->getId(), $canonical);
+                $canonical = false;
+            }
+        }
+
+        return $publication;
+    }
+
+    public function registerLocation($publicationFormat, $publicationId, $fileId = null, $canonical = true)
+    {
+        $locationService = new ThothLocationService();
+        $locationProps = $locationService->getPropertiesByPublicationFormat($publicationFormat, $fileId);
+
+        $location = $locationService->new($locationProps);
+        $location->setPublicationId($publicationId);
+        $location->setCanonical($canonical);
+
+        $locationId = $this->getThothClient()->createLocation($location);
+        $location->setId($locationId);
+
+        return $location;
     }
 }

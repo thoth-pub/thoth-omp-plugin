@@ -65,4 +65,18 @@ class ThothClient
         $graphql = new ThothGraphQL($this->endpoint, $this->httpClient, $this->token);
         return $mutation->run($graphql);
     }
+
+    public function createPublication($publication)
+    {
+        $mutation = new ThothMutation('createPublication', $publication);
+        $graphql = new ThothGraphQL($this->endpoint, $this->httpClient, $this->token);
+        return $mutation->run($graphql);
+    }
+
+    public function createLocation($location)
+    {
+        $mutation = new ThothMutation('createLocation', $location);
+        $graphql = new ThothGraphQL($this->endpoint, $this->httpClient, $this->token);
+        return $mutation->run($graphql);
+    }
 }
