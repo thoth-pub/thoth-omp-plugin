@@ -50,7 +50,7 @@ class ThothServiceTest extends PKPTestCase
 
     protected function getMockedDAOs()
     {
-        return ['PublicationDAO'];
+        return ['SubmissionDAO', 'PublicationDAO'];
     }
 
     private function setUpMockEnvironment()
@@ -58,7 +58,7 @@ class ThothServiceTest extends PKPTestCase
         $press = new Press();
         $press->setId(2);
         $press->setPrimaryLocale('en_US');
-        $press->setPath('press_path');
+        $press->setPath('press');
 
         $mockApplication = $this->getMockBuilder(Application::class)
             ->setMethods(['getContextDepth', 'getContextList'])
@@ -72,7 +72,7 @@ class ThothServiceTest extends PKPTestCase
         Registry::set('application', $mockApplication);
 
         $mockRequest = $this->getMockBuilder(PKPRequest::class)
-            ->setMethods(['getContext', 'getBaseUrl'])
+            ->setMethods(['getContext', 'getBaseUrl', 'url'])
             ->getMock();
         $dispatcher = $mockApplication->getDispatcher();
         $mockRequest->setDispatcher($dispatcher);
@@ -84,17 +84,24 @@ class ThothServiceTest extends PKPTestCase
             ->will($this->returnValue('https://omp.publicknowledgeproject.org'));
         Registry::set('request', $mockRequest);
 
+        $submissionDaoMock = $this->getMockBuilder(SubmissionDAO::class)
+            ->setMethods(['getById'])
+            ->getMock();
+        $submission = new Submission();
+        $submission->setId(53);
+        $submissionDaoMock->expects($this->any())
+            ->method('getById')
+            ->will($this->returnValue($submission));
+        DAORegistry::registerDAO('SubmissionDAO', $submissionDaoMock);
+
         $publicationMockDao = $this->getMockBuilder(PublicationDAO::class)
             ->setMethods(['getById'])
             ->getMock();
-
         $publication = new Publication();
         $publication->setData('primaryContactId', 13);
-
         $publicationMockDao->expects($this->any())
             ->method('getById')
             ->will($this->returnValue($publication));
-
         DAORegistry::registerDAO('PublicationDAO', $publicationMockDao);
 
         $mockPlugin = $this->getMockBuilder(ThothPlugin::class)
@@ -115,7 +122,8 @@ class ThothServiceTest extends PKPTestCase
                 'createContributor',
                 'createContribution',
                 'createWorkRelation',
-                'createPublication'
+                'createPublication',
+                'createLocation'
             ])
             ->getMock();
         $mockThothClient->expects($this->any())
@@ -133,6 +141,9 @@ class ThothServiceTest extends PKPTestCase
         $mockThothClient->expects($this->any())
             ->method('createPublication')
             ->will($this->returnValue('80359118-9b33-4cf4-a4b4-8784e6d4375a'));
+        $mockThothClient->expects($this->any())
+            ->method('createLocation')
+            ->will($this->returnValue('03b0367d-bba3-4e26-846a-4c36d3920db2'));
 
         $thothService = $this->getMockBuilder(ThothService::class)
             ->setMethods(['getThothClient'])
@@ -155,7 +166,7 @@ class ThothServiceTest extends PKPTestCase
         $expectedBook->setTitle('A Designer\'s Log');
         $expectedBook->setSubtitle('Case Studies in Instructional Design');
         $expectedBook->setFullTitle('A Designer\'s Log: Case Studies in Instructional Design');
-        $expectedBook->setLandingPage('https://omp.publicknowledgeproject.org/index.php/press_path/catalog/book/11');
+        $expectedBook->setLandingPage('https://omp.publicknowledgeproject.org/index.php/press/catalog/book/11');
         $expectedBook->setCoverUrl('https://omp.publicknowledgeproject.org/templates/images/book-default.png');
 
         $publication = new Publication();
@@ -290,5 +301,25 @@ class ThothServiceTest extends PKPTestCase
 
         $publication = $this->thothService->registerPublication($publicationFormat, $workId);
         $this->assertEquals($expectedPublication, $publication);
+    }
+
+    public function testRegisterLocation()
+    {
+        $publicationId = '8ac3e585-c32a-42d7-bd36-ef42ee397e6e';
+
+        $expectedLocation = new ThothLocation();
+        $expectedLocation->setId('03b0367d-bba3-4e26-846a-4c36d3920db2');
+        $expectedLocation->setPublicationId($publicationId);
+        $expectedLocation->setLandingPage('https://omp.publicknowledgeproject.org/index.php/press/catalog/book/53');
+        $expectedLocation->setFullTextUrl('https://www.bookstore.com/site/books/book5');
+        $expectedLocation->setLocationPlatform(ThothLocation::LOCATION_PLATFORM_OTHER);
+        $expectedLocation->setCanonical(true);
+
+        $publicationFormat = DAORegistry::getDAO('PublicationFormatDAO')->newDataObject();
+        $publicationFormat->setId(41);
+        $publicationFormat->setRemoteUrl('https://www.bookstore.com/site/books/book5');
+
+        $location = $this->thothService->registerLocation($publicationFormat, $publicationId);
+        $this->assertEquals($expectedLocation, $location);
     }
 }

@@ -1,13 +1,13 @@
 <?php
 
 /**
- * @file plugins/generic/thoth/thoth/models/Publication.inc.php
+ * @file plugins/generic/thoth/thoth/models/ThothPublication.inc.php
  *
  * Copyright (c) 2024 Lepidus Tecnologia
  * Copyright (c) 2024 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
- * @class Publication
+ * @class ThothPublication
  * @ingroup plugins_generic_thoth
  *
  * @brief Class for a Thoth's publication.
