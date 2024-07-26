@@ -182,4 +182,25 @@ class ThothClientTest extends PKPTestCase
 
         $this->assertEquals('4f51514b-5d45-42fc-a757-185cd5cee7b1', $publicationId);
     }
+
+    public function testLocationCreation()
+    {
+        $location = new ThothLocation();
+        $location->setPublicationId('8ac3e585-c32a-42d7-bd36-ef42ee397e6e');
+
+        $mock = new MockHandler([
+            new Response(
+                200,
+                [],
+                '{"data":{"createLocation":{"locationId":"03b0367d-bba3-4e26-846a-4c36d3920db2"}}}'
+            )
+        ]);
+        $handlerStack = HandlerStack::create($mock);
+        $httpClient = new Client(['handler' => $handlerStack]);
+
+        $client = new ThothClient('https://api.thoth.test.pub/', $httpClient);
+        $locationId = $client->createLocation($location);
+
+        $this->assertEquals('03b0367d-bba3-4e26-846a-4c36d3920db2', $locationId);
+    }
 }
