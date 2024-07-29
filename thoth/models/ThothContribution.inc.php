@@ -1,12 +1,13 @@
 <?php
 
 /**
- * @file plugins/generic/thoth/thoth/models/Contribution.inc.php
+ * @file plugins/generic/thoth/thoth/models/ThothContribution.inc.php
  *
  * Copyright (c) 2024 Lepidus Tecnologia
+ * Copyright (c) 2024 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
- * @class Contribution
+ * @class ThothContribution
  * @ingroup plugins_generic_thoth
  *
  * @brief Class for a Thoth Contribution.
@@ -14,7 +15,7 @@
 
 import('plugins.generic.thoth.thoth.models.ThothModel');
 
-class Contribution extends ThothModel
+class ThothContribution extends ThothModel
 {
     private $contributionId;
 

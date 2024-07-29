@@ -1,12 +1,13 @@
 <?php
 
 /**
- * @file plugins/generic/thoth/thoth/models/WorkRelation.inc.php
+ * @file plugins/generic/thoth/thoth/models/ThothWorkRelation.inc.php
  *
  * Copyright (c) 2024 Lepidus Tecnologia
+ * Copyright (c) 2024 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
- * @class WorkRelation
+ * @class ThothWorkRelation
  * @ingroup plugins_generic_thoth
  *
  * @brief Class for a Thoth WorkRelation.
@@ -14,7 +15,7 @@
 
 import('plugins.generic.thoth.thoth.models.ThothModel');
 
-class WorkRelation extends ThothModel
+class ThothWorkRelation extends ThothModel
 {
     private $workRelationId;
 
