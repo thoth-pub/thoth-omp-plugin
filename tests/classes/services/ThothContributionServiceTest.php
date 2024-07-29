@@ -1,29 +1,30 @@
 <?php
 
 /**
- * @file plugins/generic/thoth/tests/classes/services/ContributionServiceTest.php
+ * @file plugins/generic/thoth/tests/classes/services/ThothContributionServiceTest.php
  *
  * Copyright (c) 2024 Lepidus Tecnologia
+ * Copyright (c) 2024 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
- * @class ContributionServiceTest
+ * @class ThothContributionServiceTest
  * @ingroup plugins_generic_thoth_tests
- * @see ContributionService
+ * @see ThothContributionService
  *
- * @brief Test class for the ContributionService class
+ * @brief Test class for the ThothContributionService class
  */
 
 import('lib.pkp.tests.PKPTestCase');
 import('classes.monograph.Author');
 import('classes.publication.Publication');
-import('plugins.generic.thoth.classes.services.ContributionService');
+import('plugins.generic.thoth.classes.services.ThothContributionService');
 
-class ContributionServiceTest extends PKPTestCase
+class ThothContributionServiceTest extends PKPTestCase
 {
     protected function setUp(): void
     {
         parent::setUp();
-        $this->contributionService = new ContributionService();
+        $this->contributionService = new ThothContributionService();
         $this->setUpMockEnvironment();
     }
 
@@ -70,19 +71,19 @@ class ContributionServiceTest extends PKPTestCase
     public function testGettingContributionTypeByUserGroupLocaleKey()
     {
         $this->assertEquals(
-            Contribution::CONTRIBUTION_TYPE_AUTHOR,
+            ThothContribution::CONTRIBUTION_TYPE_AUTHOR,
             $this->contributionService->getContributionTypeByUserGroupLocaleKey('default.groups.name.author')
         );
         $this->assertEquals(
-            Contribution::CONTRIBUTION_TYPE_AUTHOR,
+            ThothContribution::CONTRIBUTION_TYPE_AUTHOR,
             $this->contributionService->getContributionTypeByUserGroupLocaleKey('default.groups.name.chapterAuthor')
         );
         $this->assertEquals(
-            Contribution::CONTRIBUTION_TYPE_EDITOR,
+            ThothContribution::CONTRIBUTION_TYPE_EDITOR,
             $this->contributionService->getContributionTypeByUserGroupLocaleKey('default.groups.name.volumeEditor')
         );
         $this->assertEquals(
-            Contribution::CONTRIBUTION_TYPE_TRANSLATOR,
+            ThothContribution::CONTRIBUTION_TYPE_TRANSLATOR,
             $this->contributionService->getContributionTypeByUserGroupLocaleKey('default.groups.name.translator')
         );
     }
@@ -90,7 +91,7 @@ class ContributionServiceTest extends PKPTestCase
     public function testGetPropertiesByAuthor()
     {
         $expectedProps = [
-            'contributionType' => Contribution::CONTRIBUTION_TYPE_AUTHOR,
+            'contributionType' => ThothContribution::CONTRIBUTION_TYPE_AUTHOR,
             'mainContribution' => true,
             'contributionOrdinal' => 1,
             'firstName' => 'Reza',
@@ -120,15 +121,15 @@ class ContributionServiceTest extends PKPTestCase
 
     public function testCreateNewContribution()
     {
-        $expectedContribution = new Contribution();
-        $expectedContribution->setContributionType(Contribution::CONTRIBUTION_TYPE_EDITOR);
+        $expectedContribution = new ThothContribution();
+        $expectedContribution->setContributionType(ThothContribution::CONTRIBUTION_TYPE_EDITOR);
         $expectedContribution->setMainContribution(false);
         $expectedContribution->setContributionOrdinal(3);
         $expectedContribution->setLastName('Steyerl');
         $expectedContribution->setFullName('Hito Steyerl');
 
         $params = [
-            'contributionType' => Contribution::CONTRIBUTION_TYPE_EDITOR,
+            'contributionType' => ThothContribution::CONTRIBUTION_TYPE_EDITOR,
             'mainContribution' => false,
             'contributionOrdinal' => 3,
             'lastName' => 'Steyerl',

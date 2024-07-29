@@ -12,14 +12,14 @@
  * @brief Helper class that encapsulates business logic Thoth API interactions
  */
 
-import('plugins.generic.thoth.classes.services.WorkService');
-import('plugins.generic.thoth.classes.services.ContributorService');
-import('plugins.generic.thoth.classes.services.ContributionService');
+import('plugins.generic.thoth.classes.services.ThothWorkService');
+import('plugins.generic.thoth.classes.services.ThothContributorService');
+import('plugins.generic.thoth.classes.services.ThothContributionService');
 import('plugins.generic.thoth.classes.services.ThothPublicationService');
 import('plugins.generic.thoth.classes.services.ThothLocationService');
 import('plugins.generic.thoth.lib.APIKeyEncryption.APIKeyEncryption');
 import('plugins.generic.thoth.thoth.ThothClient');
-import('plugins.generic.thoth.thoth.models.WorkRelation');
+import('plugins.generic.thoth.thoth.models.ThothWorkRelation');
 
 class ThothService
 {
@@ -53,7 +53,7 @@ class ThothService
 
     public function registerBook($submission)
     {
-        $workService = new WorkService();
+        $workService = new ThothWorkService();
         $bookProps = $workService->getPropertiesBySubmission($submission);
 
         $book = $workService->new($bookProps);
@@ -89,7 +89,7 @@ class ThothService
 
     public function registerContributor($author)
     {
-        $contributorService = new contributorService();
+        $contributorService = new ThothContributorService();
         $contributorProps = $contributorService->getPropertiesByAuthor($author);
 
         $contributor = $contributorService->new($contributorProps);
@@ -102,7 +102,7 @@ class ThothService
 
     public function registerContribution($author, $workId)
     {
-        $contributionService = new ContributionService();
+        $contributionService = new ThothContributionService();
         $contributionProps = $contributionService->getPropertiesByAuthor($author);
 
         $contribution = $contributionService->new($contributionProps);
@@ -119,7 +119,7 @@ class ThothService
 
     public function registerChapter($chapter)
     {
-        $workService = new WorkService();
+        $workService = new ThothWorkService();
         $thothChapterProps = $workService->getPropertiesByChapter($chapter);
 
         $thothChapter = $workService->new($thothChapterProps);
@@ -158,10 +158,10 @@ class ThothService
     {
         $thothChapter = $this->registerChapter($chapter);
 
-        $relation = new WorkRelation();
+        $relation = new ThothWorkRelation();
         $relation->setRelatorWorkId($thothChapter->getId());
         $relation->setRelatedWorkId($relatedWorkId);
-        $relation->setRelationType(WorkRelation::RELATION_TYPE_IS_CHILD_OF);
+        $relation->setRelationType(ThothWorkRelation::RELATION_TYPE_IS_CHILD_OF);
         $relation->setRelationOrdinal($chapter->getSequence() + 1);
 
         $relationId = $this->getThothClient()->createWorkRelation($relation);

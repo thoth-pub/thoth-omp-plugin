@@ -4,6 +4,7 @@
  * @file plugins/generic/thoth/tests/thoth/ThothClientTest.php
  *
  * Copyright (c) 2024 Lepidus Tecnologia
+ * Copyright (c) 2024 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothClientTest
@@ -21,10 +22,10 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 
 import('lib.pkp.tests.PKPTestCase');
-import('plugins.generic.thoth.thoth.models.Contribution');
-import('plugins.generic.thoth.thoth.models.Contributor');
-import('plugins.generic.thoth.thoth.models.Work');
-import('plugins.generic.thoth.thoth.models.WorkRelation');
+import('plugins.generic.thoth.thoth.models.ThothContribution');
+import('plugins.generic.thoth.thoth.models.ThothContributor');
+import('plugins.generic.thoth.thoth.models.ThothWork');
+import('plugins.generic.thoth.thoth.models.ThothWorkRelation');
 import('plugins.generic.thoth.thoth.ThothClient');
 
 class ThothClientTest extends PKPTestCase
@@ -54,9 +55,9 @@ class ThothClientTest extends PKPTestCase
 
     public function testWorkCreation()
     {
-        $work = new Work();
-        $work->setWorkType(Work::WORK_TYPE_MONOGRAPH);
-        $work->setWorkStatus(Work::WORK_STATUS_ACTIVE);
+        $work = new ThothWork();
+        $work->setWorkType(ThothWork::WORK_TYPE_MONOGRAPH);
+        $work->setWorkStatus(ThothWork::WORK_STATUS_ACTIVE);
         $work->setFullTitle('Feliks Volkhovskii');
         $work->setTitle('Feliks Volkhovskii');
         $work->setEdition(1);
@@ -80,7 +81,7 @@ class ThothClientTest extends PKPTestCase
 
     public function testContributorCreation()
     {
-        $contributor = new Contributor();
+        $contributor = new ThothContributor();
         $contributor->setFirstName('Adriana Laura');
         $contributor->setLastName('Massidda');
         $contributor->setFullName('Adriana Laura Massidda');
@@ -105,10 +106,10 @@ class ThothClientTest extends PKPTestCase
 
     public function testContributionCreation()
     {
-        $contribution = new Contribution();
+        $contribution = new ThothContribution();
         $contribution->setWorkId('e763a10c-1e2b-4b10-84c4-ac3f95236a97');
         $contribution->setContributorId('e1de541c-e84b-4092-941f-dab9b5dac865');
-        $contribution->setContributionType(Contribution::CONTRIBUTION_TYPE_EDITOR);
+        $contribution->setContributionType(ThothContribution::CONTRIBUTION_TYPE_EDITOR);
         $contribution->setMainContribution(false);
         $contribution->setContributionOrdinal(1);
         $contribution->setFirstName('Thomas');
@@ -137,11 +138,11 @@ class ThothClientTest extends PKPTestCase
 
     public function testRelationCreation()
     {
-        $workRelation = new WorkRelation();
+        $workRelation = new ThothWorkRelation();
         $workRelation->setId('3e587b61-58f1-4064-bf80-e40e5c924d27');
         $workRelation->setRelatorWorkId('991f1070-67fa-4e6e-8519-114006043492');
         $workRelation->setRelatedWorkId('7d861db5-22f6-4ef8-abbb-b56ab8397624');
-        $workRelation->setRelationType(WorkRelation::RELATION_TYPE_IS_CHILD_OF);
+        $workRelation->setRelationType(ThothWorkRelation::RELATION_TYPE_IS_CHILD_OF);
         $workRelation->setRelationOrdinal(1);
 
         $mock = new MockHandler([

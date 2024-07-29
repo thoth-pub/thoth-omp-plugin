@@ -4,6 +4,7 @@
  * @file plugins/generic/thoth/tests/thoth/ThothMutationTest.php
  *
  * Copyright (c) 2024 Lepidus Tecnologia
+ * Copyright (c) 2024 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothMutationTest
@@ -19,7 +20,7 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 
 import('lib.pkp.tests.PKPTestCase');
-import('plugins.generic.thoth.thoth.models.Contributor');
+import('plugins.generic.thoth.thoth.models.ThothContributor');
 import('plugins.generic.thoth.thoth.ThothAuthenticator');
 import('plugins.generic.thoth.thoth.ThothGraphQL');
 import('plugins.generic.thoth.thoth.ThothMutation');
@@ -28,7 +29,7 @@ class ThothMutationTest extends PKPTestCase
 {
     public function testExecuteMutation()
     {
-        $contributor = new Contributor();
+        $contributor = new ThothContributor();
         $contributor->setFirstName('Basem');
         $contributor->setLastName('Adi');
         $contributor->setFullName('Basem Adi');

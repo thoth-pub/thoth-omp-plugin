@@ -1,20 +1,21 @@
 <?php
 
 /**
- * @file plugins/generic/thoth/classes/services/ContributorService.php
+ * @file plugins/generic/thoth/classes/services/ThothContributorService.php
  *
  * Copyright (c) 2024 Lepidus Tecnologia
+ * Copyright (c) 2024 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
- * @class ContributorService
+ * @class ThothContributorService
  * @ingroup plugins_generic_thoth
  *
  * @brief Helper class that encapsulates business logic for Thoth contributors
  */
 
-import('plugins.generic.thoth.thoth.models.Contributor');
+import('plugins.generic.thoth.thoth.models.ThothContributor');
 
-class ContributorService
+class ThothContributorService
 {
     public function getPropertiesByAuthor($author)
     {
@@ -29,7 +30,7 @@ class ContributorService
 
     public function new($params)
     {
-        $contributor = new Contributor();
+        $contributor = new ThothContributor();
         $contributor->setFirstName($params['firstName'] ?? null);
         $contributor->setLastName($params['lastName']);
         $contributor->setFullName($params['fullName']);

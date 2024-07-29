@@ -1,22 +1,23 @@
 <?php
 
 /**
- * @file plugins/generic/thoth/tests/thoth/models/WorkTest.php
+ * @file plugins/generic/thoth/tests/thoth/models/ThothWorkTest.php
  *
  * Copyright (c) 2024 Lepidus Tecnologia
+ * Copyright (c) 2024 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
- * @class WorkTest
+ * @class ThothWorkTest
  * @ingroup plugins_generic_thoth_tests
- * @see Work
+ * @see ThothWork
  *
- * @brief Test class for the Work class
+ * @brief Test class for the ThothWorks class
  */
 
 import('lib.pkp.tests.PKPTestCase');
-import('plugins.generic.thoth.thoth.models.Work');
+import('plugins.generic.thoth.thoth.models.ThothWork');
 
-class WorkTest extends PKPTestCase
+class ThothWorkTest extends PKPTestCase
 {
     private $work;
 
@@ -25,8 +26,8 @@ class WorkTest extends PKPTestCase
     public function setUp(): void
     {
         $this->workData['uuid'] = \Ramsey\Uuid\Uuid::uuid4()->toString();
-        $this->workData['workType'] = Work::WORK_TYPE_MONOGRAPH;
-        $this->workData['workStatus'] = Work::WORK_STATUS_ACTIVE;
+        $this->workData['workType'] = ThothWork::WORK_TYPE_MONOGRAPH;
+        $this->workData['workStatus'] = ThothWork::WORK_STATUS_ACTIVE;
         $this->workData['fullTitle'] = 'Feliks Volkhovskii: A Revolutionary Life';
         $this->workData['title'] = 'Feliks Volkhovskii';
         $this->workData['subtitle'] = 'A Revolutionary Life';
@@ -42,7 +43,7 @@ class WorkTest extends PKPTestCase
             'this notable but hitherto neglected figure of both the political and literary worlds.';
         $this->workData['coverUrl'] = 'https://cdn.openbookpublishers.com/covers/10.11647/obp.0385.jpg';
 
-        $this->work = new Work();
+        $this->work = new ThothWork();
         $this->work->setId($this->workData['uuid']);
         $this->work->setWorkType($this->workData['workType']);
         $this->work->setWorkStatus($this->workData['workStatus']);

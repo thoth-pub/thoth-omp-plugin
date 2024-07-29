@@ -1,27 +1,28 @@
 <?php
 
 /**
- * @file plugins/generic/thoth/tests/thoth/models/ContributorTest.php
+ * @file plugins/generic/thoth/tests/thoth/models/ThothContributorTest.php
  *
  * Copyright (c) 2024 Lepidus Tecnologia
+ * Copyright (c) 2024 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
- * @class ContributorTest
+ * @class ThothContributorTest
  * @ingroup plugins_generic_thoth_tests
- * @see Contributor
+ * @see ThothContributor
  *
- * @brief Test class for the Contributor class
+ * @brief Test class for the ThothContributor class
  */
 
 import('lib.pkp.tests.PKPTestCase');
-import('plugins.generic.thoth.thoth.models.Contributor');
+import('plugins.generic.thoth.thoth.models.ThothContributor');
 
-class ContributorTest extends PKPTestCase
+class ThothContributorTest extends PKPTestCase
 {
     public function testGettersAndSetters()
     {
         $uuid = \Ramsey\Uuid\Uuid::uuid4()->toString();
-        $contributor = new Contributor();
+        $contributor = new ThothContributor();
         $contributor->setId($uuid);
         $contributor->setFirstName('John');
         $contributor->setLastName('Doe');
@@ -41,7 +42,7 @@ class ContributorTest extends PKPTestCase
     public function testGetContributorData()
     {
         $uuid = \Ramsey\Uuid\Uuid::uuid4()->toString();
-        $contributor = new Contributor();
+        $contributor = new ThothContributor();
         $contributor->setId($uuid);
         $contributor->setFirstName('Adriana Laura');
         $contributor->setLastName('Massidda');
