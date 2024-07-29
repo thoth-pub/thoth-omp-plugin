@@ -1,28 +1,29 @@
 <?php
 
 /**
- * @file plugins/generic/thoth/tests/classes/services/ContributorServiceTest.php
+ * @file plugins/generic/thoth/tests/classes/services/ThothContributorServiceTest.php
  *
  * Copyright (c) 2024 Lepidus Tecnologia
+ * Copyright (c) 2024 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
- * @class ContributorServiceTest
+ * @class ThothContributorServiceTest
  * @ingroup plugins_generic_thoth_tests
- * @see ContributorService
+ * @see ThothContributorService
  *
- * @brief Test class for the ContributorService class
+ * @brief Test class for the ThothContributorService class
  */
 
 import('lib.pkp.tests.PKPTestCase');
 import('classes.monograph.Author');
-import('plugins.generic.thoth.classes.services.ContributorService');
+import('plugins.generic.thoth.classes.services.ThothContributorService');
 
-class ContributorServiceTest extends PKPTestCase
+class ThothContributorServiceTest extends PKPTestCase
 {
     protected function setUp(): void
     {
         parent::setUp();
-        $this->contributorService = new ContributorService();
+        $this->contributorService = new ThothContributorService();
     }
 
     protected function tearDown(): void
@@ -54,7 +55,7 @@ class ContributorServiceTest extends PKPTestCase
 
     public function testCreateNewContributor()
     {
-        $expectedContributor = new Contributor();
+        $expectedContributor = new ThothContributor();
         $expectedContributor->setFirstName('Brian');
         $expectedContributor->setLastName('Dupuis');
         $expectedContributor->setFullName('Brian Dupuis');

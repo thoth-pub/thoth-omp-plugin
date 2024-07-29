@@ -1,20 +1,21 @@
 <?php
 
 /**
- * @file plugins/generic/thoth/classes/services/WorkService.php
+ * @file plugins/generic/thoth/classes/services/ThothWorkService.php
  *
  * Copyright (c) 2024 Lepidus Tecnologia
+ * Copyright (c) 2024 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
- * @class WorkService
+ * @class ThothWorkService
  * @ingroup plugins_generic_thoth
  *
  * @brief Helper class that encapsulates business logic for Thoth works
  */
 
-import('plugins.generic.thoth.thoth.models.Work');
+import('plugins.generic.thoth.thoth.models.ThothWork');
 
-class WorkService
+class ThothWorkService
 {
     public function getPropertiesBySubmission($submission)
     {
@@ -25,7 +26,7 @@ class WorkService
 
         $props = [];
         $props['workType'] = $this->getWorkTypeBySubmissionWorkType($submission->getData('workType'));
-        $props['workStatus'] = Work::WORK_STATUS_ACTIVE;
+        $props['workStatus'] = ThothWork::WORK_STATUS_ACTIVE;
         $props['fullTitle'] = $publication->getLocalizedFullTitle();
         $props['title'] = $publication->getLocalizedTitle();
         $props['subtitle'] = $publication->getLocalizedData('subtitle');
@@ -51,8 +52,8 @@ class WorkService
     public function getPropertiesByChapter($chapter)
     {
         $props = [];
-        $props['workType'] = Work::WORK_TYPE_BOOK_CHAPTER;
-        $props['workStatus'] = Work::WORK_STATUS_ACTIVE;
+        $props['workType'] = ThothWork::WORK_TYPE_BOOK_CHAPTER;
+        $props['workStatus'] = ThothWork::WORK_STATUS_ACTIVE;
         $props['fullTitle'] = $chapter->getLocalizedFullTitle();
         $props['title'] = $chapter->getLocalizedTitle();
         $props['subtitle'] = $chapter->getLocalizedData('subtitle');
@@ -66,7 +67,7 @@ class WorkService
 
     public function new($params)
     {
-        $work = new Work();
+        $work = new ThothWork();
         $work->setWorkType($params['workType']);
         $work->setWorkStatus($params['workStatus']);
         $work->setFullTitle($params['fullTitle']);
@@ -88,8 +89,8 @@ class WorkService
     public function getWorkTypeBySubmissionWorkType($submissionWorkType)
     {
         $workTypeMapping = [
-            WORK_TYPE_EDITED_VOLUME => Work::WORK_TYPE_EDITED_BOOK,
-            WORK_TYPE_AUTHORED_WORK => Work::WORK_TYPE_MONOGRAPH
+            WORK_TYPE_EDITED_VOLUME => ThothWork::WORK_TYPE_EDITED_BOOK,
+            WORK_TYPE_AUTHORED_WORK => ThothWork::WORK_TYPE_MONOGRAPH
         ];
 
         return $workTypeMapping[$submissionWorkType];

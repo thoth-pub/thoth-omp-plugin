@@ -4,6 +4,7 @@
  * @file plugins/generic/thoth/tests/classes/services/ThothServiceTest.php
  *
  * Copyright (c) 2024 Lepidus Tecnologia
+ * Copyright (c) 2024 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothServiceTest
@@ -22,10 +23,10 @@ import('lib.pkp.classes.core.PKPRequest');
 import('lib.pkp.classes.core.PKPRouter');
 import('lib.pkp.tests.PKPTestCase');
 import('plugins.generic.thoth.classes.services.ThothService');
-import('plugins.generic.thoth.thoth.models.Contribution');
-import('plugins.generic.thoth.thoth.models.Contributor');
-import('plugins.generic.thoth.thoth.models.Work');
-import('plugins.generic.thoth.thoth.models.WorkRelation');
+import('plugins.generic.thoth.thoth.models.ThothContribution');
+import('plugins.generic.thoth.thoth.models.ThothContributor');
+import('plugins.generic.thoth.thoth.models.ThothWork');
+import('plugins.generic.thoth.thoth.models.ThothWorkRelation');
 import('plugins.generic.thoth.thoth.ThothClient');
 import('plugins.generic.thoth.ThothPlugin');
 
@@ -158,11 +159,11 @@ class ThothServiceTest extends PKPTestCase
 
     public function testRegisterBook()
     {
-        $expectedBook = new Work();
+        $expectedBook = new ThothWork();
         $expectedBook->setId('74fde3e2-ca4e-4597-bb0c-aee90648f5a5');
         $expectedBook->setImprintId('f02786d4-3bcc-473e-8d43-3da66c7e877c');
-        $expectedBook->setWorkType(Work::WORK_TYPE_MONOGRAPH);
-        $expectedBook->setWorkStatus(Work::WORK_STATUS_ACTIVE);
+        $expectedBook->setWorkType(ThothWork::WORK_TYPE_MONOGRAPH);
+        $expectedBook->setWorkStatus(ThothWork::WORK_STATUS_ACTIVE);
         $expectedBook->setTitle('A Designer\'s Log');
         $expectedBook->setSubtitle('Case Studies in Instructional Design');
         $expectedBook->setFullTitle('A Designer\'s Log: Case Studies in Instructional Design');
@@ -187,7 +188,7 @@ class ThothServiceTest extends PKPTestCase
 
     public function testRegisterContributor()
     {
-        $expectedContributor = new Contributor();
+        $expectedContributor = new ThothContributor();
         $expectedContributor->setId('f70f709e-2137-4c87-a2e5-d52b263759ec');
         $expectedContributor->setFirstName('Brian');
         $expectedContributor->setLastName('Dupuis');
@@ -203,11 +204,11 @@ class ThothServiceTest extends PKPTestCase
 
     public function testRegisterContribution()
     {
-        $expectedContribution = new Contribution();
+        $expectedContribution = new ThothContribution();
         $expectedContribution->setId('67afac83-b015-4f32-9576-60b665a9e685');
         $expectedContribution->setWorkId('45a6622c-a306-4559-bb77-25367dc881b8');
         $expectedContribution->setContributorId('f70f709e-2137-4c87-a2e5-d52b263759ec');
-        $expectedContribution->setContributionType(Contribution::CONTRIBUTION_TYPE_AUTHOR);
+        $expectedContribution->setContributionType(ThothContribution::CONTRIBUTION_TYPE_AUTHOR);
         $expectedContribution->setMainContribution(true);
         $expectedContribution->setContributionOrdinal(1);
         $expectedContribution->setFirstName('Michael');
@@ -234,11 +235,11 @@ class ThothServiceTest extends PKPTestCase
 
     public function testRegisterChapter()
     {
-        $expectedChapter = new Work();
+        $expectedChapter = new ThothWork();
         $expectedChapter->setId('74fde3e2-ca4e-4597-bb0c-aee90648f5a5');
         $expectedChapter->setImprintId('f02786d4-3bcc-473e-8d43-3da66c7e877c');
-        $expectedChapter->setWorkType(Work::WORK_TYPE_BOOK_CHAPTER);
-        $expectedChapter->setWorkStatus(Work::WORK_STATUS_ACTIVE);
+        $expectedChapter->setWorkType(ThothWork::WORK_TYPE_BOOK_CHAPTER);
+        $expectedChapter->setWorkStatus(ThothWork::WORK_STATUS_ACTIVE);
         $expectedChapter->setFullTitle('Chapter 2: Classical Music and the Classical Mind');
         $expectedChapter->setTitle('Chapter 2: Classical Music and the Classical Mind');
 
@@ -253,11 +254,11 @@ class ThothServiceTest extends PKPTestCase
     {
         $relatedWorkId = '7d861db5-22f6-4ef8-abbb-b56ab8397624';
 
-        $expectedRelation = new WorkRelation();
+        $expectedRelation = new ThothWorkRelation();
         $expectedRelation->setId('3e587b61-58f1-4064-bf80-e40e5c924d27');
         $expectedRelation->setRelatorWorkId('74fde3e2-ca4e-4597-bb0c-aee90648f5a5');
         $expectedRelation->setRelatedWorkId($relatedWorkId);
-        $expectedRelation->setRelationType(WorkRelation::RELATION_TYPE_IS_CHILD_OF);
+        $expectedRelation->setRelationType(ThothWorkRelation::RELATION_TYPE_IS_CHILD_OF);
         $expectedRelation->setRelationOrdinal(5);
 
         $chapter = DAORegistry::getDAO('ChapterDAO')->newDataObject();

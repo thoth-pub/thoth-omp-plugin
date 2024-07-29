@@ -1,21 +1,22 @@
 <?php
 
 /**
- * @file plugins/generic/thoth/classes/services/ContributionService.php
+ * @file plugins/generic/thoth/classes/services/ThothContributionService.php
  *
  * Copyright (c) 2024 Lepidus Tecnologia
+ * Copyright (c) 2024 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
- * @class ContributionService
+ * @class ThothContributionService
  * @ingroup plugins_generic_thoth
  *
  * @brief Helper class that encapsulates business logic for Thoth contributions
  */
 
-import('plugins.generic.thoth.thoth.models.Contribution');
+import('plugins.generic.thoth.thoth.models.ThothContribution');
 import('classes.core.Services');
 
-class ContributionService
+class ThothContributionService
 {
     public function getPropertiesByAuthor($author)
     {
@@ -34,7 +35,7 @@ class ContributionService
 
     public function new($params)
     {
-        $contribution = new Contribution();
+        $contribution = new ThothContribution();
         $contribution->setContributionType($params['contributionType']);
         $contribution->setMainContribution($params['mainContribution']);
         $contribution->setContributionOrdinal($params['contributionOrdinal']);
@@ -58,10 +59,10 @@ class ContributionService
     public function getContributionTypeByUserGroupLocaleKey($userGroupLocaleKey)
     {
         $contributionTypeMapping = [
-            'default.groups.name.author' => Contribution::CONTRIBUTION_TYPE_AUTHOR,
-            'default.groups.name.chapterAuthor' => Contribution::CONTRIBUTION_TYPE_AUTHOR,
-            'default.groups.name.volumeEditor' => Contribution::CONTRIBUTION_TYPE_EDITOR,
-            'default.groups.name.translator' => Contribution::CONTRIBUTION_TYPE_TRANSLATOR,
+            'default.groups.name.author' => ThothContribution::CONTRIBUTION_TYPE_AUTHOR,
+            'default.groups.name.chapterAuthor' => ThothContribution::CONTRIBUTION_TYPE_AUTHOR,
+            'default.groups.name.volumeEditor' => ThothContribution::CONTRIBUTION_TYPE_EDITOR,
+            'default.groups.name.translator' => ThothContribution::CONTRIBUTION_TYPE_TRANSLATOR,
         ];
         return $contributionTypeMapping[$userGroupLocaleKey];
     }

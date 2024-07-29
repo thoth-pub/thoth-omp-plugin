@@ -1,16 +1,17 @@
 <?php
 
 /**
- * @file plugins/generic/thoth/tests/classes/services/WorkServiceTest.php
+ * @file plugins/generic/thoth/tests/classes/services/ThothWorkServiceTest.php
  *
  * Copyright (c) 2024 Lepidus Tecnologia
+ * Copyright (c) 2024 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
- * @class WorkServiceTest
+ * @class ThothWorkServiceTest
  * @ingroup plugins_generic_thoth_tests
  * @see WorkService
  *
- * @brief Test class for the WorkService class
+ * @brief Test class for the ThothWorkService class
  */
 
 import('classes.core.Application');
@@ -18,15 +19,15 @@ import('classes.press.Press');
 import('lib.pkp.classes.core.PKPRequest');
 import('lib.pkp.classes.core.PKPRouter');
 import('lib.pkp.tests.PKPTestCase');
-import('plugins.generic.thoth.classes.services.WorkService');
+import('plugins.generic.thoth.classes.services.ThothWorkService');
 
-class WorkServiceTest extends PKPTestCase
+class ThothWorkServiceTest extends PKPTestCase
 {
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->workService = new WorkService();
+        $this->workService = new ThothWorkService();
     }
 
     protected function tearDown(): void
@@ -80,11 +81,11 @@ class WorkServiceTest extends PKPTestCase
     public function testGetWorkTypeBySubmissionWorkType()
     {
         $this->assertEquals(
-            Work::WORK_TYPE_EDITED_BOOK,
+            ThothWork::WORK_TYPE_EDITED_BOOK,
             $this->workService->getWorkTypeBySubmissionWorkType(WORK_TYPE_EDITED_VOLUME)
         );
         $this->assertEquals(
-            Work::WORK_TYPE_MONOGRAPH,
+            ThothWork::WORK_TYPE_MONOGRAPH,
             $this->workService->getWorkTypeBySubmissionWorkType(WORK_TYPE_AUTHORED_WORK)
         );
     }
@@ -92,8 +93,8 @@ class WorkServiceTest extends PKPTestCase
     public function testGetWorkPropsBySubmission()
     {
         $expectedProps = [
-            'workType' => Work::WORK_TYPE_MONOGRAPH,
-            'workStatus' => Work::WORK_STATUS_ACTIVE,
+            'workType' => ThothWork::WORK_TYPE_MONOGRAPH,
+            'workStatus' => ThothWork::WORK_STATUS_ACTIVE,
             'fullTitle' => 'Accessible Elements: Teaching Science Online and at a Distance',
             'title' => 'Accessible Elements',
             'subtitle' => 'Teaching Science Online and at a Distance',
@@ -167,8 +168,8 @@ class WorkServiceTest extends PKPTestCase
     public function testGetWorkPropsByChapter()
     {
         $expectedProps = [
-            'workType' => Work::WORK_TYPE_BOOK_CHAPTER,
-            'workStatus' => Work::WORK_STATUS_ACTIVE,
+            'workType' => ThothWork::WORK_TYPE_BOOK_CHAPTER,
+            'workStatus' => ThothWork::WORK_STATUS_ACTIVE,
             'fullTitle' => 'Chapter 1: Interactions Affording Distance Science Education',
             'title' => 'Chapter 1: Interactions Affording Distance Science Education',
             'subtitle' => null,
@@ -190,15 +191,15 @@ class WorkServiceTest extends PKPTestCase
 
     public function testCreateNewWork()
     {
-        $expectedWork = new Work();
-        $expectedWork->setWorkType(Work::WORK_TYPE_EDITED_BOOK);
-        $expectedWork->setWorkStatus(Work::WORK_TYPE_EDITED_BOOK);
+        $expectedWork = new ThothWork();
+        $expectedWork->setWorkType(ThothWork::WORK_TYPE_EDITED_BOOK);
+        $expectedWork->setWorkStatus(ThothWork::WORK_TYPE_EDITED_BOOK);
         $expectedWork->setFullTitle('Bomb Canada and Other Unkind Remarks in the American Media');
         $expectedWork->setTitle('Bomb Canada and Other Unkind Remarks in the American Media');
 
         $params = [
-            'workType' => Work::WORK_TYPE_EDITED_BOOK,
-            'workStatus' => Work::WORK_TYPE_EDITED_BOOK,
+            'workType' => ThothWork::WORK_TYPE_EDITED_BOOK,
+            'workStatus' => ThothWork::WORK_TYPE_EDITED_BOOK,
             'fullTitle' => 'Bomb Canada and Other Unkind Remarks in the American Media',
             'title' => 'Bomb Canada and Other Unkind Remarks in the American Media',
         ];
