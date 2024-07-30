@@ -124,7 +124,8 @@ class ThothServiceTest extends PKPTestCase
                 'createContribution',
                 'createWorkRelation',
                 'createPublication',
-                'createLocation'
+                'createLocation',
+                'createSubject'
             ])
             ->getMock();
         $mockThothClient->expects($this->any())
@@ -145,6 +146,9 @@ class ThothServiceTest extends PKPTestCase
         $mockThothClient->expects($this->any())
             ->method('createLocation')
             ->will($this->returnValue('03b0367d-bba3-4e26-846a-4c36d3920db2'));
+        $mockThothClient->expects($this->any())
+            ->method('createSubject')
+            ->will($this->returnValue('6a9cdd5a-5877-433e-8063-9af0617eaa17'));
 
         $thothService = $this->getMockBuilder(ThothService::class)
             ->setMethods(['getThothClient'])
@@ -322,5 +326,22 @@ class ThothServiceTest extends PKPTestCase
 
         $location = $this->thothService->registerLocation($publicationFormat, $publicationId);
         $this->assertEquals($expectedLocation, $location);
+    }
+
+    public function testRegisterKeyword()
+    {
+        $workId = '1ef03055-2890-429a-b870-f9671711bcc4';
+
+        $expectedThothKeyword = new ThothSubject();
+        $expectedThothKeyword->setId('6a9cdd5a-5877-433e-8063-9af0617eaa17');
+        $expectedThothKeyword->setWorkId($workId);
+        $expectedThothKeyword->setSubjectType(ThothSubject::SUBJECT_TYPE_KEYWORD);
+        $expectedThothKeyword->setSubjectCode('Psychology');
+        $expectedThothKeyword->setSubjectOrdinal(1);
+
+        $submissionKeyword = 'Psychology';
+
+        $thothKeyword = $this->thothService->registerKeyword($submissionKeyword, $workId);
+        $this->assertEquals($expectedThothKeyword, $thothKeyword);
     }
 }
