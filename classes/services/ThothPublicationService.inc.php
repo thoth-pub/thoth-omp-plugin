@@ -77,7 +77,7 @@ class ThothPublicationService
     {
         $identificationCodes = $publicationFormat->getIdentificationCodes()->toArray();
         foreach ($identificationCodes as $identificationCode) {
-            if ($identificationCode->getCode() == "02" || $identificationCode->getCode() == "15") {
+            if ($identificationCode->getCode() == "15" || $identificationCode->getCode() == "24") {
                 return $identificationCode->getValue();
             }
         }

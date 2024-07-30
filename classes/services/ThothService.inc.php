@@ -21,6 +21,7 @@ import('plugins.generic.thoth.lib.APIKeyEncryption.APIKeyEncryption');
 import('plugins.generic.thoth.thoth.ThothClient');
 import('plugins.generic.thoth.thoth.models.ThothLanguage');
 import('plugins.generic.thoth.thoth.models.ThothSubject');
+import('plugins.generic.thoth.thoth.models.ThothReference');
 import('plugins.generic.thoth.thoth.models.ThothWorkRelation');
 
 class ThothService
@@ -86,16 +87,21 @@ class ThothService
             }
         }
 
-        $seq = 1;
         $submissionKeywords = DAORegistry::getDAO('SubmissionKeywordDAO')
             ->getKeywords($submission->getData('currentPublicationId'));
-        foreach ($submissionKeywords[$submission->getLocale()] as $submissionKeyword) {
-            $this->registerKeyword($submissionKeyword, $bookId, $seq);
-            $seq++;
+        foreach ($submissionKeywords[$submission->getLocale()] as $seq => $submissionKeyword) {
+            $this->registerKeyword($submissionKeyword, $bookId, $seq + 1);
         }
 
         $submissionLocale = $submission->getData('locale');
         $this->registerLanguage($submissionLocale, $bookId);
+
+        $citations = DAORegistry::getDAO('CitationDAO')
+            ->getByPublicationId($submission->getData('currentPublicationId'))
+            ->toArray();
+        foreach ($citations as $citation) {
+            $this->registerReference($citation, $bookId);
+        }
 
         return $book;
     }
@@ -190,6 +196,9 @@ class ThothService
 
         $publication = $publicationService->new($publicationProps);
         $publication->setWorkId($workId);
+        if ($chapterId && $publication->getIsbn()) {
+            $publication->setIsbn(null);
+        }
 
         $publicationId = $this->getThothClient()->createPublication($publication);
         $publication->setId($publicationId);
@@ -197,10 +206,6 @@ class ThothService
         if ($publicationFormat->getRemoteUrl()) {
             $this->registerLocation($publicationFormat, $publicationId);
         } else {
-            $files = iterator_to_array(Services::get('submissionFile')->getMany([
-                'assocTypes' => [ASSOC_TYPE_PUBLICATION_FORMAT],
-                'assocIds' => [$publicationFormat->getId()],
-            ]));
             $files = array_filter(
                 iterator_to_array(Services::get('submissionFile')->getMany([
                     'assocTypes' => [ASSOC_TYPE_PUBLICATION_FORMAT],
@@ -262,5 +267,18 @@ class ThothService
         $thothLanguage->setId($thothLanguageId);
 
         return $thothLanguage;
+    }
+
+    public function registerReference($citation, $workId)
+    {
+        $thothReference = new ThothReference();
+        $thothReference->setWorkId($workId);
+        $thothReference->setReferenceOrdinal($citation->getSequence());
+        $thothReference->setUnstructuredCitation($citation->getRawCitation());
+
+        $thothReferenceId = $this->getThothClient()->createReference($thothReference);
+        $thothReference->setId($thothReferenceId);
+
+        return $thothReference;
     }
 }

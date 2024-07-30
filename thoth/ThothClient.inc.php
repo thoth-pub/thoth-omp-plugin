@@ -94,4 +94,11 @@ class ThothClient
         $graphql = new ThothGraphQL($this->endpoint, $this->httpClient, $this->token);
         return $mutation->run($graphql);
     }
+
+    public function createReference($reference)
+    {
+        $mutation = new ThothMutation('createReference', $reference);
+        $graphql = new ThothGraphQL($this->endpoint, $this->httpClient, $this->token);
+        return $mutation->run($graphql);
+    }
 }
