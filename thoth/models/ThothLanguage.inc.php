@@ -32,6 +32,7 @@ class ThothLanguage extends ThothModel
     public function getEnumeratedValues()
     {
         return parent::getEnumeratedValues() + [
+            'languageCode',
             'languageRelation'
         ];
     }
