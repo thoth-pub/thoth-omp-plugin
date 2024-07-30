@@ -225,4 +225,25 @@ class ThothClientTest extends PKPTestCase
 
         $this->assertEquals('279b9910-38bf-4742-a7ae-cfd9eeb10bf8', $subjectId);
     }
+
+    public function testLanguageCreation()
+    {
+        $language = new ThothLanguage();
+        $language->setWorkId('30e3d0d8-4f7a-4659-ab33-d9c7b25b3af8');
+
+        $mock = new MockHandler([
+            new Response(
+                200,
+                [],
+                '{"data":{"createLanguage":{"languageId":"4cfdf70d-cd8c-41a5-a5e2-356a2ff2f37f"}}}'
+            )
+        ]);
+        $handlerStack = HandlerStack::create($mock);
+        $httpClient = new Client(['handler' => $handlerStack]);
+
+        $client = new ThothClient('https://api.thoth.test.pub/', $httpClient);
+        $languageId = $client->createLanguage($language);
+
+        $this->assertEquals('4cfdf70d-cd8c-41a5-a5e2-356a2ff2f37f', $languageId);
+    }
 }
