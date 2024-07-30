@@ -20,6 +20,7 @@ import('plugins.generic.thoth.classes.services.ThothLocationService');
 import('plugins.generic.thoth.lib.APIKeyEncryption.APIKeyEncryption');
 import('plugins.generic.thoth.thoth.ThothClient');
 import('plugins.generic.thoth.thoth.models.ThothWorkRelation');
+import('plugins.generic.thoth.thoth.models.ThothSubject');
 
 class ThothService
 {
@@ -82,6 +83,14 @@ class ThothService
             if ($publicationFormat->getIsAvailable()) {
                 $this->registerPublication($publicationFormat, $bookId);
             }
+        }
+
+        $seq = 1;
+        $submissionKeywords = DAORegistry::getDAO('SubmissionKeywordDAO')
+            ->getKeywords($submission->getData('currentPublicationId'));
+        foreach ($submissionKeywords[$submission->getLocale()] as $submissionKeyword) {
+            $this->registerKeyword($submissionKeyword, $bookId, $seq);
+            $seq++;
         }
 
         return $book;
@@ -221,5 +230,19 @@ class ThothService
         $location->setId($locationId);
 
         return $location;
+    }
+
+    public function registerKeyword($submissionKeyword, $workId, $seq = 1)
+    {
+        $thothKeyword = new ThothSubject();
+        $thothKeyword->setWorkId($workId);
+        $thothKeyword->setSubjectType(ThothSubject::SUBJECT_TYPE_KEYWORD);
+        $thothKeyword->setSubjectCode($submissionKeyword);
+        $thothKeyword->setSubjectOrdinal($seq);
+
+        $thothKeywordId = $this->getThothClient()->createSubject($thothKeyword);
+        $thothKeyword->setId($thothKeywordId);
+
+        return $thothKeyword;
     }
 }
