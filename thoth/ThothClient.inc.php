@@ -87,4 +87,11 @@ class ThothClient
         $graphql = new ThothGraphQL($this->endpoint, $this->httpClient, $this->token);
         return $mutation->run($graphql);
     }
+
+    public function createLanguage($language)
+    {
+        $mutation = new ThothMutation('createLanguage', $language);
+        $graphql = new ThothGraphQL($this->endpoint, $this->httpClient, $this->token);
+        return $mutation->run($graphql);
+    }
 }

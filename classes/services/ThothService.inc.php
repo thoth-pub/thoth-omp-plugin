@@ -15,12 +15,13 @@
 import('plugins.generic.thoth.classes.services.ThothWorkService');
 import('plugins.generic.thoth.classes.services.ThothContributorService');
 import('plugins.generic.thoth.classes.services.ThothContributionService');
-import('plugins.generic.thoth.classes.services.ThothPublicationService');
 import('plugins.generic.thoth.classes.services.ThothLocationService');
+import('plugins.generic.thoth.classes.services.ThothPublicationService');
 import('plugins.generic.thoth.lib.APIKeyEncryption.APIKeyEncryption');
 import('plugins.generic.thoth.thoth.ThothClient');
-import('plugins.generic.thoth.thoth.models.ThothWorkRelation');
+import('plugins.generic.thoth.thoth.models.ThothLanguage');
 import('plugins.generic.thoth.thoth.models.ThothSubject');
+import('plugins.generic.thoth.thoth.models.ThothWorkRelation');
 
 class ThothService
 {
@@ -92,6 +93,9 @@ class ThothService
             $this->registerKeyword($submissionKeyword, $bookId, $seq);
             $seq++;
         }
+
+        $submissionLocale = $submission->getData('locale');
+        $this->registerLanguage($submissionLocale, $bookId);
 
         return $book;
     }
@@ -244,5 +248,19 @@ class ThothService
         $thothKeyword->setId($thothKeywordId);
 
         return $thothKeyword;
+    }
+
+    public function registerLanguage($submissionLocale, $workId)
+    {
+        $thothLanguage = new ThothLanguage();
+        $thothLanguage->setWorkId($workId);
+        $thothLanguage->setLanguageCode(strtoupper(AppLocale::getIso3FromLocale($submissionLocale)));
+        $thothLanguage->setLanguageRelation(ThothLanguage::LANGUAGE_RELATION_ORIGINAL);
+        $thothLanguage->setMainLanguage(true);
+
+        $thothLanguageId = $this->getThothClient()->createLanguage($thothLanguage);
+        $thothLanguage->setId($thothLanguageId);
+
+        return $thothLanguage;
     }
 }

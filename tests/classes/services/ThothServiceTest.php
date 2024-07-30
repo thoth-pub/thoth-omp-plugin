@@ -125,7 +125,8 @@ class ThothServiceTest extends PKPTestCase
                 'createWorkRelation',
                 'createPublication',
                 'createLocation',
-                'createSubject'
+                'createSubject',
+                'createLanguage'
             ])
             ->getMock();
         $mockThothClient->expects($this->any())
@@ -149,6 +150,10 @@ class ThothServiceTest extends PKPTestCase
         $mockThothClient->expects($this->any())
             ->method('createSubject')
             ->will($this->returnValue('6a9cdd5a-5877-433e-8063-9af0617eaa17'));
+        $mockThothClient->expects($this->any())
+            ->method('createLanguage')
+            ->will($this->returnValue('47b9ecbe-98af-4c01-8b5c-0c222e996429'));
+
 
         $thothService = $this->getMockBuilder(ThothService::class)
             ->setMethods(['getThothClient'])
@@ -343,5 +348,22 @@ class ThothServiceTest extends PKPTestCase
 
         $thothKeyword = $this->thothService->registerKeyword($submissionKeyword, $workId);
         $this->assertEquals($expectedThothKeyword, $thothKeyword);
+    }
+
+    public function testRegisterLanguage()
+    {
+        $workId = '0600200b-865b-4706-a7e5-b5861a60dbc4';
+
+        $expectedLanguage = new ThothLanguage();
+        $expectedLanguage->setId('47b9ecbe-98af-4c01-8b5c-0c222e996429');
+        $expectedLanguage->setWorkId($workId);
+        $expectedLanguage->setLanguageCode('ENG');
+        $expectedLanguage->setLanguageRelation(ThothLanguage::LANGUAGE_RELATION_ORIGINAL);
+        $expectedLanguage->setMainLanguage(true);
+
+        $submissionLocale = 'en_US';
+
+        $language = $this->thothService->registerLanguage($submissionLocale, $workId);
+        $this->assertEquals($expectedLanguage, $language);
     }
 }
