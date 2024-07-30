@@ -131,7 +131,7 @@ class ThothPublicationServiceTest extends PKPTestCase
         ];
 
         $identificationCode = DAORegistry::getDAO('IdentificationCodeDAO')->newDataObject();
-        $identificationCode->setCode('02');
+        $identificationCode->setCode('15');
         $identificationCode->setValue('978-0-615-94946-8');
 
         $mockResult = $this->getMockBuilder(DAOResultFactory::class)
