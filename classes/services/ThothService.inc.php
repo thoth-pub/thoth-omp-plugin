@@ -196,6 +196,9 @@ class ThothService
 
         $publication = $publicationService->new($publicationProps);
         $publication->setWorkId($workId);
+        if ($chapterId && $publication->getIsbn()) {
+            $publication->setIsbn(null);
+        }
 
         $publicationId = $this->getThothClient()->createPublication($publication);
         $publication->setId($publicationId);
@@ -203,10 +206,6 @@ class ThothService
         if ($publicationFormat->getRemoteUrl()) {
             $this->registerLocation($publicationFormat, $publicationId);
         } else {
-            $files = iterator_to_array(Services::get('submissionFile')->getMany([
-                'assocTypes' => [ASSOC_TYPE_PUBLICATION_FORMAT],
-                'assocIds' => [$publicationFormat->getId()],
-            ]));
             $files = array_filter(
                 iterator_to_array(Services::get('submissionFile')->getMany([
                     'assocTypes' => [ASSOC_TYPE_PUBLICATION_FORMAT],
