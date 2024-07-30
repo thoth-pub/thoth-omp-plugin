@@ -35,7 +35,7 @@ class ThothSubjectTest extends PKPTestCase
         $this->assertEquals(1, $subject->getSubjectOrdinal());
     }
 
-    public function testGetPublicationData()
+    public function testGetSubjectData()
     {
         $subject = new ThothSubject();
         $subject->setId('fb3cdeec-a533-49f2-ac42-7f3860f966f3');
