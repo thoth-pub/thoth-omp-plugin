@@ -9,7 +9,7 @@
  *
  * @class ThothPublicationTest
  * @ingroup plugins_generic_thoth_tests
- * @see Publication
+ * @see ThothPublication
  *
  * @brief Test class for the ThothPublication class
  */
