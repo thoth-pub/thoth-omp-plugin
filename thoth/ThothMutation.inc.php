@@ -1,13 +1,13 @@
 <?php
 
 /**
- * @file plugins/generic/thoth/thoth/ThothClient.inc.php
+ * @file plugins/generic/thoth/thoth/ThothMutation.inc.php
  *
  * Copyright (c) 2024 Lepidus Tecnologia
  * Copyright (c) 2024 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
- * @class ThothClient
+ * @class ThothMutation
  * @ingroup plugins_generic_thoth
  *
  * @brief Prepares and performs Thoth mutations

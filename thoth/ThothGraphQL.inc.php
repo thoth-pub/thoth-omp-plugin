@@ -32,7 +32,7 @@ class ThothGraphQL
         $this->token = $token;
     }
 
-    public function execute($query, $variables = null)
+    public function execute($query)
     {
         $payload = [
             'query' => $query,
