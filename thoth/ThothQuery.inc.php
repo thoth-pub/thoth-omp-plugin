@@ -33,17 +33,25 @@ class ThothQuery
         return implode(
             ',',
             array_map(
-                fn ($key, $value) => is_array($value) ?
+                function ($key, $value) {
+                    return is_array($value) ?
                     sprintf(
                         '%s:{%s}',
                         $key,
                         implode(',', array_map(
-                            fn ($a, $b) => sprintf('%s:%s', $a, $b),
+                            function ($a, $b) {
+                                return sprintf('%s:%s', $a, $b);
+                            },
                             array_keys($value),
                             array_values($value)
                         ))
                     ) :
-                    sprintf('%s:%s', $key, ($key == 'filter') ? json_encode($value) : $value),
+                    sprintf(
+                        '%s:%s',
+                        $key,
+                        ($key == 'filter') ? json_encode($value) : $value
+                    );
+                },
                 array_keys($params),
                 array_values($params)
             )
