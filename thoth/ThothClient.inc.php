@@ -85,6 +85,16 @@ class ThothClient
         return $this->mutation('createReference', $reference);
     }
 
+    public function contributors($limit = 100, $offset = 0, $filter = '', $order = [])
+    {
+        $this->addParameter($params, 'limit', $limit);
+        $this->addParameter($params, 'offset', $offset);
+        $this->addParameter($params, 'filter', $filter, true);
+        $this->addParameter($params, 'order', $order);
+
+        return $this->query('contributors', $params, ThothContributor::class);
+    }
+
     private function mutation($name, $data)
     {
         $mutation = new ThothMutation($name, $data);
