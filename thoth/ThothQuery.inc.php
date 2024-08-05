@@ -17,44 +17,27 @@ class ThothQuery
 {
     private $queryName;
 
-    private $fields;
-
     private $params;
 
-    public function __construct($queryName, $fields, $params)
+    private $fields;
+
+    public function __construct($queryName, $params, $queryClass)
     {
         $this->queryName = $queryName;
-        $this->fields = implode(',', $fields);
-        $this->params = $this->prepareParams($params);
+        $this->params = implode(',', $params);
+        $this->fields = $this->getQueryFields($queryClass);
     }
 
-    private function prepareParams($params)
+    private function getQueryFields($className)
     {
+        $reflector = new ReflectionClass($className);
+        $properties = $reflector->getProperties(ReflectionProperty::IS_PRIVATE);
+
         return implode(
             ',',
-            array_map(
-                function ($key, $value) {
-                    return is_array($value) ?
-                    sprintf(
-                        '%s:{%s}',
-                        $key,
-                        implode(',', array_map(
-                            function ($a, $b) {
-                                return sprintf('%s:%s', $a, $b);
-                            },
-                            array_keys($value),
-                            array_values($value)
-                        ))
-                    ) :
-                    sprintf(
-                        '%s:%s',
-                        $key,
-                        ($key == 'filter') ? json_encode($value) : $value
-                    );
-                },
-                array_keys($params),
-                array_values($params)
-            )
+            array_map(function ($prop) {
+                return $prop->getName();
+            }, $properties)
         );
     }
 
@@ -68,7 +51,6 @@ class ThothQuery
         );
         return $query;
     }
-
 
     public function run($graphqlClient)
     {

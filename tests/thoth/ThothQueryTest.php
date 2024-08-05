@@ -48,17 +48,13 @@ class ThothQueryTest extends PKPTestCase
         '}';
 
         $params = [
-            'limit' => 100,
-            'offset' => 0,
-            'filter' => 'John',
-            'order' => [
-                'field' => 'FIRST_NAME',
-                'direction' => 'ASC'
-            ]
+            'limit:100',
+            'offset:0',
+            'filter:"John"',
+            'order:{field:FIRST_NAME,direction:ASC}'
         ];
 
-        $contributor = new ThothContributor();
-        $thothQuery = new ThothQuery('contributors', $contributor->getProperties(), $params);
+        $thothQuery = new ThothQuery('contributors', $params, ThothContributor::class);
         $query = $thothQuery->prepare();
 
         $this->assertEquals($expectedQuery, $query);
@@ -68,30 +64,21 @@ class ThothQueryTest extends PKPTestCase
     {
         $expectedContributors = [
             [
-                'contributorId' => 'a2cd810e-b206-4ac3-8233-043113e1deac',
-                'firstName' => 'Abigail',
-                'lastName' => 'Branford',
-                'fullName' => 'Abigail Branford',
-                'orcid' => 'https://orcid.org/0000-0002-4353-928X',
-                'website' => null
-            ],
-            [
                 'contributorId' => 'fd1ea3ac-bb47-4a19-a743-5c2c38a400bc',
                 'firstName' => 'Ádám',
                 'lastName' => 'Bethlenfalvy',
                 'fullName' => 'Ádám Bethlenfalvy',
                 'orcid' => 'https://orcid.org/0000-0002-4251-8161',
                 'website' => 'https://www.linkedin.com/in/adam-bethlenfalvy-31b18489/'
-            ],
+            ]
         ];
 
         $params = [
-            'limit' => 100,
-            'offset' => 0
+            'limit:100',
+            'offset:0'
         ];
 
-        $contributor = new ThothContributor();
-        $thothQuery = new ThothQuery('contributors', $contributor->getProperties(), $params);
+        $thothQuery = new ThothQuery('contributors', $params, ThothContributor::class);
 
         $body = file_get_contents(__DIR__ . '/../fixtures/contributors.json');
         $mock = new MockHandler([
