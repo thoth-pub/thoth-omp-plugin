@@ -250,6 +250,40 @@ class ThothClientTest extends PKPTestCase
         $this->assertEquals('56338ed3-d2a9-4ef4-9afc-303d63be719f', $referenceId);
     }
 
+    public function testGetContribution()
+    {
+        $contributionId = 'f6b4b1ba-6849-42f0-b43e-fff5c6693738';
+
+        $expectedContribution = [
+            'contributionId' => $contributionId,
+            'contributorId' => '70a8a8c1-06f7-4adf-bfec-9421a6a70813',
+            'workId' => '473fcddc-23ee-46a4-8ffa-afa5020ac540',
+            'contributionType' => 'AUTHOR',
+            'mainContribution' => true,
+            'biography' => 'Paula Bialski is junior professor of digital sociality at Leuphana University Lüneburg. ' .
+                'She is an ethnographer of new media in everyday life and the author of Becoming Intimately Mobile.',
+            'firstName' => 'Paula',
+            'lastName' => 'Bialski',
+            'fullName' => 'Paula Bialski',
+            'contributionOrdinal' => 1
+        ];
+
+        $mock = new MockHandler([
+            new Response(
+                200,
+                [],
+                file_get_contents($this->fixturesPath . 'contribution.json')
+            )
+        ]);
+        $handlerStack = HandlerStack::create($mock);
+        $httpClient = new Client(['handler' => $handlerStack]);
+
+        $client = new ThothClient('https://api.thoth.test.pub/', $httpClient);
+        $contribution = $client->contribution($contributionId);
+
+        $this->assertEquals($expectedContribution, $contribution);
+    }
+
     public function testGetContributor()
     {
         $contributorId = 'e8def8cf-0dfe-4da9-b7fa-f77e7aec7524';

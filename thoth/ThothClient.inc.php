@@ -85,6 +85,13 @@ class ThothClient
         return $this->mutation('createReference', $reference);
     }
 
+    public function contribution($contributionId)
+    {
+        $this->addParameter($params, 'contributionId', $contributionId, true);
+
+        return $this->query('contribution', $params, ThothContribution::class);
+    }
+
     public function contributor($contributorId)
     {
         $this->addParameter($params, 'contributorId', $contributorId, true);
@@ -125,9 +132,15 @@ class ThothClient
         $params = $params ?? [];
 
         if (is_array($value)) {
-            $params[] = implode(',', array_map(function ($subKey, $subValue) {
-                return sprintf('%s:%s', $subKey, $subValue);
-            }, array_keys($value), array_values($value)));
+            $params[] = sprintf(
+                '%s:{%s}',
+                implode(
+                    ',',
+                    array_map(function ($subKey, $subValue) {
+                        return sprintf('%s:%s', $subKey, $subValue);
+                    }, array_keys($value), array_values($value))
+                )
+            );
             return;
         }
 
