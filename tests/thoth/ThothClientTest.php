@@ -250,6 +250,35 @@ class ThothClientTest extends PKPTestCase
         $this->assertEquals('56338ed3-d2a9-4ef4-9afc-303d63be719f', $referenceId);
     }
 
+    public function testGetContributor()
+    {
+        $contributorId = 'e8def8cf-0dfe-4da9-b7fa-f77e7aec7524';
+
+        $expectedContributor = [
+            'contributorId' => $contributorId,
+            'firstName' => 'Martin Paul',
+            'lastName' => 'Eve',
+            'fullName' => 'Martin Paul Eve',
+            'orcid' => 'https://orcid.org/0000-0002-5589-8511',
+            'website' => 'https://eve.gd/'
+        ];
+
+        $mock = new MockHandler([
+            new Response(
+                200,
+                [],
+                file_get_contents($this->fixturesPath . 'contributor.json')
+            )
+        ]);
+        $handlerStack = HandlerStack::create($mock);
+        $httpClient = new Client(['handler' => $handlerStack]);
+
+        $client = new ThothClient('https://api.thoth.test.pub/', $httpClient);
+        $contributor = $client->contributor($contributorId);
+
+        $this->assertEquals($expectedContributor, $contributor);
+    }
+
     public function testGetContributors()
     {
         $expectedContributors = [
