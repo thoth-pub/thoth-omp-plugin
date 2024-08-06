@@ -461,4 +461,32 @@ class ThothClientTest extends PKPTestCase
 
         $this->assertEquals($expectedImprint, $imprint);
     }
+
+    public function testGetImprints()
+    {
+        $expectedImprints = [
+            [
+                'imprintId' => '8bf133ee-e6d0-4a5f-981b-fda73bcc389c',
+                'publisherId' => '7ec3811c-667b-419e-b96c-a726acac610c',
+                'imprintName' => 'Edinburgh Diamond',
+                'imprintUrl' => 'https://books.ed.ac.uk/edinburgh-diamond/',
+                'crossmarkDoi' => 'https://doi.org/10.12345/11122233'
+            ]
+        ];
+
+        $mock = new MockHandler([
+            new Response(
+                200,
+                [],
+                file_get_contents($this->fixturesPath . 'imprints.json')
+            )
+        ]);
+        $handlerStack = HandlerStack::create($mock);
+        $httpClient = new Client(['handler' => $handlerStack]);
+
+        $client = new ThothClient('https://api.thoth.test.pub/', $httpClient);
+        $imprints = $client->imprints();
+
+        $this->assertEquals($expectedImprints, $imprints);
+    }
 }

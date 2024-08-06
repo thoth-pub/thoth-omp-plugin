@@ -144,6 +144,17 @@ class ThothClient
         return $this->query('imprint', $params, ThothImprint::class);
     }
 
+    public function imprints($limit = 100, $offset = 0, $filter = '', $order = [], $publishers = [])
+    {
+        $this->addParameter($params, 'limit', $limit);
+        $this->addParameter($params, 'offset', $offset);
+        $this->addParameter($params, 'filter', $filter, true);
+        $this->addParameter($params, 'order', $order);
+        $this->addParameter($params, 'publishers', $publishers, true);
+
+        return $this->query('imprints', $params, ThothImprint::class);
+    }
+
     private function mutation($name, $data)
     {
         $mutation = new ThothMutation($name, $data);
