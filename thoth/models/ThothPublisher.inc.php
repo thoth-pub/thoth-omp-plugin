@@ -21,7 +21,7 @@ class ThothPublisher extends ThothModel
 
     private $publisherName;
 
-    private $publisherShortName;
+    private $publisherShortname;
 
     private $publisherUrl;
 
@@ -50,14 +50,14 @@ class ThothPublisher extends ThothModel
         $this->publisherName = $publisherName;
     }
 
-    public function getPublisherShortName()
+    public function getPublisherShortname()
     {
-        return $this->publisherShortName;
+        return $this->publisherShortname;
     }
 
-    public function setPublisherShortName($publisherShortName)
+    public function setPublisherShortname($publisherShortname)
     {
-        $this->publisherShortName = $publisherShortName;
+        $this->publisherShortname = $publisherShortname;
     }
 
     public function getPublisherUrl()

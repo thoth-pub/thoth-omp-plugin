@@ -28,7 +28,7 @@ class ThothPublisherTest extends PKPTestCase
         $publisher->setPublisherUrl('https://edicionesuc.reduc.edu.cu/');
 
         $this->assertEquals('ea0ad5ff-dd59-48f8-8da7-95dfd40c90d8', $publisher->getId());
-        $this->assertEquals('Ediciones Universidad de Camagüey', $publisher->getPublisherName());
+        $this->assertEquals('Ediciones Universidad de Camagüey', $publisher->getPublishername());
         $this->assertEquals('UCEdiciones', $publisher->getPublisherShortName());
         $this->assertEquals('https://edicionesuc.reduc.edu.cu/', $publisher->getPublisherUrl());
     }
@@ -38,13 +38,13 @@ class ThothPublisherTest extends PKPTestCase
         $publisher = new ThothPublisher();
         $publisher->setId('67d14e6c-8922-4cf9-9bc7-1c03a9357144');
         $publisher->setPublisherName('Editora da Universidade Federal da Bahia');
-        $publisher->setPublisherShortName('EDUFBA');
+        $publisher->setPublisherShortname('EDUFBA');
         $publisher->setPublisherUrl('https://books.scielo.org/edufba/');
 
         $this->assertEquals([
             'publisherId' => '67d14e6c-8922-4cf9-9bc7-1c03a9357144',
             'publisherName' => 'Editora da Universidade Federal da Bahia',
-            'publisherShortName' => 'EDUFBA',
+            'publisherShortname' => 'EDUFBA',
             'publisherUrl' => 'https://books.scielo.org/edufba/'
         ], $publisher->getData());
     }
