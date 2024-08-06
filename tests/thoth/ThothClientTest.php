@@ -284,6 +284,42 @@ class ThothClientTest extends PKPTestCase
         $this->assertEquals($expectedContribution, $contribution);
     }
 
+    public function testGetContributions()
+    {
+        $contributionId = '6a132206-62f9-43ca-a05b-32e534eaf11a';
+
+        $expectedContributions = [
+            [
+                'contributionId' => $contributionId,
+                'contributorId' => 'c165d8d5-f8e1-43a3-ad46-9c999841ab12',
+                'workId' => '2566ed3d-3df1-4e56-a7dc-455ecf7d3a4b',
+                'contributionType' => 'AUTHOR',
+                'mainContribution' => true,
+                'biography' => '(7 December 1937 - 30 June 2021) was a British historian, senior research fellow at ' .
+                    'the Institute of English Studies, School of Advanced Study, University of London.',
+                'firstName' => 'William',
+                'lastName' => 'St Clair',
+                'fullName' => 'William St Clair',
+                'contributionOrdinal' => 1
+            ]
+        ];
+
+        $mock = new MockHandler([
+            new Response(
+                200,
+                [],
+                file_get_contents($this->fixturesPath . 'contributions.json')
+            )
+        ]);
+        $handlerStack = HandlerStack::create($mock);
+        $httpClient = new Client(['handler' => $handlerStack]);
+
+        $client = new ThothClient('https://api.thoth.test.pub/', $httpClient);
+        $contributions = $client->contributions();
+
+        $this->assertEquals($expectedContributions, $contributions);
+    }
+
     public function testGetContributor()
     {
         $contributorId = 'e8def8cf-0dfe-4da9-b7fa-f77e7aec7524';

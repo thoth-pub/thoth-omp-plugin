@@ -92,6 +92,17 @@ class ThothClient
         return $this->query('contribution', $params, ThothContribution::class);
     }
 
+    public function contributions($limit = 100, $offset = 0, $order = [], $publishers = [], $contributionTypes = [])
+    {
+        $this->addParameter($params, 'limit', $limit);
+        $this->addParameter($params, 'offset', $offset);
+        $this->addParameter($params, 'order', $order);
+        $this->addParameter($params, 'publishers', $publishers, true);
+        $this->addParameter($params, 'contributionTypes', $contributionTypes, true);
+
+        return $this->query('contributions', $params, ThothContributor::class);
+    }
+
     public function contributor($contributorId)
     {
         $this->addParameter($params, 'contributorId', $contributorId, true);
@@ -132,19 +143,28 @@ class ThothClient
         $params = $params ?? [];
 
         if (is_array($value)) {
-            $params[] = sprintf(
-                '%s:{%s}',
-                implode(
-                    ',',
-                    array_map(function ($subKey, $subValue) {
+            $params[] = (array_values($value) !== $value) ?
+                sprintf(
+                    '%s:{%s}',
+                    $key,
+                    implode(',', array_map(function ($subKey, $subValue) {
                         return sprintf('%s:%s', $subKey, $subValue);
-                    }, array_keys($value), array_values($value))
-                )
-            );
+                    }, array_keys($value), array_values($value)))
+                ) :
+                sprintf(
+                    '%s:[%s]',
+                    $key,
+                    implode(',', $enclosed ? array_map([$this, 'encloseValue'], $value) : $value)
+                );
             return;
         }
 
-        $params[] = sprintf('%s:%s', $key, $enclosed ? json_encode($value) : $value);
+        $params[] = sprintf('%s:%s', $key, $enclosed ? $this->encloseValue($value) : $value);
         return;
+    }
+
+    private function encloseValue($value)
+    {
+        return json_encode($value);
     }
 }
