@@ -405,4 +405,32 @@ class ThothClientTest extends PKPTestCase
 
         $this->assertEquals($expectedInstitution, $institution);
     }
+
+    public function testGetInstitutions()
+    {
+        $expectedInstitutions = [
+            [
+                'institutionId' => '6302c2bb-8e89-4d9a-801a-16b2329fd493',
+                'institutionName' => 'Arctic Sciences',
+                'institutionDoi' => 'https://doi.org/10.13039/100000163',
+                'countryCode' => 'USA',
+                'ror' => 'https://ror.org/02trddg58'
+            ]
+        ];
+
+        $mock = new MockHandler([
+            new Response(
+                200,
+                [],
+                file_get_contents($this->fixturesPath . 'institutions.json')
+            )
+        ]);
+        $handlerStack = HandlerStack::create($mock);
+        $httpClient = new Client(['handler' => $handlerStack]);
+
+        $client = new ThothClient('https://api.thoth.test.pub/', $httpClient);
+        $institutions = $client->institutions();
+
+        $this->assertEquals($expectedInstitutions, $institutions);
+    }
 }

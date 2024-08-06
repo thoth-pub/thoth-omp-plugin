@@ -127,6 +127,18 @@ class ThothClient
         return $this->query('institution', $params, ThothInstitution::class);
     }
 
+    public function institutions($limit = 100, $offset = 0, $filter = '', $order = [])
+    {
+        $this->addParameter($params, 'limit', $limit);
+        $this->addParameter($params, 'offset', $offset);
+        $this->addParameter($params, 'filter', $filter, true);
+        $this->addParameter($params, 'order', $order);
+
+        dump($params);
+
+        return $this->query('institutions', $params, ThothInstitution::class);
+    }
+
     private function mutation($name, $data)
     {
         $mutation = new ThothMutation($name, $data);
