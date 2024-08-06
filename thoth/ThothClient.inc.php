@@ -137,6 +137,13 @@ class ThothClient
         return $this->query('institutions', $params, ThothInstitution::class);
     }
 
+    public function imprint($imprintId)
+    {
+        $this->addParameter($params, 'imprintId', $imprintId, true);
+
+        return $this->query('imprint', $params, ThothImprint::class);
+    }
+
     private function mutation($name, $data)
     {
         $mutation = new ThothMutation($name, $data);
