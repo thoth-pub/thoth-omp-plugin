@@ -120,6 +120,13 @@ class ThothClient
         return $this->query('contributors', $params, ThothContributor::class);
     }
 
+    public function institution($institutionId)
+    {
+        $this->addParameter($params, 'institutionId', $institutionId, true);
+
+        return $this->query('institution', $params, ThothInstitution::class);
+    }
+
     private function mutation($name, $data)
     {
         $mutation = new ThothMutation($name, $data);
