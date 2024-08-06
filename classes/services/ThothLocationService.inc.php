@@ -34,15 +34,15 @@ class ThothLocationService
             [$submission->getBestId()]
         );
         $fullTextUrl = !$fileId ?
-        $publicationFormat->getRemoteUrl() :
-        $dispatcher->url(
-            $request,
-            ROUTE_PAGE,
-            $context->getPath(),
-            'catalog',
-            'view',
-            [$submission->getBestId(), $publicationFormat->getBestId(), $fileId]
-        );
+            $publicationFormat->getRemoteUrl() :
+            $dispatcher->url(
+                $request,
+                ROUTE_PAGE,
+                $context->getPath(),
+                'catalog',
+                'view',
+                [$submission->getBestId(), $publicationFormat->getBestId(), $fileId]
+            );
 
         $props = [];
         $props['landingPage'] = $landingPage;

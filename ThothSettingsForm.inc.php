@@ -71,7 +71,9 @@ class ThothSettingsForm extends Form
         foreach (self::SETTINGS as $setting) {
             if ($setting == 'password') {
                 $password = $this->plugin->getSetting($this->contextId, $setting);
-                $this->_data[$setting] = $password ? APIKeyEncryption::decryptString($password) : null;
+                $this->_data[$setting] = (APIKeyEncryption::secretConfigExists() && $password) ?
+                    APIKeyEncryption::decryptString($password) :
+                    null;
                 continue;
             }
             $this->_data[$setting] = $this->plugin->getSetting($this->contextId, $setting);

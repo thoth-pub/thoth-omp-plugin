@@ -24,12 +24,29 @@ use GuzzleHttp\Psr7\Response;
 import('lib.pkp.tests.PKPTestCase');
 import('plugins.generic.thoth.thoth.models.ThothContribution');
 import('plugins.generic.thoth.thoth.models.ThothContributor');
+import('plugins.generic.thoth.thoth.models.ThothLanguage');
+import('plugins.generic.thoth.thoth.models.ThothLocation');
+import('plugins.generic.thoth.thoth.models.ThothPublication');
+import('plugins.generic.thoth.thoth.models.ThothReference');
+import('plugins.generic.thoth.thoth.models.ThothSubject');
 import('plugins.generic.thoth.thoth.models.ThothWork');
 import('plugins.generic.thoth.thoth.models.ThothWorkRelation');
 import('plugins.generic.thoth.thoth.ThothClient');
 
 class ThothClientTest extends PKPTestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->fixturesPath = __DIR__ . '/../fixtures/';
+    }
+
+    protected function tearDown(): void
+    {
+        unset($this->fixturesPath);
+        parent::tearDown();
+    }
+
     public function testLoginWithInvalidCredentials()
     {
         $mockHandler = new MockHandler([
@@ -56,12 +73,6 @@ class ThothClientTest extends PKPTestCase
     public function testWorkCreation()
     {
         $work = new ThothWork();
-        $work->setWorkType(ThothWork::WORK_TYPE_MONOGRAPH);
-        $work->setWorkStatus(ThothWork::WORK_STATUS_ACTIVE);
-        $work->setFullTitle('Feliks Volkhovskii');
-        $work->setTitle('Feliks Volkhovskii');
-        $work->setEdition(1);
-        $work->setImprintId('e3cb2206-c2b6-4835-9f35-24bfa1572643');
 
         $mock = new MockHandler([
             new Response(
@@ -82,11 +93,6 @@ class ThothClientTest extends PKPTestCase
     public function testContributorCreation()
     {
         $contributor = new ThothContributor();
-        $contributor->setFirstName('Adriana Laura');
-        $contributor->setLastName('Massidda');
-        $contributor->setFullName('Adriana Laura Massidda');
-        $contributor->setOrcid('https://orcid.org/0000-0001-8735-7990');
-        $contributor->setWebsite('https://sites.google.com/site/adrianamassidda');
 
         $mock = new MockHandler([
             new Response(
@@ -107,18 +113,6 @@ class ThothClientTest extends PKPTestCase
     public function testContributionCreation()
     {
         $contribution = new ThothContribution();
-        $contribution->setWorkId('e763a10c-1e2b-4b10-84c4-ac3f95236a97');
-        $contribution->setContributorId('e1de541c-e84b-4092-941f-dab9b5dac865');
-        $contribution->setContributionType(ThothContribution::CONTRIBUTION_TYPE_EDITOR);
-        $contribution->setMainContribution(false);
-        $contribution->setContributionOrdinal(1);
-        $contribution->setFirstName('Thomas');
-        $contribution->setLastName('Pringle');
-        $contribution->setFullName('Thomas Patrick Pringle');
-        $contribution->setBiography(
-            'Thomas Pringle is an SSHRC doctoral and presidential fellow at Brown University, ' .
-            'where he is a PhD candidate in the Department of Modern Culture and Media.'
-        );
 
         $mock = new MockHandler([
             new Response(
@@ -139,11 +133,6 @@ class ThothClientTest extends PKPTestCase
     public function testRelationCreation()
     {
         $workRelation = new ThothWorkRelation();
-        $workRelation->setId('3e587b61-58f1-4064-bf80-e40e5c924d27');
-        $workRelation->setRelatorWorkId('991f1070-67fa-4e6e-8519-114006043492');
-        $workRelation->setRelatedWorkId('7d861db5-22f6-4ef8-abbb-b56ab8397624');
-        $workRelation->setRelationType(ThothWorkRelation::RELATION_TYPE_IS_CHILD_OF);
-        $workRelation->setRelationOrdinal(1);
 
         $mock = new MockHandler([
             new Response(
@@ -164,9 +153,6 @@ class ThothClientTest extends PKPTestCase
     public function testPublicationCreation()
     {
         $publication = new ThothPublication();
-        $publication->setWorkId('991f1070-67fa-4e6e-8519-114006043492');
-        $publication->setPublicationType(ThothPublication::PUBLICATION_TYPE_EPUB);
-        $publication->setIsbn('978-1-78374-032-1');
 
         $mock = new MockHandler([
             new Response(
@@ -187,7 +173,6 @@ class ThothClientTest extends PKPTestCase
     public function testLocationCreation()
     {
         $location = new ThothLocation();
-        $location->setPublicationId('8ac3e585-c32a-42d7-bd36-ef42ee397e6e');
 
         $mock = new MockHandler([
             new Response(
@@ -208,7 +193,6 @@ class ThothClientTest extends PKPTestCase
     public function testSubjectCreation()
     {
         $subject = new ThothSubject();
-        $subject->setWorkId('7fbd3c3e-1e37-4352-9211-82665cc25ce1');
 
         $mock = new MockHandler([
             new Response(
@@ -229,7 +213,6 @@ class ThothClientTest extends PKPTestCase
     public function testLanguageCreation()
     {
         $language = new ThothLanguage();
-        $language->setWorkId('30e3d0d8-4f7a-4659-ab33-d9c7b25b3af8');
 
         $mock = new MockHandler([
             new Response(
@@ -250,7 +233,6 @@ class ThothClientTest extends PKPTestCase
     public function testReferenceCreation()
     {
         $reference = new ThothReference();
-        $reference->setWorkId('810b7f09-baef-44cb-96eb-64ce6c26df19');
 
         $mock = new MockHandler([
             new Response(
@@ -266,5 +248,299 @@ class ThothClientTest extends PKPTestCase
         $referenceId = $client->createReference($reference);
 
         $this->assertEquals('56338ed3-d2a9-4ef4-9afc-303d63be719f', $referenceId);
+    }
+
+    public function testGetContribution()
+    {
+        $contributionId = 'f6b4b1ba-6849-42f0-b43e-fff5c6693738';
+
+        $expectedContribution = [
+            'contributionId' => $contributionId,
+            'contributorId' => '70a8a8c1-06f7-4adf-bfec-9421a6a70813',
+            'workId' => '473fcddc-23ee-46a4-8ffa-afa5020ac540',
+            'contributionType' => 'AUTHOR',
+            'mainContribution' => true,
+            'biography' => 'Paula Bialski is junior professor of digital sociality at Leuphana University Lüneburg. ' .
+                'She is an ethnographer of new media in everyday life and the author of Becoming Intimately Mobile.',
+            'firstName' => 'Paula',
+            'lastName' => 'Bialski',
+            'fullName' => 'Paula Bialski',
+            'contributionOrdinal' => 1
+        ];
+
+        $mock = new MockHandler([
+            new Response(
+                200,
+                [],
+                file_get_contents($this->fixturesPath . 'contribution.json')
+            )
+        ]);
+        $handlerStack = HandlerStack::create($mock);
+        $httpClient = new Client(['handler' => $handlerStack]);
+
+        $client = new ThothClient('https://api.thoth.test.pub/', $httpClient);
+        $contribution = $client->contribution($contributionId);
+
+        $this->assertEquals($expectedContribution, $contribution);
+    }
+
+    public function testGetContributions()
+    {
+        $contributionId = '6a132206-62f9-43ca-a05b-32e534eaf11a';
+
+        $expectedContributions = [
+            [
+                'contributionId' => $contributionId,
+                'contributorId' => 'c165d8d5-f8e1-43a3-ad46-9c999841ab12',
+                'workId' => '2566ed3d-3df1-4e56-a7dc-455ecf7d3a4b',
+                'contributionType' => 'AUTHOR',
+                'mainContribution' => true,
+                'biography' => '(7 December 1937 - 30 June 2021) was a British historian, senior research fellow at ' .
+                    'the Institute of English Studies, School of Advanced Study, University of London.',
+                'firstName' => 'William',
+                'lastName' => 'St Clair',
+                'fullName' => 'William St Clair',
+                'contributionOrdinal' => 1
+            ]
+        ];
+
+        $mock = new MockHandler([
+            new Response(
+                200,
+                [],
+                file_get_contents($this->fixturesPath . 'contributions.json')
+            )
+        ]);
+        $handlerStack = HandlerStack::create($mock);
+        $httpClient = new Client(['handler' => $handlerStack]);
+
+        $client = new ThothClient('https://api.thoth.test.pub/', $httpClient);
+        $contributions = $client->contributions();
+
+        $this->assertEquals($expectedContributions, $contributions);
+    }
+
+    public function testGetContributor()
+    {
+        $contributorId = 'e8def8cf-0dfe-4da9-b7fa-f77e7aec7524';
+
+        $expectedContributor = [
+            'contributorId' => $contributorId,
+            'firstName' => 'Martin Paul',
+            'lastName' => 'Eve',
+            'fullName' => 'Martin Paul Eve',
+            'orcid' => 'https://orcid.org/0000-0002-5589-8511',
+            'website' => 'https://eve.gd/'
+        ];
+
+        $mock = new MockHandler([
+            new Response(
+                200,
+                [],
+                file_get_contents($this->fixturesPath . 'contributor.json')
+            )
+        ]);
+        $handlerStack = HandlerStack::create($mock);
+        $httpClient = new Client(['handler' => $handlerStack]);
+
+        $client = new ThothClient('https://api.thoth.test.pub/', $httpClient);
+        $contributor = $client->contributor($contributorId);
+
+        $this->assertEquals($expectedContributor, $contributor);
+    }
+
+    public function testGetContributors()
+    {
+        $expectedContributors = [
+            [
+                'contributorId' => 'fd1ea3ac-bb47-4a19-a743-5c2c38a400bc',
+                'firstName' => 'Ádám',
+                'lastName' => 'Bethlenfalvy',
+                'fullName' => 'Ádám Bethlenfalvy',
+                'orcid' => 'https://orcid.org/0000-0002-4251-8161',
+                'website' => 'https://www.linkedin.com/in/adam-bethlenfalvy-31b18489/'
+            ]
+        ];
+
+        $mock = new MockHandler([
+            new Response(
+                200,
+                [],
+                file_get_contents($this->fixturesPath . 'contributors.json')
+            )
+        ]);
+        $handlerStack = HandlerStack::create($mock);
+        $httpClient = new Client(['handler' => $handlerStack]);
+
+        $client = new ThothClient('https://api.thoth.test.pub/', $httpClient);
+        $contributors = $client->contributors();
+
+        $this->assertEquals($expectedContributors, $contributors);
+    }
+
+    public function testGetInstitution()
+    {
+        $institutionId = '6e451aef-e496-4730-ac86-9f60d8ef4c55';
+
+        $expectedInstitution = [
+            'institutionId' => $institutionId,
+            'institutionName' => 'National Science Foundation',
+            'institutionDoi' => 'https://doi.org/10.13039/100000001',
+            'countryCode' => 'USA',
+            'ror' => 'https://ror.org/021nxhr62'
+        ];
+
+        $mock = new MockHandler([
+            new Response(
+                200,
+                [],
+                file_get_contents($this->fixturesPath . 'institution.json')
+            )
+        ]);
+        $handlerStack = HandlerStack::create($mock);
+        $httpClient = new Client(['handler' => $handlerStack]);
+
+        $client = new ThothClient('https://api.thoth.test.pub/', $httpClient);
+        $institution = $client->institution($institutionId);
+
+        $this->assertEquals($expectedInstitution, $institution);
+    }
+
+    public function testGetInstitutions()
+    {
+        $expectedInstitutions = [
+            [
+                'institutionId' => '6302c2bb-8e89-4d9a-801a-16b2329fd493',
+                'institutionName' => 'Arctic Sciences',
+                'institutionDoi' => 'https://doi.org/10.13039/100000163',
+                'countryCode' => 'USA',
+                'ror' => 'https://ror.org/02trddg58'
+            ]
+        ];
+
+        $mock = new MockHandler([
+            new Response(
+                200,
+                [],
+                file_get_contents($this->fixturesPath . 'institutions.json')
+            )
+        ]);
+        $handlerStack = HandlerStack::create($mock);
+        $httpClient = new Client(['handler' => $handlerStack]);
+
+        $client = new ThothClient('https://api.thoth.test.pub/', $httpClient);
+        $institutions = $client->institutions();
+
+        $this->assertEquals($expectedInstitutions, $institutions);
+    }
+
+    public function testGetImprint()
+    {
+        $imprintId = '5078b33c-5b3f-48bf-bf37-ced6b02beb7c';
+
+        $expectedImprint = [
+            'imprintId' => $imprintId,
+            'publisherId' => '4ab3bec2-c491-46d4-8731-47a5d9b33cc5',
+            'imprintName' => 'mediastudies.press',
+            'imprintUrl' => 'https://www.mediastudies.press/',
+            'crossmarkDoi' => 'https://doi.org/10.33333/87654321'
+        ];
+
+        $mock = new MockHandler([
+            new Response(
+                200,
+                [],
+                file_get_contents($this->fixturesPath . 'imprint.json')
+            )
+        ]);
+        $handlerStack = HandlerStack::create($mock);
+        $httpClient = new Client(['handler' => $handlerStack]);
+
+        $client = new ThothClient('https://api.thoth.test.pub/', $httpClient);
+        $imprint = $client->imprint($imprintId);
+
+        $this->assertEquals($expectedImprint, $imprint);
+    }
+
+    public function testGetImprints()
+    {
+        $expectedImprints = [
+            [
+                'imprintId' => '8bf133ee-e6d0-4a5f-981b-fda73bcc389c',
+                'publisherId' => '7ec3811c-667b-419e-b96c-a726acac610c',
+                'imprintName' => 'Edinburgh Diamond',
+                'imprintUrl' => 'https://books.ed.ac.uk/edinburgh-diamond/',
+                'crossmarkDoi' => 'https://doi.org/10.12345/11122233'
+            ]
+        ];
+
+        $mock = new MockHandler([
+            new Response(
+                200,
+                [],
+                file_get_contents($this->fixturesPath . 'imprints.json')
+            )
+        ]);
+        $handlerStack = HandlerStack::create($mock);
+        $httpClient = new Client(['handler' => $handlerStack]);
+
+        $client = new ThothClient('https://api.thoth.test.pub/', $httpClient);
+        $imprints = $client->imprints();
+
+        $this->assertEquals($expectedImprints, $imprints);
+    }
+
+    public function testGetPublisher()
+    {
+        $publisherId = 'd2459c17-ae6c-4179-a0ec-9aebd4c2d0be';
+
+        $expectedPublisher = [
+            'publisherId' => $publisherId,
+            'publisherName' => 'Editorial Universidad del Rosario',
+            'publisherShortname' => 'Editorial UR',
+            'publisherUrl' => 'https://editorial.urosario.edu.co/'
+        ];
+
+        $mock = new MockHandler([
+            new Response(
+                200,
+                [],
+                file_get_contents($this->fixturesPath . 'publisher.json')
+            )
+        ]);
+        $handlerStack = HandlerStack::create($mock);
+        $httpClient = new Client(['handler' => $handlerStack]);
+
+        $client = new ThothClient('https://api.thoth.test.pub/', $httpClient);
+        $publisher = $client->publisher($publisherId);
+
+        $this->assertEquals($expectedPublisher, $publisher);
+    }
+
+    public function testGetPublishers()
+    {
+        $expectedPublishers = [
+            [
+                'publisherId' => 'f2229e70-e973-4e89-b60f-1055fa3d7505',
+                'publisherName' => 'University of Westminster Press',
+                'publisherShortname' => 'UWP',
+                'publisherUrl' => 'https://www.uwestminsterpress.co.uk/'
+            ]
+        ];
+
+        $mock = new MockHandler([
+            new Response(
+                200,
+                [],
+                file_get_contents($this->fixturesPath . 'publishers.json')
+            )
+        ]);
+        $handlerStack = HandlerStack::create($mock);
+        $httpClient = new Client(['handler' => $handlerStack]);
+
+        $client = new ThothClient('https://api.thoth.test.pub/', $httpClient);
+        $publishers = $client->publishers();
+
+        $this->assertEquals($expectedPublishers, $publishers);
     }
 }
