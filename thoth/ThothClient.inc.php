@@ -134,8 +134,6 @@ class ThothClient
         $this->addParameter($params, 'filter', $filter, true);
         $this->addParameter($params, 'order', $order);
 
-        dump($params);
-
         return $this->query('institutions', $params, ThothInstitution::class);
     }
 
