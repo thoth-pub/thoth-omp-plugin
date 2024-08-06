@@ -162,6 +162,17 @@ class ThothClient
         return $this->query('publisher', $params, ThothPublisher::class);
     }
 
+    public function publishers($limit = 100, $offset = 0, $filter = '', $order = [], $publishers = [])
+    {
+        $this->addParameter($params, 'limit', $limit);
+        $this->addParameter($params, 'offset', $offset);
+        $this->addParameter($params, 'filter', $filter, true);
+        $this->addParameter($params, 'order', $order);
+        $this->addParameter($params, 'publishers', $publishers, true);
+
+        return $this->query('publishers', $params, ThothPublisher::class);
+    }
+
     private function mutation($name, $data)
     {
         $mutation = new ThothMutation($name, $data);

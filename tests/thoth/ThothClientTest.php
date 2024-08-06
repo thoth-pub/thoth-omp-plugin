@@ -498,7 +498,7 @@ class ThothClientTest extends PKPTestCase
             'publisherId' => $publisherId,
             'publisherName' => 'Editorial Universidad del Rosario',
             'publisherShortname' => 'Editorial UR',
-            'publisherUrl' => 'https://editorial.urosario.edu.co/',
+            'publisherUrl' => 'https://editorial.urosario.edu.co/'
         ];
 
         $mock = new MockHandler([
@@ -515,5 +515,32 @@ class ThothClientTest extends PKPTestCase
         $publisher = $client->publisher($publisherId);
 
         $this->assertEquals($expectedPublisher, $publisher);
+    }
+
+    public function testGetPublishers()
+    {
+        $expectedPublishers = [
+            [
+                'publisherId' => 'f2229e70-e973-4e89-b60f-1055fa3d7505',
+                'publisherName' => 'University of Westminster Press',
+                'publisherShortname' => 'UWP',
+                'publisherUrl' => 'https://www.uwestminsterpress.co.uk/'
+            ]
+        ];
+
+        $mock = new MockHandler([
+            new Response(
+                200,
+                [],
+                file_get_contents($this->fixturesPath . 'publishers.json')
+            )
+        ]);
+        $handlerStack = HandlerStack::create($mock);
+        $httpClient = new Client(['handler' => $handlerStack]);
+
+        $client = new ThothClient('https://api.thoth.test.pub/', $httpClient);
+        $publishers = $client->publishers();
+
+        $this->assertEquals($expectedPublishers, $publishers);
     }
 }
