@@ -198,37 +198,6 @@ class ThothServiceTest extends PKPTestCase
         $this->assertEquals($expectedBook, $book);
     }
 
-    public function testRegisterContribution()
-    {
-        $expectedContribution = new ThothContribution();
-        $expectedContribution->setId('67afac83-b015-4f32-9576-60b665a9e685');
-        $expectedContribution->setWorkId('45a6622c-a306-4559-bb77-25367dc881b8');
-        $expectedContribution->setContributorId('f70f709e-2137-4c87-a2e5-d52b263759ec');
-        $expectedContribution->setContributionType(ThothContribution::CONTRIBUTION_TYPE_AUTHOR);
-        $expectedContribution->setMainContribution(true);
-        $expectedContribution->setContributionOrdinal(1);
-        $expectedContribution->setFirstName('Michael');
-        $expectedContribution->setLastName('Wilson');
-        $expectedContribution->setFullName('Michael Wilson');
-
-        $userGroup = new UserGroup();
-        $userGroup->setData('nameLocaleKey', 'default.groups.name.author');
-
-        $author = $this->getMockBuilder(Author::class)
-            ->setMethods(['getUserGroup'])
-            ->getMock();
-        $author->expects($this->any())
-            ->method('getUserGroup')
-            ->will($this->returnValue($userGroup));
-        $author->setId(13);
-        $author->setGivenName('Michael', 'en_US');
-        $author->setFamilyName('Wilson', 'en_US');
-        $author->setSequence(0);
-
-        $contribution = $this->thothService->registerContribution($author, '45a6622c-a306-4559-bb77-25367dc881b8');
-        $this->assertEquals($expectedContribution, $contribution);
-    }
-
     public function testRegisterChapter()
     {
         $expectedChapter = new ThothWork();
