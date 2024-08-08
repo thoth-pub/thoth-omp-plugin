@@ -269,26 +269,6 @@ class ThothServiceTest extends PKPTestCase
         $this->assertEquals($expectedPublication, $publication);
     }
 
-    public function testRegisterLocation()
-    {
-        $publicationId = '8ac3e585-c32a-42d7-bd36-ef42ee397e6e';
-
-        $expectedLocation = new ThothLocation();
-        $expectedLocation->setId('03b0367d-bba3-4e26-846a-4c36d3920db2');
-        $expectedLocation->setPublicationId($publicationId);
-        $expectedLocation->setLandingPage('https://omp.publicknowledgeproject.org/index.php/press/catalog/book/53');
-        $expectedLocation->setFullTextUrl('https://www.bookstore.com/site/books/book5');
-        $expectedLocation->setLocationPlatform(ThothLocation::LOCATION_PLATFORM_OTHER);
-        $expectedLocation->setCanonical(true);
-
-        $publicationFormat = DAORegistry::getDAO('PublicationFormatDAO')->newDataObject();
-        $publicationFormat->setId(41);
-        $publicationFormat->setRemoteUrl('https://www.bookstore.com/site/books/book5');
-
-        $location = $this->thothService->registerLocation($publicationFormat, $publicationId);
-        $this->assertEquals($expectedLocation, $location);
-    }
-
     public function testRegisterKeyword()
     {
         $workId = '1ef03055-2890-429a-b870-f9671711bcc4';

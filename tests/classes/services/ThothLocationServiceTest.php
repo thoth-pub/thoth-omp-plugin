@@ -17,10 +17,12 @@
 import('classes.core.Application');
 import('classes.press.Press');
 import('classes.submission.Submission');
+import('classes.publication.Publication');
 import('lib.pkp.classes.core.Dispatcher');
 import('lib.pkp.classes.core.PKPRequest');
 import('lib.pkp.tests.PKPTestCase');
 import('plugins.generic.thoth.classes.services.ThothLocationService');
+import('plugins.generic.thoth.thoth.ThothClient');
 
 class ThothLocationServiceTest extends PKPTestCase
 {
@@ -70,7 +72,10 @@ class ThothLocationServiceTest extends PKPTestCase
             ->getMock();
         $mockDispatcher->expects($this->any())
             ->method('url')
-            ->will($this->onConsecutiveCalls('https://omp.publicknowledgeproject.org/press/catalog/book/23', 'https://omp.publicknowledgeproject.org/press/catalog/view/23/5/17'));
+            ->will($this->onConsecutiveCalls(
+                'https://omp.publicknowledgeproject.org/press/catalog/book/23',
+                'https://omp.publicknowledgeproject.org/press/catalog/view/23/5/17'
+            ));
 
         $mockRequest = $this->getMockBuilder(PKPRequest::class)
             ->setMethods(['getContext', 'url'])
@@ -102,18 +107,19 @@ class ThothLocationServiceTest extends PKPTestCase
         DAORegistry::registerDAO('PublicationDAO', $publicationDaoMock);
     }
 
-    public function testGetLocationPropsByPublicationFormat()
+    public function testCreateNewLocationByPublicationFormat()
     {
+        $expectedLocation = new ThothLocation();
+        $expectedLocation->setLandingPage('https://omp.publicknowledgeproject.org/press/catalog/book/23');
+        $expectedLocation->setFullTextUrl('https://omp.publicknowledgeproject.org/press/catalog/view/23/5/17');
+        $expectedLocation->setLocationPlatform(ThothLocation::LOCATION_PLATFORM_OTHER);
+
         $publicationFormat = DAORegistry::getDAO('PublicationFormatDAO')->newDataObject();
         $publicationFormat->setId(5);
 
-        $locationProps = $this->locationService->getPropertiesByPublicationFormat($publicationFormat, 17);
+        $location = $this->locationService->newByPublicationFormat($publicationFormat, 17);
 
-        $this->assertEquals([
-            'landingPage' => 'https://omp.publicknowledgeproject.org/press/catalog/book/23',
-            'fullTextUrl' => 'https://omp.publicknowledgeproject.org/press/catalog/view/23/5/17',
-            'locationPlatform' => ThothLocation::LOCATION_PLATFORM_OTHER
-        ], $locationProps);
+        $this->assertEquals($expectedLocation, $location);
     }
 
     public function testCreateNewLocation()
@@ -129,6 +135,35 @@ class ThothLocationServiceTest extends PKPTestCase
             'locationPlatform' => ThothLocation::LOCATION_PLATFORM_OTHER,
         ]);
 
+        $this->assertEquals($expectedLocation, $location);
+    }
+
+    public function testRegisterLocation()
+    {
+        $thothPublicationId = '8ac3e585-c32a-42d7-bd36-ef42ee397e6e';
+
+        $expectedLocation = new ThothLocation();
+        $expectedLocation->setId('03b0367d-bba3-4e26-846a-4c36d3920db2');
+        $expectedLocation->setPublicationId($thothPublicationId);
+        $expectedLocation->setLandingPage('https://omp.publicknowledgeproject.org/press/catalog/book/23');
+        $expectedLocation->setFullTextUrl('https://www.bookstore.com/site/books/book5');
+        $expectedLocation->setLocationPlatform(ThothLocation::LOCATION_PLATFORM_OTHER);
+        $expectedLocation->setCanonical(true);
+
+        $publicationFormat = DAORegistry::getDAO('PublicationFormatDAO')->newDataObject();
+        $publicationFormat->setId(41);
+        $publicationFormat->setRemoteUrl('https://www.bookstore.com/site/books/book5');
+
+        $mockThothClient = $this->getMockBuilder(ThothClient::class)
+            ->setMethods([
+                'createLocation',
+            ])
+            ->getMock();
+        $mockThothClient->expects($this->any())
+            ->method('createLocation')
+            ->will($this->returnValue('03b0367d-bba3-4e26-846a-4c36d3920db2'));
+
+        $location = $this->locationService->register($mockThothClient, $publicationFormat, $thothPublicationId);
         $this->assertEquals($expectedLocation, $location);
     }
 }

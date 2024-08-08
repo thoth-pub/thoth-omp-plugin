@@ -196,21 +196,6 @@ class ThothService
         return $publication;
     }
 
-    public function registerLocation($publicationFormat, $publicationId, $fileId = null, $canonical = true)
-    {
-        $locationService = new ThothLocationService();
-        $locationProps = $locationService->getPropertiesByPublicationFormat($publicationFormat, $fileId);
-
-        $location = $locationService->new($locationProps);
-        $location->setPublicationId($publicationId);
-        $location->setCanonical($canonical);
-
-        $locationId = $this->getThothClient()->createLocation($location);
-        $location->setId($locationId);
-
-        return $location;
-    }
-
     public function registerKeyword($submissionKeyword, $workId, $seq = 1)
     {
         $thothKeyword = new ThothSubject();
