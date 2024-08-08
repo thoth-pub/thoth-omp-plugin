@@ -106,19 +106,6 @@ class ThothService
         return $book;
     }
 
-    public function registerContributor($author)
-    {
-        $contributorService = new ThothContributorService();
-        $contributorProps = $contributorService->getPropertiesByAuthor($author);
-
-        $contributor = $contributorService->new($contributorProps);
-
-        $contributorId = $this->getThothClient()->createContributor($contributor);
-        $contributor->setId($contributorId);
-
-        return $contributor;
-    }
-
     public function registerContribution($author, $workId)
     {
         $contributionService = new ThothContributionService();

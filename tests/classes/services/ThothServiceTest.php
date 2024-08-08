@@ -198,22 +198,6 @@ class ThothServiceTest extends PKPTestCase
         $this->assertEquals($expectedBook, $book);
     }
 
-    public function testRegisterContributor()
-    {
-        $expectedContributor = new ThothContributor();
-        $expectedContributor->setId('f70f709e-2137-4c87-a2e5-d52b263759ec');
-        $expectedContributor->setFirstName('Brian');
-        $expectedContributor->setLastName('Dupuis');
-        $expectedContributor->setFullName('Brian Dupuis');
-
-        $author = new Author();
-        $author->setGivenName('Brian', 'en_US');
-        $author->setFamilyName('Dupuis', 'en_US');
-
-        $contributor = $this->thothService->registerContributor($author);
-        $this->assertEquals($expectedContributor, $contributor);
-    }
-
     public function testRegisterContribution()
     {
         $expectedContribution = new ThothContribution();

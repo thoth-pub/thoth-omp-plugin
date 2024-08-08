@@ -33,27 +33,6 @@ class ThothContributorServiceTest extends PKPTestCase
         parent::tearDown();
     }
 
-    public function testGetContributorsPropertiesByAuthor()
-    {
-        $expectedProps = [
-            'fullName' => 'Chantal Allan',
-            'firstName' => 'Chantal',
-            'lastName' => 'Allan',
-            'orcid' => 'https://orcid.org/0000-0002-1825-0097',
-            'website' => 'https://sites.google.com/site/chantalallan'
-        ];
-
-        $author = new Author();
-        $author->setGivenName('Chantal', 'en_US');
-        $author->setFamilyName('Allan', 'en_US');
-        $author->setOrcid('https://orcid.org/0000-0002-1825-0097');
-        $author->setUrl('https://sites.google.com/site/chantalallan');
-
-        $contributorProps = $this->contributorService->getPropertiesByAuthor($author);
-
-        $this->assertEquals($expectedProps, $contributorProps);
-    }
-
     public function testCreateNewContributor()
     {
         $expectedContributor = new ThothContributor();
@@ -68,6 +47,51 @@ class ThothContributorServiceTest extends PKPTestCase
         ];
 
         $contributor = $this->contributorService->new($params);
+        $this->assertEquals($expectedContributor, $contributor);
+    }
+
+    public function testCreateNewContributorByAuthor()
+    {
+        $expectedContributor = new ThothContributor();
+        $expectedContributor->setFirstName('Chantal');
+        $expectedContributor->setLastName('Allan');
+        $expectedContributor->setFullName('Chantal Allan');
+        $expectedContributor->setOrcid('https://orcid.org/0000-0002-1825-0097');
+        $expectedContributor->setWebsite('https://sites.google.com/site/chantalallan');
+
+        $author = new Author();
+        $author->setGivenName('Chantal', 'en_US');
+        $author->setFamilyName('Allan', 'en_US');
+        $author->setOrcid('https://orcid.org/0000-0002-1825-0097');
+        $author->setUrl('https://sites.google.com/site/chantalallan');
+
+        $contributor = $this->contributorService->newByAuthor($author);
+
+        $this->assertEquals($expectedContributor, $contributor);
+    }
+
+    public function testRegisterContributor()
+    {
+        $expectedContributor = new ThothContributor();
+        $expectedContributor->setId('f70f709e-2137-4c87-a2e5-d52b263759ec');
+        $expectedContributor->setFirstName('Brian');
+        $expectedContributor->setLastName('Dupuis');
+        $expectedContributor->setFullName('Brian Dupuis');
+
+        $author = new Author();
+        $author->setGivenName('Brian', 'en_US');
+        $author->setFamilyName('Dupuis', 'en_US');
+
+        $mockThothClient = $this->getMockBuilder(ThothClient::class)
+            ->setMethods([
+                'createContributor',
+            ])
+            ->getMock();
+        $mockThothClient->expects($this->any())
+            ->method('createContributor')
+            ->will($this->returnValue('f70f709e-2137-4c87-a2e5-d52b263759ec'));
+
+        $contributor = $this->contributorService->register($mockThothClient, $author);
         $this->assertEquals($expectedContributor, $contributor);
     }
 
