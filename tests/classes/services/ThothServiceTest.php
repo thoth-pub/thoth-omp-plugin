@@ -234,41 +234,6 @@ class ThothServiceTest extends PKPTestCase
         $this->assertEquals($expectedRelation, $relation);
     }
 
-    public function testRegisterPublication()
-    {
-        $workId = '2a065323-76cd-4f54-b83b-19f2a925f426';
-
-        $expectedPublication = new ThothPublication();
-        $expectedPublication->setId('80359118-9b33-4cf4-a4b4-8784e6d4375a');
-        $expectedPublication->setWorkId($workId);
-        $expectedPublication->setPublicationType(ThothPublication::PUBLICATION_TYPE_HTML);
-        $expectedPublication->setIsbn('978-1-912656-00-4');
-
-        $identificationCode = DAORegistry::getDAO('IdentificationCodeDAO')->newDataObject();
-        $identificationCode->setCode('15');
-        $identificationCode->setValue('978-1-912656-00-4');
-
-        $mockResult = $this->getMockBuilder(DAOResultFactory::class)
-            ->setMethods(['toArray'])
-            ->disableOriginalConstructor()
-            ->getMock();
-        $mockResult->expects($this->any())
-            ->method('toArray')
-            ->will($this->returnValue([$identificationCode]));
-
-        $publicationFormat = $mockRequest = $this->getMockBuilder(PublicationFormat::class)
-            ->setMethods(['getIdentificationCodes'])
-            ->getMock();
-        $publicationFormat->expects($this->any())
-            ->method('getIdentificationCodes')
-            ->will($this->returnValue($mockResult));
-        $publicationFormat->setEntryKey('DA');
-        $publicationFormat->setName('HTML', 'en_US');
-
-        $publication = $this->thothService->registerPublication($publicationFormat, $workId);
-        $this->assertEquals($expectedPublication, $publication);
-    }
-
     public function testRegisterKeyword()
     {
         $workId = '1ef03055-2890-429a-b870-f9671711bcc4';

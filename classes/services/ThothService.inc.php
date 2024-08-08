@@ -159,43 +159,6 @@ class ThothService
         return $relation;
     }
 
-    public function registerPublication($publicationFormat, $workId, $chapterId = null)
-    {
-        $publicationService = new ThothPublicationService();
-        $publicationProps = $publicationService->getPropertiesByPublicationFormat($publicationFormat);
-
-        $publication = $publicationService->new($publicationProps);
-        $publication->setWorkId($workId);
-        if ($chapterId && $publication->getIsbn()) {
-            $publication->setIsbn(null);
-        }
-
-        $publicationId = $this->getThothClient()->createPublication($publication);
-        $publication->setId($publicationId);
-
-        if ($publicationFormat->getRemoteUrl()) {
-            $this->registerLocation($publicationFormat, $publicationId);
-        } else {
-            $files = array_filter(
-                iterator_to_array(Services::get('submissionFile')->getMany([
-                    'assocTypes' => [ASSOC_TYPE_PUBLICATION_FORMAT],
-                    'assocIds' => [$publicationFormat->getId()],
-                ])),
-                function ($a) use ($chapterId) {
-                    return $a->getData('chapterId') == $chapterId;
-                }
-            );
-
-            $canonical = true;
-            foreach ($files as $file) {
-                $this->registerLocation($publicationFormat, $publicationId, $file->getId(), $canonical);
-                $canonical = false;
-            }
-        }
-
-        return $publication;
-    }
-
     public function registerKeyword($submissionKeyword, $workId, $seq = 1)
     {
         $thothKeyword = new ThothSubject();
