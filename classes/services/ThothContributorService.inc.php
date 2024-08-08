@@ -31,11 +31,24 @@ class ThothContributorService
     public function new($params)
     {
         $contributor = new ThothContributor();
+        $contributor->setId($params['contributorId'] ?? null);
         $contributor->setFirstName($params['firstName'] ?? null);
         $contributor->setLastName($params['lastName']);
         $contributor->setFullName($params['fullName']);
         $contributor->setOrcid($params['orcid'] ?? null);
         $contributor->setWebsite($params['website'] ?? null);
         return $contributor;
+    }
+
+    public function getMany($thothClient, $params = [])
+    {
+        $limit = $params['limit'] ?? 100;
+        $offset = $params['offset'] ?? 0;
+        $filter = $params['filter'] ?? '';
+        $order = $params['order'] ?? [];
+
+        $contributorsData = $thothClient->contributors($limit, $offset, $filter, $order);
+
+        return array_map([$this, 'new'], $contributorsData);
     }
 }

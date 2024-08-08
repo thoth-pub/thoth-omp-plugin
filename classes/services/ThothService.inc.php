@@ -127,7 +127,16 @@ class ThothService
         $contribution = $contributionService->new($contributionProps);
         $contribution->setWorkId($workId);
 
-        $contributor = $this->registerContributor($author);
+        $contributorService = new ThothContributorService();
+        $contributors = $contributorService->getMany($this->getThothClient(), [
+            'limit' => 1,
+            'filter' => (!empty($author->getOrcid())) ? $author->getOrcid() : $author->getFullName(false)
+        ]);
+
+        $contributor = empty($contributors) ?
+            $this->registerContributor($author) :
+            $contributor = array_shift($contributors);
+
         $contribution->setContributorId($contributor->getId());
 
         $contributionId = $this->getThothClient()->createContribution($contribution);

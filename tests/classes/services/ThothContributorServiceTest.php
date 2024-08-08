@@ -17,6 +17,7 @@
 import('lib.pkp.tests.PKPTestCase');
 import('classes.monograph.Author');
 import('plugins.generic.thoth.classes.services.ThothContributorService');
+import('plugins.generic.thoth.thoth.ThothClient');
 
 class ThothContributorServiceTest extends PKPTestCase
 {
@@ -68,5 +69,53 @@ class ThothContributorServiceTest extends PKPTestCase
 
         $contributor = $this->contributorService->new($params);
         $this->assertEquals($expectedContributor, $contributor);
+    }
+
+    public function testGetManyContributors()
+    {
+        $expectedContributors = [];
+        $expectedContributors[] = new ThothContributor();
+        $expectedContributors[0]->setId('59383141-fff9-46e2-bc66-f71e42189380');
+        $expectedContributors[0]->setFirstName('Brenna Clarke');
+        $expectedContributors[0]->setLastName('Gray');
+        $expectedContributors[0]->setFullName('Brenna Clarke Gray');
+        $expectedContributors[0]->setOrcid('https://orcid.org/0000-0002-6079-0484');
+        $expectedContributors[0]->setWebsite('http://brennaclarkegray.ca');
+        $expectedContributors[] = new ThothContributor();
+        $expectedContributors[1]->setId('5b0d32d4-bfd9-4db1-88fb-4cb91bdaf246');
+        $expectedContributors[1]->setFirstName('Dilton Oliveira de');
+        $expectedContributors[1]->setLastName('Araújo');
+        $expectedContributors[1]->setFullName('Dilton Oliveira de Araújo');
+        $expectedContributors[1]->setWebsite('http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=B00408');
+
+        $mockThothClient = $this->getMockBuilder(ThothClient::class)
+            ->setMethods([
+                'contributors',
+            ])
+            ->getMock();
+        $mockThothClient->expects($this->any())
+            ->method('contributors')
+            ->will($this->returnValue([
+                [
+                    'contributorId' => '59383141-fff9-46e2-bc66-f71e42189380',
+                    'firstName' => 'Brenna Clarke',
+                    'lastName' => 'Gray',
+                    'fullName' => 'Brenna Clarke Gray',
+                    'orcid' => 'https://orcid.org/0000-0002-6079-0484',
+                    'website' => 'http://brennaclarkegray.ca'
+                ],
+                [
+                    'contributorId' => '5b0d32d4-bfd9-4db1-88fb-4cb91bdaf246',
+                    'firstName' => 'Dilton Oliveira de',
+                    'lastName' => 'Araújo',
+                    'fullName' => 'Dilton Oliveira de Araújo',
+                    'orcid' => null,
+                    'website' => 'http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=B00408'
+                ]
+            ]));
+
+        $contributors = $this->contributorService->getMany($mockThothClient);
+
+        $this->assertEquals($expectedContributors, $contributors);
     }
 }
