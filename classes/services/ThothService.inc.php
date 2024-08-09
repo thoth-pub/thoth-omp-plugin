@@ -158,18 +158,4 @@ class ThothService
 
         return $relation;
     }
-
-    public function registerKeyword($submissionKeyword, $workId, $seq = 1)
-    {
-        $thothKeyword = new ThothSubject();
-        $thothKeyword->setWorkId($workId);
-        $thothKeyword->setSubjectType(ThothSubject::SUBJECT_TYPE_KEYWORD);
-        $thothKeyword->setSubjectCode($submissionKeyword);
-        $thothKeyword->setSubjectOrdinal($seq);
-
-        $thothKeywordId = $this->getThothClient()->createSubject($thothKeyword);
-        $thothKeyword->setId($thothKeywordId);
-
-        return $thothKeyword;
-    }
 }

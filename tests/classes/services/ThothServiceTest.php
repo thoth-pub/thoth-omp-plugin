@@ -233,21 +233,4 @@ class ThothServiceTest extends PKPTestCase
         $relation = $this->thothService->registerRelation($chapter, $relatedWorkId);
         $this->assertEquals($expectedRelation, $relation);
     }
-
-    public function testRegisterKeyword()
-    {
-        $workId = '1ef03055-2890-429a-b870-f9671711bcc4';
-
-        $expectedThothKeyword = new ThothSubject();
-        $expectedThothKeyword->setId('6a9cdd5a-5877-433e-8063-9af0617eaa17');
-        $expectedThothKeyword->setWorkId($workId);
-        $expectedThothKeyword->setSubjectType(ThothSubject::SUBJECT_TYPE_KEYWORD);
-        $expectedThothKeyword->setSubjectCode('Psychology');
-        $expectedThothKeyword->setSubjectOrdinal(1);
-
-        $submissionKeyword = 'Psychology';
-
-        $thothKeyword = $this->thothService->registerKeyword($submissionKeyword, $workId);
-        $this->assertEquals($expectedThothKeyword, $thothKeyword);
-    }
 }
