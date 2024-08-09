@@ -172,18 +172,4 @@ class ThothService
 
         return $thothKeyword;
     }
-
-    public function registerLanguage($submissionLocale, $workId)
-    {
-        $thothLanguage = new ThothLanguage();
-        $thothLanguage->setWorkId($workId);
-        $thothLanguage->setLanguageCode(strtoupper(AppLocale::getIso3FromLocale($submissionLocale)));
-        $thothLanguage->setLanguageRelation(ThothLanguage::LANGUAGE_RELATION_ORIGINAL);
-        $thothLanguage->setMainLanguage(true);
-
-        $thothLanguageId = $this->getThothClient()->createLanguage($thothLanguage);
-        $thothLanguage->setId($thothLanguageId);
-
-        return $thothLanguage;
-    }
 }

@@ -250,21 +250,4 @@ class ThothServiceTest extends PKPTestCase
         $thothKeyword = $this->thothService->registerKeyword($submissionKeyword, $workId);
         $this->assertEquals($expectedThothKeyword, $thothKeyword);
     }
-
-    public function testRegisterLanguage()
-    {
-        $workId = '0600200b-865b-4706-a7e5-b5861a60dbc4';
-
-        $expectedLanguage = new ThothLanguage();
-        $expectedLanguage->setId('47b9ecbe-98af-4c01-8b5c-0c222e996429');
-        $expectedLanguage->setWorkId($workId);
-        $expectedLanguage->setLanguageCode('ENG');
-        $expectedLanguage->setLanguageRelation(ThothLanguage::LANGUAGE_RELATION_ORIGINAL);
-        $expectedLanguage->setMainLanguage(true);
-
-        $submissionLocale = 'en_US';
-
-        $language = $this->thothService->registerLanguage($submissionLocale, $workId);
-        $this->assertEquals($expectedLanguage, $language);
-    }
 }
