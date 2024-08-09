@@ -186,17 +186,4 @@ class ThothService
 
         return $thothLanguage;
     }
-
-    public function registerReference($citation, $workId)
-    {
-        $thothReference = new ThothReference();
-        $thothReference->setWorkId($workId);
-        $thothReference->setReferenceOrdinal($citation->getSequence());
-        $thothReference->setUnstructuredCitation($citation->getRawCitation());
-
-        $thothReferenceId = $this->getThothClient()->createReference($thothReference);
-        $thothReference->setId($thothReferenceId);
-
-        return $thothReference;
-    }
 }

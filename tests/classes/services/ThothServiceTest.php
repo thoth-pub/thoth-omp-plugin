@@ -267,25 +267,4 @@ class ThothServiceTest extends PKPTestCase
         $language = $this->thothService->registerLanguage($submissionLocale, $workId);
         $this->assertEquals($expectedLanguage, $language);
     }
-
-    public function testRegisterReference()
-    {
-        $workId = '9a6aab2b-8077-4cd3-9dd1-19c115f2a3ca';
-        $rawCitation = 'Fendrick AM, Monto AS, Nightengale B, Sarnes M. The economic burden of non-influenza-related ' .
-            'viral respiratory tract infection in the United States. Arch Intern Med. 2003;163(4):487-494. ' .
-            'DOI: https://doi.org/10.1001/archinte.163.4.487 PMID: https://www.ncbi.nlm.nih.gov/pubmed/12588210';
-
-        $expectedReference = new ThothReference();
-        $expectedReference->setId('c9521541-6676-4cf4-ad6d-06299682718b');
-        $expectedReference->setWorkId($workId);
-        $expectedReference->setReferenceOrdinal(3);
-        $expectedReference->setUnstructuredCitation($rawCitation);
-
-        $citation = DAORegistry::getDAO('CitationDAO')->_newDataObject();
-        $citation->setRawCitation($rawCitation);
-        $citation->setSequence(3);
-
-        $reference = $this->thothService->registerReference($citation, $workId);
-        $this->assertEquals($expectedReference, $reference);
-    }
 }
