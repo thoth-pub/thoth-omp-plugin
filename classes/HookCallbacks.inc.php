@@ -13,7 +13,9 @@
  * @brief Manage callback functions for the plugin hooks
  */
 
-import('plugins.generic.thoth.classes.services.ThothService');
+import('plugins.generic.thoth.classes.services.ThothWorkService');
+import('plugins.generic.thoth.lib.APIKeyEncryption.APIKeyEncryption');
+import('plugins.generic.thoth.thoth.ThothClient');
 
 class HookCallbacks
 {
@@ -38,29 +40,50 @@ class HookCallbacks
     public function createWork($hookName, $args)
     {
         $request = Application::get()->getRequest();
-        $context = $request->getContext();
+        $contextId = $request->getContext()->getId();
         $submission = $args[2];
 
         if ($submission->getData('thothWorkId')) {
             return false;
         }
 
+        $endpoint = $this->plugin->getSetting($contextId, 'apiUrl');
+        $thothClient = new ThothClient($endpoint);
+
+        $email = $this->plugin->getSetting($contextId, 'email');
+        $password = $this->plugin->getSetting($contextId, 'password');
+        if (!$email || !$password) {
+            $this->notify(
+                $request,
+                NOTIFICATION_TYPE_ERROR,
+                __('plugins.generic.thoth.credentialsMissing')
+            );
+            return false;
+        }
+        $password = APIKeyEncryption::decryptString($password);
+
+        $thothImprintId = $this->plugin->getSetting($contextId, 'imprintId');
         try {
-            $thothService = new ThothService($this->plugin, $context->getId());
-            $book = $thothService->registerBook($submission);
-            $submission = Services::get('submission')->edit($submission, ['thothWorkId' => $book->getId()], $request);
+            $thothClient->login($email, $password);
+            $thothWorkService = new ThothWorkService();
+            $thothBook = $thothWorkService->registerBook($thothClient, $submission, $thothImprintId);
+            $submission = Services::get('submission')->edit(
+                $submission,
+                ['thothWorkId' => $thothBook->getId()],
+                $request
+            );
 
             $this->notify(
                 $request,
                 NOTIFICATION_TYPE_SUCCESS,
-                __('plugins.generic.thoth.settings.registerMetadata')
+                __('plugins.generic.thoth.registerMetadata')
             );
         } catch (ThothException $e) {
             error_log($e->getMessage());
             $this->notify(
                 $request,
                 NOTIFICATION_TYPE_ERROR,
-                __('plugins.generic.thoth.settings.registerMetadata.error')
+                __('plugins.generic.thoth.registerMetadata.error')
             );
         }
 

@@ -50,7 +50,7 @@ class ThothPublicationService
 
         $thothLocationService = new ThothLocationService();
         if ($publicationFormat->getRemoteUrl()) {
-            $thothLocationService->register($publicationFormat, $thothPublicationId);
+            $thothLocationService->register($thothClient, $publicationFormat, $thothPublicationId);
             return $thothPublication;
         }
 
@@ -66,7 +66,7 @@ class ThothPublicationService
 
         $canonical = true;
         foreach ($files as $file) {
-            $thothLocationService->register($publicationFormat, $thothPublicationId, $file->getId(), $canonical);
+            $thothLocationService->register($thothClient, $publicationFormat, $thothPublicationId, $file->getId(), $canonical);
             $canonical = false;
         }
 

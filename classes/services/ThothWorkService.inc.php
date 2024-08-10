@@ -111,7 +111,7 @@ class ThothWorkService
             ->getByPublicationId($submission->getData('currentPublicationId'))
             ->toArray();
         foreach ($chapters as $chapter) {
-            $this->registerWorkRelation($thothClient, $chapter, $thothBookId);
+            $this->registerWorkRelation($thothClient, $chapter, $thothImprintId, $thothBookId);
         }
 
         $publicationService = new ThothPublicationService();
