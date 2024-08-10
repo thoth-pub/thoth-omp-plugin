@@ -16,17 +16,19 @@
 
 import('classes.core.Application');
 import('classes.press.Press');
+import('classes.submission.Submission');
 import('lib.pkp.classes.core.PKPRequest');
 import('lib.pkp.classes.core.PKPRouter');
 import('lib.pkp.tests.PKPTestCase');
 import('plugins.generic.thoth.classes.services.ThothWorkService');
+import('plugins.generic.thoth.thoth.models.ThothWork');
+import('plugins.generic.thoth.thoth.ThothClient');
 
 class ThothWorkServiceTest extends PKPTestCase
 {
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->workService = new ThothWorkService();
     }
 
@@ -46,36 +48,70 @@ class ThothWorkServiceTest extends PKPTestCase
         $press = new Press();
         $press->setId(2);
         $press->setPrimaryLocale('en_US');
-        $press->setPath('press_path');
+        $press->setPath('press');
 
         $mockApplication = $this->getMockBuilder(Application::class)
             ->setMethods(['getContextDepth', 'getContextList'])
             ->getMock();
-
         $mockApplication->expects($this->any())
             ->method('getContextDepth')
             ->will($this->returnValue(1));
-
         $mockApplication->expects($this->any())
             ->method('getContextList')
             ->will($this->returnValue(['firstContext']));
         Registry::set('application', $mockApplication);
 
         $mockRequest = $this->getMockBuilder(PKPRequest::class)
-            ->setMethods(['getContext', 'getBaseUrl'])
+            ->setMethods(['getContext', 'getBaseUrl', 'url'])
             ->getMock();
-
         $dispatcher = $mockApplication->getDispatcher();
         $mockRequest->setDispatcher($dispatcher);
-
         $mockRequest->expects($this->any())
             ->method('getContext')
             ->will($this->returnValue($press));
-
         $mockRequest->expects($this->any())
             ->method('getBaseUrl')
             ->will($this->returnValue('https://omp.publicknowledgeproject.org'));
         Registry::set('request', $mockRequest);
+
+        $submissionDaoMock = $this->getMockBuilder(SubmissionDAO::class)
+            ->setMethods(['getById'])
+            ->getMock();
+        $submission = new Submission();
+        $submission->setId(53);
+        $submissionDaoMock->expects($this->any())
+            ->method('getById')
+            ->will($this->returnValue($submission));
+        DAORegistry::registerDAO('SubmissionDAO', $submissionDaoMock);
+
+        $publicationMockDao = $this->getMockBuilder(PublicationDAO::class)
+            ->setMethods(['getById'])
+            ->getMock();
+        $publication = new Publication();
+        $publication->setData('primaryContactId', 13);
+        $publicationMockDao->expects($this->any())
+            ->method('getById')
+            ->will($this->returnValue($publication));
+        DAORegistry::registerDAO('PublicationDAO', $publicationMockDao);
+
+        $mockThothClient = $this->getMockBuilder(ThothClient::class)
+            ->setMethods([
+                'createWork',
+                'createLanguage',
+                'createWorkRelation'
+            ])
+            ->getMock();
+        $mockThothClient->expects($this->any())
+            ->method('createWork')
+            ->will($this->returnValue('74fde3e2-ca4e-4597-bb0c-aee90648f5a5'));
+        $mockThothClient->expects($this->any())
+            ->method('createLanguage')
+            ->will($this->returnValue('47b9ecbe-98af-4c01-8b5c-0c222e996429'));
+        $mockThothClient->expects($this->any())
+            ->method('createWorkRelation')
+            ->will($this->returnValue('3e587b61-58f1-4064-bf80-e40e5c924d27'));
+
+        return $mockThothClient;
     }
 
     public function testGetWorkTypeBySubmissionWorkType()
@@ -90,26 +126,27 @@ class ThothWorkServiceTest extends PKPTestCase
         );
     }
 
-    public function testGetWorkPropsBySubmission()
+    public function testCreateNewWorkBySubmission()
     {
-        $expectedProps = [
-            'workType' => ThothWork::WORK_TYPE_MONOGRAPH,
-            'workStatus' => ThothWork::WORK_STATUS_ACTIVE,
-            'fullTitle' => 'Accessible Elements: Teaching Science Online and at a Distance',
-            'title' => 'Accessible Elements',
-            'subtitle' => 'Teaching Science Online and at a Distance',
-            'edition' => 1,
-            'doi' => 'https://doi.org/10.1234/0000af0000',
-            'publicationDate' => '2024-07-16',
-            'license' => 'https://creativecommons.org/licenses/by-nc/4.0/',
-            'copyrightHolder' => 'Public Knowledge Press',
-            'landingPage' => 'https://omp.publicknowledgeproject.org/index.php/press_path/catalog/book/3',
-            'coverUrl' => 'https://omp.publicknowledgeproject.org/templates/images/book-default.png',
-            'longAbstract' => 'Accessible Elements informs science educators about current practices in online ' .
-                'and distance education: distance-delivered methods for laboratory coursework, the requisite ' .
-                'administrative and institutional aspects of online and distance teaching, and the relevant ' .
-                'educational theory.',
-        ];
+        $expectedThothWork = new ThothWork();
+        $expectedThothWork->setWorkType(ThothWork::WORK_TYPE_MONOGRAPH);
+        $expectedThothWork->setWorkStatus(ThothWork::WORK_STATUS_ACTIVE);
+        $expectedThothWork->setFullTitle('Accessible Elements: Teaching Science Online and at a Distance');
+        $expectedThothWork->setTitle('Accessible Elements');
+        $expectedThothWork->setSubtitle('Teaching Science Online and at a Distance');
+        $expectedThothWork->setEdition(1);
+        $expectedThothWork->setPublicationDate('2024-07-16');
+        $expectedThothWork->setDoi('https://doi.org/10.1234/0000af0000');
+        $expectedThothWork->setLicense('https://creativecommons.org/licenses/by-nc/4.0/');
+        $expectedThothWork->setCopyrightHolder('Public Knowledge Press');
+        $expectedThothWork->setLandingPage('https://omp.publicknowledgeproject.org/index.php/press/catalog/book/3');
+        $expectedThothWork->setCoverUrl('https://omp.publicknowledgeproject.org/templates/images/book-default.png');
+        $expectedThothWork->setLongAbstract(
+            'Accessible Elements informs science educators about current practices in online ' .
+            'and distance education: distance-delivered methods for laboratory coursework, the requisite ' .
+            'administrative and institutional aspects of online and distance teaching, and the relevant ' .
+            'educational theory.'
+        );
 
         $publication = DAORegistry::getDAO('PublicationDAO')->newDataObject();
         $publication->setId(4);
@@ -161,23 +198,20 @@ class ThothWorkServiceTest extends PKPTestCase
 
         $this->setUpMockEnvironment();
 
-        $workProps = $this->workService->getPropertiesBySubmission($submission);
-        $this->assertEquals($expectedProps, $workProps);
+        $thothWork = $this->workService->newBySubmission($submission);
+        $this->assertEquals($expectedThothWork, $thothWork);
     }
 
-    public function testGetWorkPropsByChapter()
+    public function testCreateNewWorkByChapter()
     {
-        $expectedProps = [
-            'workType' => ThothWork::WORK_TYPE_BOOK_CHAPTER,
-            'workStatus' => ThothWork::WORK_STATUS_ACTIVE,
-            'fullTitle' => 'Chapter 1: Interactions Affording Distance Science Education',
-            'title' => 'Chapter 1: Interactions Affording Distance Science Education',
-            'subtitle' => null,
-            'longAbstract' => null,
-            'publicationDate' => '2024-03-21',
-            'pageCount' => '27',
-            'doi' => 'https://doi.org/10.1234/jpk.14.c54'
-        ];
+        $expectedThothWork = new ThothWork();
+        $expectedThothWork->setWorkType(ThothWork::WORK_TYPE_BOOK_CHAPTER);
+        $expectedThothWork->setWorkStatus(ThothWork::WORK_STATUS_ACTIVE);
+        $expectedThothWork->setFullTitle('Chapter 1: Interactions Affording Distance Science Education');
+        $expectedThothWork->setTitle('Chapter 1: Interactions Affording Distance Science Education');
+        $expectedThothWork->setPublicationDate('2024-03-21');
+        $expectedThothWork->setPageCount('27');
+        $expectedThothWork->setDoi('https://doi.org/10.1234/jpk.14.c54');
 
         $chapter = DAORegistry::getDAO('ChapterDAO')->newDataObject();
         $chapter->setTitle('Chapter 1: Interactions Affording Distance Science Education', 'en_US');
@@ -185,8 +219,8 @@ class ThothWorkServiceTest extends PKPTestCase
         $chapter->setPages(27);
         $chapter->setStoredPubId('doi', 'https://doi.org/10.1234/jpk.14.c54');
 
-        $workProps = $this->workService->getPropertiesByChapter($chapter);
-        $this->assertEquals($expectedProps, $workProps);
+        $thothWork = $this->workService->newByChapter($chapter);
+        $this->assertEquals($expectedThothWork, $thothWork);
     }
 
     public function testCreateNewWork()
@@ -206,5 +240,88 @@ class ThothWorkServiceTest extends PKPTestCase
 
         $work = $this->workService->new($params);
         $this->assertEquals($expectedWork, $work);
+    }
+
+    public function testRegisterBook()
+    {
+        $thothImprintId = 'f02786d4-3bcc-473e-8d43-3da66c7e877c';
+
+        $expectedThothBook = new ThothWork();
+        $expectedThothBook->setId('74fde3e2-ca4e-4597-bb0c-aee90648f5a5');
+        $expectedThothBook->setImprintId($thothImprintId);
+        $expectedThothBook->setWorkType(ThothWork::WORK_TYPE_MONOGRAPH);
+        $expectedThothBook->setWorkStatus(ThothWork::WORK_STATUS_ACTIVE);
+        $expectedThothBook->setTitle('A Designer\'s Log');
+        $expectedThothBook->setSubtitle('Case Studies in Instructional Design');
+        $expectedThothBook->setFullTitle('A Designer\'s Log: Case Studies in Instructional Design');
+        $expectedThothBook->setLandingPage('https://omp.publicknowledgeproject.org/index.php/press/catalog/book/999');
+        $expectedThothBook->setCoverUrl('https://omp.publicknowledgeproject.org/templates/images/book-default.png');
+
+        $publication = new Publication();
+        $publication->setId(999);
+        $publication->setData('title', 'A Designer\'s Log', 'en_US');
+        $publication->setData('subtitle', 'Case Studies in Instructional Design', 'en_US');
+
+        $submission = new Submission();
+        $submission->setData('id', 999);
+        $submission->setData('locale', 'en_US');
+        $submission->setData('workType', WORK_TYPE_AUTHORED_WORK);
+        $submission->setData('currentPublicationId', 999);
+        $submission->setData('publications', [$publication]);
+
+        $mockThothClient = $this->setUpMockEnvironment();
+
+        $thothBook = $this->workService->registerBook($mockThothClient, $submission, $thothImprintId);
+        $this->assertEquals($expectedThothBook, $thothBook);
+    }
+
+    public function testRegisterChapter()
+    {
+        $thothImprintId = 'f02786d4-3bcc-473e-8d43-3da66c7e877c';
+
+        $expectedThothChapter = new ThothWork();
+        $expectedThothChapter->setId('74fde3e2-ca4e-4597-bb0c-aee90648f5a5');
+        $expectedThothChapter->setImprintId($thothImprintId);
+        $expectedThothChapter->setWorkType(ThothWork::WORK_TYPE_BOOK_CHAPTER);
+        $expectedThothChapter->setWorkStatus(ThothWork::WORK_STATUS_ACTIVE);
+        $expectedThothChapter->setFullTitle('Chapter 2: Classical Music and the Classical Mind');
+        $expectedThothChapter->setTitle('Chapter 2: Classical Music and the Classical Mind');
+
+        $chapter = DAORegistry::getDAO('ChapterDAO')->newDataObject();
+        $chapter->setTitle('Chapter 2: Classical Music and the Classical Mind');
+        $chapter->setData('publicationId', 9999);
+
+        $mockThothClient = $this->setUpMockEnvironment();
+
+        $thothChapter = $this->workService->registerChapter($mockThothClient, $chapter, $thothImprintId);
+        $this->assertEquals($expectedThothChapter, $thothChapter);
+    }
+
+    public function testRegisterRelation()
+    {
+        $thothImprintId = 'f02786d4-3bcc-473e-8d43-3da66c7e877c';
+        $relatedWorkId = '7d861db5-22f6-4ef8-abbb-b56ab8397624';
+
+        $expectedThothWorkRelation = new ThothWorkRelation();
+        $expectedThothWorkRelation->setId('3e587b61-58f1-4064-bf80-e40e5c924d27');
+        $expectedThothWorkRelation->setRelatorWorkId('74fde3e2-ca4e-4597-bb0c-aee90648f5a5');
+        $expectedThothWorkRelation->setRelatedWorkId($relatedWorkId);
+        $expectedThothWorkRelation->setRelationType(ThothWorkRelation::RELATION_TYPE_IS_CHILD_OF);
+        $expectedThothWorkRelation->setRelationOrdinal(5);
+
+        $chapter = DAORegistry::getDAO('ChapterDAO')->newDataObject();
+        $chapter->setTitle('Epilogue');
+        $chapter->setData('publicationId', 9999);
+        $chapter->setSequence(4);
+
+        $mockThothClient = $this->setUpMockEnvironment();
+
+        $thothWorkRelation = $this->workService->registerWorkRelation(
+            $mockThothClient,
+            $chapter,
+            $thothImprintId,
+            $relatedWorkId
+        );
+        $this->assertEquals($expectedThothWorkRelation, $thothWorkRelation);
     }
 }
