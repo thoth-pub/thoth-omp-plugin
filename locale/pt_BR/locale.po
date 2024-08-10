@@ -25,10 +25,13 @@ msgstr "Credenciais inválidas"
 msgid "plugins.generic.thoth.settings.secretKeyEmpty"
 msgstr "O administrador do seu site deve definir um segredo no arquivo de configuração ('api_key_secret')."
 
-msgid "plugins.generic.thoth.settings.registerMetadata"
+msgid "plugins.generic.thoth.credentialsMissing"
+msgstr "Credenciais do Thoth não configuradas."
+
+msgid "plugins.generic.thoth.registerMetadata"
 msgstr "Metadados da submissão enviados para Thoth com sucesso."
 
-msgid "plugins.generic.thoth.settings.registerMetadata.error"
+msgid "plugins.generic.thoth.registerMetadata.error"
 msgstr ""
 "Houve um problema ao enviar os metadados da submissão para Thoth. Por favor tente mais "
 "tarde, ou contate o administrador do sistema."

@@ -13,26 +13,12 @@
  * @brief Helper class that encapsulates business logic for Thoth contributions
  */
 
+import('plugins.generic.thoth.classes.services.ThothContributorService');
 import('plugins.generic.thoth.thoth.models.ThothContribution');
 import('classes.core.Services');
 
 class ThothContributionService
 {
-    public function getPropertiesByAuthor($author)
-    {
-        $userGroupLocaleKey = $author->getUserGroup()->getData('nameLocaleKey');
-
-        $props = [];
-        $props['contributionType'] = $this->getContributionTypeByUserGroupLocaleKey($userGroupLocaleKey);
-        $props['mainContribution'] = $this->isMainContribution($author);
-        $props['contributionOrdinal'] = $author->getSequence() + 1;
-        $props['firstName'] = $author->getLocalizedGivenName();
-        $props['lastName'] = $author->getLocalizedFamilyName();
-        $props['fullName'] = $author->getFullName(false);
-        $props['biography'] = $author->getLocalizedBiography();
-        return $props;
-    }
-
     public function new($params)
     {
         $contribution = new ThothContribution();
@@ -43,6 +29,46 @@ class ThothContributionService
         $contribution->setFullName($params['fullName']);
         $contribution->setFirstName($params['firstName'] ?? null);
         $contribution->setBiography($params['biography'] ?? null);
+        return $contribution;
+    }
+
+    public function newByAuthor($author)
+    {
+        $userGroupLocaleKey = $author->getUserGroup()->getData('nameLocaleKey');
+
+        $params = [];
+        $params['contributionType'] = $this->getContributionTypeByUserGroupLocaleKey($userGroupLocaleKey);
+        $params['mainContribution'] = $this->isMainContribution($author);
+        $params['contributionOrdinal'] = $author->getSequence() + 1;
+        $params['firstName'] = $author->getLocalizedGivenName();
+        $params['lastName'] = $author->getLocalizedFamilyName();
+        $params['fullName'] = $author->getFullName(false);
+        $params['biography'] = $author->getLocalizedBiography();
+        return $this->new($params);
+    }
+
+    public function register($thothClient, $author, $workId)
+    {
+        $contribution = $this->newByAuthor($author);
+        $contribution->setWorkId($workId);
+
+        $contributorService = new ThothContributorService();
+        $contributors = $contributorService->getMany($thothClient, [
+            'limit' => 1,
+            'filter' => (!empty($author->getOrcid())) ?
+                $author->getOrcid() :
+                $author->getFullName(false)
+        ]);
+
+        $contributor = empty($contributors) ?
+            $contributorService->register($thothClient, $author) :
+            $contributor = array_shift($contributors);
+
+        $contribution->setContributorId($contributor->getId());
+
+        $contributionId = $thothClient->createContribution($contribution);
+        $contribution->setId($contributionId);
+
         return $contribution;
     }
 

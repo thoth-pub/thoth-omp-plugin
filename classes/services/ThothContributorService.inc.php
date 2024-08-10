@@ -17,17 +17,6 @@ import('plugins.generic.thoth.thoth.models.ThothContributor');
 
 class ThothContributorService
 {
-    public function getPropertiesByAuthor($author)
-    {
-        $props = [];
-        $props['firstName'] = $author->getLocalizedGivenName();
-        $props['lastName'] = $author->getLocalizedFamilyName();
-        $props['fullName'] = $author->getFullName(false);
-        $props['orcid'] = $author->getOrcid();
-        $props['website'] = $author->getUrl();
-        return $props;
-    }
-
     public function new($params)
     {
         $contributor = new ThothContributor();
@@ -37,6 +26,27 @@ class ThothContributorService
         $contributor->setFullName($params['fullName']);
         $contributor->setOrcid($params['orcid'] ?? null);
         $contributor->setWebsite($params['website'] ?? null);
+        return $contributor;
+    }
+
+    public function newByAuthor($author)
+    {
+        $params = [];
+        $params['firstName'] = $author->getLocalizedGivenName();
+        $params['lastName'] = $author->getLocalizedFamilyName();
+        $params['fullName'] = $author->getFullName(false);
+        $params['orcid'] = $author->getOrcid();
+        $params['website'] = $author->getUrl();
+        return $this->new($params);
+    }
+
+    public function register($thothClient, $author)
+    {
+        $contributor = $this->newByAuthor($author);
+
+        $contributorId = $thothClient->createContributor($contributor);
+        $contributor->setId($contributorId);
+
         return $contributor;
     }
 

@@ -13,31 +13,37 @@
  * @brief Helper class that encapsulates business logic for Thoth works
  */
 
+import('plugins.generic.thoth.classes.services.ThothContributionService');
+import('plugins.generic.thoth.classes.services.ThothLanguageService');
+import('plugins.generic.thoth.classes.services.ThothPublicationService');
+import('plugins.generic.thoth.classes.services.ThothSubjectService');
+import('plugins.generic.thoth.classes.services.ThothReferenceService');
 import('plugins.generic.thoth.thoth.models.ThothWork');
+import('plugins.generic.thoth.thoth.models.ThothWorkRelation');
 
 class ThothWorkService
 {
-    public function getPropertiesBySubmission($submission)
+    public function newBySubmission($submission)
     {
         $request = Application::get()->getRequest();
         $dispatcher = $request->getDispatcher();
         $context = $request->getContext();
         $publication = $submission->getCurrentPublication();
 
-        $props = [];
-        $props['workType'] = $this->getWorkTypeBySubmissionWorkType($submission->getData('workType'));
-        $props['workStatus'] = ThothWork::WORK_STATUS_ACTIVE;
-        $props['fullTitle'] = $publication->getLocalizedFullTitle();
-        $props['title'] = $publication->getLocalizedTitle();
-        $props['subtitle'] = $publication->getLocalizedData('subtitle');
-        $props['longAbstract'] = $publication->getLocalizedData('abstract');
-        $props['edition'] = $publication->getData('version');
-        $props['doi'] = $publication->getStoredPubId('doi');
-        $props['publicationDate'] = $publication->getData('datePublished');
-        $props['license'] = $publication->getData('licenseUrl');
-        $props['copyrightHolder'] = $publication->getLocalizedData('copyrightHolder');
-        $props['coverUrl'] = $publication->getLocalizedCoverImageUrl($context->getId());
-        $props['landingPage'] = $dispatcher->url(
+        $params = [];
+        $params['workType'] = $this->getWorkTypeBySubmissionWorkType($submission->getData('workType'));
+        $params['workStatus'] = ThothWork::WORK_STATUS_ACTIVE;
+        $params['fullTitle'] = $publication->getLocalizedFullTitle();
+        $params['title'] = $publication->getLocalizedTitle();
+        $params['subtitle'] = $publication->getLocalizedData('subtitle');
+        $params['longAbstract'] = $publication->getLocalizedData('abstract');
+        $params['edition'] = $publication->getData('version');
+        $params['doi'] = $publication->getStoredPubId('doi');
+        $params['publicationDate'] = $publication->getData('datePublished');
+        $params['license'] = $publication->getData('licenseUrl');
+        $params['copyrightHolder'] = $publication->getLocalizedData('copyrightHolder');
+        $params['coverUrl'] = $publication->getLocalizedCoverImageUrl($context->getId());
+        $params['landingPage'] = $dispatcher->url(
             $request,
             ROUTE_PAGE,
             $context->getPath(),
@@ -46,23 +52,23 @@ class ThothWorkService
             $submission->getBestId()
         );
 
-        return $props;
+        return $this->new($params);
     }
 
-    public function getPropertiesByChapter($chapter)
+    public function newByChapter($chapter)
     {
-        $props = [];
-        $props['workType'] = ThothWork::WORK_TYPE_BOOK_CHAPTER;
-        $props['workStatus'] = ThothWork::WORK_STATUS_ACTIVE;
-        $props['fullTitle'] = $chapter->getLocalizedFullTitle();
-        $props['title'] = $chapter->getLocalizedTitle();
-        $props['subtitle'] = $chapter->getLocalizedData('subtitle');
-        $props['longAbstract'] = $chapter->getLocalizedData('abstract');
-        $props['pageCount'] = $chapter->getPages();
-        $props['publicationDate'] = $chapter->getDatePublished();
-        $props['doi'] = $chapter->getStoredPubId('doi');
+        $params = [];
+        $params['workType'] = ThothWork::WORK_TYPE_BOOK_CHAPTER;
+        $params['workStatus'] = ThothWork::WORK_STATUS_ACTIVE;
+        $params['fullTitle'] = $chapter->getLocalizedFullTitle();
+        $params['title'] = $chapter->getLocalizedTitle();
+        $params['subtitle'] = $chapter->getLocalizedData('subtitle');
+        $params['longAbstract'] = $chapter->getLocalizedData('abstract');
+        $params['pageCount'] = $chapter->getPages();
+        $params['publicationDate'] = $chapter->getDatePublished();
+        $params['doi'] = $chapter->getStoredPubId('doi');
 
-        return $props;
+        return $this->new($params);
     }
 
     public function new($params)
@@ -84,6 +90,112 @@ class ThothWorkService
         $work->setCoverUrl($params['coverUrl'] ?? null);
 
         return $work;
+    }
+
+    public function registerBook($thothClient, $submission, $thothImprintId)
+    {
+        $thothBook = $this->newBySubmission($submission);
+        $thothBook->setImprintId($thothImprintId);
+
+        $thothBookId = $thothClient->createWork($thothBook);
+        $thothBook->setId($thothBookId);
+
+        $contributionService = new ThothContributionService();
+        $authors = DAORegistry::getDAO('AuthorDAO')
+            ->getByPublicationId($submission->getData('currentPublicationId'));
+        foreach ($authors as $author) {
+            $contributionService->register($thothClient, $author, $thothBookId);
+        }
+
+        $chapters = DAORegistry::getDAO('ChapterDAO')
+            ->getByPublicationId($submission->getData('currentPublicationId'))
+            ->toArray();
+        foreach ($chapters as $chapter) {
+            $this->registerWorkRelation($thothClient, $chapter, $thothImprintId, $thothBookId);
+        }
+
+        $publicationService = new ThothPublicationService();
+        $publicationFormats = Application::getRepresentationDao()
+            ->getApprovedByPublicationId($submission->getData('currentPublicationId'))
+            ->toArray();
+        foreach ($publicationFormats as $publicationFormat) {
+            if ($publicationFormat->getIsAvailable()) {
+                $publicationService->register($thothClient, $publicationFormat, $thothBookId);
+            }
+        }
+
+        $subjectService = new ThothSubjectService();
+        $submissionKeywords = DAORegistry::getDAO('SubmissionKeywordDAO')
+            ->getKeywords($submission->getData('currentPublicationId'));
+        foreach ($submissionKeywords[$submission->getLocale()] ?? [] as $seq => $submissionKeyword) {
+            $subjectService->registerKeyword($thothClient, $submissionKeyword, $thothBookId, $seq + 1);
+        }
+
+        $languageService = new ThothLanguageService();
+        $submissionLocale = $submission->getData('locale');
+        $languageService->register($thothClient, $submissionLocale, $thothBookId);
+
+        $referenceService = new ThothReferenceService();
+        $citations = DAORegistry::getDAO('CitationDAO')
+            ->getByPublicationId($submission->getData('currentPublicationId'))
+            ->toArray();
+        foreach ($citations as $citation) {
+            $referenceService->register($thothClient, $citation, $thothBookId);
+        }
+
+        return $thothBook;
+    }
+
+    public function registerChapter($thothClient, $chapter, $thothImprintId)
+    {
+        $thothChapter = $this->newByChapter($chapter);
+        $thothChapter->setImprintId($thothImprintId);
+
+        $thothChapterId = $thothClient->createWork($thothChapter);
+        $thothChapter->setId($thothChapterId);
+
+        $contributionService = new ThothContributionService();
+        $authors = $chapter->getAuthors()->toArray();
+        foreach ($authors as $author) {
+            $contributionService->register($thothClient, $author, $thothChapterId);
+        }
+
+        $publicationService = new ThothPublicationService();
+        $publication = Services::get('publication')->get($chapter->getData('publicationId'));
+        $files = array_filter(
+            iterator_to_array(Services::get('submissionFile')->getMany([
+                'assocTypes' => [ASSOC_TYPE_PUBLICATION_FORMAT],
+                'submissionIds' => [$publication->getData('submissionId')],
+            ])),
+            function ($a) use ($chapter) {
+                return $a->getData('chapterId') == $chapter->getId();
+            }
+        );
+        $publicationFormatDao = DAORegistry::getDAO('PublicationFormatDAO');
+        foreach ($files as $file) {
+            $publicationFormat = $publicationFormatDao->getById($file->getData('assocId'));
+            if ($publicationFormat->getIsAvailable()) {
+                $publicationService->register($thothClient, $publicationFormat, $thothChapterId, $chapter->getId());
+            }
+        }
+
+        return $thothChapter;
+    }
+
+    public function registerWorkRelation($thothClient, $chapter, $thothImprintId, $relatedWorkId)
+    {
+        $thothChapter = $this->registerChapter($thothClient, $chapter, $thothImprintId);
+
+        $relation = new ThothWorkRelation();
+        $relation->setRelatorWorkId($thothChapter->getId());
+        $relation->setRelatedWorkId($relatedWorkId);
+        $relation->setRelationType(ThothWorkRelation::RELATION_TYPE_IS_CHILD_OF);
+        $relation->setRelationOrdinal($chapter->getSequence() + 1);
+
+        $relationId = $thothClient->createWorkRelation($relation);
+        $relation->setId($relationId);
+
+        return $relation;
     }
 
     public function getWorkTypeBySubmissionWorkType($submissionWorkType)

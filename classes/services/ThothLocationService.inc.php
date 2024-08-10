@@ -17,7 +17,7 @@ import('plugins.generic.thoth.thoth.models.ThothLocation');
 
 class ThothLocationService
 {
-    public function getPropertiesByPublicationFormat($publicationFormat, $fileId = null)
+    public function newByPublicationFormat($publicationFormat, $fileId = null)
     {
         $request = Application::get()->getRequest();
         $dispatcher = $request->getDispatcher();
@@ -44,21 +44,33 @@ class ThothLocationService
                 [$submission->getBestId(), $publicationFormat->getBestId(), $fileId]
             );
 
-        $props = [];
-        $props['landingPage'] = $landingPage;
-        $props['fullTextUrl'] = $fullTextUrl;
-        $props['locationPlatform'] = ThothLocation::LOCATION_PLATFORM_OTHER;
+        $params = [];
+        $params['landingPage'] = $landingPage;
+        $params['fullTextUrl'] = $fullTextUrl;
+        $params['locationPlatform'] = ThothLocation::LOCATION_PLATFORM_OTHER;
 
-        return $props;
+        return $this->new($params);
     }
 
     public function new($params)
     {
-        $location = new ThothLocation();
-        $location->setLandingPage($params['landingPage']);
-        $location->setFullTextUrl($params['fullTextUrl']);
-        $location->setLocationPlatform($params['locationPlatform']);
+        $thothLocation = new ThothLocation();
+        $thothLocation->setLandingPage($params['landingPage']);
+        $thothLocation->setFullTextUrl($params['fullTextUrl']);
+        $thothLocation->setLocationPlatform($params['locationPlatform']);
 
-        return $location;
+        return $thothLocation;
+    }
+
+    public function register($thothClient, $publicationFormat, $thothPublicationId, $fileId = null, $canonical = true)
+    {
+        $thothLocation = $this->newByPublicationFormat($publicationFormat, $fileId);
+        $thothLocation->setPublicationId($thothPublicationId);
+        $thothLocation->setCanonical($canonical);
+
+        $thothLocationId = $thothClient->createLocation($thothLocation);
+        $thothLocation->setId($thothLocationId);
+
+        return $thothLocation;
     }
 }

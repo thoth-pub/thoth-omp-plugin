@@ -13,17 +13,18 @@
  * @brief Helper class that encapsulates business logic for Thoth publications
  */
 
+import('plugins.generic.thoth.classes.services.ThothLocationService');
 import('plugins.generic.thoth.thoth.models.ThothPublication');
 
 class ThothPublicationService
 {
-    public function getPropertiesByPublicationFormat($publicationFormat)
+    public function newByPublicationFormat($publicationFormat)
     {
-        $props = [];
-        $props['publicationType'] = $this->getPublicationTypeByPublicationFormat($publicationFormat);
-        $props['isbn'] = $this->getIsbnByPublicationFormat($publicationFormat);
+        $params = [];
+        $params['publicationType'] = $this->getPublicationTypeByPublicationFormat($publicationFormat);
+        $params['isbn'] = $this->getIsbnByPublicationFormat($publicationFormat);
 
-        return $props;
+        return $this->new($params);
     }
 
     public function new($params)
@@ -33,6 +34,43 @@ class ThothPublicationService
         $publication->setIsbn($params['isbn'] ?? null);
 
         return $publication;
+    }
+
+    public function register($thothClient, $publicationFormat, $workId, $chapterId = null)
+    {
+        $thothPublication = $this->newByPublicationFormat($publicationFormat);
+        $thothPublication->setWorkId($workId);
+
+        if ($chapterId && $thothPublication->getIsbn()) {
+            $thothPublication->setIsbn(null);
+        }
+
+        $thothPublicationId = $thothClient->createPublication($thothPublication);
+        $thothPublication->setId($thothPublicationId);
+
+        $thothLocationService = new ThothLocationService();
+        if ($publicationFormat->getRemoteUrl()) {
+            $thothLocationService->register($thothClient, $publicationFormat, $thothPublicationId);
+            return $thothPublication;
+        }
+
+        $files = array_filter(
+            iterator_to_array(Services::get('submissionFile')->getMany([
+                'assocTypes' => [ASSOC_TYPE_PUBLICATION_FORMAT],
+                'assocIds' => [$publicationFormat->getId()],
+            ])),
+            function ($file) use ($chapterId) {
+                return $file->getData('chapterId') == $chapterId;
+            }
+        );
+
+        $canonical = true;
+        foreach ($files as $file) {
+            $thothLocationService->register($thothClient, $publicationFormat, $thothPublicationId, $file->getId(), $canonical);
+            $canonical = false;
+        }
+
+        return $thothPublication;
     }
 
     public function getPublicationTypeByPublicationFormat($publicationFormat)
