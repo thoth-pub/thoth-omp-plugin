@@ -42,7 +42,7 @@ class ThothContributionService
         $params['mainContribution'] = $this->isMainContribution($author);
         $params['contributionOrdinal'] = $author->getSequence() + 1;
         $params['firstName'] = $author->getLocalizedGivenName();
-        $params['lastName'] = $author->getLocalizedFamilyName();
+        $params['lastName'] = $author->getLocalizedData('familyName');
         $params['fullName'] = $author->getFullName(false);
         $params['biography'] = $author->getLocalizedBiography();
         return $this->new($params);
