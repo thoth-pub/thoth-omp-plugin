@@ -13,8 +13,8 @@
  * @brief Helper class that encapsulates business logic for Thoth affiliations
  */
 
+import('plugins.generic.thoth.classes.facades.ThothService');
 import('plugins.generic.thoth.thoth.models.ThothAffiliation');
-import('plugins.generic.thoth.classes.services.ThothInstitutionService');
 
 class ThothAffiliationService
 {
@@ -30,8 +30,7 @@ class ThothAffiliationService
 
     public function register($thothClient, $affiliation, $thothContributionId)
     {
-        $institutionService = new ThothInstitutionService();
-        $thothInstitutions = $institutionService->getMany($thothClient, [
+        $thothInstitutions = ThothService::institution()->getMany($thothClient, [
             'limit' => 1,
             'filter' => $affiliation
         ]);
