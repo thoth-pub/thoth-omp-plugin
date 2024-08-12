@@ -33,7 +33,7 @@ class ThothAffiliationTest extends PKPTestCase
         $this->assertEquals(1, $thothAffiliation->getAffiliationOrdinal());
     }
 
-    public function testGetContributionData()
+    public function testGetAffiliationData()
     {
         $thothAffiliation = new ThothAffiliation();
         $thothAffiliation->setId('3266c9b6-3f9a-4675-97dd-78c5f3b10ce9');
