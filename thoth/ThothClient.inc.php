@@ -40,6 +40,11 @@ class ThothClient
         $this->token = $authenticator->getToken();
     }
 
+    public function createAffiliation($affiliation)
+    {
+        return $this->mutation('createAffiliation', $affiliation);
+    }
+
     public function createWork($work)
     {
         return $this->mutation('createWork', $work);

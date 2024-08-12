@@ -22,6 +22,7 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 
 import('lib.pkp.tests.PKPTestCase');
+import('plugins.generic.thoth.thoth.models.ThothAffiliation');
 import('plugins.generic.thoth.thoth.models.ThothContribution');
 import('plugins.generic.thoth.thoth.models.ThothContributor');
 import('plugins.generic.thoth.thoth.models.ThothLanguage');
@@ -68,6 +69,26 @@ class ThothClientTest extends PKPTestCase
 
         $thothClient = new ThothClient('https://api.thoth.test.pub/', $guzzleClient);
         $thothClient->login('user72581@mailinator.com', 'uys9ag9s');
+    }
+
+    public function createAffiliation()
+    {
+        $thothAffiliation = new ThothAffiliation();
+
+        $mock = new MockHandler([
+            new Response(
+                200,
+                [],
+                '{"data":{"createAffiliation":{"affiliationId":"1c6e252c-9fb3-404e-ac0a-1e03cd66aa70"}}}'
+            )
+        ]);
+        $handlerStack = HandlerStack::create($mock);
+        $httpClient = new Client(['handler' => $handlerStack]);
+
+        $client = new ThothClient('https://api.thoth.test.pub/', $httpClient);
+        $thothAffiliationId = $client->createAffiliation($thothAffiliation);
+
+        $this->assertEquals('1c6e252c-9fb3-404e-ac0a-1e03cd66aa70', $thothAffiliationId);
     }
 
     public function testWorkCreation()
