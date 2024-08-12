@@ -28,20 +28,20 @@
 	{include file="controllers/notification/inPlaceNotification.tpl" notificationId="thothSettingsFormNotification"}
 
 	{fbvFormArea id="thothSettings"}
-		{fbvFormSection label="plugins.generic.thoth.settings.apiUrl"}
-			{fbvElement type="text" id="apiUrl" placeholder="plugins.generic.thoth.settings.apiUrl.placeholder" value=$apiUrl}
+		<h3>
+            {translate key="plugins.generic.thoth.settings.title" }
+        </h3>
+
+		{fbvFormSection}
+			{fbvElement type="text" id="imprintId" label="plugins.generic.thoth.settings.imprintId" value=$imprintId required="true"}
+			</p>
+			{fbvElement type="email" id="email" label="plugins.generic.thoth.settings.email" value=$email required="true"}
+			</p>
+			{fbvElement type="text" password="true" id="password" label="plugins.generic.thoth.settings.password" value=$password required="true"}
 		{/fbvFormSection}
 
-		{fbvFormSection label="plugins.generic.thoth.settings.imprintId"}
-			{fbvElement type="text" id="imprintId"  value=$imprintId required="true"}
-		{/fbvFormSection}
-
-		{fbvFormSection label="plugins.generic.thoth.settings.email"}
-			{fbvElement type="email" id="email" value=$email required="true"}
-		{/fbvFormSection}
-
-		{fbvFormSection label="plugins.generic.thoth.settings.password"}
-			{fbvElement type="text" password="true" id="password" value=$password required="true"}
+		{fbvFormSection list="true"}
+			{fbvElement type="checkbox" id="sandbox" label="plugins.generic.thoth.settings.sandbox" checked=$sandbox}
 		{/fbvFormSection}
 	{/fbvFormArea}
 

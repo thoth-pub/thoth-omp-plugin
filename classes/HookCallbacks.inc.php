@@ -13,9 +13,7 @@
  * @brief Manage callback functions for the plugin hooks
  */
 
-import('plugins.generic.thoth.classes.services.ThothWorkService');
-import('plugins.generic.thoth.lib.APIKeyEncryption.APIKeyEncryption');
-import('plugins.generic.thoth.thoth.ThothClient');
+import('plugins.generic.thoth.classes.facades.ThothService');
 
 class HookCallbacks
 {
@@ -47,26 +45,10 @@ class HookCallbacks
             return false;
         }
 
-        $endpoint = $this->plugin->getSetting($contextId, 'apiUrl');
-        $thothClient = new ThothClient($endpoint);
-
-        $email = $this->plugin->getSetting($contextId, 'email');
-        $password = $this->plugin->getSetting($contextId, 'password');
-        if (!$email || !$password) {
-            $this->notify(
-                $request,
-                NOTIFICATION_TYPE_ERROR,
-                __('plugins.generic.thoth.credentialsMissing')
-            );
-            return false;
-        }
-        $password = APIKeyEncryption::decryptString($password);
-
         $thothImprintId = $this->plugin->getSetting($contextId, 'imprintId');
         try {
-            $thothClient->login($email, $password);
-            $thothWorkService = new ThothWorkService();
-            $thothBook = $thothWorkService->registerBook($thothClient, $submission, $thothImprintId);
+            $thothClient = $this->plugin->getThothClient($contextId);
+            $thothBook = ThothService::work()->registerBook($thothClient, $submission, $thothImprintId);
             $submission = Services::get('submission')->edit(
                 $submission,
                 ['thothWorkId' => $thothBook->getId()],

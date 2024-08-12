@@ -33,7 +33,7 @@ class ThothContributorService
     {
         $params = [];
         $params['firstName'] = $author->getLocalizedGivenName();
-        $params['lastName'] = $author->getLocalizedFamilyName();
+        $params['lastName'] = $author->getLocalizedData('familyName');
         $params['fullName'] = $author->getFullName(false);
         $params['orcid'] = $author->getOrcid();
         $params['website'] = $author->getUrl();

@@ -13,8 +13,7 @@
  * @brief Helper class that encapsulates business logic for Thoth contributions
  */
 
-import('plugins.generic.thoth.classes.services.ThothContributorService');
-import('plugins.generic.thoth.classes.services.ThothAffiliationService');
+import('plugins.generic.thoth.classes.facades.ThothService');
 import('plugins.generic.thoth.thoth.models.ThothContribution');
 import('classes.core.Services');
 
@@ -42,7 +41,7 @@ class ThothContributionService
         $params['mainContribution'] = $this->isMainContribution($author);
         $params['contributionOrdinal'] = $author->getSequence() + 1;
         $params['firstName'] = $author->getLocalizedGivenName();
-        $params['lastName'] = $author->getLocalizedFamilyName();
+        $params['lastName'] = $author->getLocalizedData('familyName');
         $params['fullName'] = $author->getFullName(false);
         $params['biography'] = $author->getLocalizedBiography();
         return $this->new($params);
@@ -53,8 +52,7 @@ class ThothContributionService
         $contribution = $this->newByAuthor($author);
         $contribution->setWorkId($workId);
 
-        $contributorService = new ThothContributorService();
-        $contributors = $contributorService->getMany($thothClient, [
+        $contributors = ThothService::contributor()->getMany($thothClient, [
             'limit' => 1,
             'filter' => (!empty($author->getOrcid())) ?
                 $author->getOrcid() :
@@ -71,8 +69,7 @@ class ThothContributionService
         $contribution->setId($contributionId);
 
         if ($affiliation = $author->getLocalizedAffiliation()) {
-            $affiliationService = new ThothAffiliationService();
-            $affiliationService->register($thothClient, $affiliation, $contributionId);
+            ThothService::affiliation()->register($thothClient, $affiliation, $contributionId);
         }
 
         return $contribution;

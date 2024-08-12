@@ -13,11 +13,7 @@
  * @brief Helper class that encapsulates business logic for Thoth works
  */
 
-import('plugins.generic.thoth.classes.services.ThothContributionService');
-import('plugins.generic.thoth.classes.services.ThothLanguageService');
-import('plugins.generic.thoth.classes.services.ThothPublicationService');
-import('plugins.generic.thoth.classes.services.ThothSubjectService');
-import('plugins.generic.thoth.classes.services.ThothReferenceService');
+import('plugins.generic.thoth.classes.facades.ThothService');
 import('plugins.generic.thoth.thoth.models.ThothWork');
 import('plugins.generic.thoth.thoth.models.ThothWorkRelation');
 
@@ -100,11 +96,10 @@ class ThothWorkService
         $thothBookId = $thothClient->createWork($thothBook);
         $thothBook->setId($thothBookId);
 
-        $contributionService = new ThothContributionService();
         $authors = DAORegistry::getDAO('AuthorDAO')
             ->getByPublicationId($submission->getData('currentPublicationId'));
         foreach ($authors as $author) {
-            $contributionService->register($thothClient, $author, $thothBookId);
+            ThothService::contribution()->register($thothClient, $author, $thothBookId);
         }
 
         $chapters = DAORegistry::getDAO('ChapterDAO')
@@ -114,33 +109,29 @@ class ThothWorkService
             $this->registerWorkRelation($thothClient, $chapter, $thothImprintId, $thothBookId);
         }
 
-        $publicationService = new ThothPublicationService();
         $publicationFormats = Application::getRepresentationDao()
             ->getApprovedByPublicationId($submission->getData('currentPublicationId'))
             ->toArray();
         foreach ($publicationFormats as $publicationFormat) {
             if ($publicationFormat->getIsAvailable()) {
-                $publicationService->register($thothClient, $publicationFormat, $thothBookId);
+                ThothService::publication()->register($thothClient, $publicationFormat, $thothBookId);
             }
         }
 
-        $subjectService = new ThothSubjectService();
         $submissionKeywords = DAORegistry::getDAO('SubmissionKeywordDAO')
             ->getKeywords($submission->getData('currentPublicationId'));
         foreach ($submissionKeywords[$submission->getLocale()] ?? [] as $seq => $submissionKeyword) {
-            $subjectService->registerKeyword($thothClient, $submissionKeyword, $thothBookId, $seq + 1);
+            ThothService::subject()->registerKeyword($thothClient, $submissionKeyword, $thothBookId, $seq + 1);
         }
 
-        $languageService = new ThothLanguageService();
         $submissionLocale = $submission->getData('locale');
-        $languageService->register($thothClient, $submissionLocale, $thothBookId);
+        ThothService::language()->register($thothClient, $submissionLocale, $thothBookId);
 
-        $referenceService = new ThothReferenceService();
         $citations = DAORegistry::getDAO('CitationDAO')
             ->getByPublicationId($submission->getData('currentPublicationId'))
             ->toArray();
         foreach ($citations as $citation) {
-            $referenceService->register($thothClient, $citation, $thothBookId);
+            ThothService::reference()->register($thothClient, $citation, $thothBookId);
         }
 
         return $thothBook;
@@ -154,13 +145,11 @@ class ThothWorkService
         $thothChapterId = $thothClient->createWork($thothChapter);
         $thothChapter->setId($thothChapterId);
 
-        $contributionService = new ThothContributionService();
         $authors = $chapter->getAuthors()->toArray();
         foreach ($authors as $author) {
-            $contributionService->register($thothClient, $author, $thothChapterId);
+            ThothService::contribution()->register($thothClient, $author, $thothChapterId);
         }
 
-        $publicationService = new ThothPublicationService();
         $publication = Services::get('publication')->get($chapter->getData('publicationId'));
         $files = array_filter(
             iterator_to_array(Services::get('submissionFile')->getMany([
@@ -175,7 +164,12 @@ class ThothWorkService
         foreach ($files as $file) {
             $publicationFormat = $publicationFormatDao->getById($file->getData('assocId'));
             if ($publicationFormat->getIsAvailable()) {
-                $publicationService->register($thothClient, $publicationFormat, $thothChapterId, $chapter->getId());
+                ThothService::publication()->register(
+                    $thothClient,
+                    $publicationFormat,
+                    $thothChapterId,
+                    $chapter->getId()
+                );
             }
         }
 

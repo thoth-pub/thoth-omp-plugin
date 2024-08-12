@@ -103,4 +103,26 @@ class ThothPlugin extends GenericPlugin
         }
         return parent::manage($args, $request);
     }
+
+    public function getThothClient($contextId = null)
+    {
+        $contextId = $contextId ?? Application::get()->getRequest()->getContext()->getId();
+
+        $email = $this->getSetting($contextId, 'email');
+        $password = $this->getSetting($contextId, 'password');
+
+        if (!$email || !$password) {
+            throw new ThothException("Credentials not configured");
+        }
+
+        import('plugins.generic.thoth.lib.APIKeyEncryption.APIKeyEncryption');
+        $password = APIKeyEncryption::decryptString($password);
+        $sandbox = $this->getSetting($contextId, 'sandbox');
+
+        import('plugins.generic.thoth.thoth.ThothClient');
+        $thothClient = new ThothClient($sandbox);
+        $thothClient->login($email, $password);
+
+        return $thothClient;
+    }
 }

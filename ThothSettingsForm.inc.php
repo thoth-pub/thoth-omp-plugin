@@ -26,7 +26,7 @@ class ThothSettingsForm extends Form
     private $plugin;
 
     private const SETTINGS = [
-        'apiUrl',
+        'sandbox',
         'imprintId',
         'email',
         'password'
@@ -48,8 +48,8 @@ class ThothSettingsForm extends Form
             'plugins.generic.thoth.settings.invalidCredentials',
             function ($password) use ($form) {
                 $email = trim($this->getData('email'));
-                $apiUrl = trim($this->getData('apiUrl'));
-                $thothClient = $apiUrl ? new ThothClient($apiUrl) : new ThothClient();
+                $sandbox = $this->getData('sandbox');
+                $thothClient = new ThothClient($sandbox);
                 try {
                     $thothClient->login(
                         $email,

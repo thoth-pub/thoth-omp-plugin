@@ -13,7 +13,7 @@
  * @brief Helper class that encapsulates business logic for Thoth publications
  */
 
-import('plugins.generic.thoth.classes.services.ThothLocationService');
+import('plugins.generic.thoth.classes.facades.ThothService');
 import('plugins.generic.thoth.thoth.models.ThothPublication');
 
 class ThothPublicationService
@@ -48,9 +48,8 @@ class ThothPublicationService
         $thothPublicationId = $thothClient->createPublication($thothPublication);
         $thothPublication->setId($thothPublicationId);
 
-        $thothLocationService = new ThothLocationService();
         if ($publicationFormat->getRemoteUrl()) {
-            $thothLocationService->register($thothClient, $publicationFormat, $thothPublicationId);
+            ThothService::location()->register($thothClient, $publicationFormat, $thothPublicationId);
             return $thothPublication;
         }
 
@@ -66,7 +65,13 @@ class ThothPublicationService
 
         $canonical = true;
         foreach ($files as $file) {
-            $thothLocationService->register($thothClient, $publicationFormat, $thothPublicationId, $file->getId(), $canonical);
+            ThothService::location()->register(
+                $thothClient,
+                $publicationFormat,
+                $thothPublicationId,
+                $file->getId(),
+                $canonical
+            );
             $canonical = false;
         }
 

@@ -67,7 +67,7 @@ class ThothClientTest extends PKPTestCase
         $this->expectExceptionCode(401);
         $this->expectExceptionMessage('Failed to send the request to Thoth: Invalid credentials.');
 
-        $thothClient = new ThothClient('https://api.thoth.test.pub/', $guzzleClient);
+        $thothClient = new ThothClient(true, $guzzleClient);
         $thothClient->login('user72581@mailinator.com', 'uys9ag9s');
     }
 
@@ -85,7 +85,7 @@ class ThothClientTest extends PKPTestCase
         $handlerStack = HandlerStack::create($mock);
         $httpClient = new Client(['handler' => $handlerStack]);
 
-        $client = new ThothClient('https://api.thoth.test.pub/', $httpClient);
+        $client = new ThothClient(true, $httpClient);
         $thothAffiliationId = $client->createAffiliation($thothAffiliation);
 
         $this->assertEquals('1c6e252c-9fb3-404e-ac0a-1e03cd66aa70', $thothAffiliationId);
@@ -105,7 +105,7 @@ class ThothClientTest extends PKPTestCase
         $handlerStack = HandlerStack::create($mock);
         $httpClient = new Client(['handler' => $handlerStack]);
 
-        $client = new ThothClient('https://api.thoth.test.pub/', $httpClient);
+        $client = new ThothClient(true, $httpClient);
         $workId = $client->createWork($work);
 
         $this->assertEquals('62933c17-7f40-46af-84ab-b563ac4ac448', $workId);
@@ -125,7 +125,7 @@ class ThothClientTest extends PKPTestCase
         $handlerStack = HandlerStack::create($mock);
         $httpClient = new Client(['handler' => $handlerStack]);
 
-        $client = new ThothClient('https://api.thoth.test.pub/', $httpClient);
+        $client = new ThothClient(true, $httpClient);
         $contributorId = $client->createContributor($contributor);
 
         $this->assertEquals('454d55ec-6c4c-42b9-bbf9-fa08b70d7f1d', $contributorId);
@@ -145,7 +145,7 @@ class ThothClientTest extends PKPTestCase
         $handlerStack = HandlerStack::create($mock);
         $httpClient = new Client(['handler' => $handlerStack]);
 
-        $client = new ThothClient('https://api.thoth.test.pub/', $httpClient);
+        $client = new ThothClient(true, $httpClient);
         $contributionId = $client->createContribution($contribution);
 
         $this->assertEquals('bd59feee-53bd-403d-a1a9-db01c0edf10b', $contributionId);
@@ -165,7 +165,7 @@ class ThothClientTest extends PKPTestCase
         $handlerStack = HandlerStack::create($mock);
         $httpClient = new Client(['handler' => $handlerStack]);
 
-        $client = new ThothClient('https://api.thoth.test.pub/', $httpClient);
+        $client = new ThothClient(true, $httpClient);
         $workRelationId = $client->createWorkRelation($workRelation);
 
         $this->assertEquals('07253e79-e02f-4350-b4b5-e5fd27866ee2', $workRelationId);
@@ -185,7 +185,7 @@ class ThothClientTest extends PKPTestCase
         $handlerStack = HandlerStack::create($mock);
         $httpClient = new Client(['handler' => $handlerStack]);
 
-        $client = new ThothClient('https://api.thoth.test.pub/', $httpClient);
+        $client = new ThothClient(true, $httpClient);
         $publicationId = $client->createPublication($publication);
 
         $this->assertEquals('4f51514b-5d45-42fc-a757-185cd5cee7b1', $publicationId);
@@ -205,7 +205,7 @@ class ThothClientTest extends PKPTestCase
         $handlerStack = HandlerStack::create($mock);
         $httpClient = new Client(['handler' => $handlerStack]);
 
-        $client = new ThothClient('https://api.thoth.test.pub/', $httpClient);
+        $client = new ThothClient(true, $httpClient);
         $locationId = $client->createLocation($location);
 
         $this->assertEquals('03b0367d-bba3-4e26-846a-4c36d3920db2', $locationId);
@@ -225,7 +225,7 @@ class ThothClientTest extends PKPTestCase
         $handlerStack = HandlerStack::create($mock);
         $httpClient = new Client(['handler' => $handlerStack]);
 
-        $client = new ThothClient('https://api.thoth.test.pub/', $httpClient);
+        $client = new ThothClient(true, $httpClient);
         $subjectId = $client->createSubject($subject);
 
         $this->assertEquals('279b9910-38bf-4742-a7ae-cfd9eeb10bf8', $subjectId);
@@ -245,7 +245,7 @@ class ThothClientTest extends PKPTestCase
         $handlerStack = HandlerStack::create($mock);
         $httpClient = new Client(['handler' => $handlerStack]);
 
-        $client = new ThothClient('https://api.thoth.test.pub/', $httpClient);
+        $client = new ThothClient(true, $httpClient);
         $languageId = $client->createLanguage($language);
 
         $this->assertEquals('4cfdf70d-cd8c-41a5-a5e2-356a2ff2f37f', $languageId);
@@ -265,7 +265,7 @@ class ThothClientTest extends PKPTestCase
         $handlerStack = HandlerStack::create($mock);
         $httpClient = new Client(['handler' => $handlerStack]);
 
-        $client = new ThothClient('https://api.thoth.test.pub/', $httpClient);
+        $client = new ThothClient(true, $httpClient);
         $referenceId = $client->createReference($reference);
 
         $this->assertEquals('56338ed3-d2a9-4ef4-9afc-303d63be719f', $referenceId);
@@ -299,7 +299,7 @@ class ThothClientTest extends PKPTestCase
         $handlerStack = HandlerStack::create($mock);
         $httpClient = new Client(['handler' => $handlerStack]);
 
-        $client = new ThothClient('https://api.thoth.test.pub/', $httpClient);
+        $client = new ThothClient(true, $httpClient);
         $contribution = $client->contribution($contributionId);
 
         $this->assertEquals($expectedContribution, $contribution);
@@ -335,7 +335,7 @@ class ThothClientTest extends PKPTestCase
         $handlerStack = HandlerStack::create($mock);
         $httpClient = new Client(['handler' => $handlerStack]);
 
-        $client = new ThothClient('https://api.thoth.test.pub/', $httpClient);
+        $client = new ThothClient(true, $httpClient);
         $contributions = $client->contributions();
 
         $this->assertEquals($expectedContributions, $contributions);
@@ -364,7 +364,7 @@ class ThothClientTest extends PKPTestCase
         $handlerStack = HandlerStack::create($mock);
         $httpClient = new Client(['handler' => $handlerStack]);
 
-        $client = new ThothClient('https://api.thoth.test.pub/', $httpClient);
+        $client = new ThothClient(true, $httpClient);
         $contributor = $client->contributor($contributorId);
 
         $this->assertEquals($expectedContributor, $contributor);
@@ -393,7 +393,7 @@ class ThothClientTest extends PKPTestCase
         $handlerStack = HandlerStack::create($mock);
         $httpClient = new Client(['handler' => $handlerStack]);
 
-        $client = new ThothClient('https://api.thoth.test.pub/', $httpClient);
+        $client = new ThothClient(true, $httpClient);
         $contributors = $client->contributors();
 
         $this->assertEquals($expectedContributors, $contributors);
@@ -421,7 +421,7 @@ class ThothClientTest extends PKPTestCase
         $handlerStack = HandlerStack::create($mock);
         $httpClient = new Client(['handler' => $handlerStack]);
 
-        $client = new ThothClient('https://api.thoth.test.pub/', $httpClient);
+        $client = new ThothClient(true, $httpClient);
         $institution = $client->institution($institutionId);
 
         $this->assertEquals($expectedInstitution, $institution);
@@ -449,7 +449,7 @@ class ThothClientTest extends PKPTestCase
         $handlerStack = HandlerStack::create($mock);
         $httpClient = new Client(['handler' => $handlerStack]);
 
-        $client = new ThothClient('https://api.thoth.test.pub/', $httpClient);
+        $client = new ThothClient(true, $httpClient);
         $institutions = $client->institutions();
 
         $this->assertEquals($expectedInstitutions, $institutions);
@@ -477,7 +477,7 @@ class ThothClientTest extends PKPTestCase
         $handlerStack = HandlerStack::create($mock);
         $httpClient = new Client(['handler' => $handlerStack]);
 
-        $client = new ThothClient('https://api.thoth.test.pub/', $httpClient);
+        $client = new ThothClient(true, $httpClient);
         $imprint = $client->imprint($imprintId);
 
         $this->assertEquals($expectedImprint, $imprint);
@@ -505,7 +505,7 @@ class ThothClientTest extends PKPTestCase
         $handlerStack = HandlerStack::create($mock);
         $httpClient = new Client(['handler' => $handlerStack]);
 
-        $client = new ThothClient('https://api.thoth.test.pub/', $httpClient);
+        $client = new ThothClient(true, $httpClient);
         $imprints = $client->imprints();
 
         $this->assertEquals($expectedImprints, $imprints);
@@ -532,7 +532,7 @@ class ThothClientTest extends PKPTestCase
         $handlerStack = HandlerStack::create($mock);
         $httpClient = new Client(['handler' => $handlerStack]);
 
-        $client = new ThothClient('https://api.thoth.test.pub/', $httpClient);
+        $client = new ThothClient(true, $httpClient);
         $publisher = $client->publisher($publisherId);
 
         $this->assertEquals($expectedPublisher, $publisher);
@@ -559,7 +559,7 @@ class ThothClientTest extends PKPTestCase
         $handlerStack = HandlerStack::create($mock);
         $httpClient = new Client(['handler' => $handlerStack]);
 
-        $client = new ThothClient('https://api.thoth.test.pub/', $httpClient);
+        $client = new ThothClient(true, $httpClient);
         $publishers = $client->publishers();
 
         $this->assertEquals($expectedPublishers, $publishers);
