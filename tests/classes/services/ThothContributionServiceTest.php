@@ -29,6 +29,12 @@ class ThothContributionServiceTest extends PKPTestCase
         $this->setUpMockEnvironment();
     }
 
+    protected function tearDown(): void
+    {
+        unset($this->contributionService);
+        parent::tearDown();
+    }
+
     protected function getMockedDAOs()
     {
         return ['UserGroupDAO', 'PublicationDAO'];
@@ -61,12 +67,6 @@ class ThothContributionServiceTest extends PKPTestCase
             ->will($this->returnValue($publication));
 
         DAORegistry::registerDAO('PublicationDAO', $publicationMockDao);
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->contributionService);
-        parent::tearDown();
     }
 
     public function testGettingContributionTypeByUserGroupLocaleKey()

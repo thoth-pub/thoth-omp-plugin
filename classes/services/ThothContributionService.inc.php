@@ -14,6 +14,7 @@
  */
 
 import('plugins.generic.thoth.classes.services.ThothContributorService');
+import('plugins.generic.thoth.classes.services.ThothAffiliationService');
 import('plugins.generic.thoth.thoth.models.ThothContribution');
 import('classes.core.Services');
 
@@ -68,6 +69,11 @@ class ThothContributionService
 
         $contributionId = $thothClient->createContribution($contribution);
         $contribution->setId($contributionId);
+
+        if ($affiliation = $author->getLocalizedAffiliation()) {
+            $affiliationService = new ThothAffiliationService();
+            $affiliationService->register($thothClient, $affiliation, $contributionId);
+        }
 
         return $contribution;
     }
