@@ -34,4 +34,12 @@ msgstr "Submission metadata successfully sent to Thoth."
 msgid "plugins.generic.thoth.registerMetadata.error"
 msgstr ""
 "There was a problem sending the submission metadata to Thoth. Please try again later, or "
-"contact your system administrator.
+"contact your system administrator."
+
+msgid "plugins.generic.thoth.updateMetadata"
+msgstr "Metadata successfully updated in Thoth."
+
+msgid "plugins.generic.thoth.registerMetadata.error"
+msgstr ""
+"There was a problem updating metadata in Thoth. Please try again later, or "
+"contact your system administrator."
