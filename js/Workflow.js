@@ -46,14 +46,6 @@
     }
 
     pkp.eventBus.$on('form-success', (formId, data) => {
-        if (formId !== pkp.const.FORM_PUBLISH) {
-            return;
-        }
-
-        if (data.status !== pkp.const.STATUS_PUBLISHED) {
-            return;
-        }
-
         $.ajax({
             type: 'POST',
             url: $.pkp.plugins.generic.thothplugin.notificationUrl,
