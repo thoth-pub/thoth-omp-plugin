@@ -98,7 +98,8 @@ class ThothWorkServiceTest extends PKPTestCase
             ->setMethods([
                 'createWork',
                 'createLanguage',
-                'createWorkRelation'
+                'createWorkRelation',
+                'work'
             ])
             ->getMock();
         $mockThothClient->expects($this->any())
@@ -110,6 +111,16 @@ class ThothWorkServiceTest extends PKPTestCase
         $mockThothClient->expects($this->any())
             ->method('createWorkRelation')
             ->will($this->returnValue('3e587b61-58f1-4064-bf80-e40e5c924d27'));
+        $mockThothClient->expects($this->any())
+            ->method('work')
+            ->will($this->returnValue([
+                'workId' => '39e399fb-cd40-461d-97cf-cf7f3a14cc48',
+                'imprintId' => '145369a6-916a-4107-ba0f-ce28137659c2',
+                'workType' => ThothWork::WORK_TYPE_BOOK_CHAPTER,
+                'workStatus' => ThothWork::WORK_STATUS_ACTIVE,
+                'fullTitle' => '10. Modification and Enhancement of Consciousness',
+                'title' => '10. Modification and Enhancement of Consciousness'
+            ]));
 
         return $mockThothClient;
     }
@@ -240,6 +251,23 @@ class ThothWorkServiceTest extends PKPTestCase
 
         $work = $this->workService->new($params);
         $this->assertEquals($expectedWork, $work);
+    }
+
+    public function testGetWork()
+    {
+        $expectedThothWork = new ThothWork();
+        $expectedThothWork->setId('39e399fb-cd40-461d-97cf-cf7f3a14cc48');
+        $expectedThothWork->setImprintId('145369a6-916a-4107-ba0f-ce28137659c2');
+        $expectedThothWork->setWorkType(ThothWork::WORK_TYPE_BOOK_CHAPTER);
+        $expectedThothWork->setWorkStatus(ThothWork::WORK_STATUS_ACTIVE);
+        $expectedThothWork->setTitle('10. Modification and Enhancement of Consciousness');
+        $expectedThothWork->setFullTitle('10. Modification and Enhancement of Consciousness');
+
+        $mockThothClient = $this->setUpMockEnvironment();
+
+        $thothWork = $this->workService->get($mockThothClient, '39e399fb-cd40-461d-97cf-cf7f3a14cc48');
+
+        $this->assertEquals($expectedThothWork, $thothWork);
     }
 
     public function testRegisterBook()

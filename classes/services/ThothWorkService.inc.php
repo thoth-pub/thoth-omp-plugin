@@ -70,6 +70,9 @@ class ThothWorkService
     public function new($params)
     {
         $work = new ThothWork();
+        $work->setId($params['workId'] ?? null);
+        $work->setImprintId($params['imprintId'] ?? null);
+        $work->setWorkType($params['workType']);
         $work->setWorkType($params['workType']);
         $work->setWorkStatus($params['workStatus']);
         $work->setFullTitle($params['fullTitle']);
@@ -86,6 +89,12 @@ class ThothWorkService
         $work->setCoverUrl($params['coverUrl'] ?? null);
 
         return $work;
+    }
+
+    public function get($thothClient, $thothWorkId)
+    {
+        $thothWorkData = $thothClient->work($thothWorkId);
+        return $this->new($thothWorkData);
     }
 
     public function registerBook($thothClient, $submission, $thothImprintId)
