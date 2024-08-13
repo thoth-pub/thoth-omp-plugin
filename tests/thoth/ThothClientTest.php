@@ -603,4 +603,24 @@ class ThothClientTest extends PKPTestCase
 
         $this->assertEquals($expectedWork, $work);
     }
+
+    public function testUpdateWork()
+    {
+        $thothWork = new ThothWork();
+
+        $mock = new MockHandler([
+            new Response(
+                200,
+                [],
+                '{"data":{"updateWork":{"workId":"ad3b25d6-44f7-4419-9460-4e170c4ec64f"}}}'
+            )
+        ]);
+        $handlerStack = HandlerStack::create($mock);
+        $httpClient = new Client(['handler' => $handlerStack]);
+
+        $client = new ThothClient(true, $httpClient);
+        $thothWorkId = $client->updateWork($thothWork);
+
+        $this->assertEquals('ad3b25d6-44f7-4419-9460-4e170c4ec64f', $thothWorkId);
+    }
 }
