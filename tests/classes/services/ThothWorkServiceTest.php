@@ -97,6 +97,7 @@ class ThothWorkServiceTest extends PKPTestCase
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
             ->setMethods([
                 'createWork',
+                'updateWork',
                 'createLanguage',
                 'createWorkRelation',
                 'work'
@@ -105,6 +106,9 @@ class ThothWorkServiceTest extends PKPTestCase
         $mockThothClient->expects($this->any())
             ->method('createWork')
             ->will($this->returnValue('74fde3e2-ca4e-4597-bb0c-aee90648f5a5'));
+        $mockThothClient->expects($this->any())
+            ->method('updateWork')
+            ->will($this->returnValue('ad3b25d6-44f7-4419-9460-4e170c4ec64f'));
         $mockThothClient->expects($this->any())
             ->method('createLanguage')
             ->will($this->returnValue('47b9ecbe-98af-4c01-8b5c-0c222e996429'));
@@ -351,5 +355,37 @@ class ThothWorkServiceTest extends PKPTestCase
             $relatedWorkId
         );
         $this->assertEquals($expectedThothWorkRelation, $thothWorkRelation);
+    }
+
+    public function testUpdateWork()
+    {
+        $thothWork = new ThothWork();
+        $thothWork->setId('49e58788-95d6-427f-8726-c24f5b15484c');
+        $thothWork->setImprintId('fb025f6c-9116-49f6-b633-eb3ef162fca5');
+        $thothWork->setWorkType(ThothWork::WORK_TYPE_EDITED_BOOK);
+        $thothWork->setWorkStatus(ThothWork::WORK_STATUS_ACTIVE);
+        $thothWork->setFullTitle('Cuba : Restructuring the Economy');
+        $thothWork->setTitle('Cuba : Restructuring the Economy');
+
+        $expectedThothWork = clone $thothWork;
+        $expectedThothWork->setFullTitle('Cuba : Restructuring the Economy: A Contribution to the Debate');
+        $expectedThothWork->setSubtitle('A Contribution to the Debate');
+
+        $params = [
+            'title' => [
+                'en_US' => 'Cuba : Restructuring the Economy'
+            ],
+            'subtitle' => [
+                'en_US' => 'A Contribution to the Debate'
+            ]
+        ];
+
+        $submissionLocale = 'en_US';
+
+        $mockThothClient = $this->setUpMockEnvironment();
+
+        $updatedThothWork = $this->workService->update($mockThothClient, $thothWork, $params, $submissionLocale);
+
+        $this->assertEquals($expectedThothWork, $updatedThothWork);
     }
 }

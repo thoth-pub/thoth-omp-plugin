@@ -201,6 +201,36 @@ class ThothWorkService
         return $relation;
     }
 
+    public function update($thothClient, $thothWork, $params, $submissionLocale)
+    {
+        $workData = $thothWork->getData();
+        foreach ($params as $key => $value) {
+            switch ($key) {
+                case 'title':
+                    $workData['title'] = $value[$submissionLocale];
+                    break;
+                case 'subtitle':
+                    $workData['subtitle'] = $value[$submissionLocale];
+                    break;
+                case 'abstract':
+                    $workData['longAbstract'] = $value[$submissionLocale];
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        if (isset($workData['title']) && isset($workData['subtitle'])) {
+            $workData['fullTitle'] = $workData['title'] . ': ' . $workData['subtitle'];
+        } elseif (isset($workData['title'])) {
+            $workData['fullTitle'] = $workData['title'];
+        }
+
+        $newThothWork = $this->new($workData);
+        $thothClient->updateWork($newThothWork);
+        return $newThothWork;
+    }
+
     public function getWorkTypeBySubmissionWorkType($submissionWorkType)
     {
         $workTypeMapping = [
