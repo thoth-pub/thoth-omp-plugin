@@ -564,4 +564,43 @@ class ThothClientTest extends PKPTestCase
 
         $this->assertEquals($expectedPublishers, $publishers);
     }
+
+    public function testGetWork()
+    {
+        $workId = 'e0f748b2-984f-45cc-8b9e-13989c31dda4';
+
+        $expectedWork = [
+            'workId' => '743ada7a-1d19-4968-b5e4-6a7656d48f02',
+            'workType' => ThothWork::WORK_TYPE_MONOGRAPH,
+            'workStatus' => ThothWork::WORK_STATUS_ACTIVE,
+            'fullTitle' => '10necessárias falas: cidade, arquitetura e urbanismo',
+            'title' => '10necessárias falas',
+            'subtitle' => 'cidade, arquitetura e urbanismo',
+            'edition' => 1,
+            'imprintId' => '5cf0b304-6ee5-45c7-a89d-53cd135d8d2b',
+            'doi' => 'https://doi.org/10.7476/9788523211516',
+            'publicationDate' => '2010-01-01',
+            'pageCount' => 252,
+            'license' => 'https://creativecommons.org/licenses/by/4.0/',
+            'copyrightHolder' => null,
+            'landingPage' => 'https://books.scielo.org/id/zhjcx',
+            'longAbstract' => '10necessárias falas: Cidade, Arquitetura e Urbanismo consiste em uma coletânea de ensaios acerca de planejamento, arquitetura e urbanismo, estabelecendo relações de totalidade e fragmentos, expondo ideias e percepções do autor, algumas ainda provisórias e abertas ao diálogo com os leitores.',
+            'coverUrl' => 'https://books.scielo.org/id/zhjcx/cover/cover.jpeg'
+        ];
+
+        $mock = new MockHandler([
+            new Response(
+                200,
+                [],
+                file_get_contents($this->fixturesPath . 'work.json')
+            )
+        ]);
+        $handlerStack = HandlerStack::create($mock);
+        $httpClient = new Client(['handler' => $handlerStack]);
+
+        $client = new ThothClient(true, $httpClient);
+        $work = $client->work($workId);
+
+        $this->assertEquals($expectedWork, $work);
+    }
 }

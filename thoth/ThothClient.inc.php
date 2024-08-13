@@ -180,6 +180,13 @@ class ThothClient
         return $this->query('publishers', $params, ThothPublisher::class);
     }
 
+    public function work($workId)
+    {
+        $this->addParameter($params, 'workId', $workId, true);
+
+        return $this->query('work', $params, ThothWork::class);
+    }
+
     private function mutation($name, $data)
     {
         $mutation = new ThothMutation($name, $data);
