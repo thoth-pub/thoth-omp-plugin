@@ -112,7 +112,6 @@ class HookCallbacks
         $request = $args[3];
 
         $submission = Services::get('submission')->get($publication->getData('submissionId'));
-        $submissionLocale = $submission->getLocale();
         $thothWorkId = $submission->getData('thothWorkId');
 
         if (!$thothWorkId) {
@@ -122,7 +121,7 @@ class HookCallbacks
         try {
             $thothClient = $this->plugin->getThothClient($submission->getData('contextId'));
             $thothWork = ThothService::work()->get($thothClient, $thothWorkId);
-            ThothService::work()->update($thothClient, $thothWork, $params, $submissionLocale);
+            ThothService::work()->update($thothClient, $thothWork, $params, $submission, $publication);
 
             $this->notify(
                 $request,

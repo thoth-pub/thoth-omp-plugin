@@ -39,7 +39,7 @@ msgstr ""
 msgid "plugins.generic.thoth.updateMetadata"
 msgstr "Metadados atualizados com sucesso em Thoth."
 
-msgid "plugins.generic.thoth.registerMetadata.error"
+msgid "plugins.generic.thoth.updateMetadata.error"
 msgstr ""
 "Houve um problema ao atualizar os metadados em Thoth. Por favor, tente mais "
 "tarde, ou contate o administrador do sistema."
