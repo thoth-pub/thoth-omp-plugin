@@ -92,6 +92,11 @@ class ThothClient
         return $this->mutation('createReference', $reference);
     }
 
+    public function updateWork($work)
+    {
+        return $this->mutation('updateWork', $work);
+    }
+
     public function contribution($contributionId)
     {
         $this->addParameter($params, 'contributionId', $contributionId, true);
@@ -178,6 +183,13 @@ class ThothClient
         $this->addParameter($params, 'publishers', $publishers, true);
 
         return $this->query('publishers', $params, ThothPublisher::class);
+    }
+
+    public function work($workId)
+    {
+        $this->addParameter($params, 'workId', $workId, true);
+
+        return $this->query('work', $params, ThothWork::class);
     }
 
     private function mutation($name, $data)

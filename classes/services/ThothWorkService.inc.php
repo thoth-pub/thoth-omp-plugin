@@ -19,12 +19,12 @@ import('plugins.generic.thoth.thoth.models.ThothWorkRelation');
 
 class ThothWorkService
 {
-    public function newBySubmission($submission)
+    public function newBySubmission($submission, $publication = null)
     {
         $request = Application::get()->getRequest();
         $dispatcher = $request->getDispatcher();
         $context = $request->getContext();
-        $publication = $submission->getCurrentPublication();
+        $publication = $publication ?? $submission->getCurrentPublication();
 
         $params = [];
         $params['workType'] = $this->getWorkTypeBySubmissionWorkType($submission->getData('workType'));
@@ -70,6 +70,9 @@ class ThothWorkService
     public function new($params)
     {
         $work = new ThothWork();
+        $work->setId($params['workId'] ?? null);
+        $work->setImprintId($params['imprintId'] ?? null);
+        $work->setWorkType($params['workType']);
         $work->setWorkType($params['workType']);
         $work->setWorkStatus($params['workStatus']);
         $work->setFullTitle($params['fullTitle']);
@@ -86,6 +89,12 @@ class ThothWorkService
         $work->setCoverUrl($params['coverUrl'] ?? null);
 
         return $work;
+    }
+
+    public function get($thothClient, $thothWorkId)
+    {
+        $thothWorkData = $thothClient->work($thothWorkId);
+        return $this->new($thothWorkData);
     }
 
     public function registerBook($thothClient, $submission, $thothImprintId)
@@ -160,6 +169,7 @@ class ThothWorkService
                 return $a->getData('chapterId') == $chapter->getId();
             }
         );
+
         $publicationFormatDao = DAORegistry::getDAO('PublicationFormatDAO');
         foreach ($files as $file) {
             $publicationFormat = $publicationFormatDao->getById($file->getData('assocId'));
@@ -192,6 +202,18 @@ class ThothWorkService
         return $relation;
     }
 
+    public function update($thothClient, $thothWork, $params, $submission, $publication)
+    {
+        $odlThothWorkData = $thothWork->getData();
+        $newThothWorkData = array_merge(
+            $odlThothWorkData,
+            $this->getDataBySubmission($submission, $publication, $params)
+        );
+        $newThothWork = $this->new($newThothWorkData);
+        $thothClient->updateWork($newThothWork);
+        return $newThothWork;
+    }
+
     public function getWorkTypeBySubmissionWorkType($submissionWorkType)
     {
         $workTypeMapping = [
@@ -200,5 +222,55 @@ class ThothWorkService
         ];
 
         return $workTypeMapping[$submissionWorkType];
+    }
+
+    private function getDataBySubmission($submission, $publication, $params)
+    {
+        $data = [];
+        foreach ($params as $key => $value) {
+            switch ($key) {
+                case 'title':
+                    $data['title'] = $publication->getLocalizedData('title');
+                    break;
+                case 'subtitle':
+                    $data['subtitle'] = $publication->getLocalizedData('subtitle');
+                    break;
+                case 'abstract':
+                    $data['longAbstract'] = $publication->getLocalizedData('abstract');
+                    break;
+                case 'datePublished':
+                    $data['publicationDate'] = $publication->getData('datePublished');
+                    break;
+                case 'licenseUrl':
+                    $data['license'] = $publication->getData('licenseUrl');
+                    break;
+                case 'copyrightHolder':
+                    $data['copyrightHolder'] = $publication->getLocalizedData('copyrightHolder');
+                    break;
+                case 'coverImage':
+                    $data['coverUrl'] = $publication->getLocalizedCoverImageUrl($submission->getData('contextId'));
+                    break;
+                case 'urlPath':
+                    $request = Application::get()->getRequest();
+                    $context = $request->getContext();
+                    $data['landingPage'] = $request->getDispatcher()->url(
+                        $request,
+                        ROUTE_PAGE,
+                        $context->getPath(),
+                        'catalog',
+                        'book',
+                        $publication->getData('urlPath') ?? $submission->getId()
+                    );
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        if (isset($data['title']) || isset($data['title'])) {
+            $data['fullTitle'] = $publication->getLocalizedFullTitle();
+        }
+
+        return $data;
     }
 }

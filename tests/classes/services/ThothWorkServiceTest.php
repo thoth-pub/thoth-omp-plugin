@@ -97,19 +97,34 @@ class ThothWorkServiceTest extends PKPTestCase
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
             ->setMethods([
                 'createWork',
+                'updateWork',
                 'createLanguage',
-                'createWorkRelation'
+                'createWorkRelation',
+                'work'
             ])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('createWork')
             ->will($this->returnValue('74fde3e2-ca4e-4597-bb0c-aee90648f5a5'));
         $mockThothClient->expects($this->any())
+            ->method('updateWork')
+            ->will($this->returnValue('ad3b25d6-44f7-4419-9460-4e170c4ec64f'));
+        $mockThothClient->expects($this->any())
             ->method('createLanguage')
             ->will($this->returnValue('47b9ecbe-98af-4c01-8b5c-0c222e996429'));
         $mockThothClient->expects($this->any())
             ->method('createWorkRelation')
             ->will($this->returnValue('3e587b61-58f1-4064-bf80-e40e5c924d27'));
+        $mockThothClient->expects($this->any())
+            ->method('work')
+            ->will($this->returnValue([
+                'workId' => '39e399fb-cd40-461d-97cf-cf7f3a14cc48',
+                'imprintId' => '145369a6-916a-4107-ba0f-ce28137659c2',
+                'workType' => ThothWork::WORK_TYPE_BOOK_CHAPTER,
+                'workStatus' => ThothWork::WORK_STATUS_ACTIVE,
+                'fullTitle' => '10. Modification and Enhancement of Consciousness',
+                'title' => '10. Modification and Enhancement of Consciousness'
+            ]));
 
         return $mockThothClient;
     }
@@ -242,6 +257,23 @@ class ThothWorkServiceTest extends PKPTestCase
         $this->assertEquals($expectedWork, $work);
     }
 
+    public function testGetWork()
+    {
+        $expectedThothWork = new ThothWork();
+        $expectedThothWork->setId('39e399fb-cd40-461d-97cf-cf7f3a14cc48');
+        $expectedThothWork->setImprintId('145369a6-916a-4107-ba0f-ce28137659c2');
+        $expectedThothWork->setWorkType(ThothWork::WORK_TYPE_BOOK_CHAPTER);
+        $expectedThothWork->setWorkStatus(ThothWork::WORK_STATUS_ACTIVE);
+        $expectedThothWork->setTitle('10. Modification and Enhancement of Consciousness');
+        $expectedThothWork->setFullTitle('10. Modification and Enhancement of Consciousness');
+
+        $mockThothClient = $this->setUpMockEnvironment();
+
+        $thothWork = $this->workService->get($mockThothClient, '39e399fb-cd40-461d-97cf-cf7f3a14cc48');
+
+        $this->assertEquals($expectedThothWork, $thothWork);
+    }
+
     public function testRegisterBook()
     {
         $thothImprintId = 'f02786d4-3bcc-473e-8d43-3da66c7e877c';
@@ -323,5 +355,46 @@ class ThothWorkServiceTest extends PKPTestCase
             $relatedWorkId
         );
         $this->assertEquals($expectedThothWorkRelation, $thothWorkRelation);
+    }
+
+    public function testUpdateWork()
+    {
+        $thothWork = new ThothWork();
+        $thothWork->setId('49e58788-95d6-427f-8726-c24f5b15484c');
+        $thothWork->setImprintId('fb025f6c-9116-49f6-b633-eb3ef162fca5');
+        $thothWork->setWorkType(ThothWork::WORK_TYPE_EDITED_BOOK);
+        $thothWork->setWorkStatus(ThothWork::WORK_STATUS_ACTIVE);
+        $thothWork->setFullTitle('Cuba : Restructuring the Economy');
+        $thothWork->setTitle('Cuba : Restructuring the Economy');
+
+        $expectedThothWork = clone $thothWork;
+        $expectedThothWork->setFullTitle('Cuba : Restructuring the Economy: A Contribution to the Debate');
+        $expectedThothWork->setSubtitle('A Contribution to the Debate');
+
+        $mockThothClient = $this->setUpMockEnvironment();
+
+        $params = [
+            'title' => [
+                'en_US' => 'Cuba : Restructuring the Economy'
+            ],
+            'subtitle' => [
+                'en_US' => 'A Contribution to the Debate'
+            ]
+        ];
+
+        $publication = new Publication();
+        $publication->setData('title', 'Cuba : Restructuring the Economy', 'en_US');
+        $publication->setData('subtitle', 'A Contribution to the Debate', 'en_US');
+        $submission = new Submission();
+
+        $updatedThothWork = $this->workService->update(
+            $mockThothClient,
+            $thothWork,
+            $params,
+            $submission,
+            $publication
+        );
+
+        $this->assertEquals($expectedThothWork, $updatedThothWork);
     }
 }

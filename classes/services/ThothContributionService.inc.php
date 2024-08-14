@@ -60,8 +60,8 @@ class ThothContributionService
         ]);
 
         $contributor = empty($contributors) ?
-            $contributorService->register($thothClient, $author) :
-            $contributor = array_shift($contributors);
+            ThothService::contributor()->register($thothClient, $author) :
+            array_shift($contributors);
 
         $contribution->setContributorId($contributor->getId());
 

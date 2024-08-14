@@ -35,6 +35,39 @@ class HookCallbacks
         return false;
     }
 
+    public function addJavaScripts($hookName, $args)
+    {
+        $templateMgr = $args[0];
+        $template = $args[1];
+        $request = Application::get()->getRequest();
+
+        if ($template == 'workflow/workflow.tpl') {
+            $data = [];
+            $data['notificationUrl'] = $request->url(null, 'notification', 'fetchNotification');
+
+            $templateMgr->addJavaScript(
+                'workflowData',
+                '$.pkp.plugins.generic = $.pkp.plugins.generic || {};' .
+                    '$.pkp.plugins.generic.' . strtolower(get_class($this->plugin)) . ' = ' . json_encode($data) . ';',
+                [
+                    'inline' => true,
+                    'contexts' => 'backend',
+                ]
+            );
+
+            $templateMgr->addJavaScript(
+                'plugin-thoth-workflow',
+                $request->getBaseUrl() . '/' . $this->plugin->getPluginPath() . '/js/Workflow.js',
+                [
+                    'contexts' => 'backend',
+                    'priority' => STYLE_SEQUENCE_LATE,
+                ]
+            );
+        }
+
+        return false;
+    }
+
     public function createWork($hookName, $args)
     {
         $request = Application::get()->getRequest();
@@ -72,6 +105,41 @@ class HookCallbacks
         return false;
     }
 
+    public function updateWork($hookName, $args)
+    {
+        $publication = $args[0];
+        $params = $args[2];
+        $request = $args[3];
+
+        $submission = Services::get('submission')->get($publication->getData('submissionId'));
+        $thothWorkId = $submission->getData('thothWorkId');
+
+        if (!$thothWorkId) {
+            return false;
+        }
+
+        try {
+            $thothClient = $this->plugin->getThothClient($submission->getData('contextId'));
+            $thothWork = ThothService::work()->get($thothClient, $thothWorkId);
+            ThothService::work()->update($thothClient, $thothWork, $params, $submission, $publication);
+
+            $this->notify(
+                $request,
+                NOTIFICATION_TYPE_SUCCESS,
+                __('plugins.generic.thoth.updateMetadata')
+            );
+        } catch (ThothException $e) {
+            error_log($e->getMessage());
+            $this->notify(
+                $request,
+                NOTIFICATION_TYPE_ERROR,
+                __('plugins.generic.thoth.updateMetadata.error')
+            );
+        }
+
+        return false;
+    }
+
     private function notify($request, $notificationType, $message)
     {
         $currentUser = $request->getUser();
@@ -82,38 +150,5 @@ class HookCallbacks
             ['contents' => $message]
         );
         return new JSONMessage(false);
-    }
-
-    public function addJavaScripts($hookName, $args)
-    {
-        $templateMgr = $args[0];
-        $template = $args[1];
-        $request = Application::get()->getRequest();
-
-        if ($template == 'workflow/workflow.tpl') {
-            $data = [];
-            $data['notificationUrl'] = $request->url(null, 'notification', 'fetchNotification');
-
-            $templateMgr->addJavaScript(
-                'workflowData',
-                '$.pkp.plugins.generic = $.pkp.plugins.generic || {};' .
-                    '$.pkp.plugins.generic.' . strtolower(get_class($this->plugin)) . ' = ' . json_encode($data) . ';',
-                [
-                    'inline' => true,
-                    'contexts' => 'backend',
-                ]
-            );
-
-            $templateMgr->addJavaScript(
-                'plugin-thoth-workflow',
-                $request->getBaseUrl() . '/' . $this->plugin->getPluginPath() . '/js/Workflow.js',
-                [
-                    'contexts' => 'backend',
-                    'priority' => STYLE_SEQUENCE_LATE,
-                ]
-            );
-        }
-
-        return false;
     }
 }
