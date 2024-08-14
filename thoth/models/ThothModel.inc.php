@@ -26,16 +26,6 @@ abstract class ThothModel
         return [];
     }
 
-    public function getProperties()
-    {
-        $reflector = new ReflectionClass($this);
-        $properties = $reflector->getProperties(ReflectionProperty::IS_PRIVATE);
-
-        return array_map(function ($prop) {
-            return $prop->getName();
-        }, $properties);
-    }
-
     public function getData()
     {
         $reflector = new ReflectionClass($this);
