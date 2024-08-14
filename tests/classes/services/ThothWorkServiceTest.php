@@ -371,6 +371,8 @@ class ThothWorkServiceTest extends PKPTestCase
         $expectedThothWork->setFullTitle('Cuba : Restructuring the Economy: A Contribution to the Debate');
         $expectedThothWork->setSubtitle('A Contribution to the Debate');
 
+        $mockThothClient = $this->setUpMockEnvironment();
+
         $params = [
             'title' => [
                 'en_US' => 'Cuba : Restructuring the Economy'
@@ -380,11 +382,18 @@ class ThothWorkServiceTest extends PKPTestCase
             ]
         ];
 
-        $submissionLocale = 'en_US';
+        $publication = new Publication();
+        $publication->setData('title', 'Cuba : Restructuring the Economy', 'en_US');
+        $publication->setData('subtitle', 'A Contribution to the Debate', 'en_US');
+        $submission = new Submission();
 
-        $mockThothClient = $this->setUpMockEnvironment();
-
-        $updatedThothWork = $this->workService->update($mockThothClient, $thothWork, $params, $submissionLocale);
+        $updatedThothWork = $this->workService->update(
+            $mockThothClient,
+            $thothWork,
+            $params,
+            $submission,
+            $publication
+        );
 
         $this->assertEquals($expectedThothWork, $updatedThothWork);
     }
