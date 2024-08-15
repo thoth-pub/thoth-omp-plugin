@@ -28,6 +28,7 @@ class ThothPlugin extends GenericPlugin
             $hookCallbacks = new HookCallbacks($this);
             HookRegistry::register('Schema::get::submission', [$hookCallbacks, 'addWorkIdToSchema']);
             HookRegistry::register('TemplateManager::display', [$hookCallbacks, 'addJavaScripts']);
+            HookRegistry::register('TemplateManager::display', [$hookCallbacks, 'addThothBadge']);
             HookRegistry::register('Publication::publish', [$hookCallbacks, 'createWork']);
             HookRegistry::register('Publication::edit', [$hookCallbacks, 'updateWork']);
         }
