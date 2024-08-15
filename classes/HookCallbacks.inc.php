@@ -68,6 +68,37 @@ class HookCallbacks
         return false;
     }
 
+    public function addThothBadge($hookName, $args)
+    {
+        $templateMgr = $args[0];
+        $template = $args[1];
+
+        if ($template != 'workflow/workflow.tpl') {
+            return false;
+        }
+
+        $templateMgr->registerFilter("output", array($this, 'thothBadgeFilter'));
+
+        return false;
+    }
+
+    public function thothBadgeFilter($output, $templateMgr)
+    {
+        $regex = '/<span\s+class="pkpPublication__status">([\s\S]*?)<\/span>[^<]+<\/span>/';
+        if (preg_match($regex, $output, $matches, PREG_OFFSET_CAPTURE)) {
+            error_log('entrou');
+            $match = $matches[0][0];
+            $offset = $matches[0][1];
+            $newOutput = substr($output, 0, $offset + strlen($match));
+            $newOutput .= $templateMgr->fetch($this->plugin->getTemplateResource('thothBadge.tpl'));
+            $newOutput .= substr($output, $offset + strlen($match));
+            $output = $newOutput;
+            $templateMgr->unregisterFilter('output', array($this, 'thothBadgeFilter'));
+        }
+        return $output;
+    }
+
+
     public function createWork($hookName, $args)
     {
         $request = Application::get()->getRequest();

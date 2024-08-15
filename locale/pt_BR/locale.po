@@ -28,6 +28,9 @@ msgstr "O administrador do seu site deve definir um segredo no arquivo de config
 msgid "plugins.generic.thoth.credentialsMissing"
 msgstr "Credenciais do Thoth não configuradas."
 
+msgid "plugins.generic.thoth.thothBook"
+msgstr "Livro Thoth: "
+
 msgid "plugins.generic.thoth.registerMetadata"
 msgstr "Metadados da submissão enviados para Thoth com sucesso."
 

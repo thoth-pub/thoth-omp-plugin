@@ -28,6 +28,9 @@ msgstr "Your site administrator must set a secret in the config file ('api_key_s
 msgid "plugins.generic.thoth.credentialsMissing"
 msgstr "Thoth credentials not configured."
 
+msgid "plugins.generic.thoth.thothBook"
+msgstr "Thoth Book: "
+
 msgid "plugins.generic.thoth.registerMetadata"
 msgstr "Submission metadata successfully sent to Thoth."
 
