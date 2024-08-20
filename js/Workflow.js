@@ -45,7 +45,33 @@
         });
     }
 
-    pkp.eventBus.$on('form-success', (formId, data) => {
+    $.pkp.plugins.generic.thothplugin.openRegister = function (publicationId) {
+        const focusEl = document.activeElement;
+
+        const sourceUrl = $.pkp.plugins.generic.thothplugin.registerUrl.replace(
+            '__publicationId__',
+            publicationId
+        );
+
+        var opts = {
+            title: $.pkp.plugins.generic.thothplugin.registerTitle,
+            url: sourceUrl,
+            closeCallback: () => focusEl.focus(),
+            closeOnFormSuccessId: 'register'
+        };
+
+        $(
+            '<div id="' +
+            $.pkp.classes.Helper.uuid() +
+            '" ' +
+            'class="pkp_modal pkpModalWrapper" tabIndex="-1"></div>'
+        ).pkpHandler('$.pkp.controllers.modal.AjaxModalHandler', opts);
+    }
+
+    pkp.eventBus.$on('form-success', (formId) => {
+        if (formId == 'register') {
+            pkp.registry._instances.app.refreshSubmission();
+        }
         $.ajax({
             type: 'POST',
             url: $.pkp.plugins.generic.thothplugin.notificationUrl,

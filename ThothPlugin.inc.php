@@ -31,6 +31,8 @@ class ThothPlugin extends GenericPlugin
             HookRegistry::register('TemplateManager::display', [$hookCallbacks, 'addThothBadge']);
             HookRegistry::register('Publication::publish', [$hookCallbacks, 'createWork']);
             HookRegistry::register('Publication::edit', [$hookCallbacks, 'updateWork']);
+            HookRegistry::register('LoadHandler', [$hookCallbacks, 'setupHandler']);
+            HookRegistry::register('APIHandler::endpoints', [$hookCallbacks, 'addThothEndpoint']);
         }
 
         return $success;

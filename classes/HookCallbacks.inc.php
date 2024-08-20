@@ -42,8 +42,24 @@ class HookCallbacks
         $request = Application::get()->getRequest();
 
         if ($template == 'workflow/workflow.tpl') {
-            $data = [];
-            $data['notificationUrl'] = $request->url(null, 'notification', 'fetchNotification');
+            $submission = $templateMgr->getTemplateVars('submission');
+
+            $data = [
+                'notificationUrl' => $request->url(null, 'notification', 'fetchNotification'),
+                'registerTitle' => __('plugins.generic.thoth.register'),
+                'registerUrl' => $request->getDispatcher()->url(
+                    $request,
+                    ROUTE_PAGE,
+                    null,
+                    'thoth',
+                    'register',
+                    null,
+                    [
+                        'submissionId' => $submission->getId(),
+                        'publicationId' => '__publicationId__',
+                    ]
+                )
+            ];
 
             $templateMgr->addJavaScript(
                 'workflowData',
@@ -61,6 +77,14 @@ class HookCallbacks
                 [
                     'contexts' => 'backend',
                     'priority' => STYLE_SEQUENCE_LATE,
+                ]
+            );
+
+            $templateMgr->addStyleSheet(
+                'plugin-thoth-workflow_css',
+                $request->getBaseUrl() . '/' . $this->plugin->getPluginPath() . '/styles/workflow.css',
+                [
+                    'contexts' => 'backend'
                 ]
             );
         }
@@ -86,7 +110,6 @@ class HookCallbacks
     {
         $regex = '/<span\s+class="pkpPublication__status">([\s\S]*?)<\/span>[^<]+<\/span>/';
         if (preg_match($regex, $output, $matches, PREG_OFFSET_CAPTURE)) {
-            error_log('entrou');
             $match = $matches[0][0];
             $offset = $matches[0][1];
             $newOutput = substr($output, 0, $offset + strlen($match));
@@ -98,20 +121,17 @@ class HookCallbacks
         return $output;
     }
 
-
-    public function createWork($hookName, $args)
+    public function registerWork($submission)
     {
         $request = Application::get()->getRequest();
-        $contextId = $request->getContext()->getId();
-        $submission = $args[2];
-
-        if ($submission->getData('thothWorkId')) {
-            return false;
+        $submissionContext = $request->getContext();
+        if (!$submissionContext || $submissionContext->getId() !== $submission->getData('contextId')) {
+            $submissionContext = Services::get('context')->get($submission->getData('contextId'));
         }
+        $thothImprintId = $this->plugin->getSetting($submissionContext->getId(), 'imprintId');
 
-        $thothImprintId = $this->plugin->getSetting($contextId, 'imprintId');
         try {
-            $thothClient = $this->plugin->getThothClient($contextId);
+            $thothClient = $this->plugin->getThothClient($submissionContext->getId());
             $thothBook = ThothService::work()->registerBook($thothClient, $submission, $thothImprintId);
             $submission = Services::get('submission')->edit(
                 $submission,
@@ -122,16 +142,27 @@ class HookCallbacks
             $this->notify(
                 $request,
                 NOTIFICATION_TYPE_SUCCESS,
-                __('plugins.generic.thoth.registerMetadata')
+                __('plugins.generic.thoth.register.success')
             );
         } catch (ThothException $e) {
             error_log($e->getMessage());
             $this->notify(
                 $request,
                 NOTIFICATION_TYPE_ERROR,
-                __('plugins.generic.thoth.registerMetadata.error')
+                __('plugins.generic.thoth.register.error')
             );
         }
+    }
+
+    public function createWork($hookName, $args)
+    {
+        $submission = $args[2];
+
+        if ($submission->getData('thothWorkId')) {
+            return false;
+        }
+
+        $this->registerWork($submission);
 
         return false;
     }
@@ -157,14 +188,14 @@ class HookCallbacks
             $this->notify(
                 $request,
                 NOTIFICATION_TYPE_SUCCESS,
-                __('plugins.generic.thoth.updateMetadata')
+                __('plugins.generic.thoth.update.success')
             );
         } catch (ThothException $e) {
             error_log($e->getMessage());
             $this->notify(
                 $request,
                 NOTIFICATION_TYPE_ERROR,
-                __('plugins.generic.thoth.updateMetadata.error')
+                __('plugins.generic.thoth.update.error')
             );
         }
 
@@ -181,5 +212,80 @@ class HookCallbacks
             ['contents' => $message]
         );
         return new JSONMessage(false);
+    }
+
+    public function setupHandler($hookName, $params)
+    {
+        $page = $params[0];
+        if ($this->plugin->getEnabled() && $page === 'thoth') {
+            $this->plugin->import('controllers/modal/RegisterHandler');
+            define('HANDLER_CLASS', 'RegisterHandler');
+            return true;
+        }
+        return false;
+    }
+
+    public function addThothEndpoint($hookName, $args)
+    {
+        $endpoints = & $args[0];
+        $handler = $args[1];
+
+        if (!is_a($handler, 'PKPSubmissionHandler')) {
+            return false;
+        }
+
+        array_unshift(
+            $endpoints['PUT'],
+            [
+                'pattern' => $handler->getEndpointPattern() . '/{submissionId}/publications/{publicationId}/register',
+                'handler' => [$this, 'register'],
+                'roles' => [ROLE_ID_MANAGER, ROLE_ID_SUB_EDITOR],
+            ]
+        );
+
+        $handler->requiresSubmissionAccess[] = 'register';
+
+        return false;
+    }
+
+    public function register($slimRequest, $response, $args)
+    {
+        $request = Application::get()->getRequest();
+        $handler = $request->getRouter()->getHandler();
+        $submission = $handler->getAuthorizedContextObject(ASSOC_TYPE_SUBMISSION);
+        $publication = Services::get('publication')->get((int) $args['publicationId']);
+
+        if (!$publication) {
+            return $response->withStatus(404)->withJsonError('api.404.resourceNotFound');
+        }
+
+        if ($submission->getId() !== $publication->getData('submissionId')) {
+            return $response->withStatus(403)->withJsonError('api.publications.403.submissionsDidNotMatch');
+        }
+
+        if ($submission->getData('thothWorkId')) {
+            return $response->withStatus(403)->withJsonError('plugins.generic.thoth.api.403.alreadyRegistered');
+        }
+
+        AppLocale::requireComponents(LOCALE_COMPONENT_PKP_SUBMISSION, LOCALE_COMPONENT_APP_SUBMISSION);
+
+        $submissionContext = $request->getContext();
+        if (!$submissionContext || $submissionContext->getId() !== $submission->getData('contextId')) {
+            $submissionContext = Services::get('context')->get($submission->getData('contextId'));
+        }
+
+        $this->registerWork($submission);
+
+        $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
+
+        $publicationProps = Services::get('publication')->getFullProperties(
+            $publication,
+            [
+                'request' => $request,
+                'userGroups' => $userGroupDao->getByContextId($submission->getData('contextId'))->toArray(),
+            ]
+        );
+
+        return $response->withJson($publicationProps, 200);
     }
 }

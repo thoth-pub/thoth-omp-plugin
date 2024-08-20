@@ -11,13 +11,18 @@
  *
  *}
 
-<span v-if="submission.thothWorkId" style="margin-left: 1rem">
+<span v-if="submission.status === getConstant('STATUS_PUBLISHED')" class="pkpPublication__thoth">
     <strong>
         {translate key="plugins.generic.thoth.thothBook"}
     </strong>
-    <span>
+    <span v-if="submission.thothWorkId">
         <a :href="'https://thoth.pub/books/' + submission.thothWorkId">
             {{ submission.thothWorkId }}
         </a>
+    </span>
+    <span v-else>
+        <pkp-button @click="$.pkp.plugins.generic.thothplugin.openRegister(workingPublication.id)">
+            Registrar
+        </pkp-button>
     </span>
 </span>
