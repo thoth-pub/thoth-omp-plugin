@@ -16,6 +16,7 @@
  */
 
 import('lib.pkp.classes.plugins.GenericPlugin');
+import('plugins.generic.thoth.classes.ThothNotification');
 
 class ThothPlugin extends GenericPlugin
 {
@@ -33,6 +34,9 @@ class ThothPlugin extends GenericPlugin
             HookRegistry::register('Publication::edit', [$hookCallbacks, 'updateWork']);
             HookRegistry::register('LoadHandler', [$hookCallbacks, 'setupHandler']);
             HookRegistry::register('APIHandler::endpoints', [$hookCallbacks, 'addThothEndpoint']);
+
+            $thothNotification = new ThothNotification($this);
+            HookRegistry::register('TemplateManager::display', [$thothNotification, 'addNotificationScript']);
         }
 
         return $success;

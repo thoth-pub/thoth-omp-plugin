@@ -45,7 +45,6 @@ class HookCallbacks
             $submission = $templateMgr->getTemplateVars('submission');
 
             $data = [
-                'notificationUrl' => $request->url(null, 'notification', 'fetchNotification'),
                 'registerTitle' => __('plugins.generic.thoth.register'),
                 'registerUrl' => $request->getDispatcher()->url(
                     $request,
@@ -139,14 +138,14 @@ class HookCallbacks
                 $request
             );
 
-            $this->notify(
+            ThothNotification::notify(
                 $request,
                 NOTIFICATION_TYPE_SUCCESS,
                 __('plugins.generic.thoth.register.success')
             );
         } catch (ThothException $e) {
             error_log($e->getMessage());
-            $this->notify(
+            ThothNotification::notify(
                 $request,
                 NOTIFICATION_TYPE_ERROR,
                 __('plugins.generic.thoth.register.error')
@@ -185,14 +184,14 @@ class HookCallbacks
             $thothWork = ThothService::work()->get($thothClient, $thothWorkId);
             ThothService::work()->update($thothClient, $thothWork, $params, $submission, $publication);
 
-            $this->notify(
+            ThothNotification::notify(
                 $request,
                 NOTIFICATION_TYPE_SUCCESS,
                 __('plugins.generic.thoth.update.success')
             );
         } catch (ThothException $e) {
             error_log($e->getMessage());
-            $this->notify(
+            ThothNotification::notify(
                 $request,
                 NOTIFICATION_TYPE_ERROR,
                 __('plugins.generic.thoth.update.error')

@@ -16,35 +16,6 @@
         return;
     }
 
-    $.pkp.plugins.generic.thothplugin.showNotification = function (responseObject) {
-        const { content } = responseObject;
-        if (!content?.general) {
-            return;
-        }
-
-        const notificationsData = content.general;
-
-        Object.entries(notificationsData).forEach(([levelId, notifications]) => {
-            Object.values(notifications).forEach(({ addclass, text }) => {
-                let type = 'notice';
-
-                switch (addclass) {
-                    case 'notifySuccess':
-                        type = 'success';
-                        break;
-                    case 'notifyWarning':
-                    case 'notifyError':
-                    case 'notifyFormError':
-                    case 'notifyForbidden':
-                        type = 'warning';
-                        break;
-                }
-
-                pkp.eventBus.$emit('notify', text, type);
-            });
-        });
-    }
-
     $.pkp.plugins.generic.thothplugin.openRegister = function (publicationId) {
         const focusEl = document.activeElement;
 
@@ -72,12 +43,5 @@
         if (formId == 'register') {
             pkp.registry._instances.app.refreshSubmission();
         }
-        $.ajax({
-            type: 'POST',
-            url: $.pkp.plugins.generic.thothplugin.notificationUrl,
-            success: $.pkp.plugins.generic.thothplugin.showNotification,
-            dataType: 'json',
-            async: false
-        });
     });
 }());
