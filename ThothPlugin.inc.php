@@ -16,6 +16,10 @@
  */
 
 import('lib.pkp.classes.plugins.GenericPlugin');
+import('plugins.generic.thoth.classes.ThothBadgeRender');
+import('plugins.generic.thoth.classes.ThothNotification');
+import('plugins.generic.thoth.classes.ThothRegister');
+import('plugins.generic.thoth.classes.ThothUpdater');
 
 class ThothPlugin extends GenericPlugin
 {
@@ -24,13 +28,21 @@ class ThothPlugin extends GenericPlugin
         $success = parent::register($category, $path);
 
         if ($success && $this->getEnabled()) {
-            import('plugins.generic.thoth.classes.HookCallbacks');
-            $hookCallbacks = new HookCallbacks($this);
-            HookRegistry::register('Schema::get::submission', [$hookCallbacks, 'addWorkIdToSchema']);
-            HookRegistry::register('TemplateManager::display', [$hookCallbacks, 'addJavaScripts']);
-            HookRegistry::register('TemplateManager::display', [$hookCallbacks, 'addThothBadge']);
-            HookRegistry::register('Publication::publish', [$hookCallbacks, 'createWork']);
-            HookRegistry::register('Publication::edit', [$hookCallbacks, 'updateWork']);
+            $thothRegister = new ThothRegister($this);
+            HookRegistry::register('Schema::get::submission', [$thothRegister, 'addWorkIdToSchema']);
+            HookRegistry::register('TemplateManager::display', [$thothRegister, 'addResources']);
+            HookRegistry::register('Publication::publish', [$thothRegister, 'registerOnPublish']);
+            HookRegistry::register('LoadHandler', [$thothRegister, 'setupHandler']);
+            HookRegistry::register('APIHandler::endpoints', [$thothRegister, 'addThothEndpoint']);
+
+            $thothUpdater = new ThothUpdater($this);
+            HookRegistry::register('Publication::edit', [$thothUpdater, 'updateWork']);
+
+            $thothBadgeRender = new ThothBadgeRender($this);
+            HookRegistry::register('TemplateManager::display', [$thothBadgeRender, 'addThothBadge']);
+
+            $thothNotification = new ThothNotification($this);
+            HookRegistry::register('TemplateManager::display', [$thothNotification, 'addNotificationScript']);
         }
 
         return $success;

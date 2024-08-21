@@ -16,42 +16,32 @@
         return;
     }
 
-    $.pkp.plugins.generic.thothplugin.showNotification = function (responseObject) {
-        const { content } = responseObject;
-        if (!content?.general) {
-            return;
-        }
+    $.pkp.plugins.generic.thothplugin.openRegister = function (publicationId) {
+        const focusEl = document.activeElement;
 
-        const notificationsData = content.general;
+        const sourceUrl = $.pkp.plugins.generic.thothplugin.registerUrl.replace(
+            '__publicationId__',
+            publicationId
+        );
 
-        Object.entries(notificationsData).forEach(([levelId, notifications]) => {
-            Object.values(notifications).forEach(({ addclass, text }) => {
-                let type = 'notice';
+        var opts = {
+            title: $.pkp.plugins.generic.thothplugin.registerTitle,
+            url: sourceUrl,
+            closeCallback: () => focusEl.focus(),
+            closeOnFormSuccessId: 'register'
+        };
 
-                switch (addclass) {
-                    case 'notifySuccess':
-                        type = 'success';
-                        break;
-                    case 'notifyWarning':
-                    case 'notifyError':
-                    case 'notifyFormError':
-                    case 'notifyForbidden':
-                        type = 'warning';
-                        break;
-                }
-
-                pkp.eventBus.$emit('notify', text, type);
-            });
-        });
+        $(
+            '<div id="' +
+            $.pkp.classes.Helper.uuid() +
+            '" ' +
+            'class="pkp_modal pkpModalWrapper" tabIndex="-1"></div>'
+        ).pkpHandler('$.pkp.controllers.modal.AjaxModalHandler', opts);
     }
 
-    pkp.eventBus.$on('form-success', (formId, data) => {
-        $.ajax({
-            type: 'POST',
-            url: $.pkp.plugins.generic.thothplugin.notificationUrl,
-            success: $.pkp.plugins.generic.thothplugin.showNotification,
-            dataType: 'json',
-            async: false
-        });
+    pkp.eventBus.$on('form-success', (formId) => {
+        if (formId == 'register') {
+            pkp.registry._instances.app.refreshSubmission();
+        }
     });
 }());

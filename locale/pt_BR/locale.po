@@ -31,18 +31,27 @@ msgstr "Credenciais do Thoth não configuradas."
 msgid "plugins.generic.thoth.thothBook"
 msgstr "Livro Thoth: "
 
-msgid "plugins.generic.thoth.registerMetadata"
+msgid "plugins.generic.thoth.register"
+msgstr "Registrar"
+
+msgid "plugins.generic.thoth.register.confirmation"
+msgstr "Deseja realmente registrar na Thoth os metadados relacionados a essa submissão?"
+
+msgid "plugins.generic.thoth.register.success"
 msgstr "Metadados da submissão enviados para Thoth com sucesso."
 
-msgid "plugins.generic.thoth.registerMetadata.error"
+msgid "plugins.generic.thoth.register.error"
 msgstr ""
 "Houve um problema ao enviar os metadados da submissão para Thoth. Por favor, tente mais "
 "tarde, ou contate o administrador do sistema."
 
-msgid "plugins.generic.thoth.updateMetadata"
+msgid "plugins.generic.thoth.update.success"
 msgstr "Metadados atualizados com sucesso em Thoth."
 
-msgid "plugins.generic.thoth.updateMetadata.error"
+msgid "plugins.generic.thoth.update.error"
 msgstr ""
 "Houve um problema ao atualizar os metadados em Thoth. Por favor, tente mais "
 "tarde, ou contate o administrador do sistema."
+
+msgid "plugins.generic.thoth.api.403.alreadyRegistered"
+msgstr "A submissão já foi registrada na Thoth."
