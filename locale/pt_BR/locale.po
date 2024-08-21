@@ -52,3 +52,6 @@ msgid "plugins.generic.thoth.update.error"
 msgstr ""
 "Houve um problema ao atualizar os metadados em Thoth. Por favor, tente mais "
 "tarde, ou contate o administrador do sistema."
+
+msgid "plugins.generic.thoth.api.403.alreadyRegistered"
+msgstr "A submissão já foi registrada na Thoth."

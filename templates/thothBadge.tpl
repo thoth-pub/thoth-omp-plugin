@@ -7,11 +7,11 @@
  * Copyright (c) 2024 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
- * Thoth plugin settings
+ * Thoth badge
  *
  *}
 
-<span v-if="submission.status === getConstant('STATUS_PUBLISHED')" class="pkpPublication__thoth">
+<span v-if="submission.status === getConstant('STATUS_PUBLISHED') || submission.thothWorkId" class="pkpPublication__thoth">
     <strong>
         {translate key="plugins.generic.thoth.thothBook"}
     </strong>

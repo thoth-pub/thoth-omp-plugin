@@ -1,21 +1,21 @@
 <?php
 
 /**
- * @file plugins/generic/thoth/HookCallbacks.php
+ * @file plugins/generic/thoth/classes/ThothRegister.php
  *
  * Copyright (c) 2024 Lepidus Tecnologia
  * Copyright (c) 2024 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
- * @class HookCallbacks
+ * @class ThothRegister
  * @ingroup plugins_generic_thoth
  *
- * @brief Manage callback functions for the plugin hooks
+ * @brief Manage callback functions to register works in Thoth
  */
 
 import('plugins.generic.thoth.classes.facades.ThothService');
 
-class HookCallbacks
+class ThothRegister
 {
     private $plugin;
 
@@ -35,7 +35,7 @@ class HookCallbacks
         return false;
     }
 
-    public function addJavaScripts($hookName, $args)
+    public function addResources($hookName, $args)
     {
         $templateMgr = $args[0];
         $template = $args[1];
@@ -63,7 +63,7 @@ class HookCallbacks
             $templateMgr->addJavaScript(
                 'workflowData',
                 '$.pkp.plugins.generic = $.pkp.plugins.generic || {};' .
-                    '$.pkp.plugins.generic.' . strtolower(get_class($this->plugin)) . ' = ' . json_encode($data) . ';',
+                    '$.pkp.plugins.generic.thothplugin = ' . json_encode($data) . ';',
                 [
                     'inline' => true,
                     'contexts' => 'backend',
@@ -78,46 +78,9 @@ class HookCallbacks
                     'priority' => STYLE_SEQUENCE_LATE,
                 ]
             );
-
-            $templateMgr->addStyleSheet(
-                'plugin-thoth-workflow_css',
-                $request->getBaseUrl() . '/' . $this->plugin->getPluginPath() . '/styles/workflow.css',
-                [
-                    'contexts' => 'backend'
-                ]
-            );
         }
 
         return false;
-    }
-
-    public function addThothBadge($hookName, $args)
-    {
-        $templateMgr = $args[0];
-        $template = $args[1];
-
-        if ($template != 'workflow/workflow.tpl') {
-            return false;
-        }
-
-        $templateMgr->registerFilter("output", array($this, 'thothBadgeFilter'));
-
-        return false;
-    }
-
-    public function thothBadgeFilter($output, $templateMgr)
-    {
-        $regex = '/<span\s+class="pkpPublication__status">([\s\S]*?)<\/span>[^<]+<\/span>/';
-        if (preg_match($regex, $output, $matches, PREG_OFFSET_CAPTURE)) {
-            $match = $matches[0][0];
-            $offset = $matches[0][1];
-            $newOutput = substr($output, 0, $offset + strlen($match));
-            $newOutput .= $templateMgr->fetch($this->plugin->getTemplateResource('thothBadge.tpl'));
-            $newOutput .= substr($output, $offset + strlen($match));
-            $output = $newOutput;
-            $templateMgr->unregisterFilter('output', array($this, 'thothBadgeFilter'));
-        }
-        return $output;
     }
 
     public function registerWork($submission)
@@ -153,7 +116,7 @@ class HookCallbacks
         }
     }
 
-    public function createWork($hookName, $args)
+    public function registerOnPublish($hookName, $args)
     {
         $submission = $args[2];
 
@@ -164,53 +127,6 @@ class HookCallbacks
         $this->registerWork($submission);
 
         return false;
-    }
-
-    public function updateWork($hookName, $args)
-    {
-        $publication = $args[0];
-        $params = $args[2];
-        $request = $args[3];
-
-        $submission = Services::get('submission')->get($publication->getData('submissionId'));
-        $thothWorkId = $submission->getData('thothWorkId');
-
-        if (!$thothWorkId) {
-            return false;
-        }
-
-        try {
-            $thothClient = $this->plugin->getThothClient($submission->getData('contextId'));
-            $thothWork = ThothService::work()->get($thothClient, $thothWorkId);
-            ThothService::work()->update($thothClient, $thothWork, $params, $submission, $publication);
-
-            ThothNotification::notify(
-                $request,
-                NOTIFICATION_TYPE_SUCCESS,
-                __('plugins.generic.thoth.update.success')
-            );
-        } catch (ThothException $e) {
-            error_log($e->getMessage());
-            ThothNotification::notify(
-                $request,
-                NOTIFICATION_TYPE_ERROR,
-                __('plugins.generic.thoth.update.error')
-            );
-        }
-
-        return false;
-    }
-
-    private function notify($request, $notificationType, $message)
-    {
-        $currentUser = $request->getUser();
-        $notificationMgr = new NotificationManager();
-        $notificationMgr->createTrivialNotification(
-            $currentUser->getId(),
-            $notificationType,
-            ['contents' => $message]
-        );
-        return new JSONMessage(false);
     }
 
     public function setupHandler($hookName, $params)
