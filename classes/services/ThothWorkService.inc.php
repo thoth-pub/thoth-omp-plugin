@@ -19,27 +19,27 @@ import('plugins.generic.thoth.thoth.models.ThothWorkRelation');
 
 class ThothWorkService
 {
-    public function newBySubmission($submission, $publication = null)
+    public function getDataBySubmission($submission, $publication = null)
     {
         $request = Application::get()->getRequest();
         $dispatcher = $request->getDispatcher();
         $context = $request->getContext();
         $publication = $publication ?? $submission->getCurrentPublication();
 
-        $params = [];
-        $params['workType'] = $this->getWorkTypeBySubmissionWorkType($submission->getData('workType'));
-        $params['workStatus'] = ThothWork::WORK_STATUS_ACTIVE;
-        $params['fullTitle'] = $publication->getLocalizedFullTitle();
-        $params['title'] = $publication->getLocalizedTitle();
-        $params['subtitle'] = $publication->getLocalizedData('subtitle');
-        $params['longAbstract'] = $publication->getLocalizedData('abstract');
-        $params['edition'] = $publication->getData('version');
-        $params['doi'] = $publication->getStoredPubId('doi');
-        $params['publicationDate'] = $publication->getData('datePublished');
-        $params['license'] = $publication->getData('licenseUrl');
-        $params['copyrightHolder'] = $publication->getLocalizedData('copyrightHolder');
-        $params['coverUrl'] = $publication->getLocalizedCoverImageUrl($context->getId());
-        $params['landingPage'] = $dispatcher->url(
+        $data = [];
+        $data['workType'] = $this->getWorkTypeBySubmissionWorkType($submission->getData('workType'));
+        $data['workStatus'] = ThothWork::WORK_STATUS_ACTIVE;
+        $data['fullTitle'] = $publication->getLocalizedFullTitle();
+        $data['title'] = $publication->getLocalizedTitle();
+        $data['subtitle'] = $publication->getLocalizedData('subtitle');
+        $data['longAbstract'] = $publication->getLocalizedData('abstract');
+        $data['edition'] = $publication->getData('version');
+        $data['doi'] = $publication->getStoredPubId('doi');
+        $data['publicationDate'] = $publication->getData('datePublished');
+        $data['license'] = $publication->getData('licenseUrl');
+        $data['copyrightHolder'] = $publication->getLocalizedData('copyrightHolder');
+        $data['coverUrl'] = $publication->getLocalizedCoverImageUrl($context->getId());
+        $data['landingPage'] = $dispatcher->url(
             $request,
             ROUTE_PAGE,
             $context->getPath(),
@@ -48,7 +48,12 @@ class ThothWorkService
             $submission->getBestId()
         );
 
-        return $this->new($params);
+        return $data;
+    }
+
+    public function newBySubmission($submission, $publication = null)
+    {
+        return $this->new($this->getDataBySubmission($submission, $publication));
     }
 
     public function newByChapter($chapter)
@@ -202,14 +207,13 @@ class ThothWorkService
         return $relation;
     }
 
-    public function update($thothClient, $thothWork, $params, $submission, $publication)
+    public function updateBook($thothClient, $thothWork, $submission, $publication)
     {
         $odlThothWorkData = $thothWork->getData();
-        $newThothWorkData = array_merge(
-            $odlThothWorkData,
-            $this->getDataBySubmission($submission, $publication, $params)
-        );
-        $newThothWork = $this->new($newThothWorkData);
+        $newThothWork = $this->new(array_merge(
+            $thothWork->getData(),
+            $this->getDataBySubmission($submission, $publication)
+        ));
         $thothClient->updateWork($newThothWork);
         return $newThothWork;
     }
@@ -222,55 +226,5 @@ class ThothWorkService
         ];
 
         return $workTypeMapping[$submissionWorkType];
-    }
-
-    private function getDataBySubmission($submission, $publication, $params)
-    {
-        $data = [];
-        foreach ($params as $key => $value) {
-            switch ($key) {
-                case 'title':
-                    $data['title'] = $publication->getLocalizedData('title');
-                    break;
-                case 'subtitle':
-                    $data['subtitle'] = $publication->getLocalizedData('subtitle');
-                    break;
-                case 'abstract':
-                    $data['longAbstract'] = $publication->getLocalizedData('abstract');
-                    break;
-                case 'datePublished':
-                    $data['publicationDate'] = $publication->getData('datePublished');
-                    break;
-                case 'licenseUrl':
-                    $data['license'] = $publication->getData('licenseUrl');
-                    break;
-                case 'copyrightHolder':
-                    $data['copyrightHolder'] = $publication->getLocalizedData('copyrightHolder');
-                    break;
-                case 'coverImage':
-                    $data['coverUrl'] = $publication->getLocalizedCoverImageUrl($submission->getData('contextId'));
-                    break;
-                case 'urlPath':
-                    $request = Application::get()->getRequest();
-                    $context = $request->getContext();
-                    $data['landingPage'] = $request->getDispatcher()->url(
-                        $request,
-                        ROUTE_PAGE,
-                        $context->getPath(),
-                        'catalog',
-                        'book',
-                        $publication->getData('urlPath') ?? $submission->getId()
-                    );
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        if (isset($data['title']) || isset($data['title'])) {
-            $data['fullTitle'] = $publication->getLocalizedFullTitle();
-        }
-
-        return $data;
     }
 }

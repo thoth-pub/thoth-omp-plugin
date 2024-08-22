@@ -40,7 +40,7 @@ class ThothUpdater
         try {
             $thothClient = $this->plugin->getThothClient($submission->getData('contextId'));
             $thothWork = ThothService::work()->get($thothClient, $thothWorkId);
-            ThothService::work()->update($thothClient, $thothWork, $params, $submission, $publication);
+            ThothService::work()->updateBook($thothClient, $thothWork, $submission, $publication);
 
             ThothNotification::notify(
                 $request,
