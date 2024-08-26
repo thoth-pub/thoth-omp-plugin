@@ -225,6 +225,15 @@ class ThothWorkService
         ));
         $thothClient->updateWork($newThothWork);
 
+        if (isset($thothWorkData['contributions'])) {
+            ThothService::contribution()->updateContributions(
+                $thothClient,
+                $thothWorkData['contributions'],
+                $publication,
+                $thothWorkId
+            );
+        }
+
         return $newThothWork;
     }
 

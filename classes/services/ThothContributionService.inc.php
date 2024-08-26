@@ -34,23 +34,28 @@ class ThothContributionService
 
     public function newByAuthor($author)
     {
-        $userGroupLocaleKey = $author->getUserGroup()->getData('nameLocaleKey');
-
-        $params = [];
-        $params['contributionType'] = $this->getContributionTypeByUserGroupLocaleKey($userGroupLocaleKey);
-        $params['mainContribution'] = $this->isMainContribution($author);
-        $params['contributionOrdinal'] = $author->getSequence() + 1;
-        $params['firstName'] = $author->getLocalizedGivenName();
-        $params['lastName'] = $author->getLocalizedData('familyName');
-        $params['fullName'] = $author->getFullName(false);
-        $params['biography'] = $author->getLocalizedBiography();
-        return $this->new($params);
+        return $this->new($this->getDataByAuthor($author));
     }
 
-    public function register($thothClient, $author, $workId)
+    public function getDataByAuthor($author)
+    {
+        $userGroupLocaleKey = $author->getUserGroup()->getData('nameLocaleKey');
+
+        $data = [];
+        $data['contributionType'] = $this->getContributionTypeByUserGroupLocaleKey($userGroupLocaleKey);
+        $data['mainContribution'] = $this->isMainContribution($author);
+        $data['contributionOrdinal'] = $author->getSequence() + 1;
+        $data['firstName'] = $author->getLocalizedGivenName();
+        $data['lastName'] = $author->getLocalizedData('familyName');
+        $data['fullName'] = $author->getFullName(false);
+        $data['biography'] = $author->getLocalizedBiography();
+        return $data;
+    }
+
+    public function register($thothClient, $author, $thothWorkId)
     {
         $contribution = $this->newByAuthor($author);
-        $contribution->setWorkId($workId);
+        $contribution->setWorkId($thothWorkId);
 
         $contributors = ThothService::contributor()->getMany($thothClient, [
             'limit' => 1,
@@ -73,6 +78,40 @@ class ThothContributionService
         }
 
         return $contribution;
+    }
+
+    public function updateContributions($thothClient, $thothContributions, $publication, $thothWorkId)
+    {
+        $authors = DAORegistry::getDAO('AuthorDAO')->getByPublicationId($publication->getId());
+
+        $publicationContributions = array_map(function ($author) {
+            return $this->getDataByAuthor($author);
+        }, $authors);
+        foreach ($thothContributions as $thothContribution) {
+            if (!$this->contributionInList($thothContribution, $publicationContributions)) {
+                $thothClient->deleteContribution($thothContribution['contributionId']);
+            }
+        }
+
+        foreach ($authors as $author) {
+            $publicationContribution = $this->getDataByAuthor($author);
+            if (!$this->contributionInList($publicationContribution, $thothContributions)) {
+                $this->register($thothClient, $author, $thothWorkId);
+            }
+        }
+    }
+
+    private function contributionInList($targetContribution, $contributions)
+    {
+        foreach ($contributions as $contribution) {
+            if (
+                $contribution['firstName'] === $targetContribution['firstName']
+                && $contribution['lastName'] === $targetContribution['lastName']
+            ) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private function isMainContribution($author)
