@@ -100,8 +100,9 @@ class ThothClient
     public function contribution($contributionId)
     {
         $this->addParameter($params, 'contributionId', $contributionId, true);
+        $fields = $this->getFields(ThothContribution::class);
 
-        return $this->query('contribution', $params, ThothContribution::class);
+        return $this->query('contribution', $params, $fields);
     }
 
     public function contributions($limit = 100, $offset = 0, $order = [], $publishers = [], $contributionTypes = [])
@@ -111,15 +112,17 @@ class ThothClient
         $this->addParameter($params, 'order', $order);
         $this->addParameter($params, 'publishers', $publishers, true);
         $this->addParameter($params, 'contributionTypes', $contributionTypes, true);
+        $fields = $this->getFields(ThothContribution::class);
 
-        return $this->query('contributions', $params, ThothContributor::class);
+        return $this->query('contributions', $params, $fields);
     }
 
     public function contributor($contributorId)
     {
         $this->addParameter($params, 'contributorId', $contributorId, true);
+        $fields = $this->getFields(ThothContributor::class);
 
-        return $this->query('contributor', $params, ThothContributor::class);
+        return $this->query('contributor', $params, $fields);
     }
 
     public function contributors($limit = 100, $offset = 0, $filter = '', $order = [])
@@ -128,15 +131,17 @@ class ThothClient
         $this->addParameter($params, 'offset', $offset);
         $this->addParameter($params, 'filter', $filter, true);
         $this->addParameter($params, 'order', $order);
+        $fields = $this->getFields(ThothContributor::class);
 
-        return $this->query('contributors', $params, ThothContributor::class);
+        return $this->query('contributors', $params, $fields);
     }
 
     public function institution($institutionId)
     {
         $this->addParameter($params, 'institutionId', $institutionId, true);
+        $fields = $this->getFields(ThothInstitution::class);
 
-        return $this->query('institution', $params, ThothInstitution::class);
+        return $this->query('institution', $params, $fields);
     }
 
     public function institutions($limit = 100, $offset = 0, $filter = '', $order = [])
@@ -145,15 +150,17 @@ class ThothClient
         $this->addParameter($params, 'offset', $offset);
         $this->addParameter($params, 'filter', $filter, true);
         $this->addParameter($params, 'order', $order);
+        $fields = $this->getFields(ThothInstitution::class);
 
-        return $this->query('institutions', $params, ThothInstitution::class);
+        return $this->query('institutions', $params, $fields);
     }
 
     public function imprint($imprintId)
     {
         $this->addParameter($params, 'imprintId', $imprintId, true);
+        $fields = $this->getFields(ThothImprint::class);
 
-        return $this->query('imprint', $params, ThothImprint::class);
+        return $this->query('imprint', $params, $fields);
     }
 
     public function imprints($limit = 100, $offset = 0, $filter = '', $order = [], $publishers = [])
@@ -163,15 +170,17 @@ class ThothClient
         $this->addParameter($params, 'filter', $filter, true);
         $this->addParameter($params, 'order', $order);
         $this->addParameter($params, 'publishers', $publishers, true);
+        $fields = $this->getFields(ThothImprint::class);
 
-        return $this->query('imprints', $params, ThothImprint::class);
+        return $this->query('imprints', $params, $fields);
     }
 
     public function publisher($publisherId)
     {
         $this->addParameter($params, 'publisherId', $publisherId, true);
+        $fields = $this->getFields(ThothPublisher::class);
 
-        return $this->query('publisher', $params, ThothPublisher::class);
+        return $this->query('publisher', $params, $fields);
     }
 
     public function publishers($limit = 100, $offset = 0, $filter = '', $order = [], $publishers = [])
@@ -181,27 +190,29 @@ class ThothClient
         $this->addParameter($params, 'filter', $filter, true);
         $this->addParameter($params, 'order', $order);
         $this->addParameter($params, 'publishers', $publishers, true);
+        $fields = $this->getFields(ThothPublisher::class);
 
-        return $this->query('publishers', $params, ThothPublisher::class);
+        return $this->query('publishers', $params, $fields);
     }
 
     public function work($workId)
     {
         $this->addParameter($params, 'workId', $workId, true);
+        $fields = $this->getFields(ThothWork::class);
 
-        return $this->query('work', $params, ThothWork::class);
+        return $this->query('work', $params, $fields);
     }
 
-    private function mutation($name, $data)
+    public function mutation($name, $data)
     {
         $mutation = new ThothMutation($name, $data);
         $graphql = new ThothGraphQL($this->endpoint, $this->httpClient, $this->token);
         return $mutation->run($graphql);
     }
 
-    private function query($name, $params, $queryClass)
+    public function query($name, $params, $fields)
     {
-        $query = new ThothQuery($name, $params, $queryClass);
+        $query = new ThothQuery($name, $params, $fields);
         $graphql = new ThothGraphQL($this->endpoint, $this->httpClient);
         return $query->run($graphql);
     }
@@ -238,5 +249,11 @@ class ThothClient
     private function encloseValue($value)
     {
         return json_encode($value);
+    }
+
+    private function getFields($className)
+    {
+        $object = new $className();
+        return $object->getProperties();
     }
 }

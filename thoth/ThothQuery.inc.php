@@ -21,24 +21,18 @@ class ThothQuery
 
     private $fields;
 
-    public function __construct($queryName, $params, $queryClass)
+    public function __construct($queryName, $params, $fields)
     {
         $this->queryName = $queryName;
         $this->params = implode(',', $params);
-        $this->fields = $this->getQueryFields($queryClass);
+        $this->fields = $this->formatFields($fields);
     }
 
-    private function getQueryFields($className)
+    private function formatFields($fields)
     {
-        $reflector = new ReflectionClass($className);
-        $properties = $reflector->getProperties(ReflectionProperty::IS_PRIVATE);
-
-        return implode(
-            ',',
-            array_map(function ($prop) {
-                return $prop->getName();
-            }, $properties)
-        );
+        return implode(',', array_map(function ($key, $field) {
+            return is_array($field) ? sprintf('%s{%s}', $key, $this->formatFields($field)) : $field;
+        }, array_keys($fields), array_values($fields)));
     }
 
     public function prepare()
