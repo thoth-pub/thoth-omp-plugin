@@ -15,58 +15,49 @@
 
 class ThothMutation
 {
-    private $mutationName;
-
-    private $data;
-
-    private $enumeratedValues;
+    private $name;
 
     private $returnValue;
 
-    public function __construct($mutationName, $mutationObject)
+    private $mutation;
+
+    public function __construct($name, $data, $returnValue, $enumeratedValues = [], $nested = true)
     {
-        $this->mutationName = $mutationName;
-        $this->data = $mutationObject->getData();
-        $this->enumeratedValues = $mutationObject->getEnumeratedValues();
-        $this->returnValue = $mutationObject->getReturnValue();
+        $this->name = $name;
+        $this->returnValue = $returnValue;
+        $this->mutation = $this->prepare($data, $enumeratedValues, $nested);
     }
 
-    private function prepare()
+    private function prepare($data, $enumeratedValues, $nested)
     {
+        $mutationQuery = $nested ? 'mutation{%s(data:{%s}){%s}}' : 'mutation{%s(%s){%s}}';
         $fields = [];
-        foreach ($this->data as $attribute => $value) {
+        foreach ($data as $attribute => $value) {
             $fields[] = sprintf(
                 '%s: %s',
                 $attribute,
-                $this->sanitize($attribute, $value)
+                $this->sanitize($attribute, $value, $enumeratedValues)
             );
         }
 
         $mutation = sprintf(
-            'mutation {
-                %s(
-                    data: {%s}
-                ) {
-                    %s
-                }
-            }',
-            $this->mutationName,
-            implode("\n", $fields),
+            $mutationQuery,
+            $this->name,
+            implode(',', $fields),
             $this->returnValue
         );
 
         return $mutation;
     }
 
-    private function sanitize($attribute, $value)
+    private function sanitize($attribute, $value, $enumeratedValues)
     {
-        return in_array($attribute, $this->enumeratedValues) ? $value : json_encode($value);
+        return in_array($attribute, $enumeratedValues) ? $value : json_encode($value);
     }
 
     public function run($graphQlClient)
     {
-        $mutation = $this->prepare();
-        $result = $graphQlClient->execute($mutation);
-        return $result[$this->mutationName][$this->returnValue];
+        $result = $graphQlClient->execute($this->mutation);
+        return $result[$this->name][$this->returnValue];
     }
 }

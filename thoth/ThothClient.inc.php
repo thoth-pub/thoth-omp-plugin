@@ -42,6 +42,25 @@ class ThothClient
         $this->token = $authenticator->getToken();
     }
 
+    public function mutation($name, $data, $returnValue = null, $enumeratedFields = [], $nested = true)
+    {
+        if ($data instanceof ThothModel) {
+            $enumeratedFields = $data->getEnumeratedValues();
+            $returnValue = $data->getReturnValue();
+            $data = $data->getData();
+        }
+        $mutation = new ThothMutation($name, $data, $returnValue, $enumeratedFields, $nested);
+        $graphql = new ThothGraphQL($this->endpoint, $this->httpClient, $this->token);
+        return $mutation->run($graphql);
+    }
+
+    public function query($name, $params, $fields)
+    {
+        $query = new ThothQuery($name, $params, $fields);
+        $graphql = new ThothGraphQL($this->endpoint, $this->httpClient);
+        return $query->run($graphql);
+    }
+
     public function createAffiliation($affiliation)
     {
         return $this->mutation('createAffiliation', $affiliation);
@@ -95,6 +114,12 @@ class ThothClient
     public function updateWork($work)
     {
         return $this->mutation('updateWork', $work);
+    }
+
+    public function deleteContribution($contributionId)
+    {
+        $data = ['contributionId' => $contributionId];
+        return $this->mutation('deleteContribution', $data, 'contributionId', [], false);
     }
 
     public function contribution($contributionId)
@@ -201,20 +226,6 @@ class ThothClient
         $fields = $this->getFields(ThothWork::class);
 
         return $this->query('work', $params, $fields);
-    }
-
-    public function mutation($name, $data)
-    {
-        $mutation = new ThothMutation($name, $data);
-        $graphql = new ThothGraphQL($this->endpoint, $this->httpClient, $this->token);
-        return $mutation->run($graphql);
-    }
-
-    public function query($name, $params, $fields)
-    {
-        $query = new ThothQuery($name, $params, $fields);
-        $graphql = new ThothGraphQL($this->endpoint, $this->httpClient);
-        return $query->run($graphql);
     }
 
     private function addParameter(&$params, $key, $value, $enclosed = false)

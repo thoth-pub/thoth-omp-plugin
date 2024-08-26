@@ -25,9 +25,12 @@ import('lib.pkp.tests.PKPTestCase');
 import('plugins.generic.thoth.thoth.models.ThothAffiliation');
 import('plugins.generic.thoth.thoth.models.ThothContribution');
 import('plugins.generic.thoth.thoth.models.ThothContributor');
+import('plugins.generic.thoth.thoth.models.ThothImprint');
+import('plugins.generic.thoth.thoth.models.ThothInstitution');
 import('plugins.generic.thoth.thoth.models.ThothLanguage');
 import('plugins.generic.thoth.thoth.models.ThothLocation');
 import('plugins.generic.thoth.thoth.models.ThothPublication');
+import('plugins.generic.thoth.thoth.models.ThothPublisher');
 import('plugins.generic.thoth.thoth.models.ThothReference');
 import('plugins.generic.thoth.thoth.models.ThothSubject');
 import('plugins.generic.thoth.thoth.models.ThothWork');
@@ -622,5 +625,23 @@ class ThothClientTest extends PKPTestCase
         $thothWorkId = $client->updateWork($thothWork);
 
         $this->assertEquals('ad3b25d6-44f7-4419-9460-4e170c4ec64f', $thothWorkId);
+    }
+
+    public function testDeleteContribution()
+    {
+        $mock = new MockHandler([
+            new Response(
+                200,
+                [],
+                '{"data":{"deleteContribution":{"contributionId":"819d8d49-6252-49d0-8f87-6b7487a0eecc"}}}'
+            )
+        ]);
+        $handlerStack = HandlerStack::create($mock);
+        $httpClient = new Client(['handler' => $handlerStack]);
+
+        $client = new ThothClient(true, $httpClient);
+        $thothContributionId = $client->deleteContribution('819d8d49-6252-49d0-8f87-6b7487a0eecc');
+
+        $this->assertEquals('819d8d49-6252-49d0-8f87-6b7487a0eecc', $thothContributionId);
     }
 }
