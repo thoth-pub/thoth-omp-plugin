@@ -16,9 +16,15 @@
 import('plugins.generic.thoth.classes.facades.ThothService');
 import('plugins.generic.thoth.thoth.models.ThothWork');
 import('plugins.generic.thoth.thoth.models.ThothWorkRelation');
+import('plugins.generic.thoth.classes.services.queryBuilders.ThothWorkQueryBuilder');
 
 class ThothWorkService
 {
+    public function getQueryBuilder($thothClient)
+    {
+        return new ThothWorkQueryBuilder($thothClient);
+    }
+
     public function getDataBySubmission($submission, $publication = null)
     {
         $request = Application::get()->getRequest();
@@ -207,14 +213,18 @@ class ThothWorkService
         return $relation;
     }
 
-    public function updateBook($thothClient, $thothWork, $submission, $publication)
+    public function updateBook($thothClient, $thothWorkId, $submission, $publication)
     {
-        $odlThothWorkData = $thothWork->getData();
+        $thothWorkData = [];
+        $thothWorkData = $this->getQueryBuilder($thothClient)
+            ->includeContributions()
+            ->get($thothWorkId);
         $newThothWork = $this->new(array_merge(
-            $thothWork->getData(),
+            $thothWorkData,
             $this->getDataBySubmission($submission, $publication)
         ));
         $thothClient->updateWork($newThothWork);
+
         return $newThothWork;
     }
 
