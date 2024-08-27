@@ -116,6 +116,12 @@ class ThothClient
         return $this->mutation('updateWork', $work);
     }
 
+    public function deleteWork($workId)
+    {
+        $data = ['workId' => $workId];
+        return $this->mutation('deleteWork', $data, 'workId', [], false);
+    }
+
     public function deleteContribution($contributionId)
     {
         $data = ['contributionId' => $contributionId];

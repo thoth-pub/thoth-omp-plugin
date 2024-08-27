@@ -218,6 +218,7 @@ class ThothWorkService
         $thothWorkData = [];
         $thothWorkData = $this->getQueryBuilder($thothClient)
             ->includeContributions()
+            ->includeRelations(true)
             ->get($thothWorkId);
         $newThothWork = $this->new(array_merge(
             $thothWorkData,
@@ -234,7 +235,54 @@ class ThothWorkService
             );
         }
 
+        if (isset($thothWorkData['relations'])) {
+            $this->updateRelations(
+                $thothClient,
+                $thothWorkData['relations'],
+                $publication,
+                $thothWorkId
+            );
+        }
+
         return $newThothWork;
+    }
+
+    public function updateRelations($thothClient, $thothRelations, $publication, $thothWorkId)
+    {
+        $chapterDAO = DAORegistry::getDAO('ChapterDAO');
+        $chapters = $chapterDAO->getByPublicationId($publication->getId())->toArray();
+
+        if (empty($chapters) || empty($thothRelations)) {
+            return;
+        }
+
+        $thothRelationsData = array_column($thothRelations, 'relatedWork', 'fullTitle');
+        $chapterTitles = array_map(function ($chapter) {
+            return $chapter->getLocalizedFullTitle();
+        }, $chapters);
+
+        foreach ($thothRelationsData as $fullTitle => $relatedWork) {
+            if (!in_array($fullTitle, $chapterTitles)) {
+                $thothClient->deleteWork($relatedWork['workId']);
+            }
+        }
+
+        $submissionService = Services::get('submission');
+        $submission = $submissionService->get($publication->getData('submissionId'));
+
+        $pluginSettingsDAO = DAORegistry::getDAO('PluginSettingsDAO');
+        $thothImprintId = $pluginSettingsDAO->getSetting(
+            $submission->getData('contextId'),
+            'thothPlugin',
+            'imprintId'
+        );
+
+        foreach ($chapters as $chapter) {
+            $chapterTitle = $chapter->getLocalizedFullTitle();
+            if (!isset($thothRelationsData[$chapterTitle])) {
+                $this->registerWorkRelation($thothClient, $chapter, $thothImprintId, $thothWorkId);
+            }
+        }
     }
 
     public function getWorkTypeBySubmissionWorkType($submissionWorkType)
