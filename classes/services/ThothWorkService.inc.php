@@ -219,6 +219,7 @@ class ThothWorkService
         $thothWorkData = $this->getQueryBuilder($thothClient)
             ->includeContributions()
             ->includeRelations(true)
+            ->includeSubjects()
             ->get($thothWorkId);
         $newThothWork = $this->new(array_merge(
             $thothWorkData,
@@ -239,6 +240,15 @@ class ThothWorkService
             $this->updateRelations(
                 $thothClient,
                 $thothWorkData['relations'],
+                $publication,
+                $thothWorkId
+            );
+        }
+
+        if (isset($thothWorkData['subjects'])) {
+            ThothService::subject()->updateKeywords(
+                $thothClient,
+                $thothWorkData['subjects'],
                 $publication,
                 $thothWorkId
             );

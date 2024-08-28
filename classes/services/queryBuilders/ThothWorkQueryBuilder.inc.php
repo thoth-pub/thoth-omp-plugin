@@ -16,6 +16,7 @@
 import('plugins.generic.thoth.thoth.models.ThothAffiliation');
 import('plugins.generic.thoth.thoth.models.ThothContribution');
 import('plugins.generic.thoth.thoth.models.ThothContributor');
+import('plugins.generic.thoth.thoth.models.ThothSubject');
 import('plugins.generic.thoth.thoth.models.ThothWorkRelation');
 import('plugins.generic.thoth.thoth.models.ThothWork');
 
@@ -59,6 +60,16 @@ class ThothWorkQueryBuilder
         if ($withWork) {
             $fields['relations']['relatedWork'] = $this->getDefaultFields(ThothWork::class);
         }
+
+        $this->fields = array_merge($this->fields, $fields);
+        return $this;
+    }
+
+    public function includeSubjects()
+    {
+        $fields = [
+            'subjects' => $this->getDefaultFields(ThothSubject::class)
+        ];
 
         $this->fields = array_merge($this->fields, $fields);
         return $this;
