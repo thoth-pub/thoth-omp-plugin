@@ -134,6 +134,13 @@ class ThothClient
         return $this->mutation('deleteSubject', $data, 'subjectId', [], false);
     }
 
+    public function deleteReference($referenceId)
+    {
+        $data = ['referenceId' => $referenceId];
+        return $this->mutation('deleteReference', $data, 'referenceId', [], false);
+    }
+
+
     public function contribution($contributionId)
     {
         $this->addParameter($params, 'contributionId', $contributionId, true);
