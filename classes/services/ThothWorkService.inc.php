@@ -221,6 +221,7 @@ class ThothWorkService
             ->includeRelations(true)
             ->includeSubjects()
             ->includeReferences()
+            ->includePublications(true)
             ->get($thothWorkId);
         $newThothWork = $this->new(array_merge(
             $thothWorkData,
@@ -259,6 +260,15 @@ class ThothWorkService
             ThothService::reference()->updateReferences(
                 $thothClient,
                 $thothWorkData['references'],
+                $publication,
+                $thothWorkId
+            );
+        }
+
+        if (isset($thothWorkData['publications'])) {
+            ThothService::publication()->updateBookPublications(
+                $thothClient,
+                $thothWorkData['publications'],
                 $publication,
                 $thothWorkId
             );

@@ -16,6 +16,8 @@
 import('plugins.generic.thoth.thoth.models.ThothAffiliation');
 import('plugins.generic.thoth.thoth.models.ThothContribution');
 import('plugins.generic.thoth.thoth.models.ThothContributor');
+import('plugins.generic.thoth.thoth.models.ThothLocation');
+import('plugins.generic.thoth.thoth.models.ThothPublication');
 import('plugins.generic.thoth.thoth.models.ThothReference');
 import('plugins.generic.thoth.thoth.models.ThothSubject');
 import('plugins.generic.thoth.thoth.models.ThothWorkRelation');
@@ -81,6 +83,20 @@ class ThothWorkQueryBuilder
         $fields = [
             'references' => $this->getDefaultFields(ThothReference::class)
         ];
+
+        $this->fields = array_merge($this->fields, $fields);
+        return $this;
+    }
+
+    public function includePublications($withLocations = false)
+    {
+        $fields = [
+            'publications' => $this->getDefaultFields(ThothPublication::class)
+        ];
+
+        if ($withLocations) {
+            $fields['publications']['locations'] = $this->getDefaultFields(ThothLocation::class);
+        }
 
         $this->fields = array_merge($this->fields, $fields);
         return $this;

@@ -50,6 +50,12 @@ class ThothReferenceService
 
     public function updateReferences($thothClient, $thothReferences, $publication, $thothWorkId)
     {
+        $oldPublication = Services::get('publication')->get($publication->getId());
+
+        if ($publication->getData('citationsRaw') == $oldPublication->getData('citationsRaw')) {
+            return;
+        }
+
         foreach ($thothReferences as $thothReference) {
             $thothClient->deleteReference($thothReference['referenceId']);
         }

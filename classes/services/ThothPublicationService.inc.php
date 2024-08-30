@@ -30,6 +30,8 @@ class ThothPublicationService
     public function new($params)
     {
         $publication = new ThothPublication();
+        $publication->setId($params['publicationId'] ?? null);
+        $publication->setWorkId($params['workId'] ?? null);
         $publication->setPublicationType($params['publicationType']);
         $publication->setIsbn($params['isbn'] ?? null);
 
@@ -76,6 +78,45 @@ class ThothPublicationService
         }
 
         return $thothPublication;
+    }
+
+    public function updateBookPublications($thothClient, $thothPublications, $publication, $thothWorkId)
+    {
+        $publicationFormats = Application::getRepresentationDao()
+            ->getApprovedByPublicationId($publication->getId())
+            ->toArray();
+
+        $publicationTypes = array_map(function ($publicationFormat) {
+            return $this->getPublicationTypeByPublicationFormat($publicationFormat);
+        }, $publicationFormats);
+        foreach ($thothPublications as $thothPublication) {
+            if (!in_array($thothPublication['publicationType'], $publicationTypes)) {
+                $thothClient->deletePublication($thothPublication['publicationId']);
+            }
+        }
+
+        foreach ($publicationFormats as $publicationFormat) {
+            if (!$publicationFormat->getIsAvailable()) {
+                continue;
+            }
+
+            $publicationType = $this->getPublicationTypeByPublicationFormat($publicationFormat);
+            $result = array_filter($thothPublications, function ($thothPublication) use ($publicationType) {
+                return $thothPublication['publicationType'] == $publicationType;
+            });
+
+            if (empty($result)) {
+                $this->register($thothClient, $publicationFormat, $thothWorkId);
+                continue;
+            }
+
+            $thothPublication = array_shift($result);
+            $isbn = $this->getIsbnByPublicationFormat($publicationFormat);
+            if ($isbn != $thothPublication['isbn']) {
+                $thothPublication['isbn'] = $isbn;
+                $thothClient->updatePublication($this->new($thothPublication));
+            }
+        }
     }
 
     public function getPublicationTypeByPublicationFormat($publicationFormat)
