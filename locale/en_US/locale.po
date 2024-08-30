@@ -8,7 +8,10 @@ msgid "plugins.generic.thoth.settings.title"
 msgstr "Thoth API Settings"
 
 msgid "plugins.generic.thoth.settings.sandbox"
-msgstr "Sandbox"
+msgstr "Test Environment"
+
+msgid "plugins.generic.thoth.settings.sandbox.description"
+msgstr "Use a local instance of Thoth API (http://localhost:8000) for plugin tests."
 
 msgid "plugins.generic.thoth.settings.imprintId"
 msgstr "Imprint ID"

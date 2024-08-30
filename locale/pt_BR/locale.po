@@ -8,7 +8,10 @@ msgid "plugins.generic.thoth.settings.title"
 msgstr "Configurações da API Thoth"
 
 msgid "plugins.generic.thoth.settings.sandbox"
-msgstr "Caixa de Arreia"
+msgstr "Ambiente de testes"
+
+msgid "plugins.generic.thoth.settings.sandbox.description"
+msgstr "Usar uma instância local da API do Thoth (http://localhost:8000) para testes do plugin."
 
 msgid "plugins.generic.thoth.settings.imprintId"
 msgstr "ID da Marca"
