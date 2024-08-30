@@ -116,6 +116,13 @@ class ThothPublicationService
                 $thothPublication['isbn'] = $isbn;
                 $thothClient->updatePublication($this->new($thothPublication));
             }
+
+            ThothService::location()->updateLocations(
+                $thothClient,
+                $thothPublication['locations'],
+                $publicationFormat,
+                $thothPublication['publicationId']
+            );
         }
     }
 

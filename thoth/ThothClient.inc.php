@@ -151,6 +151,12 @@ class ThothClient
         return $this->mutation('deletePublication', $data, 'publicationId', [], false);
     }
 
+    public function deleteLocation($locationId)
+    {
+        $data = ['locationId' => $locationId];
+        return $this->mutation('deleteLocation', $data, 'locationId', [], false);
+    }
+
     public function contribution($contributionId)
     {
         $this->addParameter($params, 'contributionId', $contributionId, true);
