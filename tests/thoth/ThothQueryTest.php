@@ -54,7 +54,9 @@ class ThothQueryTest extends PKPTestCase
             'order:{field:FIRST_NAME,direction:ASC}'
         ];
 
-        $thothQuery = new ThothQuery('contributors', $params, ThothContributor::class);
+        $contributor = new ThothContributor();
+
+        $thothQuery = new ThothQuery('contributors', $params, $contributor->getProperties());
         $query = $thothQuery->prepare();
 
         $this->assertEquals($expectedQuery, $query);
@@ -78,7 +80,8 @@ class ThothQueryTest extends PKPTestCase
             'offset:0'
         ];
 
-        $thothQuery = new ThothQuery('contributors', $params, ThothContributor::class);
+        $contributor = new ThothContributor();
+        $thothQuery = new ThothQuery('contributors', $params, $contributor->getProperties());
 
         $body = file_get_contents(__DIR__ . '/../fixtures/contributors.json');
         $mock = new MockHandler([

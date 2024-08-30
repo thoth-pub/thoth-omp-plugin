@@ -35,7 +35,11 @@ class ThothMutationTest extends PKPTestCase
         $contributor->setFullName('Basem Adi');
         $contributor->setWebsite('https://sites.google.com/site/basemadi');
 
-        $thothMutation = new ThothMutation('createContributor', $contributor);
+        $thothMutation = new ThothMutation(
+            'createContributor',
+            $contributor->getData(),
+            $contributor->getReturnValue()
+        );
 
         $body = '{"data":{"createContributor":{"contributorId":"abcd1234-e5f6-g7h8-i9j0-a1b2c3d4e5f6"}}}';
         $mock = new MockHandler([

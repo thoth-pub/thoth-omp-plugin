@@ -42,4 +42,30 @@ class ThothSubjectService
 
         return $thothSubject;
     }
+
+    public function updateKeywords($thothClient, $thothKeywords, $publication, $thothWorkId)
+    {
+        $submission = Services::get('submission')->get($publication->getData('submissionId'));
+        $locale = $submission->getLocale();
+
+        $keywords = $publication->getData('keywords');
+        if (!isset($keywords[$locale])) {
+            return;
+        }
+
+        $localizedKeywords = $keywords[$locale];
+
+        $thothKeywordData = array_column($thothKeywords, 'subjectCode', 'subjectId');
+        foreach ($thothKeywordData as $subjectId => $subjectCode) {
+            if (!in_array($subjectCode, $localizedKeywords)) {
+                $thothClient->deleteSubject($subjectId);
+            }
+        }
+
+        foreach ($localizedKeywords as $order => $keyword) {
+            if (!in_array($keyword, $thothKeywordData)) {
+                $this->registerKeyword($thothClient, $keyword, $thothWorkId, $order + 1);
+            }
+        }
+    }
 }

@@ -19,6 +19,11 @@ class ThothLocationService
 {
     public function newByPublicationFormat($publicationFormat, $fileId = null)
     {
+        return $this->new($this->getDataByPublicationFormat($publicationFormat, $fileId));
+    }
+
+    public function getDataByPublicationFormat($publicationFormat, $fileId = null)
+    {
         $request = Application::get()->getRequest();
         $dispatcher = $request->getDispatcher();
         $context = $request->getContext();
@@ -49,15 +54,18 @@ class ThothLocationService
         $params['fullTextUrl'] = $fullTextUrl;
         $params['locationPlatform'] = ThothLocation::LOCATION_PLATFORM_OTHER;
 
-        return $this->new($params);
+        return $params;
     }
 
     public function new($params)
     {
         $thothLocation = new ThothLocation();
+        $thothLocation->setId($params['locationId'] ?? null);
+        $thothLocation->setPublicationId($params['publicationId'] ?? null);
         $thothLocation->setLandingPage($params['landingPage']);
         $thothLocation->setFullTextUrl($params['fullTextUrl']);
         $thothLocation->setLocationPlatform($params['locationPlatform']);
+        $thothLocation->setCanonical($params['canonical'] ?? null);
 
         return $thothLocation;
     }
@@ -72,5 +80,65 @@ class ThothLocationService
         $thothLocation->setId($thothLocationId);
 
         return $thothLocation;
+    }
+
+    public function updateLocations(
+        $thothClient,
+        $thothLocations,
+        $publicationFormat,
+        $thothPublicationId,
+        $chapterId = null
+    ) {
+        $files = array_filter(
+            iterator_to_array(Services::get('submissionFile')->getMany([
+                'assocTypes' => [ASSOC_TYPE_PUBLICATION_FORMAT],
+                'assocIds' => [$publicationFormat->getId()],
+            ])),
+            function ($file) use ($chapterId) {
+                return $file->getData('chapterId') == $chapterId;
+            }
+        );
+
+        if (empty($files) && !$publicationFormat->getRemoteUrl()) {
+            foreach ($thothLocations as $thothLocation) {
+                $thothClient->deleteLocation($thothLocation['locationId']);
+            }
+            return;
+        }
+
+        $currentThothLocations = [];
+        $canonical = !in_array(true, array_column($thothLocations, 'canonical'));
+        if ($publicationFormat->getRemoteUrl()) {
+            $thothLocationData = $this->getDataByPublicationFormat($publicationFormat);
+            $thothLocationData['publicationId'] = $thothPublicationId;
+            $thothLocationData['canonical'] = $canonical;
+            $currentThothLocations[] = $thothLocationData;
+        }
+
+        foreach ($files as $file) {
+            if (!$file->getViewable() || !$file->getSalesType()) {
+                continue;
+            }
+
+            $thothPublicationData = $this->getDataByPublicationFormat($publicationFormat, $file->getId());
+            $thothPublicationData['publicationId'] = $thothPublicationId;
+            $thothPublicationData['canonical'] = $canonical;
+            $currentThothLocations[] = $thothPublicationData;
+            $canonical = false;
+        }
+
+        $thothLocationsData = array_column($thothLocations, 'fullTextUrl', 'locationId');
+        foreach ($thothLocationsData as $locationId => $fullTextUrl) {
+            if (!in_array($fullTextUrl, array_column($currentThothLocations, 'fullTextUrl'))) {
+                $thothClient->deleteLocation($locationId);
+                unset($thothLocationsData[$locationId]);
+            }
+        }
+
+        foreach ($currentThothLocations as $thothLocation) {
+            if (!in_array($thothLocation['fullTextUrl'], $thothLocationsData)) {
+                $thothClient->createLocation($this->new($thothLocation));
+            }
+        }
     }
 }

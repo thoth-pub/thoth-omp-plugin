@@ -27,7 +27,6 @@ class ThothUpdater
     public function updateWork($hookName, $args)
     {
         $publication = $args[0];
-        $params = $args[2];
         $request = $args[3];
 
         $submission = Services::get('submission')->get($publication->getData('submissionId'));
@@ -39,8 +38,7 @@ class ThothUpdater
 
         try {
             $thothClient = $this->plugin->getThothClient($submission->getData('contextId'));
-            $thothWork = ThothService::work()->get($thothClient, $thothWorkId);
-            ThothService::work()->update($thothClient, $thothWork, $params, $submission, $publication);
+            ThothService::work()->updateBook($thothClient, $thothWorkId, $submission, $publication);
 
             ThothNotification::notify(
                 $request,
