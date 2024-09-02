@@ -28,11 +28,11 @@ class ThothClient
 
     public const THOTH_ENDPOINT = 'https://api.thoth.pub/';
 
-    public const THOTH_SANDBOX_ENDPOINT = 'http://localhost:8000/';
+    public const THOTH_TEST_ENDPOINT = 'http://localhost:8000/';
 
-    public function __construct($sandbox = false, $httpClient = null)
+    public function __construct($testEnvironment = false, $httpClient = null)
     {
-        $this->endpoint = $sandbox ? self::THOTH_SANDBOX_ENDPOINT : self::THOTH_ENDPOINT;
+        $this->endpoint = $testEnvironment ? self::THOTH_TEST_ENDPOINT : self::THOTH_ENDPOINT;
         $this->httpClient = $httpClient ?? Application::get()->getHttpClient();
     }
 

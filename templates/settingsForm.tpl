@@ -40,8 +40,8 @@
 			{fbvElement type="text" password="true" id="password" label="plugins.generic.thoth.settings.password" value=$password required="true"}
 		{/fbvFormSection}
 
-		{fbvFormSection list="true" title="plugins.generic.thoth.settings.sandbox"}
-			{fbvElement type="checkbox" id="sandbox" label="plugins.generic.thoth.settings.sandbox.description" checked=$sandbox}
+		{fbvFormSection list="true" title="plugins.generic.thoth.settings.testEnvironment"}
+			{fbvElement type="checkbox" id="testEnvironment" label="plugins.generic.thoth.settings.testEnvironment.description" checked=$testEnvironment}
 		{/fbvFormSection}
 	{/fbvFormArea}
 

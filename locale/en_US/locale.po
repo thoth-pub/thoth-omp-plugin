@@ -7,11 +7,11 @@ msgstr "Integrate OMP with Thoth for communication and synchronization of book d
 msgid "plugins.generic.thoth.settings.title"
 msgstr "Thoth API Settings"
 
-msgid "plugins.generic.thoth.settings.sandbox"
+msgid "plugins.generic.thoth.settings.testEnvironment"
 msgstr "Test Environment"
 
-msgid "plugins.generic.thoth.settings.sandbox.description"
-msgstr "Use a local instance of Thoth API (http://localhost:8000) for plugin tests."
+msgid "plugins.generic.thoth.settings.testEnvironment.description"
+msgstr "Check this option if you have a local instance of the Thoth API. (http://localhost:8000)"
 
 msgid "plugins.generic.thoth.settings.imprintId"
 msgstr "Imprint ID"
