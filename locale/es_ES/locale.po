@@ -1,0 +1,60 @@
+msgid "plugins.generic.thoth.name"
+msgstr "Módulo Thoth"
+
+msgid "plugins.generic.thoth.description"
+msgstr "Integrar OMP con Thoth para la comunicación y sincronización de los datos de los libros entre las dos plataformas."
+
+msgid "plugins.generic.thoth.settings.title"
+msgstr "Configuración de la API de Thoth"
+
+msgid "plugins.generic.thoth.settings.testEnvironment"
+msgstr "Entorno de prueba"
+
+msgid "plugins.generic.thoth.settings.testEnvironment.description"
+msgstr "Marque esta opción si dispone de una instancia local de la API Thoth. (http://localhost:8000)"
+
+msgid "plugins.generic.thoth.settings.imprintId"
+msgstr "Impresión ID"
+
+msgid "plugins.generic.thoth.settings.email"
+msgstr "Correo electrónico"
+
+msgid "plugins.generic.thoth.settings.password"
+msgstr "Contraseña"
+
+msgid "plugins.generic.thoth.settings.invalidCredentials"
+msgstr "Credenciales no válidas"
+
+msgid "plugins.generic.thoth.settings.secretKeyEmpty"
+msgstr "El administrador de su sitio debe establecer un secreto en el archivo de configuración ('api_key_secret')."
+
+msgid "plugins.generic.thoth.credentialsMissing"
+msgstr "Credenciales de Thoth no configuradas."
+
+msgid "plugins.generic.thoth.thothBook"
+msgstr "Libro de Thoth: "
+
+msgid "plugins.generic.thoth.register"
+msgstr "Registrar"
+
+msgid "plugins.generic.thoth.register.confirmation"
+msgstr "¿Realmente desea registrar en Thoth los metadatos relacionados con este envío?"
+
+msgid "plugins.generic.thoth.register.success"
+msgstr "Metadatos de envío enviados correctamente a Thoth."
+
+msgid "plugins.generic.thoth.register.error"
+msgstr ""
+"Se ha producido un problema al enviar los metadatos de envío a Thoth. "
+"Vuelva a intentarlo más tarde o póngase en contacto con el administrador del sistema."
+
+msgid "plugins.generic.thoth.update.success"
+msgstr "Metadatos actualizados correctamente en Thoth."
+
+msgid "plugins.generic.thoth.update.error"
+msgstr ""
+"Se ha producido un problema al actualizar los metadatos en Thoth "
+"Vuelva a intentarlo más tarde o póngase en contacto con el administrador del sistema."
+
+msgid "plugins.generic.thoth.api.403.alreadyRegistered"
+msgstr "El envío ya está registrado en Thoth."
