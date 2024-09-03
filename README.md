@@ -18,6 +18,27 @@ The OMP instance must have the `api_key_secret` configuration set up, you may co
 
 This is required to use the API credentials provided, that are stored encrypted in the OMP database.
 
+## Installation
+
+1. Go to [Release page](https://github.com/lepidus/thoth-omp-plugin/releases) to download the latest version of the installation package `thoth.tar.gz` from the page.
+
+2. Enter the administration area of ​​your OMP website through the Dashboard.
+Navigate to `Settings` > `Website` > `Plugins` > Upload a new plugin and select the file `thoth.tar.gz`.
+
+3. Click 'Save' to install the plugin on your website.
+
+## Usage
+
+### Configuration
+
+Open the plugin settings form and fill the fields: 
+
+- **Imprint ID**: An imprint ID of the Publisher which you want to use to register books.
+- **E-mail** and **Password**: credentials of a Thoth account.
+- **Test Enviroment**: Check this option only if you have a local instance of Thoth API which you want to use for plugin tests.
+
+![image](/uploads/fa2ae3c82c1d868f28570410afdb2fbf/image.png)
+
 ## Credits
 
 This plugin was idealized and sponsored by [Thoth](https://thoth.pub/).
