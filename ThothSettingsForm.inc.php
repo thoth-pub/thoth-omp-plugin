@@ -26,10 +26,9 @@ class ThothSettingsForm extends Form
     private $plugin;
 
     private const SETTINGS = [
-        'testEnvironment',
-        'imprintId',
         'email',
-        'password'
+        'password',
+        'testEnvironment',
     ];
 
     public function __construct($plugin, $contextId)

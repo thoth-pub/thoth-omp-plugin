@@ -33,8 +33,6 @@
         </h3>
 
 		{fbvFormSection}
-			{fbvElement type="text" id="imprintId" label="plugins.generic.thoth.settings.imprintId" value=$imprintId required="true"}
-			</p>
 			{fbvElement type="email" id="email" label="plugins.generic.thoth.settings.email" value=$email required="true"}
 			</p>
 			{fbvElement type="text" password="true" id="password" label="plugins.generic.thoth.settings.password" value=$password required="true"}

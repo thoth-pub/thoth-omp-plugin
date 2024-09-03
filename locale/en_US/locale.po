@@ -13,9 +13,6 @@ msgstr "Test Environment"
 msgid "plugins.generic.thoth.settings.testEnvironment.description"
 msgstr "Check this option if you have a local instance of the Thoth API. (http://localhost:8000)"
 
-msgid "plugins.generic.thoth.settings.imprintId"
-msgstr "Imprint ID"
-
 msgid "plugins.generic.thoth.settings.email"
 msgstr "Email"
 
