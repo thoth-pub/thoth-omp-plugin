@@ -21,7 +21,6 @@ use GuzzleHttp\Psr7\Response;
 
 import('lib.pkp.tests.PKPTestCase');
 import('plugins.generic.thoth.thoth.models.ThothContributor');
-import('plugins.generic.thoth.thoth.ThothAuthenticator');
 import('plugins.generic.thoth.thoth.ThothGraphQL');
 import('plugins.generic.thoth.thoth.ThothMutation');
 

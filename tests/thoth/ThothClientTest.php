@@ -74,7 +74,32 @@ class ThothClientTest extends PKPTestCase
         $thothClient->login('user72581@mailinator.com', 'uys9ag9s');
     }
 
-    public function createAffiliation()
+    public function testGetLinkedPublishers()
+    {
+        $expectedLinkedPublishers = [
+            [
+                'publisherId' => '7e0435ab-a0a6-4dca-8503-ffc1dcaa9f9d',
+                'isAdmin' => true
+            ]
+        ];
+
+        $mock = new MockHandler([
+            new Response(
+                200,
+                [],
+                file_get_contents($this->fixturesPath . 'accountDetails.json')
+            )
+        ]);
+        $handlerStack = HandlerStack::create($mock);
+        $httpClient = new Client(['handler' => $handlerStack]);
+
+        $client = new ThothClient(true, $httpClient);
+        $linkedPublishers = $client->linkedPublishers();
+
+        $this->assertEquals($expectedLinkedPublishers, $linkedPublishers);
+    }
+
+    public function testCreateAffiliation()
     {
         $thothAffiliation = new ThothAffiliation();
 

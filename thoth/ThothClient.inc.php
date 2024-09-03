@@ -13,7 +13,7 @@
  * @brief Client for Thoth's API
  */
 
-import('plugins.generic.thoth.thoth.ThothAuthenticator');
+import('plugins.generic.thoth.thoth.ThothAccount');
 import('plugins.generic.thoth.thoth.ThothGraphQL');
 import('plugins.generic.thoth.thoth.ThothMutation');
 import('plugins.generic.thoth.thoth.ThothQuery');
@@ -38,8 +38,15 @@ class ThothClient
 
     public function login($email, $password)
     {
-        $authenticator = new ThothAuthenticator($this->endpoint, $this->httpClient, $email, $password);
-        $this->token = $authenticator->getToken();
+        $account = new ThothAccount($this->endpoint, $this->httpClient);
+        $this->token = $account->getToken($email, $password);
+    }
+
+    public function linkedPublishers()
+    {
+        $account = new ThothAccount($this->endpoint, $this->httpClient);
+        $details = $account->getDetails($this->token);
+        return $details['resourceAccess']['linkedPublishers'];
     }
 
     public function mutation($name, $data, $returnValue = null, $enumeratedFields = [], $nested = true)
