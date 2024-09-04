@@ -13,15 +13,7 @@
  * @brief Class for building graphQL queries for works
  */
 
-import('plugins.generic.thoth.thoth.models.ThothAffiliation');
-import('plugins.generic.thoth.thoth.models.ThothContribution');
-import('plugins.generic.thoth.thoth.models.ThothContributor');
-import('plugins.generic.thoth.thoth.models.ThothLocation');
-import('plugins.generic.thoth.thoth.models.ThothPublication');
-import('plugins.generic.thoth.thoth.models.ThothReference');
-import('plugins.generic.thoth.thoth.models.ThothSubject');
-import('plugins.generic.thoth.thoth.models.ThothWorkRelation');
-import('plugins.generic.thoth.thoth.models.ThothWork');
+import('plugins.generic.thoth.thoth.ThothQueryFields');
 
 class ThothWorkQueryBuilder
 {
@@ -33,21 +25,21 @@ class ThothWorkQueryBuilder
     {
         $this->thothClient = $thothClient;
 
-        $this->fields = $this->getDefaultFields(ThothWork::class);
+        $this->fields = ThothQueryFields::work();
     }
 
     public function includeContributions($withContributors = false, $withAffiliation = false)
     {
         $fields = [
-            'contributions' => $this->getDefaultFields(ThothContribution::class)
+            'contributions' => ThothQueryFields::contribution()
         ];
 
         if ($withContributors) {
-            $fields['contributions']['contributor'] = $this->getDefaultFields(ThothContributor::class);
+            $fields['contributions']['contributor'] = ThothQueryFields::contributor();
         }
 
         if ($withAffiliation) {
-            $fields['contributions']['affiliations'] = $this->getDefaultFields(ThothAffiliation::class);
+            $fields['contributions']['affiliations'] = ThothQueryFields::affiliation();
         }
 
         $this->fields = array_merge($this->fields, $fields);
@@ -57,11 +49,11 @@ class ThothWorkQueryBuilder
     public function includeRelations($withWork = false)
     {
         $fields = [
-            'relations' => $this->getDefaultFields(ThothWorkRelation::class)
+            'relations' => ThothQueryFields::workRelation()
         ];
 
         if ($withWork) {
-            $fields['relations']['relatedWork'] = $this->getDefaultFields(ThothWork::class);
+            $fields['relations']['relatedWork'] = ThothQueryFields::work();
         }
 
         $this->fields = array_merge($this->fields, $fields);
@@ -71,7 +63,7 @@ class ThothWorkQueryBuilder
     public function includeSubjects()
     {
         $fields = [
-            'subjects' => $this->getDefaultFields(ThothSubject::class)
+            'subjects' => ThothQueryFields::subject()
         ];
 
         $this->fields = array_merge($this->fields, $fields);
@@ -81,7 +73,7 @@ class ThothWorkQueryBuilder
     public function includeReferences()
     {
         $fields = [
-            'references' => $this->getDefaultFields(ThothReference::class)
+            'references' => ThothQueryFields::reference()
         ];
 
         $this->fields = array_merge($this->fields, $fields);
@@ -91,11 +83,11 @@ class ThothWorkQueryBuilder
     public function includePublications($withLocations = false)
     {
         $fields = [
-            'publications' => $this->getDefaultFields(ThothPublication::class)
+            'publications' => ThothQueryFields::publication()
         ];
 
         if ($withLocations) {
-            $fields['publications']['locations'] = $this->getDefaultFields(ThothLocation::class);
+            $fields['publications']['locations'] = ThothQueryFields::location();
         }
 
         $this->fields = array_merge($this->fields, $fields);
@@ -107,11 +99,5 @@ class ThothWorkQueryBuilder
         $params = [sprintf('workId:"%s"', $workId)];
 
         return $this->thothClient->query('work', $params, $this->fields);
-    }
-
-    private function getDefaultFields($className)
-    {
-        $object = new $className();
-        return $object->getProperties();
     }
 }
