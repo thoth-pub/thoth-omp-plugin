@@ -32,7 +32,7 @@ class ThothAccount
     public function __construct($thothEndpoint, $httpClient)
     {
         $this->httpClient = $httpClient;
-        $this->accountEndpoint = $thothEndpoint . self::THOTH_AUTH_ENDPOINT;
+        $this->accountEndpoint = $thothEndpoint . self::THOTH_ACCOUNT_ENDPOINT;
         $this->authEndpoint = $thothEndpoint . self::THOTH_AUTH_ENDPOINT;
     }
 
