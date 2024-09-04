@@ -83,18 +83,17 @@ class ThothRegister
         return false;
     }
 
-    public function registerWork($submission)
+    public function registerWork($submission, $imprint)
     {
         $request = Application::get()->getRequest();
         $submissionContext = $request->getContext();
         if (!$submissionContext || $submissionContext->getId() !== $submission->getData('contextId')) {
             $submissionContext = Services::get('context')->get($submission->getData('contextId'));
         }
-        $thothImprintId = $this->plugin->getSetting($submissionContext->getId(), 'imprintId');
 
         try {
             $thothClient = $this->plugin->getThothClient($submissionContext->getId());
-            $thothBook = ThothService::work()->registerBook($thothClient, $submission, $thothImprintId);
+            $thothBook = ThothService::work()->registerBook($thothClient, $submission, $imprint);
             $submission = Services::get('submission')->edit(
                 $submission,
                 ['thothWorkId' => $thothBook->getId()],
@@ -169,6 +168,11 @@ class ThothRegister
         $handler = $request->getRouter()->getHandler();
         $submission = $handler->getAuthorizedContextObject(ASSOC_TYPE_SUBMISSION);
         $publication = Services::get('publication')->get((int) $args['publicationId']);
+        $params = $slimRequest->getParsedBody();
+
+        if (empty($params['imprint'])) {
+            return $response->withStatus(400)->withJson(['imprint' => [__('plugins.generic.thoth.imprint.required')]]);
+        }
 
         if (!$publication) {
             return $response->withStatus(404)->withJsonError('api.404.resourceNotFound');
@@ -189,7 +193,7 @@ class ThothRegister
             $submissionContext = Services::get('context')->get($submission->getData('contextId'));
         }
 
-        $this->registerWork($submission);
+        $this->registerWork($submission, $params['imprint']);
 
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
 

@@ -31,6 +31,12 @@ msgstr "Credenciales de Thoth no configuradas."
 msgid "plugins.generic.thoth.thothBook"
 msgstr "Libro de Thoth: "
 
+msgid "plugins.generic.thoth.imprint"
+msgstr "Impresión"
+
+msgid "plugins.generic.thoth.imprint.required"
+msgstr "Seleccione una impresión."
+
 msgid "plugins.generic.thoth.register"
 msgstr "Registrar"
 

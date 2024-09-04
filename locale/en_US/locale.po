@@ -31,6 +31,12 @@ msgstr "Thoth credentials not configured."
 msgid "plugins.generic.thoth.thothBook"
 msgstr "Thoth Book: "
 
+msgid "plugins.generic.thoth.imprint"
+msgstr "Imprint"
+
+msgid "plugins.generic.thoth.imprint.required"
+msgstr "Select a imprint."
+
 msgid "plugins.generic.thoth.register"
 msgstr "Register"
 
