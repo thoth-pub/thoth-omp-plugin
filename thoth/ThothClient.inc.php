@@ -289,7 +289,7 @@ class ThothClient
         return $this->query('publisher', $params, $fields);
     }
 
-    public function publishers($args)
+    public function publishers($args = [])
     {
         $defaultArgs = [
             'limit' => 100,
