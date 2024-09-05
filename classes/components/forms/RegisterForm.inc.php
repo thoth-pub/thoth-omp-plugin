@@ -18,6 +18,7 @@
 
 use PKP\components\forms\FormComponent;
 use PKP\components\forms\FieldHTML;
+use PKP\components\forms\FieldSelect;
 
 class RegisterForm extends FormComponent
 {
@@ -25,9 +26,37 @@ class RegisterForm extends FormComponent
 
     public $method = 'PUT';
 
-    public function __construct($action)
+    public function __construct($action, $imprints, $errors)
     {
         $this->action = $action;
+
+        if (!empty($errors)) {
+            $this->addPage([
+                'id' => 'default',
+            ])->addGroup([
+                'id' => 'default',
+                'pageId' => 'default',
+            ]);
+
+            foreach ($errors as $error) {
+                $warningIconHtml = '<span class="fa fa-exclamation-triangle pkpIcon--inline"></span>';
+                $msg = '<div class="pkpNotification pkpNotification--warning">' . $warningIconHtml . $error . '</div>';
+                $this->addField(new \PKP\components\forms\FieldHTML('registerNotice', [
+                    'description' => $msg,
+                    'groupId' => 'default',
+                ]));
+            }
+
+            return;
+        }
+
+        $imprintOptions = [['value' => '', 'label' => '']];
+        foreach ($imprints as $imprint) {
+            $imprintOptions[] = [
+                'value' => $imprint['imprintId'],
+                'label' => $imprint['imprintName']
+            ];
+        }
 
         $msg = __('plugins.generic.thoth.register.confirmation');
         $submitLabel = __('plugins.generic.thoth.register');
@@ -45,6 +74,24 @@ class RegisterForm extends FormComponent
             ->addField(new FieldHTML('validation', [
                 'description' => $msg,
                 'groupId' => 'default',
+            ]))
+            ->addField(new FieldSelect('imprint', [
+                'label' => __('plugins.generic.thoth.imprint'),
+                'options' => $imprintOptions,
+                'required' => true,
+                'groupId' => 'default'
             ]));
+    }
+
+    public function getOptions($list)
+    {
+        $options = [];
+        foreach ($list as $value => $label) {
+            $options[] = [
+                'value' => $value,
+                'label' => $label,
+            ];
+        }
+        return $options;
     }
 }

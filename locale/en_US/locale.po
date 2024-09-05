@@ -13,9 +13,6 @@ msgstr "Test Environment"
 msgid "plugins.generic.thoth.settings.testEnvironment.description"
 msgstr "Check this option if you have a local instance of the Thoth API. (http://localhost:8000)"
 
-msgid "plugins.generic.thoth.settings.imprintId"
-msgstr "Imprint ID"
-
 msgid "plugins.generic.thoth.settings.email"
 msgstr "Email"
 
@@ -34,11 +31,25 @@ msgstr "Thoth credentials not configured."
 msgid "plugins.generic.thoth.thothBook"
 msgstr "Thoth Book: "
 
+msgid "plugins.generic.thoth.imprint"
+msgstr "Imprint"
+
+msgid "plugins.generic.thoth.imprint.required"
+msgstr "Select a imprint."
+
+msgid "plugins.generic.thoth.connectionError"
+msgstr ""
+"There was a problem connecting to Thoth. Please try again later, or "
+"contact your system administrator."
+
 msgid "plugins.generic.thoth.register"
 msgstr "Register"
 
+msgid "plugins.generic.thoth.register.label"
+msgstr "Thoth registration"
+
 msgid "plugins.generic.thoth.register.confirmation"
-msgstr "Do you really want to register in Thoth the metadata related to this submission?"
+msgstr "Do you want to register in Thoth the metadata related to this submission?"
 
 msgid "plugins.generic.thoth.register.success"
 msgstr "Submission metadata successfully sent to Thoth."

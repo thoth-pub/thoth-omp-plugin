@@ -35,6 +35,79 @@ class ThothRegister
         return false;
     }
 
+    public function addImprintField($hookName, $form)
+    {
+
+        if ($form->id !== 'publish' || !empty($form->errors)) {
+            return;
+        }
+
+        $submission = Services::get('submission')->get($form->publication->getData('submissionId'));
+
+        if ($submission->getData('thothWorkId')) {
+            return;
+        }
+
+        try {
+            $thothClient = $this->plugin->getThothClient($submission->getData('contextId'));
+            $publishers = $thothClient->linkedPublishers();
+            $imprints = $thothClient->imprints(['publishers' => array_column($publishers, 'publisherId')]);
+
+            $imprintOptions = [['value' => '', 'label' => '']];
+            foreach ($imprints as $imprint) {
+                $imprintOptions[] = [
+                    'value' => $imprint['imprintId'],
+                    'label' => $imprint['imprintName']
+                ];
+            }
+
+            $form->addField(new \PKP\components\forms\FieldOptions('registerConfirmation', [
+                'label' => __('plugins.generic.thoth.register.label'),
+                'options' => [
+                    ['value' => true, 'label' => __('plugins.generic.thoth.register.confirmation')]
+                ],
+                'value' => false,
+                'groupId' => 'default',
+            ]))
+            ->addField(new \PKP\components\forms\FieldSelect('imprint', [
+                'label' => __('plugins.generic.thoth.imprint'),
+                'options' => $imprintOptions,
+                'required' => true,
+                'showWhen' => 'registerConfirmation',
+                'groupId' => 'default'
+            ]));
+        } catch (ThothException $e) {
+            $warningIconHtml = '<span class="fa fa-exclamation-triangle pkpIcon--inline"></span>';
+            $noticeMsg = __('plugins.generic.thoth.connectionError');
+            $msg = '<div class="pkpNotification pkpNotification--warning">' . $warningIconHtml . $noticeMsg . '</div>';
+
+            $form->addField(new \PKP\components\forms\FieldHTML('registerNotice', [
+                'description' => $msg,
+                'groupId' => 'default',
+            ]));
+
+            error_log($e->getMessage());
+        }
+
+        return false;
+    }
+
+    public function validateRegister($hookName, $args)
+    {
+        $errors = & $args[0];
+        $request = Application::get()->getRequest();
+
+        $confirmation = $request->getUserVar('registerConfirmation');
+        if (!$confirmation || $confirmation == 'false') {
+            return;
+        }
+
+        $imprint = $request->getUserVar('imprint');
+        if (empty($imprint)) {
+            $errors['imprint'] = [__('plugins.generic.thoth.imprint.required')];
+        }
+    }
+
     public function addResources($hookName, $args)
     {
         $templateMgr = $args[0];
@@ -83,18 +156,17 @@ class ThothRegister
         return false;
     }
 
-    public function registerWork($submission)
+    public function registerWork($submission, $imprint)
     {
         $request = Application::get()->getRequest();
         $submissionContext = $request->getContext();
         if (!$submissionContext || $submissionContext->getId() !== $submission->getData('contextId')) {
             $submissionContext = Services::get('context')->get($submission->getData('contextId'));
         }
-        $thothImprintId = $this->plugin->getSetting($submissionContext->getId(), 'imprintId');
 
         try {
             $thothClient = $this->plugin->getThothClient($submissionContext->getId());
-            $thothBook = ThothService::work()->registerBook($thothClient, $submission, $thothImprintId);
+            $thothBook = ThothService::work()->registerBook($thothClient, $submission, $imprint);
             $submission = Services::get('submission')->edit(
                 $submission,
                 ['thothWorkId' => $thothBook->getId()],
@@ -119,12 +191,19 @@ class ThothRegister
     public function registerOnPublish($hookName, $args)
     {
         $submission = $args[2];
+        $request = Application::get()->getRequest();
 
         if ($submission->getData('thothWorkId')) {
             return false;
         }
 
-        $this->registerWork($submission);
+        $confirmation = $request->getUserVar('registerConfirmation');
+        if (!$confirmation || $confirmation == 'false') {
+            return;
+        }
+
+        $imprint = $request->getUserVar('imprint');
+        $this->registerWork($submission, $imprint);
 
         return false;
     }
@@ -169,6 +248,11 @@ class ThothRegister
         $handler = $request->getRouter()->getHandler();
         $submission = $handler->getAuthorizedContextObject(ASSOC_TYPE_SUBMISSION);
         $publication = Services::get('publication')->get((int) $args['publicationId']);
+        $params = $slimRequest->getParsedBody();
+
+        if (empty($params['imprint'])) {
+            return $response->withStatus(400)->withJson(['imprint' => [__('plugins.generic.thoth.imprint.required')]]);
+        }
 
         if (!$publication) {
             return $response->withStatus(404)->withJsonError('api.404.resourceNotFound');
@@ -189,7 +273,7 @@ class ThothRegister
             $submissionContext = Services::get('context')->get($submission->getData('contextId'));
         }
 
-        $this->registerWork($submission);
+        $this->registerWork($submission, $params['imprint']);
 
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
 

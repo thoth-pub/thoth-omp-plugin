@@ -22,6 +22,7 @@ use GuzzleHttp\Psr7\Response;
 import('lib.pkp.tests.PKPTestCase');
 import('plugins.generic.thoth.thoth.ThothGraphQL');
 import('plugins.generic.thoth.thoth.ThothQuery');
+import('plugins.generic.thoth.thoth.ThothQueryFields');
 import('plugins.generic.thoth.thoth.models.ThothContributor');
 
 class ThothQueryTest extends PKPTestCase
@@ -56,7 +57,7 @@ class ThothQueryTest extends PKPTestCase
 
         $contributor = new ThothContributor();
 
-        $thothQuery = new ThothQuery('contributors', $params, $contributor->getProperties());
+        $thothQuery = new ThothQuery('contributors', $params, ThothQueryFields::contributor());
         $query = $thothQuery->prepare();
 
         $this->assertEquals($expectedQuery, $query);
@@ -81,7 +82,7 @@ class ThothQueryTest extends PKPTestCase
         ];
 
         $contributor = new ThothContributor();
-        $thothQuery = new ThothQuery('contributors', $params, $contributor->getProperties());
+        $thothQuery = new ThothQuery('contributors', $params, ThothQueryFields::contributor());
 
         $body = file_get_contents(__DIR__ . '/../fixtures/contributors.json');
         $mock = new MockHandler([

@@ -22,7 +22,6 @@ use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\Request;
 
 import('lib.pkp.tests.PKPTestCase');
-import('plugins.generic.thoth.thoth.ThothAuthenticator');
 import('plugins.generic.thoth.thoth.ThothGraphQL');
 
 class ThothGraphQLTest extends PKPTestCase

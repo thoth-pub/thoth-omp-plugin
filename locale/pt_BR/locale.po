@@ -13,9 +13,6 @@ msgstr "Ambiente de testes"
 msgid "plugins.generic.thoth.settings.testEnvironment.description"
 msgstr "Marque essa opção caso possua uma instância local da API do Thoth. (http://localhost:8000)"
 
-msgid "plugins.generic.thoth.settings.imprintId"
-msgstr "ID da Marca"
-
 msgid "plugins.generic.thoth.settings.email"
 msgstr "Email"
 
@@ -34,8 +31,22 @@ msgstr "Credenciais do Thoth não configuradas."
 msgid "plugins.generic.thoth.thothBook"
 msgstr "Livro Thoth: "
 
+msgid "plugins.generic.thoth.imprint"
+msgstr "Impressão"
+
+msgid "plugins.generic.thoth.imprint.required"
+msgstr "Selecione uma impressão."
+
+msgid "plugins.generic.thoth.connectionError"
+msgstr ""
+"Houve um problema ao conectar-se com Thoth. Por favor, tente mais "
+"tarde, ou contate o administrador do sistema."
+
 msgid "plugins.generic.thoth.register"
 msgstr "Registrar"
+
+msgid "plugins.generic.thoth.register.label"
+msgstr "Registro em Thoth"
 
 msgid "plugins.generic.thoth.register.confirmation"
 msgstr "Deseja realmente registrar na Thoth os metadados relacionados a essa submissão?"
