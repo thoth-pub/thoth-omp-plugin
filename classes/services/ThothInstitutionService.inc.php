@@ -30,13 +30,7 @@ class ThothInstitutionService
 
     public function getMany($thothClient, $params = [])
     {
-        $limit = $params['limit'] ?? 100;
-        $offset = $params['offset'] ?? 0;
-        $filter = $params['filter'] ?? '';
-        $order = $params['order'] ?? [];
-
-        $institutionsData = $thothClient->institutions($limit, $offset, $filter, $order);
-
+        $institutionsData = $thothClient->institutions($params);
         return array_map([$this, 'new'], $institutionsData);
     }
 }

@@ -52,12 +52,7 @@ class ThothContributorService
 
     public function getMany($thothClient, $params = [])
     {
-        $limit = $params['limit'] ?? 100;
-        $offset = $params['offset'] ?? 0;
-        $filter = $params['filter'] ?? '';
-        $order = $params['order'] ?? [];
-
-        $contributorsData = $thothClient->contributors($limit, $offset, $filter, $order);
+        $contributorsData = $thothClient->contributors($params);
 
         return array_map([$this, 'new'], $contributorsData);
     }
