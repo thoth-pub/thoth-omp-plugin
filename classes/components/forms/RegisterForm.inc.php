@@ -26,9 +26,29 @@ class RegisterForm extends FormComponent
 
     public $method = 'PUT';
 
-    public function __construct($action, $imprints)
+    public function __construct($action, $imprints, $errors)
     {
         $this->action = $action;
+
+        if (!empty($errors)) {
+            $this->addPage([
+                'id' => 'default',
+            ])->addGroup([
+                'id' => 'default',
+                'pageId' => 'default',
+            ]);
+
+            foreach ($errors as $error) {
+                $warningIconHtml = '<span class="fa fa-exclamation-triangle pkpIcon--inline"></span>';
+                $msg = '<div class="pkpNotification pkpNotification--warning">' . $warningIconHtml . $error . '</div>';
+                $this->addField(new \PKP\components\forms\FieldHTML('registerNotice', [
+                    'description' => $msg,
+                    'groupId' => 'default',
+                ]));
+            }
+
+            return;
+        }
 
         $imprintOptions = [['value' => '', 'label' => '']];
         foreach ($imprints as $imprint) {

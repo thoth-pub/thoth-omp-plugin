@@ -37,11 +37,19 @@ msgstr "Impresión"
 msgid "plugins.generic.thoth.imprint.required"
 msgstr "Seleccione una impresión."
 
+msgid "plugins.generic.thoth.connectionError"
+msgstr ""
+"Se ha producido un problema al conectar con Thoth. "
+"Vuelva a intentarlo más tarde o póngase en contacto con el administrador del sistema."
+
 msgid "plugins.generic.thoth.register"
 msgstr "Registrar"
 
+msgid "plugins.generic.thoth.register.label"
+msgstr "Registro en Thoth"
+
 msgid "plugins.generic.thoth.register.confirmation"
-msgstr "¿Realmente desea registrar en Thoth los metadatos relacionados con este envío?"
+msgstr "¿Desea registrar en Thoth los metadatos relacionados con este envío?"
 
 msgid "plugins.generic.thoth.register.success"
 msgstr "Metadatos de envío enviados correctamente a Thoth."

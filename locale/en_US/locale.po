@@ -37,11 +37,19 @@ msgstr "Imprint"
 msgid "plugins.generic.thoth.imprint.required"
 msgstr "Select a imprint."
 
+msgid "plugins.generic.thoth.connectionError"
+msgstr ""
+"There was a problem connecting to Thoth. Please try again later, or "
+"contact your system administrator."
+
 msgid "plugins.generic.thoth.register"
 msgstr "Register"
 
+msgid "plugins.generic.thoth.register.label"
+msgstr "Thoth registration"
+
 msgid "plugins.generic.thoth.register.confirmation"
-msgstr "Do you really want to register in Thoth the metadata related to this submission?"
+msgstr "Do you want to register in Thoth the metadata related to this submission?"
 
 msgid "plugins.generic.thoth.register.success"
 msgstr "Submission metadata successfully sent to Thoth."

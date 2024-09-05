@@ -35,6 +35,79 @@ class ThothRegister
         return false;
     }
 
+    public function addImprintField($hookName, $form)
+    {
+
+        if ($form->id !== 'publish' || !empty($form->errors)) {
+            return;
+        }
+
+        $submission = Services::get('submission')->get($form->publication->getData('submissionId'));
+
+        if ($submission->getData('thothWorkId')) {
+            return;
+        }
+
+        try {
+            $thothClient = $this->plugin->getThothClient($submission->getData('contextId'));
+            $publishers = $thothClient->linkedPublishers();
+            $imprints = $thothClient->imprints(['publishers' => array_column($publishers, 'publisherId')]);
+
+            $imprintOptions = [['value' => '', 'label' => '']];
+            foreach ($imprints as $imprint) {
+                $imprintOptions[] = [
+                    'value' => $imprint['imprintId'],
+                    'label' => $imprint['imprintName']
+                ];
+            }
+
+            $form->addField(new \PKP\components\forms\FieldOptions('registerConfirmation', [
+                'label' => __('plugins.generic.thoth.register.label'),
+                'options' => [
+                    ['value' => true, 'label' => __('plugins.generic.thoth.register.confirmation')]
+                ],
+                'value' => false,
+                'groupId' => 'default',
+            ]))
+            ->addField(new \PKP\components\forms\FieldSelect('imprint', [
+                'label' => __('plugins.generic.thoth.imprint'),
+                'options' => $imprintOptions,
+                'required' => true,
+                'showWhen' => 'registerConfirmation',
+                'groupId' => 'default'
+            ]));
+        } catch (ThothException $e) {
+            $warningIconHtml = '<span class="fa fa-exclamation-triangle pkpIcon--inline"></span>';
+            $noticeMsg = __('plugins.generic.thoth.connectionError');
+            $msg = '<div class="pkpNotification pkpNotification--warning">' . $warningIconHtml . $noticeMsg . '</div>';
+
+            $form->addField(new \PKP\components\forms\FieldHTML('registerNotice', [
+                'description' => $msg,
+                'groupId' => 'default',
+            ]));
+
+            error_log($e->getMessage());
+        }
+
+        return false;
+    }
+
+    public function validateRegister($hookName, $args)
+    {
+        $errors = & $args[0];
+        $request = Application::get()->getRequest();
+
+        $confirmation = $request->getUserVar('registerConfirmation');
+        if (!$confirmation || $confirmation == 'false') {
+            return;
+        }
+
+        $imprint = $request->getUserVar('imprint');
+        if (empty($imprint)) {
+            $errors['imprint'] = [__('plugins.generic.thoth.imprint.required')];
+        }
+    }
+
     public function addResources($hookName, $args)
     {
         $templateMgr = $args[0];
@@ -118,12 +191,19 @@ class ThothRegister
     public function registerOnPublish($hookName, $args)
     {
         $submission = $args[2];
+        $request = Application::get()->getRequest();
 
         if ($submission->getData('thothWorkId')) {
             return false;
         }
 
-        $this->registerWork($submission);
+        $confirmation = $request->getUserVar('registerConfirmation');
+        if (!$confirmation || $confirmation == 'false') {
+            return;
+        }
+
+        $imprint = $request->getUserVar('imprint');
+        $this->registerWork($submission, $imprint);
 
         return false;
     }

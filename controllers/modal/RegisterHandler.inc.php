@@ -79,17 +79,20 @@ class RegisterHandler extends Handler
             'submissions/' . $this->submission->getId() . '/publications/' . $this->publication->getId() . '/register'
         );
 
-        $thothClient = $plugin->getThothClient($submissionContext->getId());
+        $imprints = [];
+        $errors = [];
+
         try {
+            $thothClient = $plugin->getThothClient($submissionContext->getId());
             $publishers = $thothClient->linkedPublishers();
             $imprints = $thothClient->imprints(['publishers' => array_column($publishers, 'publisherId')]);
         } catch (ThothException $e) {
+            $errors[] = __('plugins.generic.thoth.connectionError');
             error_log($e->getMessage());
-            return new JSONMessage(false);
         }
 
         $plugin->import('classes.components.forms.RegisterForm');
-        $registerForm = new RegisterForm($publicationApiUrl, $imprints);
+        $registerForm = new RegisterForm($publicationApiUrl, $imprints, $errors);
 
         $settingsData = [
             'components' => [
