@@ -31,13 +31,27 @@ Navigate to `Settings` > `Website` > `Plugins` > Upload a new plugin and select 
 
 ### Configuration
 
-Open the plugin settings form and fill the fields: 
+Open the plugin settings form to fill the fields: 
 
-- **Imprint ID**: An imprint ID of the Publisher which you want to use to register books.
-- **E-mail** and **Password**: credentials of a Thoth account.
+- **E-mail** and **Password**: Credentials of a Thoth account to connect with the API.
 - **Test Enviroment**: Check this option only if you have a local instance of Thoth API which you want to use for plugin tests.
 
-![image](/uploads/fa2ae3c82c1d868f28570410afdb2fbf/image.png)
+### Unpublished monographs
+
+You can register the metadata in Thoth during the publishing process.
+To do this, check the option to register the metadata in the publish modal and select an imprint.
+
+### Published monographs
+
+For published monographs, you can register the metadata via the register button next to the publication status.
+
+### Updating metadata
+
+To update the metadata in Thoth, unpublish the monograph and edit the data. The update is done automatically in Thoth.
+
+### Accessing the book registered on Thoth
+
+Once the metadata has been published, a link to the book on Thoth is displayed at the top of the publication.
 
 ## Credits
 
