@@ -20,38 +20,34 @@ This is required to use the API credentials provided, that are stored encrypted 
 
 ## Installation
 
-1. Go to [Release page](https://github.com/lepidus/thoth-omp-plugin/releases) to download the latest version of the installation package `thoth.tar.gz` from the page.
+1. Download the latest version of the installation package (`thoth.tar.gz`) from the [Release page](https://github.com/lepidus/thoth-omp-plugin/releases).
 
-2. Enter the administration area of ​​your OMP website through the Dashboard.
-Navigate to `Settings` > `Website` > `Plugins` > Upload a new plugin and select the file `thoth.tar.gz`.
+2. Access the administration area of your OMP website through the Dashboard. Navigate to `Settings` > `Website` > `Plugins` > `Upload a new plugin`, and select the `thoth.tar.gz` file.
 
-3. Click 'Save' to install the plugin on your website.
+3. Click 'Save' to install the plugin.
 
 ## Usage
 
 ### Configuration
 
-Open the plugin settings form to fill the fields: 
+To configure the plugin:
 
-- **E-mail** and **Password**: Credentials of a Thoth account to connect with the API.
-- **Test Enviroment**: Check this option only if you have a local instance of Thoth API which you want to use for plugin tests.
+- **E-mail** and **Password**: Enter the credentials for a Thoth account to connect with the API.
+- **Test Environment**: Check this option if you are using a local instance of the Thoth API for testing purposes.
 
-### Unpublished monographs
+### Managing Monographs
 
-You can register the metadata in Thoth during the publishing process.
-To do this, check the option to register the metadata in the publish modal and select an imprint.
+- **Unpublished Monographs**: Register metadata in Thoth during the publishing process by selecting the option to register metadata in the publish modal and choosing an imprint.
 
-### Published monographs
+- **Published Monographs**: Register metadata for published monographs by using the 'Register' button next to the publication status.
 
-For published monographs, you can register the metadata via the register button next to the publication status.
+### Updating Metadata
 
-### Updating metadata
+To update metadata in Thoth, unpublish the monograph, edit the data, and the changes will be automatically updated in Thoth.
 
-To update the metadata in Thoth, unpublish the monograph and edit the data. The update is done automatically in Thoth.
+### Accessing Thoth Book Records
 
-### Accessing the book registered on Thoth
-
-Once the metadata has been published, a link to the book on Thoth is displayed at the top of the publication.
+After metadata is published, a link to the book on Thoth will appear at the top of the publication.
 
 ## Credits
 
