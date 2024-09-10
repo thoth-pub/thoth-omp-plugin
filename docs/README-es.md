@@ -1,4 +1,4 @@
-[Inglés](README.md) | **Español** | [Portugués brasileño](README-pt_BR.md)
+[Inglés](README.md) | **Español** | [Portugués brasileño](docs/README-pt_BR.md)
 
 # Plugin Thoth OMP
 
