@@ -1,4 +1,6 @@
-# Thoth
+**English** | [Spanish](README-es.md) | [Português Brasileiro](README-pt_BR.md)
+
+# Thoth OMP Plugin
 
 Work in Progress Integration of OMP and [Thoth](https://thoth.pub/) for communication and synchronization of book data between the two platforms.
 
