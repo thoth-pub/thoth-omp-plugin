@@ -13,7 +13,7 @@
  * @brief Helper class that encapsulates business logic for Thoth contributors
  */
 
-import('plugins.generic.thoth.thoth.models.ThothContributor');
+import('plugins.generic.thoth.lib.thothAPI.models.ThothContributor');
 
 class ThothContributorService
 {

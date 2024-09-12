@@ -17,7 +17,7 @@
 import('lib.pkp.tests.PKPTestCase');
 import('classes.monograph.Author');
 import('plugins.generic.thoth.classes.services.ThothContributorService');
-import('plugins.generic.thoth.thoth.ThothClient');
+import('plugins.generic.thoth.lib.thothAPI.ThothClient');
 
 class ThothContributorServiceTest extends PKPTestCase
 {

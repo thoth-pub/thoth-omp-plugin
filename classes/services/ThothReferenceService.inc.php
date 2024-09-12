@@ -15,7 +15,7 @@
 
 import('lib.pkp.classes.citation.Citation');
 import('lib.pkp.classes.citation.CitationListTokenizerFilter');
-import('plugins.generic.thoth.thoth.models.ThothReference');
+import('plugins.generic.thoth.lib.thothAPI.models.ThothReference');
 
 class ThothReferenceService
 {

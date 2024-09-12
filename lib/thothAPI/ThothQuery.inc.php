@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @file plugins/generic/thoth/thoth/ThothQuery.inc.php
+ * @file plugins/generic/thoth/lib/thothAPI/ThothQuery.inc.php
  *
  * Copyright (c) 2024 Lepidus Tecnologia
  * Copyright (c) 2024 Thoth

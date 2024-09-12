@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @file plugins/generic/thoth/thoth/models/ThothSubject.inc.php
+ * @file plugins/generic/thoth/lib/thothAPI/models/ThothSubject.inc.php
  *
  * Copyright (c) 2024 Lepidus Tecnologia
  * Copyright (c) 2024 Thoth
@@ -13,7 +13,7 @@
  * @brief Class for a Thoth's subject.
  */
 
-import('plugins.generic.thoth.thoth.models.ThothModel');
+import('plugins.generic.thoth.lib.thothAPI.models.ThothModel');
 
 class ThothSubject extends ThothModel
 {

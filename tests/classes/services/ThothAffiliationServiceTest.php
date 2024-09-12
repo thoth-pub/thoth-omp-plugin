@@ -16,8 +16,8 @@
 
 import('lib.pkp.tests.PKPTestCase');
 import('plugins.generic.thoth.classes.services.ThothAffiliationService');
-import('plugins.generic.thoth.thoth.models.ThothAffiliation');
-import('plugins.generic.thoth.thoth.ThothClient');
+import('plugins.generic.thoth.lib.thothAPI.models.ThothAffiliation');
+import('plugins.generic.thoth.lib.thothAPI.ThothClient');
 
 class ThothAffiliationServiceTest extends PKPTestCase
 {

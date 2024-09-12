@@ -15,7 +15,7 @@
  */
 
 import('lib.pkp.tests.PKPTestCase');
-import('plugins.generic.thoth.thoth.models.ThothAffiliation');
+import('plugins.generic.thoth.lib.thothAPI.models.ThothAffiliation');
 
 class ThothAffiliationTest extends PKPTestCase
 {

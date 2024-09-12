@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @file plugins/generic/thoth/thoth/ThothClient.inc.php
+ * @file plugins/generic/thoth/lib/thothAPI/ThothClient.inc.php
  *
  * Copyright (c) 2024 Lepidus Tecnologia
  * Copyright (c) 2024 Thoth
@@ -13,11 +13,11 @@
  * @brief Client for Thoth's API
  */
 
-import('plugins.generic.thoth.thoth.ThothAccount');
-import('plugins.generic.thoth.thoth.ThothGraphQL');
-import('plugins.generic.thoth.thoth.ThothMutation');
-import('plugins.generic.thoth.thoth.ThothQuery');
-import('plugins.generic.thoth.thoth.ThothQueryFields');
+import('plugins.generic.thoth.lib.thothAPI.ThothAccount');
+import('plugins.generic.thoth.lib.thothAPI.ThothGraphQL');
+import('plugins.generic.thoth.lib.thothAPI.ThothMutation');
+import('plugins.generic.thoth.lib.thothAPI.ThothQuery');
+import('plugins.generic.thoth.lib.thothAPI.ThothQueryFields');
 
 class ThothClient
 {

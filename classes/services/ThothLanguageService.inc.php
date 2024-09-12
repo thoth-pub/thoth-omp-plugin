@@ -13,7 +13,7 @@
  * @brief Helper class that encapsulates business logic for Thoth languages
  */
 
-import('plugins.generic.thoth.thoth.models.ThothLanguage');
+import('plugins.generic.thoth.lib.thothAPI.models.ThothLanguage');
 
 class ThothLanguageService
 {

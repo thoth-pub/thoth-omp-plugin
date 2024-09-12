@@ -135,7 +135,7 @@ class ThothPlugin extends GenericPlugin
         $password = APIKeyEncryption::decryptString($password);
         $testEnvironment = $this->getSetting($contextId, 'testEnvironment');
 
-        import('plugins.generic.thoth.thoth.ThothClient');
+        import('plugins.generic.thoth.lib.thothAPI.ThothClient');
         $thothClient = new ThothClient($testEnvironment);
         $thothClient->login($email, $password);
 

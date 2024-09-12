@@ -21,7 +21,7 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Exception\RequestException;
 
 import('lib.pkp.tests.PKPTestCase');
-import('plugins.generic.thoth.thoth.ThothAccount');
+import('plugins.generic.thoth.lib.thothAPI.ThothAccount');
 
 class ThothAccountTest extends PKPTestCase
 {

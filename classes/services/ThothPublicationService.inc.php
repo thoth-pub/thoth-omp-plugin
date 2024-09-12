@@ -14,7 +14,7 @@
  */
 
 import('plugins.generic.thoth.classes.facades.ThothService');
-import('plugins.generic.thoth.thoth.models.ThothPublication');
+import('plugins.generic.thoth.lib.thothAPI.models.ThothPublication');
 
 class ThothPublicationService
 {

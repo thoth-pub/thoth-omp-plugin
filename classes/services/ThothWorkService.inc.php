@@ -14,8 +14,8 @@
  */
 
 import('plugins.generic.thoth.classes.facades.ThothService');
-import('plugins.generic.thoth.thoth.models.ThothWork');
-import('plugins.generic.thoth.thoth.models.ThothWorkRelation');
+import('plugins.generic.thoth.lib.thothAPI.models.ThothWork');
+import('plugins.generic.thoth.lib.thothAPI.models.ThothWorkRelation');
 import('plugins.generic.thoth.classes.services.queryBuilders.ThothWorkQueryBuilder');
 
 class ThothWorkService

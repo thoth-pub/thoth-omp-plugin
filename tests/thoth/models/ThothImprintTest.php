@@ -15,7 +15,7 @@
  */
 
 import('lib.pkp.tests.PKPTestCase');
-import('plugins.generic.thoth.thoth.models.ThothImprint');
+import('plugins.generic.thoth.lib.thothAPI.models.ThothImprint');
 
 class ThothImprintTest extends PKPTestCase
 {

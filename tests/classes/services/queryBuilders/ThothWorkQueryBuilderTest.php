@@ -16,7 +16,7 @@
 
 import('lib.pkp.tests.PKPTestCase');
 import('plugins.generic.thoth.classes.services.queryBuilders.ThothWorkQueryBuilder');
-import('plugins.generic.thoth.thoth.ThothClient');
+import('plugins.generic.thoth.lib.thothAPI.ThothClient');
 
 class ThothWorkQueryBuilderTest extends PKPTestCase
 {

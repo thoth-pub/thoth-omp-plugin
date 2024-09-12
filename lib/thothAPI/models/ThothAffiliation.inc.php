@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @file plugins/generic/thoth/thoth/models/ThothAffiliation.inc.php
+ * @file plugins/generic/thoth/lib/thothAPI/models/ThothAffiliation.inc.php
  *
  * Copyright (c) 2024 Lepidus Tecnologia
  * Copyright (c) 2024 Thoth
@@ -13,7 +13,7 @@
  * @brief Class for a Thoth Contribution.
  */
 
-import('plugins.generic.thoth.thoth.models.ThothModel');
+import('plugins.generic.thoth.lib.thothAPI.models.ThothModel');
 
 class ThothAffiliation extends ThothModel
 {
