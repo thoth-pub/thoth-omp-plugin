@@ -13,7 +13,7 @@
  * @brief Helper class that encapsulates business logic for Thoth institutions
  */
 
-import('plugins.generic.thoth.thoth.models.ThothInstitution');
+import('plugins.generic.thoth.lib.thothAPI.models.ThothInstitution');
 
 class ThothInstitutionService
 {

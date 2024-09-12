@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @file plugins/generic/thoth/thoth/ThothQueryFields.inc.php
+ * @file plugins/generic/thoth/lib/thothAPI/ThothQueryFields.inc.php
  *
  * Copyright (c) 2024 Lepidus Tecnologia
  * Copyright (c) 2024 Thoth
@@ -13,19 +13,19 @@
  * @brief Retrieve object fields for queries
  */
 
-import('plugins.generic.thoth.thoth.models.ThothAffiliation');
-import('plugins.generic.thoth.thoth.models.ThothContribution');
-import('plugins.generic.thoth.thoth.models.ThothContributor');
-import('plugins.generic.thoth.thoth.models.ThothImprint');
-import('plugins.generic.thoth.thoth.models.ThothInstitution');
-import('plugins.generic.thoth.thoth.models.ThothLanguage');
-import('plugins.generic.thoth.thoth.models.ThothLocation');
-import('plugins.generic.thoth.thoth.models.ThothPublication');
-import('plugins.generic.thoth.thoth.models.ThothPublisher');
-import('plugins.generic.thoth.thoth.models.ThothReference');
-import('plugins.generic.thoth.thoth.models.ThothSubject');
-import('plugins.generic.thoth.thoth.models.ThothWork');
-import('plugins.generic.thoth.thoth.models.ThothWorkRelation');
+import('plugins.generic.thoth.lib.thothAPI.models.ThothAffiliation');
+import('plugins.generic.thoth.lib.thothAPI.models.ThothContribution');
+import('plugins.generic.thoth.lib.thothAPI.models.ThothContributor');
+import('plugins.generic.thoth.lib.thothAPI.models.ThothImprint');
+import('plugins.generic.thoth.lib.thothAPI.models.ThothInstitution');
+import('plugins.generic.thoth.lib.thothAPI.models.ThothLanguage');
+import('plugins.generic.thoth.lib.thothAPI.models.ThothLocation');
+import('plugins.generic.thoth.lib.thothAPI.models.ThothPublication');
+import('plugins.generic.thoth.lib.thothAPI.models.ThothPublisher');
+import('plugins.generic.thoth.lib.thothAPI.models.ThothReference');
+import('plugins.generic.thoth.lib.thothAPI.models.ThothSubject');
+import('plugins.generic.thoth.lib.thothAPI.models.ThothWork');
+import('plugins.generic.thoth.lib.thothAPI.models.ThothWorkRelation');
 
 class ThothQueryFields
 {

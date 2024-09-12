@@ -14,7 +14,7 @@
  */
 
 import('plugins.generic.thoth.classes.facades.ThothService');
-import('plugins.generic.thoth.thoth.models.ThothContribution');
+import('plugins.generic.thoth.lib.thothAPI.models.ThothContribution');
 import('classes.core.Services');
 
 class ThothContributionService

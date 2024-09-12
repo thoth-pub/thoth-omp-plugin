@@ -13,7 +13,7 @@
  * @brief Helper class that encapsulates business logic for Thoth locations
  */
 
-import('plugins.generic.thoth.thoth.models.ThothLocation');
+import('plugins.generic.thoth.lib.thothAPI.models.ThothLocation');
 
 class ThothLocationService
 {

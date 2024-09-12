@@ -20,10 +20,10 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 
 import('lib.pkp.tests.PKPTestCase');
-import('plugins.generic.thoth.thoth.ThothGraphQL');
-import('plugins.generic.thoth.thoth.ThothQuery');
-import('plugins.generic.thoth.thoth.ThothQueryFields');
-import('plugins.generic.thoth.thoth.models.ThothContributor');
+import('plugins.generic.thoth.lib.thothAPI.ThothGraphQL');
+import('plugins.generic.thoth.lib.thothAPI.ThothQuery');
+import('plugins.generic.thoth.lib.thothAPI.ThothQueryFields');
+import('plugins.generic.thoth.lib.thothAPI.models.ThothContributor');
 
 class ThothQueryTest extends PKPTestCase
 {

@@ -22,7 +22,7 @@ import('lib.pkp.classes.core.Dispatcher');
 import('lib.pkp.classes.core.PKPRequest');
 import('lib.pkp.tests.PKPTestCase');
 import('plugins.generic.thoth.classes.services.ThothLocationService');
-import('plugins.generic.thoth.thoth.ThothClient');
+import('plugins.generic.thoth.lib.thothAPI.ThothClient');
 
 class ThothLocationServiceTest extends PKPTestCase
 {

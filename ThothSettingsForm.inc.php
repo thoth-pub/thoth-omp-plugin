@@ -17,7 +17,7 @@
 
 import('lib.pkp.classes.form.Form');
 import('plugins.generic.thoth.lib.APIKeyEncryption.APIKeyEncryption');
-import('plugins.generic.thoth.thoth.ThothClient');
+import('plugins.generic.thoth.lib.thothAPI.ThothClient');
 
 class ThothSettingsForm extends Form
 {

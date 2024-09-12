@@ -15,7 +15,7 @@
  */
 
 import('lib.pkp.tests.PKPTestCase');
-import('plugins.generic.thoth.thoth.models.ThothContribution');
+import('plugins.generic.thoth.lib.thothAPI.models.ThothContribution');
 
 class ThothContributionTest extends PKPTestCase
 {

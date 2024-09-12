@@ -21,8 +21,8 @@ import('lib.pkp.classes.core.PKPRequest');
 import('lib.pkp.classes.core.PKPRouter');
 import('lib.pkp.tests.PKPTestCase');
 import('plugins.generic.thoth.classes.services.ThothWorkService');
-import('plugins.generic.thoth.thoth.models.ThothWork');
-import('plugins.generic.thoth.thoth.ThothClient');
+import('plugins.generic.thoth.lib.thothAPI.models.ThothWork');
+import('plugins.generic.thoth.lib.thothAPI.ThothClient');
 
 class ThothWorkServiceTest extends PKPTestCase
 {

@@ -15,7 +15,7 @@
  */
 
 import('lib.pkp.tests.PKPTestCase');
-import('plugins.generic.thoth.thoth.models.ThothPublisher');
+import('plugins.generic.thoth.lib.thothAPI.models.ThothPublisher');
 
 class ThothPublisherTest extends PKPTestCase
 {

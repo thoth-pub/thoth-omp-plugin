@@ -13,7 +13,7 @@
  * @brief Class for building graphQL queries for works
  */
 
-import('plugins.generic.thoth.thoth.ThothQueryFields');
+import('plugins.generic.thoth.lib.thothAPI.ThothQueryFields');
 
 class ThothWorkQueryBuilder
 {

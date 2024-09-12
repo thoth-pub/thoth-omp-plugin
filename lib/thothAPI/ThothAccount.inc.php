@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @file plugins/generic/thoth/thoth/ThothAccount.inc.php
+ * @file plugins/generic/thoth/lib/thothAPI/ThothAccount.inc.php
  *
  * Copyright (c) 2024 Lepidus Tecnologia
  * Copyright (c) 2024 Thoth
@@ -15,7 +15,7 @@
 
 use GuzzleHttp\Exception\RequestException;
 
-import('plugins.generic.thoth.thoth.exceptions.ThothException');
+import('plugins.generic.thoth.lib.thothAPI.exceptions.ThothException');
 
 class ThothAccount
 {

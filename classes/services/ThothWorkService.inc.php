@@ -14,8 +14,8 @@
  */
 
 import('plugins.generic.thoth.classes.facades.ThothService');
-import('plugins.generic.thoth.thoth.models.ThothWork');
-import('plugins.generic.thoth.thoth.models.ThothWorkRelation');
+import('plugins.generic.thoth.lib.thothAPI.models.ThothWork');
+import('plugins.generic.thoth.lib.thothAPI.models.ThothWorkRelation');
 import('plugins.generic.thoth.classes.services.queryBuilders.ThothWorkQueryBuilder');
 
 class ThothWorkService
@@ -72,7 +72,8 @@ class ThothWorkService
         $params['subtitle'] = $chapter->getLocalizedData('subtitle');
         $params['longAbstract'] = $chapter->getLocalizedData('abstract');
         $params['pageCount'] = $chapter->getPages();
-        $params['publicationDate'] = $chapter->getDatePublished();
+        $params['publicationDate'] = $chapter->getDatePublished() ??
+            Services::get('publication')->get($chapter->getData('publicationId'))->getData('datePublished');
         $params['doi'] = $chapter->getStoredPubId('doi');
 
         return $this->new($params);

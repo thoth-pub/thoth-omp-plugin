@@ -15,7 +15,7 @@
  */
 
 import('lib.pkp.tests.PKPTestCase');
-import('plugins.generic.thoth.thoth.models.ThothLocation');
+import('plugins.generic.thoth.lib.thothAPI.models.ThothLocation');
 
 class ThothLocationTest extends PKPTestCase
 {

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @file plugins/generic/thoth/thoth/ThothMutation.inc.php
+ * @file plugins/generic/thoth/lib/thothAPI/ThothMutation.inc.php
  *
  * Copyright (c) 2024 Lepidus Tecnologia
  * Copyright (c) 2024 Thoth
