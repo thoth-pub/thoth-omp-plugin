@@ -72,7 +72,8 @@ class ThothWorkService
         $params['subtitle'] = $chapter->getLocalizedData('subtitle');
         $params['longAbstract'] = $chapter->getLocalizedData('abstract');
         $params['pageCount'] = $chapter->getPages();
-        $params['publicationDate'] = $chapter->getDatePublished();
+        $params['publicationDate'] = $chapter->getDatePublished() ?? 
+            Services::get('publication')->get($chapter->getData('publicationId'))->getData('datePublished');
         $params['doi'] = $chapter->getStoredPubId('doi');
 
         return $this->new($params);
