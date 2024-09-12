@@ -1,4 +1,4 @@
-[Inglês](README.md) | [Espanhol](docs/README-es.md) | **Português Brasileiro**
+[English](/README.md) | [Español](/docs/README-es.md) | **Português Brasileiro**
 
 # Plugin Thoth OMP
 
