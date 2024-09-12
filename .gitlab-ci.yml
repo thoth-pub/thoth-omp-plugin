@@ -8,3 +8,9 @@ include:
     file:
       - 'templates/groups/pkp_plugin.yml'
       - 'templates/groups/omp/unit_tests.yml'
+
+.unit_test_template:
+  before_script:
+    - rm -rf lib/APIKeyEncryption
+    - git submodule update --init --depth 1
+    - sed -i 's/api_key_secret = ""/api_key_secret = "$API_KEY_SECRET"/' /var/www/ojs/config.inc.php
