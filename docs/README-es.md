@@ -37,11 +37,18 @@ Para configurar el plugin:
 - **Correo electrónico** y **Contraseña**: Introduce las credenciales de una cuenta de Thoth para conectar con la API.
 - **Entorno de Prueba**: Marca esta opción si estás utilizando una instancia local de la API de Thoth para fines de prueba.
 
+![settings](/images/settings.png)
+
 ### Gestión de Monografías
 
 - **Monografías No Publicadas**: Registra metadatos en Thoth durante el proceso de publicación seleccionando la opción para registrar metadatos en el modal de publicación y eligiendo un sello.
 
+![publish](/images/publish.png)
+
 - **Monografías Publicadas**: Registra metadatos para monografías publicadas utilizando el botón 'Registrar' junto al estado de publicación.
+
+![button](/images/button.png)
+![register](/images/register.png)
 
 ### Actualización de Metadatos
 
@@ -50,6 +57,8 @@ Para actualizar los metadatos en Thoth, despublica la monografía, edita los dat
 ### Acceso a Registros de Libros en Thoth
 
 Después de que los metadatos estén publicados, aparecerá un enlace al libro en Thoth en la parte superior de la publicación.
+
+![link](/images/link.png)
 
 ## Créditos
 
