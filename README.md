@@ -60,6 +60,56 @@ After metadata is published, a link to the book on Thoth will appear at the top 
 
 ![link](/images/link.png)
 
+## OMP-Thoth Mapping
+
+<details>
+    <summary>Click here to see the data relationship between Thoth and OMP</summary>
+
+| OMP               |                    |   | Thoth                  |                     |             |
+| ----------------- | ------------------ | - | ---------------------- | ------------------- | ----------- |
+| Submission        |                    |   | Work                   |                     |             |
+|                   | WorkType           |   |                        | WorkType            |             |
+| SubmissionUrl     |                    |   |                        | LandingPage         |             |
+| Publication       |                    |   |                        |                     |             |
+|                   | FullTitle          |   |                        | FullTitle           |             |
+|                   | Title              |   |                        | Title               |             |
+|                   | Subtitle           |   |                        | Subtitle            |             |
+|                   | Abstract           |   |                        | Abstract            |             |
+|                   | Version            |   |                        | Edition             |             |
+|                   | DOI                |   |                        | DOI                 |             |
+|                   | DatePublished      |   |                        | PublicationDate     |             |
+|                   | License            |   |                        | License             |             |
+|                   | copyrightHolder    |   |                        | copyrightHolder     |             |
+|                   | coverUrl           |   |                        | CoverImageUrl       |             |
+| Author            |                    |   | Contribution           |                     |             |
+|                   | UserGroupId        |   |                        | ContributionType    |             |
+|                   | PrimaryContactId   |   |                        | MainContribution    |             |
+|                   | Sequence           |   |                        | ContributionOrdinal |             |
+|                   | GivenName          |   |                        | FirstName           |             |
+|                   | LastName           |   |                        | FamilyName          |             |
+|                   | FullName           |   |                        | FullName            |             |
+|                   | Biography          |   |                        | Biography           |             |
+|                   | Affiliation        |   | Affiliation            |                     |             |
+| Chapter           |                    |   | Work(Type: Chapter)    |                     |             |
+|                   | FullTitle          |   |                        | FullTitle           |             |
+|                   | Title              |   |                        | Title               |             |
+|                   | Subtitle           |   |                        | Subtitle            |             |
+|                   | Abstract           |   |                        | Abstract            |             |
+|                   | Pages              |   |                        | pageCount           |             |
+|                   | DatePublished      |   |                        | PublicationDate     |             |
+|                   | DOI                |   |                        | DOI                 |             |
+| SubmissionLocale  |                    |   | Language               |                     |             |
+| PublicationFormat |                    |   | Publication            |                     |             |
+|                   | EntryKey           |   |                        | PublicationType     |             |
+|                   | IdentificationCode |   |                        | ISBN                |             |
+|                   |                    |   |                        | Location            |             |
+| SubmissionUrl     |                    |   |                        |                     | LandingPage |
+|                   | RemoteUrl/FileUrl  |   |                        |                     | FullTextUrl |
+| Keyword           |                    |   | Subject(Type: Keyword) |                     |             |
+| Citation          |                    |   | Reference              |                     |             |
+
+</details>
+
 ## Credits
 
 This plugin was idealized and sponsored by [Thoth](https://thoth.pub/).
