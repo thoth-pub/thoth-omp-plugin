@@ -79,8 +79,8 @@ After metadata is published, a link to the book on Thoth will appear at the top 
 |                   | DOI                |   |                        | DOI                 |             |
 |                   | DatePublished      |   |                        | PublicationDate     |             |
 |                   | License            |   |                        | License             |             |
-|                   | copyrightHolder    |   |                        | copyrightHolder     |             |
-|                   | coverUrl           |   |                        | CoverImageUrl       |             |
+|                   | CopyrightHolder    |   |                        | CopyrightHolder     |             |
+|                   | CoverUrl           |   |                        | CoverImageUrl       |             |
 | Author            |                    |   | Contribution           |                     |             |
 |                   | UserGroupId        |   |                        | ContributionType    |             |
 |                   | PrimaryContactId   |   |                        | MainContribution    |             |
@@ -103,8 +103,8 @@ After metadata is published, a link to the book on Thoth will appear at the top 
 |                   | EntryKey           |   |                        | PublicationType     |             |
 |                   | IdentificationCode |   |                        | ISBN                |             |
 |                   |                    |   |                        | Location            |             |
-| SubmissionUrl     |                    |   |                        |                     | LandingPage |
 |                   | RemoteUrl/FileUrl  |   |                        |                     | FullTextUrl |
+| SubmissionUrl     |                    |   |                        |                     | LandingPage |
 | Keyword           |                    |   | Subject(Type: Keyword) |                     |             |
 | Citation          |                    |   | Reference              |                     |             |
 
