@@ -47,8 +47,8 @@ To configure the plugin:
 
 - **Published Monographs**: Register metadata for published monographs by using the 'Register' button next to the publication status.
 
-![button](/images/button.png.png)
-![register](/images/register.png.png)
+![button](/images/button.png)
+![register](/images/register.png)
 
 ### Updating Metadata
 
