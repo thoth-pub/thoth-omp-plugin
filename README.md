@@ -37,11 +37,18 @@ To configure the plugin:
 - **E-mail** and **Password**: Enter the credentials for a Thoth account to connect with the API.
 - **Test Environment**: Check this option if you are using a local instance of the Thoth API for testing purposes.
 
+![settings](/images/settings.png)
+
 ### Managing Monographs
 
 - **Unpublished Monographs**: Register metadata in Thoth during the publishing process by selecting the option to register metadata in the publish modal and choosing an imprint.
 
+![publish](/images/publish.png)
+
 - **Published Monographs**: Register metadata for published monographs by using the 'Register' button next to the publication status.
+
+![button](/images/button.png.png)
+![register](/images/register.png.png)
 
 ### Updating Metadata
 
@@ -50,6 +57,8 @@ To update metadata in Thoth, unpublish the monograph, edit the data, and the cha
 ### Accessing Thoth Book Records
 
 After metadata is published, a link to the book on Thoth will appear at the top of the publication.
+
+![link](/images/link.png)
 
 ## Credits
 
