@@ -37,11 +37,18 @@ Para configurar o plugin:
 - **E-mail** e **Senha**: Insira as credenciais de uma conta do Thoth para conectar com a API.
 - **Ambiente de Teste**: Marque esta opção se você estiver usando uma instância local da API do Thoth para fins de teste.
 
+![settings](/images/settings.png)
+
 ### Gerenciamento de Monografias
 
 - **Monografias Não Publicadas**: Registre os metadados no Thoth durante o processo de publicação, selecionando a opção para registrar metadados no modal de publicação e escolhendo uma editora.
 
+![publish](/images/publish.png)
+
 - **Monografias Publicadas**: Registre os metadados para monografias publicadas usando o botão 'Registrar' ao lado do status de publicação.
+
+![button](/images/button.png)
+![register](/images/register.png)
 
 ### Atualização de Metadados
 
@@ -50,6 +57,58 @@ Para atualizar os metadados no Thoth, despublique a monografia, edite os dados e
 ### Acessando Registros de Livros no Thoth
 
 Após a publicação dos metadados, um link para o livro no Thoth aparecerá no topo da publicação.
+
+![link](/images/link.png)
+
+## Mapeamento OMP-Thoth
+
+<details>
+    <summary>Clique aqui para ver a relação de dados entre Thoth e OMP</summary>
+
+| OMP               |                    |   | Thoth                  |                     |             |
+| ----------------- | ------------------ | - | ---------------------- | ------------------- | ----------- |
+| Submission        |                    |   | Work                   |                     |             |
+|                   | WorkType           |   |                        | WorkType            |             |
+| SubmissionUrl     |                    |   |                        | LandingPage         |             |
+| Publication       |                    |   |                        |                     |             |
+|                   | FullTitle          |   |                        | FullTitle           |             |
+|                   | Title              |   |                        | Title               |             |
+|                   | Subtitle           |   |                        | Subtitle            |             |
+|                   | Abstract           |   |                        | Abstract            |             |
+|                   | Version            |   |                        | Edition             |             |
+|                   | DOI                |   |                        | DOI                 |             |
+|                   | DatePublished      |   |                        | PublicationDate     |             |
+|                   | License            |   |                        | License             |             |
+|                   | CopyrightHolder    |   |                        | CopyrightHolder     |             |
+|                   | CoverUrl           |   |                        | CoverImageUrl       |             |
+| Author            |                    |   | Contribution           |                     |             |
+|                   | UserGroupId        |   |                        | ContributionType    |             |
+|                   | PrimaryContactId   |   |                        | MainContribution    |             |
+|                   | Sequence           |   |                        | ContributionOrdinal |             |
+|                   | GivenName          |   |                        | FirstName           |             |
+|                   | LastName           |   |                        | FamilyName          |             |
+|                   | FullName           |   |                        | FullName            |             |
+|                   | Biography          |   |                        | Biography           |             |
+|                   | Affiliation        |   | Affiliation            |                     |             |
+| Chapter           |                    |   | Work(Type: Chapter)    |                     |             |
+|                   | FullTitle          |   |                        | FullTitle           |             |
+|                   | Title              |   |                        | Title               |             |
+|                   | Subtitle           |   |                        | Subtitle            |             |
+|                   | Abstract           |   |                        | Abstract            |             |
+|                   | Pages              |   |                        | pageCount           |             |
+|                   | DatePublished      |   |                        | PublicationDate     |             |
+|                   | DOI                |   |                        | DOI                 |             |
+| SubmissionLocale  |                    |   | Language               |                     |             |
+| PublicationFormat |                    |   | Publication            |                     |             |
+|                   | EntryKey           |   |                        | PublicationType     |             |
+|                   | IdentificationCode |   |                        | ISBN                |             |
+|                   |                    |   |                        | Location            |             |
+|                   | RemoteUrl/FileUrl  |   |                        |                     | FullTextUrl |
+| SubmissionUrl     |                    |   |                        |                     | LandingPage |
+| Keyword           |                    |   | Subject(Type: Keyword) |                     |             |
+| Citation          |                    |   | Reference              |                     |             |
+
+</details>
 
 ## Créditos
 

@@ -22,7 +22,7 @@
     </span>
     <span v-else>
         <pkp-button @click="$.pkp.plugins.generic.thothplugin.openRegister(workingPublication.id)">
-            Registrar
+            {translate key="plugins.generic.thoth.register"}
         </pkp-button>
     </span>
 </span>
