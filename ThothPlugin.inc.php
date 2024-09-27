@@ -20,6 +20,7 @@ import('plugins.generic.thoth.classes.ThothBadgeRender');
 import('plugins.generic.thoth.classes.ThothNotification');
 import('plugins.generic.thoth.classes.ThothRegister');
 import('plugins.generic.thoth.classes.ThothUpdater');
+import('plugins.generic.thoth.lib.thothAPI.exceptions.ThothException');
 
 class ThothPlugin extends GenericPlugin
 {
@@ -128,7 +129,7 @@ class ThothPlugin extends GenericPlugin
         $password = $this->getSetting($contextId, 'password');
 
         if (!$email || !$password) {
-            throw new ThothException("Credentials not configured");
+            throw new ThothException("Credentials not configured", 0);
         }
 
         import('plugins.generic.thoth.lib.APIKeyEncryption.APIKeyEncryption');
