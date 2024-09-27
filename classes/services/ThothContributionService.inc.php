@@ -57,6 +57,10 @@ class ThothContributionService
         $contribution = $this->newByAuthor($author);
         $contribution->setWorkId($thothWorkId);
 
+        if (!$contribution->getContributionType()) {
+            return;
+        }
+
         $contributors = ThothService::contributor()->getMany($thothClient, [
             'limit' => 1,
             'filter' => (!empty($author->getOrcid())) ?
