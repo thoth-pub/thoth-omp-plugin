@@ -130,6 +130,12 @@ class ThothRegister
                         'submissionId' => $submission->getId(),
                         'publicationId' => '__publicationId__',
                     ]
+                ),
+                'publicationUrl' => $request->getDispatcher()->url(
+                    $request,
+                    ROUTE_API,
+                    $request->getContext()->getData('urlPath'),
+                    'submissions/' . $submission->getId() . '/publications/__publicationId__'
                 )
             ];
 
