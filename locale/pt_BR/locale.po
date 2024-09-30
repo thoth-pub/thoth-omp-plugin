@@ -59,6 +59,9 @@ msgstr ""
 "Houve um problema ao enviar os metadados da submissão para Thoth. Por favor, tente mais "
 "tarde, ou contate o administrador do sistema."
 
+msgid "plugins.generic.thoth.update"
+msgstr "Atualizar Metadados"
+
 msgid "plugins.generic.thoth.update.success"
 msgstr "Metadados atualizados com sucesso em Thoth."
 
