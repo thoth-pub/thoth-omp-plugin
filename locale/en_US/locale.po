@@ -59,6 +59,9 @@ msgstr ""
 "There was a problem sending the submission metadata to Thoth. Please try again later, or "
 "contact your system administrator."
 
+msgid "plugins.generic.thoth.update"
+msgstr "Update Metadata"
+
 msgid "plugins.generic.thoth.update.success"
 msgstr "Metadata successfully updated in Thoth."
 
