@@ -77,7 +77,7 @@ class ThothWorkService
         $params['title'] = $chapter->getLocalizedTitle();
         $params['subtitle'] = $chapter->getLocalizedData('subtitle');
         $params['longAbstract'] = $chapter->getLocalizedData('abstract');
-        $params['pageCount'] = $chapter->getPages();
+        $params['pageCount'] = $chapter->getPages() ? (int) $chapter->getPages() : null;
         $params['publicationDate'] = $chapter->getDatePublished() ??
             Repo::publication()->get($chapter->getData('publicationId'))->getData('datePublished');
         $params['doi'] = $chapter->getDoi();
