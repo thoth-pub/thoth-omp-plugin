@@ -54,10 +54,16 @@ msgstr "Do you want to register in Thoth the metadata related to this submission
 msgid "plugins.generic.thoth.register.success"
 msgstr "Submission metadata successfully sent to Thoth."
 
+msgid "plugins.generic.thoth.register.success.log"
+msgstr "Submission metadata registered in Thoth."
+
 msgid "plugins.generic.thoth.register.error"
 msgstr ""
 "There was a problem sending the submission metadata to Thoth. Please try again later, or "
 "contact your system administrator."
+
+msgid "plugins.generic.thoth.register.error.log"
+msgstr "Error registering metadata in Thoth. Reason: {$reason}"
 
 msgid "plugins.generic.thoth.update"
 msgstr "Update Metadata"
@@ -65,10 +71,16 @@ msgstr "Update Metadata"
 msgid "plugins.generic.thoth.update.success"
 msgstr "Metadata successfully updated in Thoth."
 
+msgid "plugins.generic.thoth.update.success.log"
+msgstr "Submission metadata updated in Thoth."
+
 msgid "plugins.generic.thoth.update.error"
 msgstr ""
 "There was a problem updating metadata in Thoth. Please try again later, or "
 "contact your system administrator."
+
+msgid "plugins.generic.thoth.update.error.log"
+msgstr "Error updating metadata in Thoth. Reason: {$reason}"
 
 msgid "plugins.generic.thoth.api.403.alreadyRegistered"
 msgstr "The submission is already registered in Thoth."

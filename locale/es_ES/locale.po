@@ -54,10 +54,16 @@ msgstr "¿Desea registrar en Thoth los metadatos relacionados con este envío?"
 msgid "plugins.generic.thoth.register.success"
 msgstr "Metadatos de envío enviados correctamente a Thoth."
 
+msgid "plugins.generic.thoth.register.success.log"
+msgstr "Metadatos de envío registrados en Thoth."
+
 msgid "plugins.generic.thoth.register.error"
 msgstr ""
 "Se ha producido un problema al enviar los metadatos de envío a Thoth. "
 "Vuelva a intentarlo más tarde o póngase en contacto con el administrador del sistema."
+
+msgid "plugins.generic.thoth.register.error.log"
+msgstr "Error al registrar metadatos en Thoth. Razón: {$reason}"
 
 msgid "plugins.generic.thoth.update"
 msgstr "Actualizar Metadatos"
@@ -65,10 +71,16 @@ msgstr "Actualizar Metadatos"
 msgid "plugins.generic.thoth.update.success"
 msgstr "Metadatos actualizados correctamente en Thoth."
 
+msgid "plugins.generic.thoth.update.success.log"
+msgstr "Metadatos actualizados en Thoth."
+
 msgid "plugins.generic.thoth.update.error"
 msgstr ""
 "Se ha producido un problema al actualizar los metadatos en Thoth "
 "Vuelva a intentarlo más tarde o póngase en contacto con el administrador del sistema."
+
+msgid "plugins.generic.thoth.update.error.log"
+msgstr "Error al actualizar metadatos en Thoth. Razón: {$reason}"
 
 msgid "plugins.generic.thoth.api.403.alreadyRegistered"
 msgstr "El envío ya está registrado en Thoth."

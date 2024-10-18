@@ -12,8 +12,16 @@
 
 class ThothException extends \RuntimeException
 {
+    private $error;
+
     public function __construct($error, $code)
     {
+        $this->error = $error;
         parent::__construct('Failed to send the request to Thoth: ' . $error, $code);
+    }
+
+    public function getError()
+    {
+        return $this->error;
     }
 }

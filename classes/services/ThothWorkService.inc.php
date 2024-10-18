@@ -244,7 +244,8 @@ class ThothWorkService
                 $thothClient,
                 $thothWorkData['relations'],
                 $publication,
-                $thothWorkId
+                $thothWorkId,
+                $thothWorkData['imprintId']
             );
         }
 
@@ -278,7 +279,7 @@ class ThothWorkService
         return $newThothWork;
     }
 
-    public function updateRelations($thothClient, $thothRelations, $publication, $thothWorkId)
+    public function updateRelations($thothClient, $thothRelations, $publication, $thothWorkId, $thothImprintId)
     {
         $chapterDAO = DAORegistry::getDAO('ChapterDAO');
         $chapters = $chapterDAO->getByPublicationId($publication->getId())->toArray();
@@ -300,13 +301,6 @@ class ThothWorkService
 
         $submissionService = Services::get('submission');
         $submission = $submissionService->get($publication->getData('submissionId'));
-
-        $pluginSettingsDAO = DAORegistry::getDAO('PluginSettingsDAO');
-        $thothImprintId = $pluginSettingsDAO->getSetting(
-            $submission->getData('contextId'),
-            'thothPlugin',
-            'imprintId'
-        );
 
         foreach ($chapters as $chapter) {
             $chapterTitle = $chapter->getLocalizedFullTitle();

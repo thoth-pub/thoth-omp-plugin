@@ -181,15 +181,18 @@ class ThothRegister
 
             ThothNotification::notify(
                 $request,
+                $submission,
                 NOTIFICATION_TYPE_SUCCESS,
-                __('plugins.generic.thoth.register.success')
+                'plugins.generic.thoth.register.success'
             );
         } catch (ThothException $e) {
             error_log($e->getMessage());
             ThothNotification::notify(
                 $request,
+                $submission,
                 NOTIFICATION_TYPE_ERROR,
-                __('plugins.generic.thoth.register.error')
+                'plugins.generic.thoth.register.error',
+                $e->getError()
             );
         }
     }
