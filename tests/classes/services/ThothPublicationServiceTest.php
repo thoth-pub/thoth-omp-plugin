@@ -8,16 +8,19 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothPublicationServiceTest
+ *
  * @ingroup plugins_generic_thoth_tests
+ *
  * @see ThothPublicationService
  *
  * @brief Test class for the ThothPublicationService class
  */
 
-import('classes.core.Services');
-import('classes.monograph.Author');
-import('lib.pkp.classes.services.PKPSchemaService');
-import('lib.pkp.tests.PKPTestCase');
+use APP\publicationFormat\PublicationFormat;
+use PKP\db\DAORegistry;
+use PKP\db\DAOResultFactory;
+use PKP\tests\PKPTestCase;
+
 import('plugins.generic.thoth.classes.services.ThothPublicationService');
 
 class ThothPublicationServiceTest extends PKPTestCase

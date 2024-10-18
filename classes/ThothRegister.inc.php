@@ -8,10 +8,16 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothRegister
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief Manage callback functions to register works in Thoth
  */
+
+use APP\facades\Repo;
+use APP\i18n\AppLocale;
+use APP\notification\Notification;
+use PKP\security\Role;
 
 import('plugins.generic.thoth.classes.facades.ThothService');
 
@@ -42,7 +48,7 @@ class ThothRegister
             return;
         }
 
-        $submission = Services::get('submission')->get($form->publication->getData('submissionId'));
+        $submission = Repo::submission()->get($form->publication->getData('submissionId'));
 
         if ($submission->getData('thothWorkId')) {
             return;
@@ -69,13 +75,13 @@ class ThothRegister
                 'value' => false,
                 'groupId' => 'default',
             ]))
-            ->addField(new \PKP\components\forms\FieldSelect('imprint', [
-                'label' => __('plugins.generic.thoth.imprint'),
-                'options' => $imprintOptions,
-                'required' => true,
-                'showWhen' => 'registerConfirmation',
-                'groupId' => 'default'
-            ]));
+                ->addField(new \PKP\components\forms\FieldSelect('imprint', [
+                    'label' => __('plugins.generic.thoth.imprint'),
+                    'options' => $imprintOptions,
+                    'required' => true,
+                    'showWhen' => 'registerConfirmation',
+                    'groupId' => 'default'
+                ]));
         } catch (ThothException $e) {
             $warningIconHtml = '<span class="fa fa-exclamation-triangle pkpIcon--inline"></span>';
             $noticeMsg = __('plugins.generic.thoth.connectionError');
@@ -173,22 +179,18 @@ class ThothRegister
         try {
             $thothClient = $this->plugin->getThothClient($submissionContext->getId());
             $thothBook = ThothService::work()->registerBook($thothClient, $submission, $imprint);
-            $submission = Services::get('submission')->edit(
-                $submission,
-                ['thothWorkId' => $thothBook->getId()],
-                $request
-            );
+            $submission = Repo::submission()->edit($submission, ['thothWorkId' => $thothBook->getId()]);
 
             ThothNotification::notify(
                 $request,
-                NOTIFICATION_TYPE_SUCCESS,
+                Notification::NOTIFICATION_TYPE_SUCCESS,
                 __('plugins.generic.thoth.register.success')
             );
         } catch (ThothException $e) {
             error_log($e->getMessage());
             ThothNotification::notify(
                 $request,
-                NOTIFICATION_TYPE_ERROR,
+                Notification::NOTIFICATION_TYPE_ERROR,
                 __('plugins.generic.thoth.register.error')
             );
         }
@@ -230,16 +232,17 @@ class ThothRegister
         $endpoints = & $args[0];
         $handler = $args[1];
 
-        if (!is_a($handler, 'PKPSubmissionHandler')) {
+        if (!is_a($handler, 'PKP\API\v1\submissions\PKPSubmissionHandler')) {
             return false;
         }
+
 
         array_unshift(
             $endpoints['PUT'],
             [
                 'pattern' => $handler->getEndpointPattern() . '/{submissionId}/publications/{publicationId}/register',
                 'handler' => [$this, 'register'],
-                'roles' => [ROLE_ID_MANAGER, ROLE_ID_SUB_EDITOR],
+                'roles' => [Role::ROLE_ID_MANAGER, Role::ROLE_ID_SUB_EDITOR],
             ]
         );
 
@@ -253,7 +256,7 @@ class ThothRegister
         $request = Application::get()->getRequest();
         $handler = $request->getRouter()->getHandler();
         $submission = $handler->getAuthorizedContextObject(ASSOC_TYPE_SUBMISSION);
-        $publication = Services::get('publication')->get((int) $args['publicationId']);
+        $publication = Repo::publication()->get($args['publicationId']);
         $params = $slimRequest->getParsedBody();
 
         if (empty($params['imprint'])) {
@@ -281,16 +284,16 @@ class ThothRegister
 
         $this->registerWork($submission, $params['imprint']);
 
-        $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
+        $userGroups = Repo::userGroup()->getCollector()
+            ->filterByContextIds([$submission->getData('contextId')])
+            ->getMany();
 
-        $publicationProps = Services::get('publication')->getFullProperties(
-            $publication,
-            [
-                'request' => $request,
-                'userGroups' => $userGroupDao->getByContextId($submission->getData('contextId'))->toArray(),
-            ]
+        $genreDao = DAORegistry::getDAO('GenreDAO');
+        $genres = $genreDao->getByContextId($submission->getData('contextId'))->toArray();
+
+        return $response->withJson(
+            Repo::publication()->getSchemaMap($submission, $userGroups, $genres)->map($publication),
+            200
         );
-
-        return $response->withJson($publicationProps, 200);
     }
 }

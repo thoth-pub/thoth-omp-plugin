@@ -8,18 +8,23 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothWorkServiceTest
+ *
  * @ingroup plugins_generic_thoth_tests
+ *
  * @see WorkService
  *
  * @brief Test class for the ThothWorkService class
  */
 
-import('classes.core.Application');
-import('classes.press.Press');
-import('classes.submission.Submission');
-import('lib.pkp.classes.core.PKPRequest');
-import('lib.pkp.classes.core.PKPRouter');
-import('lib.pkp.tests.PKPTestCase');
+use APP\core\Application;
+use APP\publication\Publication;
+use APP\publication\Repository as PublicationRepository;
+use APP\submission\Submission;
+use PKP\core\PKPRequest;
+use PKP\core\Registry;
+use PKP\db\DAORegistry;
+use PKP\tests\PKPTestCase;
+
 import('plugins.generic.thoth.classes.services.ThothWorkService');
 import('plugins.generic.thoth.lib.thothAPI.models.ThothWork');
 import('plugins.generic.thoth.lib.thothAPI.ThothClient');
@@ -38,17 +43,44 @@ class ThothWorkServiceTest extends PKPTestCase
         parent::tearDown();
     }
 
-    protected function getMockedRegistryKeys()
+    protected function getMockedRegistryKeys(): array
     {
         return ['application', 'request'];
     }
 
+    protected function getMockedContainerKeys(): array
+    {
+        return [...parent::getMockedContainerKeys(), PublicationRepository::class];
+    }
+
     private function setUpMockEnvironment()
     {
-        $press = new Press();
-        $press->setId(2);
-        $press->setPrimaryLocale('en_US');
-        $press->setPath('press');
+        $publicationRepoMock = Mockery::mock(app(PublicationRepository::class))
+            ->makePartial()
+            ->shouldReceive('get')
+            ->withAnyArgs()
+            ->andReturn(
+                Mockery::mock(\APP\publication\Publication::class)
+                    ->shouldReceive('getData')
+                    ->with('submissionId')
+                    ->andReturn(1)
+                    ->shouldReceive('getData')
+                    ->with('datePublished')
+                    ->andReturn('2020-01-01')
+                    ->getMock()
+            )
+            ->getMock();
+
+        app()->instance(PublicationRepository::class, $publicationRepoMock);
+
+        $pressMock = Mockery::mock(\APP\press\Press::class)
+            ->makePartial()
+            ->shouldReceive([
+                'getId' => 2,
+                'getPrimaryLocale' => 'en',
+                'getPath' => 'press'
+            ])
+            ->getMock();
 
         $mockApplication = $this->getMockBuilder(Application::class)
             ->setMethods(['getContextDepth', 'getContextList'])
@@ -68,31 +100,11 @@ class ThothWorkServiceTest extends PKPTestCase
         $mockRequest->setDispatcher($dispatcher);
         $mockRequest->expects($this->any())
             ->method('getContext')
-            ->will($this->returnValue($press));
+            ->will($this->returnValue($pressMock));
         $mockRequest->expects($this->any())
             ->method('getBaseUrl')
             ->will($this->returnValue('https://omp.publicknowledgeproject.org'));
         Registry::set('request', $mockRequest);
-
-        $submissionDaoMock = $this->getMockBuilder(SubmissionDAO::class)
-            ->setMethods(['getById'])
-            ->getMock();
-        $submission = new Submission();
-        $submission->setId(53);
-        $submissionDaoMock->expects($this->any())
-            ->method('getById')
-            ->will($this->returnValue($submission));
-        DAORegistry::registerDAO('SubmissionDAO', $submissionDaoMock);
-
-        $publicationMockDao = $this->getMockBuilder(PublicationDAO::class)
-            ->setMethods(['getById'])
-            ->getMock();
-        $publication = new Publication();
-        $publication->setData('primaryContactId', 13);
-        $publicationMockDao->expects($this->any())
-            ->method('getById')
-            ->will($this->returnValue($publication));
-        DAORegistry::registerDAO('PublicationDAO', $publicationMockDao);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
             ->setMethods([
@@ -167,57 +179,64 @@ class ThothWorkServiceTest extends PKPTestCase
             'educational theory.'
         );
 
-        $publication = DAORegistry::getDAO('PublicationDAO')->newDataObject();
-        $publication->setId(4);
-        $publication->setData(
-            'title',
-            'Accessible Elements',
-            'en_US'
-        );
-        $publication->setData(
-            'subtitle',
-            'Teaching Science Online and at a Distance',
-            'en_US'
-        );
-        $publication->setData(
-            'version',
-            1
-        );
-        $publication->setData(
-            'pub-id::doi',
-            'https://doi.org/10.1234/0000af0000'
-        );
-        $publication->setData(
-            'datePublished',
-            '2024-07-16'
-        );
-        $publication->setData(
-            'licenseUrl',
-            'https://creativecommons.org/licenses/by-nc/4.0/'
-        );
-        $publication->setData(
-            'copyrightHolder',
-            'Public Knowledge Press',
-            'en_US'
-        );
-        $publication->setData(
-            'abstract',
-            'Accessible Elements informs science educators about current practices in online and distance education: ' .
-            'distance-delivered methods for laboratory coursework, the requisite administrative and institutional ' .
-            'aspects of online and distance teaching, and the relevant educational theory.',
-            'en_US'
-        );
-
-        $submission = DAORegistry::getDAO('SubmissionDAO')->newDataObject();
-        $submission->setData('id', 3);
-        $submission->setData('locale', 'en_US');
-        $submission->setData('workType', WORK_TYPE_AUTHORED_WORK);
-        $submission->setData('currentPublicationId', 4);
-        $submission->setData('publications', [$publication]);
+        $submissionMock = Mockery::mock(\APP\submission\Submission::class)
+            ->makePartial()
+            ->shouldReceive('getId')
+            ->withAnyArgs()
+            ->andReturn(3)
+            ->shouldReceive('getLocale')
+            ->withAnyArgs()
+            ->andReturn('en')
+            ->shouldReceive('getData')
+            ->with('workType')
+            ->andReturn(Submission::WORK_TYPE_AUTHORED_WORK)
+            ->shouldReceive('getCurrentPublication')
+            ->withAnyArgs()
+            ->andReturn(
+                Mockery::mock(\APP\publication\Publication::class)
+                    ->makePartial()
+                    ->shouldReceive('getId')
+                    ->withAnyArgs()
+                    ->andReturn(4)
+                    ->shouldReceive('getLocalizedFullTitle')
+                    ->withAnyArgs()
+                    ->andReturn('Accessible Elements: Teaching Science Online and at a Distance')
+                    ->shouldReceive('getLocalizedTitle')
+                    ->withAnyArgs()
+                    ->andReturn('Accessible Elements')
+                    ->shouldReceive('getLocalizedData')
+                    ->with('subtitle')
+                    ->andReturn('Teaching Science Online and at a Distance')
+                    ->shouldReceive('getLocalizedData')
+                    ->with('abstract')
+                    ->andReturn(
+                        'Accessible Elements informs science educators about current practices in online ' .
+                        'and distance education: distance-delivered methods for laboratory coursework, the requisite ' .
+                        'administrative and institutional aspects of online and distance teaching, and the relevant ' .
+                        'educational theory.'
+                    )
+                    ->shouldReceive('getLocalizedData')
+                    ->with('copyrightHolder')
+                    ->andReturn('Public Knowledge Press')
+                    ->shouldReceive('getData')
+                    ->with('version')
+                    ->andReturn(1)
+                    ->shouldReceive('getData')
+                    ->with('datePublished')
+                    ->andReturn('2024-07-16')
+                    ->shouldReceive('getData')
+                    ->with('licenseUrl')
+                    ->andReturn('https://creativecommons.org/licenses/by-nc/4.0/')
+                    ->shouldReceive('getDoi')
+                    ->withAnyArgs()
+                    ->andReturn('https://doi.org/10.1234/0000af0000')
+                    ->getMock()
+            )
+            ->getMock();
 
         $this->setUpMockEnvironment();
 
-        $thothWork = $this->workService->newBySubmission($submission);
+        $thothWork = $this->workService->newBySubmission($submissionMock);
         $this->assertEquals($expectedThothWork, $thothWork);
     }
 
@@ -232,13 +251,26 @@ class ThothWorkServiceTest extends PKPTestCase
         $expectedThothWork->setPageCount('27');
         $expectedThothWork->setDoi('https://doi.org/10.1234/jpk.14.c54');
 
-        $chapter = DAORegistry::getDAO('ChapterDAO')->newDataObject();
-        $chapter->setTitle('Chapter 1: Interactions Affording Distance Science Education', 'en_US');
-        $chapter->setDatePublished('2024-03-21');
-        $chapter->setPages(27);
-        $chapter->setStoredPubId('doi', 'https://doi.org/10.1234/jpk.14.c54');
+        $chapterMock = Mockery::mock(\APP\monograph\Chapter::class)
+            ->makePartial()
+            ->shouldReceive('getLocalizedFullTitle')
+            ->withAnyArgs()
+            ->andReturn('Chapter 1: Interactions Affording Distance Science Education')
+            ->shouldReceive('getLocalizedTitle')
+            ->withAnyArgs()
+            ->andReturn('Chapter 1: Interactions Affording Distance Science Education')
+            ->shouldReceive('getDatePublished')
+            ->withAnyArgs()
+            ->andReturn('2024-03-21')
+            ->shouldReceive('getPages')
+            ->withAnyArgs()
+            ->andReturn(27)
+            ->shouldReceive('getDoi')
+            ->withAnyArgs()
+            ->andReturn('https://doi.org/10.1234/jpk.14.c54')
+            ->getMock();
 
-        $thothWork = $this->workService->newByChapter($chapter);
+        $thothWork = $this->workService->newByChapter($chapterMock);
         $this->assertEquals($expectedThothWork, $thothWork);
     }
 
@@ -301,7 +333,7 @@ class ThothWorkServiceTest extends PKPTestCase
         $submission = new Submission();
         $submission->setData('id', 999);
         $submission->setData('locale', 'en_US');
-        $submission->setData('workType', WORK_TYPE_AUTHORED_WORK);
+        $submission->setData('workType', Submission::WORK_TYPE_AUTHORED_WORK);
         $submission->setData('currentPublicationId', 999);
         $submission->setData('publications', [$publication]);
 
@@ -322,6 +354,7 @@ class ThothWorkServiceTest extends PKPTestCase
         $expectedThothChapter->setWorkStatus(ThothWork::WORK_STATUS_ACTIVE);
         $expectedThothChapter->setFullTitle('Chapter 2: Classical Music and the Classical Mind');
         $expectedThothChapter->setTitle('Chapter 2: Classical Music and the Classical Mind');
+        $expectedThothChapter->setPublicationDate('2020-01-01');
 
         $chapter = DAORegistry::getDAO('ChapterDAO')->newDataObject();
         $chapter->setTitle('Chapter 2: Classical Music and the Classical Mind');

@@ -8,14 +8,16 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothContributorServiceTest
+ *
  * @ingroup plugins_generic_thoth_tests
+ *
  * @see ThothContributorService
  *
  * @brief Test class for the ThothContributorService class
  */
 
-import('lib.pkp.tests.PKPTestCase');
-import('classes.monograph.Author');
+use PKP\tests\PKPTestCase;
+
 import('plugins.generic.thoth.classes.services.ThothContributorService');
 import('plugins.generic.thoth.lib.thothAPI.ThothClient');
 
@@ -59,13 +61,26 @@ class ThothContributorServiceTest extends PKPTestCase
         $expectedContributor->setOrcid('https://orcid.org/0000-0002-1825-0097');
         $expectedContributor->setWebsite('https://sites.google.com/site/chantalallan');
 
-        $author = new Author();
-        $author->setGivenName('Chantal', 'en_US');
-        $author->setFamilyName('Allan', 'en_US');
-        $author->setOrcid('https://orcid.org/0000-0002-1825-0097');
-        $author->setUrl('https://sites.google.com/site/chantalallan');
+        $authorMock = Mockery::mock(\APP\author\Author::class)
+            ->makePartial()
+            ->shouldReceive('getLocalizedGivenName')
+            ->withAnyArgs()
+            ->andReturn('Chantal')
+            ->shouldReceive('getLocalizedData')
+            ->with('familyName')
+            ->andReturn('Allan')
+            ->shouldReceive('getFullName')
+            ->withAnyArgs()
+            ->andReturn('Chantal Allan')
+            ->shouldReceive('getOrcid')
+            ->withAnyArgs()
+            ->andReturn('https://orcid.org/0000-0002-1825-0097')
+            ->shouldReceive('getUrl')
+            ->withAnyArgs()
+            ->andReturn('https://sites.google.com/site/chantalallan')
+            ->getMock();
 
-        $contributor = $this->contributorService->newByAuthor($author);
+        $contributor = $this->contributorService->newByAuthor($authorMock);
 
         $this->assertEquals($expectedContributor, $contributor);
     }
@@ -78,9 +93,18 @@ class ThothContributorServiceTest extends PKPTestCase
         $expectedContributor->setLastName('Dupuis');
         $expectedContributor->setFullName('Brian Dupuis');
 
-        $author = new Author();
-        $author->setGivenName('Brian', 'en_US');
-        $author->setFamilyName('Dupuis', 'en_US');
+        $authorMock = Mockery::mock(\APP\author\Author::class)
+            ->makePartial()
+            ->shouldReceive('getLocalizedGivenName')
+            ->withAnyArgs()
+            ->andReturn('Brian')
+            ->shouldReceive('getLocalizedData')
+            ->with('familyName')
+            ->andReturn('Dupuis')
+            ->shouldReceive('getFullName')
+            ->withAnyArgs()
+            ->andReturn('Brian Dupuis')
+            ->getMock();
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
             ->setMethods([
@@ -91,7 +115,7 @@ class ThothContributorServiceTest extends PKPTestCase
             ->method('createContributor')
             ->will($this->returnValue('f70f709e-2137-4c87-a2e5-d52b263759ec'));
 
-        $contributor = $this->contributorService->register($mockThothClient, $author);
+        $contributor = $this->contributorService->register($mockThothClient, $authorMock);
         $this->assertEquals($expectedContributor, $contributor);
     }
 

@@ -8,13 +8,16 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothSubjectServiceTest
+ *
  * @ingroup plugins_generic_thoth_tests
+ *
  * @see ThothSubjectService
  *
  * @brief Test class for the ThothSubjectService class
  */
 
-import('lib.pkp.tests.PKPTestCase');
+use PKP\tests\PKPTestCase;
+
 import('plugins.generic.thoth.classes.services.ThothSubjectService');
 
 class ThothSubjectServiceTest extends PKPTestCase

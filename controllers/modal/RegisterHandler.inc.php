@@ -10,12 +10,16 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class RegisterHandler
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief A handler to load Thoth register confirmation
  */
 
-use APP\components\forms\publication\PublishForm;
+use APP\i18n\AppLocale;
+use APP\template\TemplateManager;
+use PKP\plugins\PluginRegistry;
+use PKP\security\Role;
 
 import('classes.handler.Handler');
 
@@ -29,7 +33,7 @@ class RegisterHandler extends Handler
     {
         parent::__construct();
         $this->addRoleAssignment(
-            [ROLE_ID_SUB_EDITOR, ROLE_ID_MANAGER, ROLE_ID_ASSISTANT],
+            [Role::ROLE_ID_SUB_EDITOR, Role::ROLE_ID_MANAGER, Role::ROLE_ID_ASSISTANT],
             ['register']
         );
     }
@@ -69,7 +73,7 @@ class RegisterHandler extends Handler
             !$submissionContext
             || $submissionContext->getId() !== $this->submission->getData('contextId')
         ) {
-            $submissionContext = Services::get('context')->get($this->submission->getData('contextId'));
+            $submissionContext = Repo::context()->get($this->submission->getData('contextId'));
         }
 
         $publicationApiUrl = $request->getDispatcher()->url(

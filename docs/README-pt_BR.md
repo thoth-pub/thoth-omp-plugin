@@ -9,6 +9,7 @@ Integração em progresso do OMP com o [Thoth](https://thoth.pub/) para comunica
 Este plugin é compatível com as seguintes aplicações PKP:
 
 - OMP 3.3.0-x
+- OMP 3.4.0-x
 
 ## Requisitos
 
