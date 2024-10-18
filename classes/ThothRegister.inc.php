@@ -179,19 +179,22 @@ class ThothRegister
         try {
             $thothClient = $this->plugin->getThothClient($submissionContext->getId());
             $thothBook = ThothService::work()->registerBook($thothClient, $submission, $imprint);
-            $submission = Repo::submission()->edit($submission, ['thothWorkId' => $thothBook->getId()]);
-
+            Repo::submission()->edit($submission, ['thothWorkId' => $thothBook->getId()]);
             ThothNotification::notify(
                 $request,
+                $submission,
                 Notification::NOTIFICATION_TYPE_SUCCESS,
-                __('plugins.generic.thoth.register.success')
+                __('plugins.generic.thoth.register.success'),
+                __('plugins.generic.thoth.log.register.success')
             );
         } catch (ThothException $e) {
             error_log($e->getMessage());
             ThothNotification::notify(
                 $request,
+                $submission,
                 Notification::NOTIFICATION_TYPE_ERROR,
-                __('plugins.generic.thoth.register.error')
+                __('plugins.generic.thoth.register.error'),
+                __('plugins.generic.thoth.log.register.error', ['reason' => $e->getError()])
             );
         }
     }
