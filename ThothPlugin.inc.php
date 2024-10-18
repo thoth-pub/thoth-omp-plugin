@@ -10,10 +10,14 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothPlugin
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief Plugin for integration with Thoth for communication and synchronization of book data between the two platforms
  */
+
+use APP\plugins\generic\thoth\classes\APIKeyEncryption;
+use PKP\core\JSONMessage;
 
 import('lib.pkp.classes.plugins.GenericPlugin');
 import('plugins.generic.thoth.classes.ThothBadgeRender');
@@ -129,10 +133,9 @@ class ThothPlugin extends GenericPlugin
         $password = $this->getSetting($contextId, 'password');
 
         if (!$email || !$password) {
-            throw new ThothException("Credentials not configured", 0);
+            throw new ThothException('Credentials not configured', 0);
         }
 
-        import('plugins.generic.thoth.lib.APIKeyEncryption.APIKeyEncryption');
         $password = APIKeyEncryption::decryptString($password);
         $testEnvironment = $this->getSetting($contextId, 'testEnvironment');
 

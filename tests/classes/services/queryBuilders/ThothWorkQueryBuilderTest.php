@@ -8,13 +8,16 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothWorkQueryBuilderTest
+ *
  * @ingroup plugins_generic_thoth_tests
+ *
  * @see ThothWorkQueryBuilder
  *
  * @brief Test class for the ThothWorkQueryBuilder class
  */
 
-import('lib.pkp.tests.PKPTestCase');
+use PKP\tests\PKPTestCase;
+
 import('plugins.generic.thoth.classes.services.queryBuilders.ThothWorkQueryBuilder');
 import('plugins.generic.thoth.lib.thothAPI.ThothClient');
 

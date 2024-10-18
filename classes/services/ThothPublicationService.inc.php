@@ -8,10 +8,14 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothPublicationService
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief Helper class that encapsulates business logic for Thoth publications
  */
+
+use APP\core\Application;
+use APP\facades\Repo;
 
 import('plugins.generic.thoth.classes.facades.ThothService');
 import('plugins.generic.thoth.lib.thothAPI.models.ThothPublication');
@@ -56,10 +60,13 @@ class ThothPublicationService
         }
 
         $files = array_filter(
-            iterator_to_array(Services::get('submissionFile')->getMany([
-                'assocTypes' => [ASSOC_TYPE_PUBLICATION_FORMAT],
-                'assocIds' => [$publicationFormat->getId()],
-            ])),
+            iterator_to_array(Repo::submissionFile()
+                ->getCollector()
+                ->filterByAssoc(
+                    Application::ASSOC_TYPE_PUBLICATION_FORMAT,
+                    [$publicationFormat->getId()]
+                )
+                ->getMany()),
             function ($file) use ($chapterId) {
                 return $file->getData('chapterId') == $chapterId;
             }
@@ -152,7 +159,7 @@ class ThothPublicationService
         $formatName = trim(
             preg_replace(
                 "/[^a-z0-9\.\-]+/",
-                "",
+                '',
                 str_replace(
                     [' ', '_', ':'],
                     '',
@@ -168,7 +175,7 @@ class ThothPublicationService
     {
         $identificationCodes = $publicationFormat->getIdentificationCodes()->toArray();
         foreach ($identificationCodes as $identificationCode) {
-            if ($identificationCode->getCode() == "15" || $identificationCode->getCode() == "24") {
+            if ($identificationCode->getCode() == '15' || $identificationCode->getCode() == '24') {
                 return $identificationCode->getValue();
             }
         }

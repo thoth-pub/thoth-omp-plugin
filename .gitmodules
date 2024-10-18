@@ -1,3 +1,0 @@
-[submodule "lib/APIKeyEncryption"]
-	path = lib/APIKeyEncryption
-	url = https://github.com/lepidus/APIKeyEncryption.git

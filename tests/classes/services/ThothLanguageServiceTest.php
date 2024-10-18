@@ -8,13 +8,16 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothLanguageServiceTest
+ *
  * @ingroup plugins_generic_thoth_tests
+ *
  * @see ThothLanguageService
  *
  * @brief Test class for the ThothLanguageService class
  */
 
-import('lib.pkp.tests.PKPTestCase');
+use PKP\tests\PKPTestCase;
+
 import('plugins.generic.thoth.classes.services.ThothLanguageService');
 import('plugins.generic.thoth.lib.thothAPI.ThothClient');
 
