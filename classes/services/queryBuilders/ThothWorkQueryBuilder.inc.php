@@ -8,6 +8,7 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothWorkQueryBuilder
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief Class for building graphQL queries for works

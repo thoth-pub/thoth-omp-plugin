@@ -8,10 +8,14 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothLocationService
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief Helper class that encapsulates business logic for Thoth locations
  */
+
+use APP\core\Application;
+use APP\facades\Repo;
 
 import('plugins.generic.thoth.lib.thothAPI.models.ThothLocation');
 
@@ -27,8 +31,8 @@ class ThothLocationService
         $request = Application::get()->getRequest();
         $dispatcher = $request->getDispatcher();
         $context = $request->getContext();
-        $publication = Services::get('publication')->get($publicationFormat->getData('publicationId'));
-        $submission = Services::get('submission')->get($publication->getData('submissionId'));
+        $publication = Repo::publication()->get($publicationFormat->getData('publicationId'));
+        $submission = Repo::submission()->get($publication->getData('submissionId'));
 
         $landingPage = $dispatcher->url(
             $request,
@@ -90,10 +94,13 @@ class ThothLocationService
         $chapterId = null
     ) {
         $files = array_filter(
-            iterator_to_array(Services::get('submissionFile')->getMany([
-                'assocTypes' => [ASSOC_TYPE_PUBLICATION_FORMAT],
-                'assocIds' => [$publicationFormat->getId()],
-            ])),
+            iterator_to_array(Repo::submissionFile()
+                ->getCollector()
+                ->filterByAssoc(
+                    Application::ASSOC_TYPE_PUBLICATION_FORMAT,
+                    [$publicationFormat->getId()]
+                )
+                ->getMany()),
             function ($file) use ($chapterId) {
                 return $file->getData('chapterId') == $chapterId;
             }

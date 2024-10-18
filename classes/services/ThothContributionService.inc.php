@@ -8,10 +8,13 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothContributionService
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief Helper class that encapsulates business logic for Thoth contributions
  */
+
+use APP\facades\Repo;
 
 import('plugins.generic.thoth.classes.facades.ThothService');
 import('plugins.generic.thoth.lib.thothAPI.models.ThothContribution');
@@ -86,11 +89,11 @@ class ThothContributionService
 
     public function updateContributions($thothClient, $thothContributions, $publication, $thothWorkId)
     {
-        $authors = DAORegistry::getDAO('AuthorDAO')->getByPublicationId($publication->getId());
+        $authors = $publication->getData('authors');
 
         $publicationContributions = array_map(function ($author) {
             return $this->getDataByAuthor($author);
-        }, $authors);
+        }, $authors->toArray());
         foreach ($thothContributions as $thothContribution) {
             if (!$this->contributionInList($thothContribution, $publicationContributions)) {
                 $thothClient->deleteContribution($thothContribution['contributionId']);
@@ -124,7 +127,7 @@ class ThothContributionService
             return (bool) $author->getPrimaryContact();
         }
 
-        $publication = Services::get('publication')->get($author->getData('publicationId'));
+        $publication = Repo::publication()->get($author->getData('publicationId'));
         return $publication->getData('primaryContactId') == $author->getId();
     }
 
