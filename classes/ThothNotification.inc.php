@@ -22,15 +22,26 @@ class ThothNotification
         $this->plugin = $plugin;
     }
 
-    public static function notify($request, $notificationType, $message)
+    public static function notify($request, $submission, $notificationType, $messageKey, $error = null)
     {
         $currentUser = $request->getUser();
         $notificationMgr = new NotificationManager();
         $notificationMgr->createTrivialNotification(
             $currentUser->getId(),
             $notificationType,
-            ['contents' => $message]
+            ['contents' => __($messageKey)]
         );
+
+        import('lib.pkp.classes.log.SubmissionLog');
+        import('classes.log.SubmissionEventLogEntry');
+        SubmissionLog::logEvent(
+            $request,
+            $submission,
+            SUBMISSION_LOG_TYPE_DEFAULT,
+            $messageKey . '.log',
+            ['reason' => $error]
+        );
+
         return new JSONMessage(false);
     }
 
