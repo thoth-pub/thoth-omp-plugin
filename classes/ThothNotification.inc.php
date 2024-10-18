@@ -15,8 +15,10 @@
  */
 
 use APP\core\Application;
+use APP\facades\Repo;
 use APP\notification\NotificationManager;
 use PKP\core\JSONMessage;
+use PKP\log\event\PKPSubmissionEventLogEntry;
 
 class ThothNotification
 {
@@ -27,7 +29,7 @@ class ThothNotification
         $this->plugin = $plugin;
     }
 
-    public static function notify($request, $notificationType, $message)
+    public static function notify($request, $submission, $notificationType, $message, $logMessage)
     {
         $currentUser = $request->getUser();
         $notificationMgr = new NotificationManager();
@@ -36,6 +38,18 @@ class ThothNotification
             $notificationType,
             ['contents' => $message]
         );
+
+        $eventLog = Repo::eventLog()->newDataObject([
+            'assocType' => Application::ASSOC_TYPE_SUBMISSION,
+            'assocId' => $submission->getId(),
+            'eventType' => PKPSubmissionEventLogEntry::SUBMISSION_LOG_CREATE_VERSION,
+            'userId' => $currentUser->getId(),
+            'message' => $logMessage,
+            'isTranslated' => true,
+            'dateLogged' => Core::getCurrentDate(),
+        ]);
+        Repo::eventLog()->add($eventLog);
+
         return new JSONMessage(false);
     }
 
