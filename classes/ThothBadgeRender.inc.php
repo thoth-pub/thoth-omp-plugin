@@ -8,10 +8,13 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothBadgeRender
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief Manage callback functions render Thoth badge in Workflow page
  */
+
+use APP\core\Application;
 
 class ThothBadgeRender
 {
@@ -40,7 +43,7 @@ class ThothBadgeRender
             ]
         );
 
-        $templateMgr->registerFilter("output", array($this, 'thothBadgeFilter'));
+        $templateMgr->registerFilter('output', [$this, 'thothBadgeFilter']);
 
         return false;
     }
@@ -55,7 +58,7 @@ class ThothBadgeRender
             $newOutput .= $templateMgr->fetch($this->plugin->getTemplateResource('thothBadge.tpl'));
             $newOutput .= substr($output, $offset + strlen($match));
             $output = $newOutput;
-            $templateMgr->unregisterFilter('output', array($this, 'thothBadgeFilter'));
+            $templateMgr->unregisterFilter('output', [$this, 'thothBadgeFilter']);
         }
         return $output;
     }

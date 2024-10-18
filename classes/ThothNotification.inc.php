@@ -8,10 +8,15 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothNotification
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief Manage function to display plugin notifications
  */
+
+use APP\core\Application;
+use APP\notification\NotificationManager;
+use PKP\core\JSONMessage;
 
 class ThothNotification
 {
