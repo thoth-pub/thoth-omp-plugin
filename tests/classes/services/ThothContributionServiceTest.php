@@ -8,15 +8,18 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothContributionServiceTest
+ *
  * @ingroup plugins_generic_thoth_tests
+ *
  * @see ThothContributionService
  *
  * @brief Test class for the ThothContributionService class
  */
 
-import('lib.pkp.tests.PKPTestCase');
-import('classes.monograph.Author');
-import('classes.publication.Publication');
+use APP\publication\Repository as PublicationRepository;
+use PKP\tests\PKPTestCase;
+use PKP\userGroup\Repository as UserGroupRepository;
+
 import('plugins.generic.thoth.classes.services.ThothContributionService');
 import('plugins.generic.thoth.lib.thothAPI.ThothClient');
 
@@ -35,38 +38,45 @@ class ThothContributionServiceTest extends PKPTestCase
         parent::tearDown();
     }
 
-    protected function getMockedDAOs()
+    protected function getMockedContainerKeys(): array
     {
-        return ['UserGroupDAO', 'PublicationDAO'];
+        return [...parent::getMockedContainerKeys(), UserGroupRepository::class, PublicationRepository::class];
     }
 
     private function setUpMockEnvironment()
     {
-        $userGroupMockDao = $this->getMockBuilder(UserGroupDAO::class)
-            ->setMethods(['getById'])
+        $userGroupRepoMock = Mockery::mock(app(UserGroupRepository::class))
+            ->makePartial()
+            ->shouldReceive('get')
+            ->withAnyArgs()
+            ->andReturn(
+                Mockery::mock(\PKP\userGroup\UserGroup::class)
+                    ->shouldReceive([
+                        'getId' => 1
+                    ])
+                    ->shouldReceive('getData')
+                    ->with('nameLocaleKey')
+                    ->andReturn('default.groups.name.author')
+                    ->getMock()
+            )
             ->getMock();
 
-        $userGroup = new UserGroup();
-        $userGroup->setData('nameLocaleKey', 'default.groups.name.author');
+        app()->instance(UserGroupRepository::class, $userGroupRepoMock);
 
-        $userGroupMockDao->expects($this->any())
-            ->method('getById')
-            ->will($this->returnValue($userGroup));
-
-        DAORegistry::registerDAO('UserGroupDAO', $userGroupMockDao);
-
-        $publicationMockDao = $this->getMockBuilder(PublicationDAO::class)
-            ->setMethods(['getById'])
+        $publicationRepoMock = Mockery::mock(app(PublicationRepository::class))
+            ->makePartial()
+            ->shouldReceive('get')
+            ->withAnyArgs()
+            ->andReturn(
+                Mockery::mock(\APP\publication\Publication::class)
+                    ->shouldReceive('getData')
+                    ->with('primaryContactId')
+                    ->andReturn(1)
+                    ->getMock()
+            )
             ->getMock();
 
-        $publication = new Publication();
-        $publication->setData('primaryContactId', 7);
-
-        $publicationMockDao->expects($this->any())
-            ->method('getById')
-            ->will($this->returnValue($publication));
-
-        DAORegistry::registerDAO('PublicationDAO', $publicationMockDao);
+        app()->instance(PublicationRepository::class, $publicationRepoMock);
     }
 
     public function testGettingContributionTypeByUserGroupLocaleKey()
@@ -91,6 +101,26 @@ class ThothContributionServiceTest extends PKPTestCase
 
     public function testCreateNewContributionByAuthor()
     {
+        $authorMock = Mockery::mock(\APP\author\Author::class)
+            ->makePartial()
+            ->shouldReceive([
+                'getId' => 1,
+                'getUserGroupId' => 1,
+                'getSequence' => 0,
+                'getLocalizedGivenName' => 'Reza',
+                'getFullName' => 'Reza Negarestani',
+                'getLocalizedBiography' => 'Reza Negarestani is a philosopher. His current philosophical project ' .
+                    'is focused on rationalist universalism beginning with the evolution of the modern system of ' .
+                    'knowledge and advancing toward contemporary philosophies of rationalism.',
+            ])
+            ->shouldReceive('getLocalizedData')
+            ->with('familyName')
+            ->andReturn('Negarestani')
+            ->shouldReceive('getData')
+            ->with('publicationId')
+            ->andReturn(1)
+            ->getMock();
+
         $expectedContribution = new ThothContribution();
         $expectedContribution->setContributionType(ThothContribution::CONTRIBUTION_TYPE_AUTHOR);
         $expectedContribution->setMainContribution(true);
@@ -104,20 +134,7 @@ class ThothContributionServiceTest extends PKPTestCase
             'advancing toward contemporary philosophies of rationalism.'
         );
 
-        $author = new Author();
-        $author->setId(7);
-        $author->setGivenName('Reza', 'en_US');
-        $author->setFamilyName('Negarestani', 'en_US');
-        $author->setSequence(0);
-        $author->setUserGroupId(2);
-        $author->setBiography(
-            'Reza Negarestani is a philosopher. His current philosophical project is focused on rationalist ' .
-            'universalism beginning with the evolution of the modern system of knowledge and ' .
-            'advancing toward contemporary philosophies of rationalism.',
-            'en_US'
-        );
-
-        $contribution = $this->contributionService->newByAuthor($author);
+        $contribution = $this->contributionService->newByAuthor($authorMock);
         $this->assertEquals($expectedContribution, $contribution);
     }
 
@@ -155,19 +172,22 @@ class ThothContributionServiceTest extends PKPTestCase
         $expectedContribution->setLastName('Wilson');
         $expectedContribution->setFullName('Michael Wilson');
 
-        $userGroup = new UserGroup();
-        $userGroup->setData('nameLocaleKey', 'default.groups.name.author');
-
-        $author = $this->getMockBuilder(Author::class)
-            ->setMethods(['getUserGroup'])
+        $authorMock = Mockery::mock(\APP\author\Author::class)
+            ->makePartial()
+            ->shouldReceive([
+                'getId' => 2,
+                'getUserGroupId' => 4,
+                'getSequence' => 0,
+                'getLocalizedGivenName' => 'Michael',
+                'getFullName' => 'Michael Wilson',
+            ])
+            ->shouldReceive('getLocalizedData')
+            ->with('familyName')
+            ->andReturn('Wilson')
+            ->shouldReceive('getData')
+            ->with('publicationId')
+            ->andReturn(1)
             ->getMock();
-        $author->expects($this->any())
-            ->method('getUserGroup')
-            ->will($this->returnValue($userGroup));
-        $author->setId(13);
-        $author->setGivenName('Michael', 'en_US');
-        $author->setFamilyName('Wilson', 'en_US');
-        $author->setSequence(0);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
             ->setMethods(['createContribution','contributors'])
@@ -185,7 +205,11 @@ class ThothContributionServiceTest extends PKPTestCase
                 ]
             ]));
 
-        $contribution = $this->contributionService->register($mockThothClient, $author, '45a6622c-a306-4559-bb77-25367dc881b8');
+        $contribution = $this->contributionService->register(
+            $mockThothClient,
+            $authorMock,
+            '45a6622c-a306-4559-bb77-25367dc881b8'
+        );
         $this->assertEquals($expectedContribution, $contribution);
     }
 }

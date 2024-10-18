@@ -8,10 +8,15 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothReferenceService
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief Helper class that encapsulates business logic for Thoth references
  */
+
+use APP\facades\Repo;
+use PKP\citation\Citation;
+use PKP\citation\CitationListTokenizerFilter;
 
 import('lib.pkp.classes.citation.Citation');
 import('lib.pkp.classes.citation.CitationListTokenizerFilter');
@@ -50,7 +55,7 @@ class ThothReferenceService
 
     public function updateReferences($thothClient, $thothReferences, $publication, $thothWorkId)
     {
-        $oldPublication = Services::get('publication')->get($publication->getId());
+        $oldPublication = Repo::publication()->get($publication->getId());
 
         if ($publication->getData('citationsRaw') == $oldPublication->getData('citationsRaw')) {
             return;

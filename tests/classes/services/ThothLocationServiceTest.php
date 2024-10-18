@@ -8,19 +8,20 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothLocationServiceTest
+ *
  * @ingroup plugins_generic_thoth_tests
+ *
  * @see ThothLocationService
  *
  * @brief Test class for the ThothLocationService class
  */
 
-import('classes.core.Application');
-import('classes.press.Press');
-import('classes.submission.Submission');
-import('classes.publication.Publication');
-import('lib.pkp.classes.core.Dispatcher');
-import('lib.pkp.classes.core.PKPRequest');
-import('lib.pkp.tests.PKPTestCase');
+use APP\core\Application;
+use PKP\core\Dispatcher;
+use PKP\core\PKPRequest;
+use PKP\core\Registry;
+use PKP\tests\PKPTestCase;
+
 import('plugins.generic.thoth.classes.services.ThothLocationService');
 import('plugins.generic.thoth.lib.thothAPI.ThothClient');
 
@@ -39,22 +40,21 @@ class ThothLocationServiceTest extends PKPTestCase
         parent::tearDown();
     }
 
-    protected function getMockedRegistryKeys()
+    protected function getMockedRegistryKeys(): array
     {
         return ['application', 'request'];
     }
 
-    protected function getMockedDAOs()
-    {
-        return ['SubmissionDAO'];
-    }
-
     private function setUpMockEnvironment()
     {
-        $press = new Press();
-        $press->setId(2);
-        $press->setPrimaryLocale('en_US');
-        $press->setPath('press');
+        $pressMock = Mockery::mock(\APP\press\Press::class)
+            ->makePartial()
+            ->shouldReceive([
+                'getId' => 2,
+                'getPrimaryLocale' => 'en',
+                'getPath' => 'press'
+            ])
+            ->getMock();
 
         $mockApplication = $this->getMockBuilder(Application::class)
             ->setMethods(['getContextDepth', 'getContextList'])
@@ -83,28 +83,8 @@ class ThothLocationServiceTest extends PKPTestCase
         $mockRequest->setDispatcher($mockDispatcher);
         $mockRequest->expects($this->any())
             ->method('getContext')
-            ->will($this->returnValue($press));
+            ->will($this->returnValue($pressMock));
         Registry::set('request', $mockRequest);
-
-        $submissionDaoMock = $this->getMockBuilder(SubmissionDAO::class)
-            ->setMethods(['getById'])
-            ->getMock();
-        $submission = new Submission();
-        $submission->setId(23);
-        $submissionDaoMock->expects($this->any())
-            ->method('getById')
-            ->will($this->returnValue($submission));
-        DAORegistry::registerDAO('SubmissionDAO', $submissionDaoMock);
-
-        $publicationDaoMock = $this->getMockBuilder(PublicationDAO::class)
-            ->setMethods(['getById'])
-            ->getMock();
-        $publication = new Publication();
-        $publication->setId(23);
-        $publicationDaoMock->expects($this->any())
-            ->method('getById')
-            ->will($this->returnValue($publication));
-        DAORegistry::registerDAO('PublicationDAO', $publicationDaoMock);
     }
 
     public function testCreateNewLocationByPublicationFormat()
@@ -114,10 +94,14 @@ class ThothLocationServiceTest extends PKPTestCase
         $expectedLocation->setFullTextUrl('https://omp.publicknowledgeproject.org/press/catalog/view/23/5/17');
         $expectedLocation->setLocationPlatform(ThothLocation::LOCATION_PLATFORM_OTHER);
 
-        $publicationFormat = DAORegistry::getDAO('PublicationFormatDAO')->newDataObject();
-        $publicationFormat->setId(5);
+        $publicationFormatMock = Mockery::mock(\APP\publicationFormat\PublicationFormat::class)
+            ->makePartial()
+            ->shouldReceive('getData')
+            ->with('publicationId')
+            ->andReturn(1)
+            ->getMock();
 
-        $location = $this->locationService->newByPublicationFormat($publicationFormat, 17);
+        $location = $this->locationService->newByPublicationFormat($publicationFormatMock, 17);
 
         $this->assertEquals($expectedLocation, $location);
     }
@@ -150,9 +134,18 @@ class ThothLocationServiceTest extends PKPTestCase
         $expectedLocation->setLocationPlatform(ThothLocation::LOCATION_PLATFORM_OTHER);
         $expectedLocation->setCanonical(true);
 
-        $publicationFormat = DAORegistry::getDAO('PublicationFormatDAO')->newDataObject();
-        $publicationFormat->setId(41);
-        $publicationFormat->setRemoteUrl('https://www.bookstore.com/site/books/book5');
+        $publicationFormatMock = Mockery::mock(\APP\publicationFormat\PublicationFormat::class)
+            ->makePartial()
+            ->shouldReceive('getId')
+            ->withAnyArgs()
+            ->andReturn(1)
+            ->shouldReceive('getData')
+            ->with('publicationId')
+            ->andReturn(1)
+            ->shouldReceive('getRemoteUrl')
+            ->with()
+            ->andReturn('https://www.bookstore.com/site/books/book5')
+            ->getMock();
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
             ->setMethods([
@@ -163,7 +156,7 @@ class ThothLocationServiceTest extends PKPTestCase
             ->method('createLocation')
             ->will($this->returnValue('03b0367d-bba3-4e26-846a-4c36d3920db2'));
 
-        $location = $this->locationService->register($mockThothClient, $publicationFormat, $thothPublicationId);
+        $location = $this->locationService->register($mockThothClient, $publicationFormatMock, $thothPublicationId);
         $this->assertEquals($expectedLocation, $location);
     }
 }

@@ -9,6 +9,7 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class RegisterForm
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief A preset form for confirming a publication's issue before publishing.
@@ -16,9 +17,9 @@
  *   publication.
  */
 
-use PKP\components\forms\FormComponent;
 use PKP\components\forms\FieldHTML;
 use PKP\components\forms\FieldSelect;
+use PKP\components\forms\FormComponent;
 
 class RegisterForm extends FormComponent
 {
@@ -68,9 +69,9 @@ class RegisterForm extends FormComponent
         ]);
 
         $this->addGroup([
-                'id' => 'default',
-                'pageId' => 'default',
-            ])
+            'id' => 'default',
+            'pageId' => 'default',
+        ])
             ->addField(new FieldHTML('validation', [
                 'description' => $msg,
                 'groupId' => 'default',

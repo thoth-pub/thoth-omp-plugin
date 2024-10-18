@@ -8,10 +8,14 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothUpdater
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief Manage callback functions to update works in Thoth
  */
+
+use APP\facades\Repo;
+use APP\notification\Notification;
 
 import('plugins.generic.thoth.classes.facades.ThothService');
 
@@ -29,7 +33,7 @@ class ThothUpdater
         $publication = $args[0];
         $request = $args[3];
 
-        $submission = Services::get('submission')->get($publication->getData('submissionId'));
+        $submission = Repo::submission()->get($publication->getData('submissionId'));
         $thothWorkId = $submission->getData('thothWorkId');
 
         if (!$thothWorkId) {
@@ -42,14 +46,14 @@ class ThothUpdater
 
             ThothNotification::notify(
                 $request,
-                NOTIFICATION_TYPE_SUCCESS,
+                Notification::NOTIFICATION_TYPE_SUCCESS,
                 __('plugins.generic.thoth.update.success')
             );
         } catch (ThothException $e) {
             error_log($e->getMessage());
             ThothNotification::notify(
                 $request,
-                NOTIFICATION_TYPE_ERROR,
+                Notification::NOTIFICATION_TYPE_ERROR,
                 __('plugins.generic.thoth.update.error')
             );
         }

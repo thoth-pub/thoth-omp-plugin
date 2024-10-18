@@ -10,13 +10,18 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothSettingsForm
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief Form for managers to modify Thoth plugin settings
  */
 
-import('lib.pkp.classes.form.Form');
-import('plugins.generic.thoth.lib.APIKeyEncryption.APIKeyEncryption');
+use APP\plugins\generic\thoth\classes\APIKeyEncryption;
+use PKP\form\Form;
+use PKP\form\validation\FormValidatorCSRF;
+use PKP\form\validation\FormValidatorCustom;
+use PKP\form\validation\FormValidatorPost;
+
 import('plugins.generic.thoth.lib.thothAPI.ThothClient');
 
 class ThothSettingsForm extends Form

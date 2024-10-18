@@ -8,10 +8,13 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothSubjectService
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief Helper class that encapsulates business logic for Thoth subjects
  */
+
+use APP\facades\Repo;
 
 import('plugins.generic.thoth.lib.thothAPI.models.ThothSubject');
 
@@ -45,7 +48,7 @@ class ThothSubjectService
 
     public function updateKeywords($thothClient, $thothKeywords, $publication, $thothWorkId)
     {
-        $submission = Services::get('submission')->get($publication->getData('submissionId'));
+        $submission = Repo::submission()->get($publication->getData('submissionId'));
         $locale = $submission->getLocale();
 
         $keywords = $publication->getData('keywords');

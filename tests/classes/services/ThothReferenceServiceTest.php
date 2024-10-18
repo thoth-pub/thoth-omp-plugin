@@ -8,13 +8,17 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothReferenceServiceTest
+ *
  * @ingroup plugins_generic_thoth_tests
+ *
  * @see ThothReferenceService
  *
  * @brief Test class for the ThothReferenceService class
  */
 
-import('lib.pkp.tests.PKPTestCase');
+use PKP\db\DAORegistry;
+use PKP\tests\PKPTestCase;
+
 import('plugins.generic.thoth.classes.services.ThothReferenceService');
 
 class ThothReferenceServiceTest extends PKPTestCase

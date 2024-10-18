@@ -8,13 +8,16 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothAffiliationServiceTest
+ *
  * @ingroup plugins_generic_thoth_tests
+ *
  * @see ThothAffiliationService
  *
  * @brief Test class for the ThothAffiliationService class
  */
 
-import('lib.pkp.tests.PKPTestCase');
+use PKP\tests\PKPTestCase;
+
 import('plugins.generic.thoth.classes.services.ThothAffiliationService');
 import('plugins.generic.thoth.lib.thothAPI.models.ThothAffiliation');
 import('plugins.generic.thoth.lib.thothAPI.ThothClient');
@@ -33,7 +36,7 @@ class ThothAffiliationServiceTest extends PKPTestCase
         parent::tearDown();
     }
 
-    public function testeCreateNewAffiliation()
+    public function testCreateNewAffiliation()
     {
         $expectedThothAffiliation = new ThothAffiliation();
         $expectedThothAffiliation->setId('42d407e2-fd07-4c45-853d-74ddfc0a02a8');
@@ -48,7 +51,7 @@ class ThothAffiliationServiceTest extends PKPTestCase
             'affiliationOrdinal' => 1,
         ];
 
-        $thothAffiliation  = $this->affiliationService->new($params);
+        $thothAffiliation = $this->affiliationService->new($params);
 
         $this->assertEquals($expectedThothAffiliation, $thothAffiliation);
     }

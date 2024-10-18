@@ -50,8 +50,9 @@
         );
 
         $.ajax({
-            method: 'PUT',
             url: url,
+            method: 'PUT',
+            data: {id: publicationId},
             headers: {
                 'X-Csrf-Token': pkp.currentUser.csrfToken,
                 'X-Http-Method-Override': 'PUT'
