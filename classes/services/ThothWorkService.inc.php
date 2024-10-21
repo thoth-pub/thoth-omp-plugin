@@ -46,7 +46,9 @@ class ThothWorkService
         $data['subtitle'] = $publication->getLocalizedData('subtitle');
         $data['longAbstract'] = $publication->getLocalizedData('abstract');
         $data['edition'] = $publication->getData('version');
-        $data['doi'] = $publication->getData('doiObject')?->getResolvingUrl();
+        $data['doi'] = $publication->getData('doiObject')
+            ? $publication->getData('doiObject')->getResolvingUrl()
+            : null;
         $data['publicationDate'] = $publication->getData('datePublished');
         $data['license'] = $publication->getData('licenseUrl');
         $data['copyrightHolder'] = $publication->getLocalizedData('copyrightHolder');
@@ -80,7 +82,9 @@ class ThothWorkService
         $params['pageCount'] = $chapter->getPages() ? (int) $chapter->getPages() : null;
         $params['publicationDate'] = $chapter->getDatePublished() ??
             Repo::publication()->get($chapter->getData('publicationId'))->getData('datePublished');
-        $params['doi'] = $chapter->getData('doiObject')?->getResolvingUrl();
+        $params['doi'] = $chapter->getData('doiObject')
+            ? $chapter->getData('doiObject')->getResolvingUrl()
+            : null;
 
         return $this->new($params);
     }
