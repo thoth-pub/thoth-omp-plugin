@@ -22,7 +22,7 @@ This is required to use the API credentials provided, that are stored encrypted 
 
 ## Installation
 
-1. Download the latest version of the installation package (`thoth.tar.gz`) from the [Release page](https://github.com/lepidus/thoth-omp-plugin/releases).
+1. Download the latest version of the installation package (`thoth.tar.gz`) from the [Release page](https://github.com/thoth-pub/thoth-omp-plugin/releases).
 
 2. Access the administration area of your OMP website through the Dashboard. Navigate to `Settings` > `Website` > `Plugins` > `Upload a new plugin`, and select the `thoth.tar.gz` file.
 

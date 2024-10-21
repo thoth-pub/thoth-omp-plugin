@@ -42,15 +42,18 @@ class ThothUpdater
 
             ThothNotification::notify(
                 $request,
+                $submission,
                 NOTIFICATION_TYPE_SUCCESS,
-                __('plugins.generic.thoth.update.success')
+                'plugins.generic.thoth.update.success'
             );
         } catch (ThothException $e) {
             error_log($e->getMessage());
             ThothNotification::notify(
                 $request,
+                $submission,
                 NOTIFICATION_TYPE_ERROR,
-                __('plugins.generic.thoth.update.error')
+                'plugins.generic.thoth.update.error',
+                $e->getError()
             );
         }
 
