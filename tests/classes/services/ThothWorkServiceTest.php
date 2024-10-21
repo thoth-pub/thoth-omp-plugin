@@ -227,9 +227,16 @@ class ThothWorkServiceTest extends PKPTestCase
                     ->shouldReceive('getData')
                     ->with('licenseUrl')
                     ->andReturn('https://creativecommons.org/licenses/by-nc/4.0/')
-                    ->shouldReceive('getDoi')
-                    ->withAnyArgs()
-                    ->andReturn('https://doi.org/10.1234/0000af0000')
+                    ->shouldReceive('getData')
+                    ->with('doiObject')
+                    ->andReturn(
+                        Mockery::mock(\PKP\doi\Doi::class)
+                            ->makePartial()
+                            ->shouldReceive('getResolvingUrl')
+                            ->withAnyArgs()
+                            ->andReturn('https://doi.org/10.1234/0000af0000')
+                            ->getMock()
+                    )
                     ->getMock()
             )
             ->getMock();
@@ -264,10 +271,17 @@ class ThothWorkServiceTest extends PKPTestCase
             ->andReturn('2024-03-21')
             ->shouldReceive('getPages')
             ->withAnyArgs()
-            ->andReturn(27)
-            ->shouldReceive('getDoi')
-            ->withAnyArgs()
-            ->andReturn('https://doi.org/10.1234/jpk.14.c54')
+            ->andReturn('27')
+            ->shouldReceive('getData')
+            ->with('doiObject')
+            ->andReturn(
+                Mockery::mock(\PKP\doi\Doi::class)
+                    ->makePartial()
+                    ->shouldReceive('getResolvingUrl')
+                    ->withAnyArgs()
+                    ->andReturn('https://doi.org/10.1234/jpk.14.c54')
+                    ->getMock()
+            )
             ->getMock();
 
         $thothWork = $this->workService->newByChapter($chapterMock);
