@@ -35,6 +35,7 @@ class ThothPlugin extends GenericPlugin
         if ($success && $this->getEnabled()) {
             $thothRegister = new ThothRegister($this);
             HookRegistry::register('Schema::get::submission', [$thothRegister, 'addWorkIdToSchema']);
+            HookRegistry::register('Schema::get::eventLog', [$thothRegister, 'addReasonToSchema']);
             HookRegistry::register('Form::config::before', [$thothRegister, 'addImprintField']);
             HookRegistry::register('Publication::validatePublish', [$thothRegister, 'validateRegister']);
             HookRegistry::register('TemplateManager::display', [$thothRegister, 'addResources']);

@@ -29,14 +29,14 @@ class ThothNotification
         $this->plugin = $plugin;
     }
 
-    public static function notify($request, $submission, $notificationType, $message, $logMessage)
+    public static function notify($request, $submission, $notificationType, $messageKey, $error = null)
     {
         $currentUser = $request->getUser();
         $notificationMgr = new NotificationManager();
         $notificationMgr->createTrivialNotification(
             $currentUser->getId(),
             $notificationType,
-            ['contents' => $message]
+            ['contents' => __($messageKey)]
         );
 
         $eventLog = Repo::eventLog()->newDataObject([
@@ -44,9 +44,10 @@ class ThothNotification
             'assocId' => $submission->getId(),
             'eventType' => PKPSubmissionEventLogEntry::SUBMISSION_LOG_CREATE_VERSION,
             'userId' => $currentUser->getId(),
-            'message' => $logMessage,
-            'isTranslated' => true,
-            'dateLogged' => Core::getCurrentDate(),
+            'message' => $messageKey . '.log',
+            'isTranslated' => false,
+            'reason' => $error,
+            'dateLogged' => Core::getCurrentDate()
         ]);
         Repo::eventLog()->add($eventLog);
 
