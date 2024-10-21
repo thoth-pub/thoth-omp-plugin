@@ -22,7 +22,7 @@ Isso é necessário para usar as credenciais da API fornecidas, que são armazen
 
 ## Instalação
 
-1. Baixe a versão mais recente do pacote de instalação (`thoth.tar.gz`) na [página de lançamentos](https://github.com/lepidus/thoth-omp-plugin/releases).
+1. Baixe a versão mais recente do pacote de instalação (`thoth.tar.gz`) na [página de lançamentos](https://github.com/thoth-pub/thoth-omp-plugin/releases).
 
 2. Acesse a área de administração do seu site OMP através do Dashboard. Navegue até `Configurações` > `Site` > `Plugins` > `Enviar um novo plugin` e selecione o arquivo `thoth.tar.gz`.
 
