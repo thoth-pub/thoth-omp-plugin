@@ -41,6 +41,17 @@ class ThothRegister
         return false;
     }
 
+    public function addReasonToSchema($hookName, $args)
+    {
+        $schema = & $args[0];
+        $schema->properties->{'reason'} = (object) [
+            'type' => 'string',
+            'apiSummary' => true,
+            'validation' => ['nullable'],
+        ];
+        return false;
+    }
+
     public function addImprintField($hookName, $form)
     {
 
@@ -184,8 +195,7 @@ class ThothRegister
                 $request,
                 $submission,
                 Notification::NOTIFICATION_TYPE_SUCCESS,
-                __('plugins.generic.thoth.register.success'),
-                __('plugins.generic.thoth.log.register.success')
+                'plugins.generic.thoth.register.success'
             );
         } catch (ThothException $e) {
             error_log($e->getMessage());
@@ -193,8 +203,8 @@ class ThothRegister
                 $request,
                 $submission,
                 Notification::NOTIFICATION_TYPE_ERROR,
-                __('plugins.generic.thoth.register.error'),
-                __('plugins.generic.thoth.log.register.error', ['reason' => $e->getError()])
+                'plugins.generic.thoth.register.error',
+                $e->getError()
             );
         }
     }
