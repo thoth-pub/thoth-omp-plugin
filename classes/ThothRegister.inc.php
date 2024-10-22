@@ -53,7 +53,7 @@ class ThothRegister
             $publishers = $thothClient->linkedPublishers();
             $imprints = $thothClient->imprints(['publishers' => array_column($publishers, 'publisherId')]);
 
-            $imprintOptions = [['value' => '', 'label' => '']];
+            $imprintOptions = [];
             foreach ($imprints as $imprint) {
                 $imprintOptions[] = [
                     'value' => $imprint['imprintId'],
@@ -74,7 +74,8 @@ class ThothRegister
                 'options' => $imprintOptions,
                 'required' => true,
                 'showWhen' => 'registerConfirmation',
-                'groupId' => 'default'
+                'groupId' => 'default',
+                'value' => $imprints[0]['imprintId'] ?? null
             ]));
         } catch (ThothException $e) {
             $warningIconHtml = '<span class="fa fa-exclamation-triangle pkpIcon--inline"></span>';

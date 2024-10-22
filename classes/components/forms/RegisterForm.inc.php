@@ -16,9 +16,9 @@
  *   publication.
  */
 
-use PKP\components\forms\FormComponent;
 use PKP\components\forms\FieldHTML;
 use PKP\components\forms\FieldSelect;
+use PKP\components\forms\FormComponent;
 
 class RegisterForm extends FormComponent
 {
@@ -50,7 +50,7 @@ class RegisterForm extends FormComponent
             return;
         }
 
-        $imprintOptions = [['value' => '', 'label' => '']];
+        $imprintOptions = [];
         foreach ($imprints as $imprint) {
             $imprintOptions[] = [
                 'value' => $imprint['imprintId'],
@@ -79,7 +79,8 @@ class RegisterForm extends FormComponent
                 'label' => __('plugins.generic.thoth.imprint'),
                 'options' => $imprintOptions,
                 'required' => true,
-                'groupId' => 'default'
+                'groupId' => 'default',
+                'value' => $imprints[0]['imprintId'] ?? null
             ]));
     }
 
