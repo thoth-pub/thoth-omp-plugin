@@ -185,7 +185,7 @@ class ThothWorkServiceTest extends PKPTestCase
         );
         $publication->setData(
             'pub-id::doi',
-            'https://doi.org/10.1234/0000af0000'
+            '10.1234/0000af0000'
         );
         $publication->setData(
             'datePublished',
@@ -236,7 +236,7 @@ class ThothWorkServiceTest extends PKPTestCase
         $chapter->setTitle('Chapter 1: Interactions Affording Distance Science Education', 'en_US');
         $chapter->setDatePublished('2024-03-21');
         $chapter->setPages(27);
-        $chapter->setStoredPubId('doi', 'https://doi.org/10.1234/jpk.14.c54');
+        $chapter->setStoredPubId('doi', '10.1234/jpk.14.c54');
 
         $thothWork = $this->workService->newByChapter($chapter);
         $this->assertEquals($expectedThothWork, $thothWork);
