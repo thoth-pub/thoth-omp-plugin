@@ -25,6 +25,19 @@ class ThothWorkService
         return new ThothWorkQueryBuilder($thothClient);
     }
 
+    private function getDoiResolvingUrl($doi)
+    {
+        if (empty($doi)) {
+            return $doi;
+        }
+
+        $search = ['%', '"', '#', ' ', '<', '>', '{'];
+        $replace = ['%25', '%22', '%23', '%20', '%3c', '%3e', '%7b'];
+        $encodedDoi = str_replace($search, $replace, $doi);
+
+        return "https://doi.org/$encodedDoi";
+    }
+
     public function getDataBySubmission($submission, $publication = null)
     {
         $request = Application::get()->getRequest();
@@ -40,7 +53,7 @@ class ThothWorkService
         $data['subtitle'] = $publication->getLocalizedData('subtitle');
         $data['longAbstract'] = $publication->getLocalizedData('abstract');
         $data['edition'] = $publication->getData('version');
-        $data['doi'] = $publication->getStoredPubId('doi');
+        $data['doi'] = $this->getDoiResolvingUrl($publication->getStoredPubId('doi'));
         $data['publicationDate'] = $publication->getData('datePublished');
         $data['license'] = $publication->getData('licenseUrl');
         $data['copyrightHolder'] = $publication->getLocalizedData('copyrightHolder');
@@ -74,7 +87,7 @@ class ThothWorkService
         $params['pageCount'] = $chapter->getPages();
         $params['publicationDate'] = $chapter->getDatePublished() ??
             Services::get('publication')->get($chapter->getData('publicationId'))->getData('datePublished');
-        $params['doi'] = $chapter->getStoredPubId('doi');
+        $params['doi'] = $this->getDoiResolvingUrl($chapter->getStoredPubId('doi'));
 
         return $this->new($params);
     }
