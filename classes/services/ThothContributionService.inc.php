@@ -25,6 +25,9 @@ class ThothContributionService
     public function new($params)
     {
         $contribution = new ThothContribution();
+        $contribution->setId($params['contributionId'] ?? null);
+        $contribution->setWorkId($params['workId'] ?? null);
+        $contribution->setContributorId($params['contributorId'] ?? null);
         $contribution->setContributionType($params['contributionType']);
         $contribution->setMainContribution($params['mainContribution']);
         $contribution->setContributionOrdinal($params['contributionOrdinal']);
@@ -51,7 +54,7 @@ class ThothContributionService
         $data['firstName'] = $author->getLocalizedGivenName();
         $data['lastName'] = $author->getLocalizedData('familyName');
         $data['fullName'] = $author->getFullName(false);
-        $data['biography'] = $author->getLocalizedBiography();
+        $data['biography'] = strip_tags($author->getLocalizedBiography());
         return $data;
     }
 
@@ -102,8 +105,13 @@ class ThothContributionService
 
         foreach ($authors as $author) {
             $publicationContribution = $this->getDataByAuthor($author);
-            if (!$this->contributionInList($publicationContribution, $thothContributions)) {
+            if (!$thothContribution = $this->contributionInList($publicationContribution, $thothContributions)) {
                 $this->register($thothClient, $author, $thothWorkId);
+                continue;
+            }
+            if ($thothContribution['biography'] !== $publicationContribution['biography']) {
+                $thothContribution['biography'] = $publicationContribution['biography'];
+                $thothClient->updateContribution($this->new($thothContribution));
             }
         }
     }
@@ -115,10 +123,10 @@ class ThothContributionService
                 $contribution['firstName'] === $targetContribution['firstName']
                 && $contribution['lastName'] === $targetContribution['lastName']
             ) {
-                return true;
+                return $contribution;
             }
         }
-        return false;
+        return null;
     }
 
     private function isMainContribution($author)
