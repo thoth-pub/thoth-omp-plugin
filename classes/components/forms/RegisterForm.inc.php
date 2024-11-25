@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file plugins/generic/thoth/classes/components/form/RegisterForm.inc.php
  *
