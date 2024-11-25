@@ -8,6 +8,7 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothClient
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief Client for Thoth's API
@@ -127,6 +128,11 @@ class ThothClient
     public function updatePublication($publication)
     {
         return $this->mutation('updatePublication', $publication);
+    }
+
+    public function updateContribution($contribution)
+    {
+        return $this->mutation('updateContribution', $contribution);
     }
 
     public function deleteWork($workId)
