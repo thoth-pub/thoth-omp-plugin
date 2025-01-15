@@ -44,6 +44,8 @@ class ThothContributionService
     {
         $userGroupLocaleKey = $author->getUserGroup()->getData('nameLocaleKey');
 
+        $allowedTags = '<b><strong><em><i><u><ul><ol><li><p><h1><h2><h3><h4><h5><h6>';
+
         $data = [];
         $data['contributionType'] = $this->getContributionTypeByUserGroupLocaleKey($userGroupLocaleKey);
         $data['mainContribution'] = $this->isMainContribution($author);
@@ -51,7 +53,7 @@ class ThothContributionService
         $data['firstName'] = $author->getLocalizedGivenName();
         $data['lastName'] = $author->getLocalizedData('familyName');
         $data['fullName'] = $author->getFullName(false);
-        $data['biography'] = strip_tags($author->getLocalizedBiography());
+        $data['biography'] = strip_tags($author->getLocalizedBiography(), $allowedTags);
         return $data;
     }
 
