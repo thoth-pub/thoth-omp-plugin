@@ -45,13 +45,15 @@ class ThothWorkService
         $context = $request->getContext();
         $publication = $publication ?? $submission->getCurrentPublication();
 
+        $allowedTags = '<b><strong><em><i><u><ul><ol><li><p><h1><h2><h3><h4><h5><h6>';
+
         $data = [];
         $data['workType'] = $this->getWorkTypeBySubmissionWorkType($submission->getData('workType'));
         $data['workStatus'] = ThothWork::WORK_STATUS_ACTIVE;
         $data['fullTitle'] = $publication->getLocalizedFullTitle();
         $data['title'] = $publication->getLocalizedTitle();
         $data['subtitle'] = $publication->getLocalizedData('subtitle');
-        $data['longAbstract'] = $publication->getLocalizedData('abstract');
+        $data['longAbstract'] = strip_tags($publication->getLocalizedData('abstract'), $allowedTags);
         $data['edition'] = $publication->getData('version');
         $data['doi'] = $this->getDoiResolvingUrl($publication->getStoredPubId('doi'));
         $data['publicationDate'] = $publication->getData('datePublished');
