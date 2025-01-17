@@ -1,0 +1,8 @@
+{
+    "require": {
+        "biblys/isbn": "~3.0"
+    },
+    "config": {
+		"vendor-dir": "lib/vendor"
+	}
+}
