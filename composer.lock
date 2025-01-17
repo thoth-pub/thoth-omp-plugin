@@ -1,0 +1,78 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "30bd5da4e33de53f4f7c5b93d76d158f",
+    "packages": [
+        {
+            "name": "biblys/isbn",
+            "version": "3.2.9",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/biblys/isbn.git",
+                "reference": "4e7d3779d35d62bd335d3c77b20fbd14d0b98560"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/biblys/isbn/zipball/4e7d3779d35d62bd335d3c77b20fbd14d0b98560",
+                "reference": "4e7d3779d35d62bd335d3c77b20fbd14d0b98560",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.2 || ^8.0"
+            },
+            "require-dev": {
+                "ext-json": "*",
+                "ext-simplexml": "*",
+                "guzzlehttp/guzzle": "^7.0",
+                "phpunit/phpunit": "^6 || ^7 || ^8 || ^11"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Biblys": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Clement Latzarus",
+                    "email": "hello@clemlatz.dev"
+                }
+            ],
+            "description": "A PHP library to convert and validate ISBNs",
+            "homepage": "https://github.com/biblys/isbn",
+            "keywords": [
+                "ISBN",
+                "book",
+                "ean",
+                "gtin"
+            ],
+            "support": {
+                "issues": "https://github.com/biblys/isbn/issues",
+                "source": "https://github.com/biblys/isbn/tree/3.2.9"
+            },
+            "funding": [
+                {
+                    "url": "https://liberapay.com/clemlatz",
+                    "type": "liberapay"
+                }
+            ],
+            "time": "2022-11-26T00:00:00+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": [],
+    "plugin-api-version": "2.6.0"
+}

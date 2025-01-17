@@ -14,6 +14,7 @@
  */
 
 import('plugins.generic.thoth.classes.facades.ThothService');
+import('plugins.generic.thoth.classes.ThothValidator');
 
 class ThothRegister
 {
@@ -35,9 +36,8 @@ class ThothRegister
         return false;
     }
 
-    public function addImprintField($hookName, $form)
+    public function addThothField($hookName, $form)
     {
-
         if ($form->id !== 'publish' || !empty($form->errors)) {
             return;
         }
@@ -48,47 +48,62 @@ class ThothRegister
             return;
         }
 
+        $errors = [];
+
         try {
             $thothClient = $this->plugin->getThothClient($submission->getData('contextId'));
             $publishers = $thothClient->linkedPublishers();
             $imprints = $thothClient->imprints(['publishers' => array_column($publishers, 'publisherId')]);
-
-            $imprintOptions = [];
-            foreach ($imprints as $imprint) {
-                $imprintOptions[] = [
-                    'value' => $imprint['imprintId'],
-                    'label' => $imprint['imprintName']
-                ];
-            }
-
-            $form->addField(new \PKP\components\forms\FieldOptions('registerConfirmation', [
-                'label' => __('plugins.generic.thoth.register.label'),
-                'options' => [
-                    ['value' => true, 'label' => __('plugins.generic.thoth.register.confirmation')]
-                ],
-                'value' => false,
-                'groupId' => 'default',
-            ]))
-            ->addField(new \PKP\components\forms\FieldSelect('imprint', [
-                'label' => __('plugins.generic.thoth.imprint'),
-                'options' => $imprintOptions,
-                'required' => true,
-                'showWhen' => 'registerConfirmation',
-                'groupId' => 'default',
-                'value' => $imprints[0]['imprintId'] ?? null
-            ]));
         } catch (ThothException $e) {
-            $warningIconHtml = '<span class="fa fa-exclamation-triangle pkpIcon--inline"></span>';
-            $noticeMsg = __('plugins.generic.thoth.connectionError');
-            $msg = '<div class="pkpNotification pkpNotification--warning">' . $warningIconHtml . $noticeMsg . '</div>';
+            $errors[] = __('plugins.generic.thoth.connectionError');
+            error_log($e->getMessage());
+        }
+
+        if (empty($errors)) {
+            $errors = ThothValidator::validate($submission);
+        }
+
+        if (!empty($errors)) {
+            $msg = '<div class="pkpNotification pkpNotification--warning">';
+            $msg .= __('plugins.generic.thoth.register.warning');
+            $msg .= '<ul>';
+            foreach ($errors as $error) {
+                $msg .= '<li>' .  $error . '</li>';
+            }
+            $msg .= '</ul></div>';
 
             $form->addField(new \PKP\components\forms\FieldHTML('registerNotice', [
                 'description' => $msg,
                 'groupId' => 'default',
             ]));
 
-            error_log($e->getMessage());
+            return false;
         }
+
+        $imprintOptions = [];
+        foreach ($imprints as $imprint) {
+            $imprintOptions[] = [
+                'value' => $imprint['imprintId'],
+                'label' => $imprint['imprintName']
+            ];
+        }
+
+        $form->addField(new \PKP\components\forms\FieldOptions('registerConfirmation', [
+            'label' => __('plugins.generic.thoth.register.label'),
+            'options' => [
+                ['value' => true, 'label' => __('plugins.generic.thoth.register.confirmation')]
+            ],
+            'value' => false,
+            'groupId' => 'default',
+        ]))
+        ->addField(new \PKP\components\forms\FieldSelect('imprint', [
+            'label' => __('plugins.generic.thoth.imprint'),
+            'options' => $imprintOptions,
+            'required' => true,
+            'showWhen' => 'registerConfirmation',
+            'groupId' => 'default',
+            'value' => $imprints[0]['imprintId'] ?? null
+        ]));
 
         return false;
     }

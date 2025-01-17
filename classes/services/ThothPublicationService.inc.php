@@ -169,33 +169,10 @@ class ThothPublicationService
         $identificationCodes = $publicationFormat->getIdentificationCodes()->toArray();
         foreach ($identificationCodes as $identificationCode) {
             if ($identificationCode->getCode() == "15" || $identificationCode->getCode() == "24") {
-                $isbn = $identificationCode->getValue();
-                return $this->convertToIsbn13($isbn);
+                return $identificationCode->getValue();
             }
         }
 
         return null;
-    }
-
-    private function convertToIsbn13($isbnString)
-    {
-        if (preg_match('/(?=.{17}$)97(?:8|9)([ -])\d{1,5}\1\d{1,7}\1\d{1,6}\1\d$/', $isbnString)) {
-            return $isbnString;
-        }
-
-        $isbnNumber = preg_replace('/\D/', '', $isbnString);
-
-        if (strlen($isbnNumber) != 13) {
-            return $isbnString;
-        }
-
-        return sprintf(
-            '%s-%s-%s-%s-%s',
-            substr($isbnNumber, 0, 3),
-            substr($isbnNumber, 3, 1),
-            substr($isbnNumber, 4, 2),
-            substr($isbnNumber, 6, 6),
-            substr($isbnNumber, 12, 1)
-        );
     }
 }
