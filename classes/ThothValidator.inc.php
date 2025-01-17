@@ -13,7 +13,7 @@
  * @brief Validate submission metadata to Thoth submit
  */
 
-require_once(__DIR__ . '/../lib/vendor/autoload.php');
+require_once(__DIR__ . '/../vendor/autoload.php');
 
 use Biblys\Isbn\Isbn;
 
