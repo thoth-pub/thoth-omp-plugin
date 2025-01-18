@@ -48,6 +48,12 @@ msgstr "Registrar"
 msgid "plugins.generic.thoth.register.label"
 msgstr "Registro em Thoth"
 
+msgid "plugins.generic.thoth.register.warning"
+msgstr "Os metadados da submissão não podem ser enviados para Thoth devido aos seguintes erros:"
+
+msgid "plugins.generic.thoth.validation.isbn"
+msgstr "\"{$isbn}\" do formato de publicação \"{$formatName}\" não é um ISBN-13 válido. Um ISBN-13 válido deve ter exatamente 17 caracteres (números e hífens)."
+
 msgid "plugins.generic.thoth.register.confirmation"
 msgstr "Deseja realmente registrar na Thoth os metadados relacionados a essa submissão?"
 
