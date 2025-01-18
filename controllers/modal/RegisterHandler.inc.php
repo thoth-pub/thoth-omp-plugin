@@ -22,6 +22,7 @@ use PKP\plugins\PluginRegistry;
 use PKP\security\Role;
 
 import('classes.handler.Handler');
+import('plugins.generic.thoth.classes.ThothValidator');
 
 class RegisterHandler extends Handler
 {
@@ -90,6 +91,8 @@ class RegisterHandler extends Handler
             $thothClient = $plugin->getThothClient($submissionContext->getId());
             $publishers = $thothClient->linkedPublishers();
             $imprints = $thothClient->imprints(['publishers' => array_column($publishers, 'publisherId')]);
+
+            $errors = array_merge(ThothValidator::validate($this->submission), $errors);
         } catch (ThothException $e) {
             $errors[] = __('plugins.generic.thoth.connectionError');
             error_log($e->getMessage());
