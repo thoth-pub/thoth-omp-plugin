@@ -1,0 +1,5 @@
+{
+    "require": {
+        "biblys/isbn": "~3.0"
+    }
+}

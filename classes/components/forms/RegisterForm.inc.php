@@ -39,14 +39,18 @@ class RegisterForm extends FormComponent
                 'pageId' => 'default',
             ]);
 
+            $msg = '<div class="pkpNotification pkpNotification--warning">';
+            $msg .= __('plugins.generic.thoth.register.warning');
+            $msg .= '<ul>';
             foreach ($errors as $error) {
-                $warningIconHtml = '<span class="fa fa-exclamation-triangle pkpIcon--inline"></span>';
-                $msg = '<div class="pkpNotification pkpNotification--warning">' . $warningIconHtml . $error . '</div>';
-                $this->addField(new \PKP\components\forms\FieldHTML('registerNotice', [
-                    'description' => $msg,
-                    'groupId' => 'default',
-                ]));
+                $msg .= '<li>' .  $error . '</li>';
             }
+            $msg .= '</ul></div>';
+
+            $this->addField(new \PKP\components\forms\FieldHTML('registerNotice', [
+                'description' => $msg,
+                'groupId' => 'default',
+            ]));
 
             return;
         }

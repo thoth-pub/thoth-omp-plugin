@@ -12,3 +12,4 @@ include:
   before_script:
     - rm -rf lib/APIKeyEncryption
     - git submodule update --init --depth 1
+    - composer install
