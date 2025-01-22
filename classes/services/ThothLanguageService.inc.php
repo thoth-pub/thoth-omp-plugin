@@ -13,14 +13,14 @@
  * @brief Helper class that encapsulates business logic for Thoth languages
  */
 
-import('plugins.generic.thoth.lib.thothAPI.models.ThothLanguage');
+use ThothApi\GraphQL\Models\Language as ThothLanguage;
 
 class ThothLanguageService
 {
     public function new($params)
     {
         $thothLanguage = new ThothLanguage();
-        $thothLanguage->setId($params['languageId'] ?? null);
+        $thothLanguage->setLanguageId($params['languageId'] ?? null);
         $thothLanguage->setWorkId($params['workId'] ?? null);
         $thothLanguage->setLanguageCode($params['languageCode']);
         $thothLanguage->setLanguageRelation($params['languageRelation']);
@@ -28,7 +28,7 @@ class ThothLanguageService
         return $thothLanguage;
     }
 
-    public function register($thothClient, $submissionLocale, $thothWorkId)
+    public function register($submissionLocale, $thothWorkId)
     {
         $thothLanguage = $this->new([
             'workId' => $thothWorkId,
@@ -37,8 +37,9 @@ class ThothLanguageService
             'mainLanguage' => true
         ]);
 
+        $thothClient = ThothContainer::getInstance()->get('client');
         $thothLanguageId = $thothClient->createLanguage($thothLanguage);
-        $thothLanguage->setId($thothLanguageId);
+        $thothLanguage->setLanguageId($thothLanguageId);
 
         return $thothLanguage;
     }

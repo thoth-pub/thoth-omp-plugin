@@ -14,29 +14,35 @@
  * @brief Test class for the ThothInstitutionService class
  */
 
+use ThothApi\GraphQL\Client as ThothClient;
+use ThothApi\GraphQL\Models\Institution as ThothInstitution;
+
 import('lib.pkp.tests.PKPTestCase');
 import('plugins.generic.thoth.classes.services.ThothInstitutionService');
-import('plugins.generic.thoth.lib.thothAPI.models.ThothInstitution');
-import('plugins.generic.thoth.lib.thothAPI.ThothClient');
 
 class ThothInstitutionServiceTest extends PKPTestCase
 {
+    private $clientFactoryBackup;
+    private $configFactoryBackup;
+
     protected function setUp(): void
     {
         parent::setUp();
+        $this->clientFactoryBackup = ThothContainer::getInstance()->backup('client');
         $this->institutionService = new ThothInstitutionService();
     }
 
     protected function tearDown(): void
     {
         unset($this->institutionService);
+        ThothContainer::getInstance()->set('client', $this->clientFactoryBackup);
         parent::tearDown();
     }
 
     public function testCreateNewInstitution()
     {
         $expectedThothInstitution = new ThothInstitution();
-        $expectedThothInstitution->setId('6e451aef-e496-4730-ac86-9f60d8ef4c55');
+        $expectedThothInstitution->setInstitutionId('6e451aef-e496-4730-ac86-9f60d8ef4c55');
         $expectedThothInstitution->setInstitutionName('National Science Foundation');
         $expectedThothInstitution->setInstitutionDoi('https://doi.org/10.13039/100000001');
         $expectedThothInstitution->setCountryCode('USA');
@@ -59,7 +65,7 @@ class ThothInstitutionServiceTest extends PKPTestCase
     {
         $expectedThothInstitutions = [];
         $expectedThothInstitutions[] = new ThothInstitution();
-        $expectedThothInstitutions[0]->setId('f014c35a-31d8-453c-b356-d4912a87e52e');
+        $expectedThothInstitutions[0]->setInstitutionId('f014c35a-31d8-453c-b356-d4912a87e52e');
         $expectedThothInstitutions[0]->setInstitutionName('United States Department of Defense');
         $expectedThothInstitutions[0]->setInstitutionDoi('https://doi.org/10.13039/100000005');
         $expectedThothInstitutions[0]->setCountryCode('USA');
@@ -73,16 +79,20 @@ class ThothInstitutionServiceTest extends PKPTestCase
         $mockThothClient->expects($this->any())
             ->method('institutions')
             ->will($this->returnValue([
-                [
+                new ThothInstitution([
                     'institutionId' => 'f014c35a-31d8-453c-b356-d4912a87e52e',
                     'institutionName' => 'United States Department of Defense',
                     'institutionDoi' => 'https://doi.org/10.13039/100000005',
                     'countryCode' => 'USA',
                     'ror' => 'https://ror.org/0447fe631'
-                ]
+                ])
             ]));
 
-        $thothInstitutions = $this->institutionService->getMany($mockThothClient);
+        ThothContainer::getInstance()->set('client', function () use ($mockThothClient) {
+            return $mockThothClient;
+        });
+
+        $thothInstitutions = $this->institutionService->getMany();
 
         $this->assertEquals($expectedThothInstitutions, $thothInstitutions);
     }

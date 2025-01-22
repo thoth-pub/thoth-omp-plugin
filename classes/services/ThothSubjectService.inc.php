@@ -13,14 +13,14 @@
  * @brief Helper class that encapsulates business logic for Thoth subjects
  */
 
-import('plugins.generic.thoth.lib.thothAPI.models.ThothSubject');
+use ThothApi\GraphQL\Models\Subject as ThothSubject;
 
 class ThothSubjectService
 {
     public function new($params)
     {
         $thothSubject = new ThothSubject();
-        $thothSubject->setId($params['subjectId'] ?? null);
+        $thothSubject->setSubjectId($params['subjectId'] ?? null);
         $thothSubject->setWorkId($params['workId'] ?? null);
         $thothSubject->setSubjectType($params['subjectType']);
         $thothSubject->setSubjectCode($params['subjectCode']);
@@ -28,7 +28,7 @@ class ThothSubjectService
         return $thothSubject;
     }
 
-    public function registerKeyword($thothClient, $submissionKeyword, $thothWorkId, $seq = 1)
+    public function registerKeyword($submissionKeyword, $thothWorkId, $seq = 1)
     {
         $thothSubject = $this->new([
             'workId' => $thothWorkId,
@@ -37,13 +37,14 @@ class ThothSubjectService
             'subjectOrdinal' => $seq
         ]);
 
+        $thothClient = ThothContainer::getInstance()->get('client');
         $thothSubjectId = $thothClient->createSubject($thothSubject);
-        $thothSubject->setId($thothSubjectId);
+        $thothSubject->setSubjectId($thothSubjectId);
 
         return $thothSubject;
     }
 
-    public function updateKeywords($thothClient, $thothKeywords, $publication, $thothWorkId)
+    public function updateKeywords($thothKeywords, $publication, $thothWorkId)
     {
         $submission = Services::get('submission')->get($publication->getData('submissionId'));
         $locale = $submission->getLocale();
@@ -53,8 +54,9 @@ class ThothSubjectService
             return;
         }
 
-        $localizedKeywords = $keywords[$locale];
+        $thothClient = ThothContainer::getInstance()->get('client');
 
+        $localizedKeywords = $keywords[$locale];
         $thothKeywordData = array_column($thothKeywords, 'subjectCode', 'subjectId');
         foreach ($thothKeywordData as $subjectId => $subjectCode) {
             if (!in_array($subjectCode, $localizedKeywords)) {
@@ -64,7 +66,7 @@ class ThothSubjectService
 
         foreach ($localizedKeywords as $order => $keyword) {
             if (!in_array($keyword, $thothKeywordData)) {
-                $this->registerKeyword($thothClient, $keyword, $thothWorkId, $order + 1);
+                $this->registerKeyword($keyword, $thothWorkId, $order + 1);
             }
         }
     }

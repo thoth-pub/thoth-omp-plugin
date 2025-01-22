@@ -14,17 +14,24 @@
  * @brief Test class for the ThothContributionService class
  */
 
+use ThothApi\GraphQL\Client as ThothClient;
+use ThothApi\GraphQL\Models\Contribution as ThothContribution;
+use ThothApi\GraphQL\Models\Contributor as ThothContributor;
+
 import('lib.pkp.tests.PKPTestCase');
 import('classes.monograph.Author');
 import('classes.publication.Publication');
 import('plugins.generic.thoth.classes.services.ThothContributionService');
-import('plugins.generic.thoth.lib.thothAPI.ThothClient');
 
 class ThothContributionServiceTest extends PKPTestCase
 {
+    private $clientFactoryBackup;
+    private $configFactoryBackup;
+
     protected function setUp(): void
     {
         parent::setUp();
+        $this->clientFactoryBackup = ThothContainer::getInstance()->backup('client');
         $this->contributionService = new ThothContributionService();
         $this->setUpMockEnvironment();
     }
@@ -32,6 +39,7 @@ class ThothContributionServiceTest extends PKPTestCase
     protected function tearDown(): void
     {
         unset($this->contributionService);
+        ThothContainer::getInstance()->set('client', $this->clientFactoryBackup);
         parent::tearDown();
     }
 
@@ -94,7 +102,7 @@ class ThothContributionServiceTest extends PKPTestCase
         $expectedContribution = new ThothContribution();
         $expectedContribution->setContributionType(ThothContribution::CONTRIBUTION_TYPE_AUTHOR);
         $expectedContribution->setMainContribution(true);
-        $expectedContribution->setContributionOrdinal(1);
+        $expectedContribution->setData('contributionOrdinal', 1);
         $expectedContribution->setFirstName('Reza');
         $expectedContribution->setLastName('Negarestani');
         $expectedContribution->setFullName('Reza Negarestani');
@@ -126,7 +134,7 @@ class ThothContributionServiceTest extends PKPTestCase
         $expectedContribution = new ThothContribution();
         $expectedContribution->setContributionType(ThothContribution::CONTRIBUTION_TYPE_EDITOR);
         $expectedContribution->setMainContribution(false);
-        $expectedContribution->setContributionOrdinal(3);
+        $expectedContribution->setData('contributionOrdinal', 3);
         $expectedContribution->setLastName('Steyerl');
         $expectedContribution->setFullName('Hito Steyerl');
 
@@ -145,15 +153,16 @@ class ThothContributionServiceTest extends PKPTestCase
     public function testRegisterContribution()
     {
         $expectedContribution = new ThothContribution();
-        $expectedContribution->setId('67afac83-b015-4f32-9576-60b665a9e685');
+        $expectedContribution->setContributionId('67afac83-b015-4f32-9576-60b665a9e685');
         $expectedContribution->setWorkId('45a6622c-a306-4559-bb77-25367dc881b8');
         $expectedContribution->setContributorId('f70f709e-2137-4c87-a2e5-d52b263759ec');
         $expectedContribution->setContributionType(ThothContribution::CONTRIBUTION_TYPE_AUTHOR);
         $expectedContribution->setMainContribution(false);
-        $expectedContribution->setContributionOrdinal(1);
+        $expectedContribution->setData('contributionOrdinal', 1);
         $expectedContribution->setFirstName('Michael');
         $expectedContribution->setLastName('Wilson');
         $expectedContribution->setFullName('Michael Wilson');
+        $expectedContribution->setBiography('');
 
         $userGroup = new UserGroup();
         $userGroup->setData('nameLocaleKey', 'default.groups.name.author');
@@ -178,14 +187,18 @@ class ThothContributionServiceTest extends PKPTestCase
         $mockThothClient->expects($this->any())
             ->method('contributors')
             ->will($this->returnValue([
-                [
+                new ThothContributor([
                     'contributorId' => 'f70f709e-2137-4c87-a2e5-d52b263759ec',
                     'lastName' => 'Wilson',
                     'fullName' => 'Michael Wilson'
-                ]
+                ])
             ]));
 
-        $contribution = $this->contributionService->register($mockThothClient, $author, '45a6622c-a306-4559-bb77-25367dc881b8');
+        ThothContainer::getInstance()->set('client', function () use ($mockThothClient) {
+            return $mockThothClient;
+        });
+
+        $contribution = $this->contributionService->register($author, '45a6622c-a306-4559-bb77-25367dc881b8');
         $this->assertEquals($expectedContribution, $contribution);
     }
 }

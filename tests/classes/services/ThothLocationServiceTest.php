@@ -14,6 +14,9 @@
  * @brief Test class for the ThothLocationService class
  */
 
+use ThothApi\GraphQL\Client as ThothClient;
+use ThothApi\GraphQL\Models\Location as ThothLocation;
+
 import('classes.core.Application');
 import('classes.press.Press');
 import('classes.submission.Submission');
@@ -22,13 +25,16 @@ import('lib.pkp.classes.core.Dispatcher');
 import('lib.pkp.classes.core.PKPRequest');
 import('lib.pkp.tests.PKPTestCase');
 import('plugins.generic.thoth.classes.services.ThothLocationService');
-import('plugins.generic.thoth.lib.thothAPI.ThothClient');
 
 class ThothLocationServiceTest extends PKPTestCase
 {
+    private $clientFactoryBackup;
+    private $configFactoryBackup;
+
     protected function setUp(): void
     {
         parent::setUp();
+        $this->clientFactoryBackup = ThothContainer::getInstance()->backup('client');
         $this->locationService = new ThothLocationService();
         $this->setUpMockEnvironment();
     }
@@ -36,6 +42,7 @@ class ThothLocationServiceTest extends PKPTestCase
     protected function tearDown(): void
     {
         unset($this->locationService);
+        ThothContainer::getInstance()->set('client', $this->clientFactoryBackup);
         parent::tearDown();
     }
 
@@ -143,7 +150,7 @@ class ThothLocationServiceTest extends PKPTestCase
         $thothPublicationId = '8ac3e585-c32a-42d7-bd36-ef42ee397e6e';
 
         $expectedLocation = new ThothLocation();
-        $expectedLocation->setId('03b0367d-bba3-4e26-846a-4c36d3920db2');
+        $expectedLocation->setLocationId('03b0367d-bba3-4e26-846a-4c36d3920db2');
         $expectedLocation->setPublicationId($thothPublicationId);
         $expectedLocation->setLandingPage('https://omp.publicknowledgeproject.org/press/catalog/book/23');
         $expectedLocation->setFullTextUrl('https://www.bookstore.com/site/books/book5');
@@ -163,7 +170,11 @@ class ThothLocationServiceTest extends PKPTestCase
             ->method('createLocation')
             ->will($this->returnValue('03b0367d-bba3-4e26-846a-4c36d3920db2'));
 
-        $location = $this->locationService->register($mockThothClient, $publicationFormat, $thothPublicationId);
+        ThothContainer::getInstance()->set('client', function () use ($mockThothClient) {
+            return $mockThothClient;
+        });
+
+        $location = $this->locationService->register($publicationFormat, $thothPublicationId);
         $this->assertEquals($expectedLocation, $location);
     }
 }
