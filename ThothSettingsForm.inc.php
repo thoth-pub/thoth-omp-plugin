@@ -15,9 +15,11 @@
  * @brief Form for managers to modify Thoth plugin settings
  */
 
+use ThothApi\Exception\QueryException;
+use ThothApi\GraphQL\Client;
+
 import('lib.pkp.classes.form.Form');
 import('plugins.generic.thoth.lib.APIKeyEncryption.APIKeyEncryption');
-import('plugins.generic.thoth.lib.thothAPI.ThothClient');
 
 class ThothSettingsForm extends Form
 {
@@ -48,13 +50,17 @@ class ThothSettingsForm extends Form
             function ($password) use ($form) {
                 $email = trim($this->getData('email'));
                 $testEnvironment = $this->getData('testEnvironment');
-                $thothClient = new ThothClient($testEnvironment);
+
+                $httpConfig = [];
+                if ($testEnvironment) {
+                    $httpConfig['base_uri'] = 'http://localhost:8000/';
+                }
+
+                $client = new Client($httpConfig);
+
                 try {
-                    $thothClient->login(
-                        $email,
-                        $password
-                    );
-                } catch (ThothException $e) {
+                    $client->login($email, $password);
+                } catch (QueryException $e) {
                     return false;
                 }
                 return true;
