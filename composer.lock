@@ -627,16 +627,16 @@
         },
         {
             "name": "thoth-pub/thoth-client-php",
-            "version": "1.1.0",
+            "version": "1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thoth-pub/thoth-client-php.git",
-                "reference": "ed09a6d7f3360c49664c0f9f608d065bf7840ad1"
+                "reference": "6d77216bd8686b61d3827b2fefd86fea23feb86f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thoth-pub/thoth-client-php/zipball/ed09a6d7f3360c49664c0f9f608d065bf7840ad1",
-                "reference": "ed09a6d7f3360c49664c0f9f608d065bf7840ad1",
+                "url": "https://api.github.com/repos/thoth-pub/thoth-client-php/zipball/6d77216bd8686b61d3827b2fefd86fea23feb86f",
+                "reference": "6d77216bd8686b61d3827b2fefd86fea23feb86f",
                 "shasum": ""
             },
             "require": {
@@ -660,9 +660,9 @@
             "description": "PHP client for Thoth's GraphQL and REST APIs.",
             "support": {
                 "issues": "https://github.com/thoth-pub/thoth-client-php/issues",
-                "source": "https://github.com/thoth-pub/thoth-client-php/tree/1.1.0"
+                "source": "https://github.com/thoth-pub/thoth-client-php/tree/1.2.0"
             },
-            "time": "2025-01-22T15:39:25+00:00"
+            "time": "2025-01-23T14:00:58+00:00"
         }
     ],
     "packages-dev": [],
