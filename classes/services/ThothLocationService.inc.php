@@ -13,7 +13,7 @@
  * @brief Helper class that encapsulates business logic for Thoth locations
  */
 
-import('plugins.generic.thoth.lib.thothAPI.models.ThothLocation');
+use ThothApi\GraphQL\Models\Location as ThothLocation;
 
 class ThothLocationService
 {
@@ -60,7 +60,7 @@ class ThothLocationService
     public function new($params)
     {
         $thothLocation = new ThothLocation();
-        $thothLocation->setId($params['locationId'] ?? null);
+        $thothLocation->setLocationId($params['locationId'] ?? null);
         $thothLocation->setPublicationId($params['publicationId'] ?? null);
         $thothLocation->setLandingPage($params['landingPage']);
         $thothLocation->setFullTextUrl($params['fullTextUrl']);
@@ -70,25 +70,23 @@ class ThothLocationService
         return $thothLocation;
     }
 
-    public function register($thothClient, $publicationFormat, $thothPublicationId, $fileId = null, $canonical = true)
+    public function register($publicationFormat, $thothPublicationId, $fileId = null, $canonical = true)
     {
         $thothLocation = $this->newByPublicationFormat($publicationFormat, $fileId);
         $thothLocation->setPublicationId($thothPublicationId);
         $thothLocation->setCanonical($canonical);
 
+        $thothClient = ThothContainer::getInstance()->get('client');
         $thothLocationId = $thothClient->createLocation($thothLocation);
-        $thothLocation->setId($thothLocationId);
+        $thothLocation->setLocationId($thothLocationId);
 
         return $thothLocation;
     }
 
-    public function updateLocations(
-        $thothClient,
-        $thothLocations,
-        $publicationFormat,
-        $thothPublicationId,
-        $chapterId = null
-    ) {
+    public function updateLocations($thothLocations, $publicationFormat, $thothPublicationId, $chapterId = null)
+    {
+        $thothClient = ThothContainer::getInstance()->get('client');
+
         $files = array_filter(
             iterator_to_array(Services::get('submissionFile')->getMany([
                 'assocTypes' => [ASSOC_TYPE_PUBLICATION_FORMAT],

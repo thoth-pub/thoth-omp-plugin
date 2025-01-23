@@ -13,14 +13,14 @@
  * @brief Helper class that encapsulates business logic for Thoth contributors
  */
 
-import('plugins.generic.thoth.lib.thothAPI.models.ThothContributor');
+use ThothApi\GraphQL\Models\Contributor as ThothContributor;
 
 class ThothContributorService
 {
     public function new($params)
     {
         $contributor = new ThothContributor();
-        $contributor->setId($params['contributorId'] ?? null);
+        $contributor->setContributorId($params['contributorId'] ?? null);
         $contributor->setFirstName($params['firstName'] ?? null);
         $contributor->setLastName($params['lastName']);
         $contributor->setFullName($params['fullName']);
@@ -40,20 +40,20 @@ class ThothContributorService
         return $this->new($params);
     }
 
-    public function register($thothClient, $author)
+    public function register($author)
     {
         $contributor = $this->newByAuthor($author);
 
+        $thothClient = ThothContainer::getInstance()->get('client');
         $contributorId = $thothClient->createContributor($contributor);
-        $contributor->setId($contributorId);
+        $contributor->setContributorId($contributorId);
 
         return $contributor;
     }
 
-    public function getMany($thothClient, $params = [])
+    public function getMany($params = [])
     {
-        $contributorsData = $thothClient->contributors($params);
-
-        return array_map([$this, 'new'], $contributorsData);
+        $thothClient = ThothContainer::getInstance()->get('client');
+        return $thothClient->contributors($params);
     }
 }

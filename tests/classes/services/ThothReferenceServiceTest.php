@@ -14,20 +14,28 @@
  * @brief Test class for the ThothReferenceService class
  */
 
+use ThothApi\GraphQL\Client as ThothClient;
+use ThothApi\GraphQL\Models\Reference as ThothReference;
+
 import('lib.pkp.tests.PKPTestCase');
 import('plugins.generic.thoth.classes.services.ThothReferenceService');
 
 class ThothReferenceServiceTest extends PKPTestCase
 {
+    private $clientFactoryBackup;
+    private $configFactoryBackup;
+
     protected function setUp(): void
     {
         parent::setUp();
+        $this->clientFactoryBackup = ThothContainer::getInstance()->backup('client');
         $this->referenceService = new ThothReferenceService();
     }
 
     protected function tearDown(): void
     {
         unset($this->referenceService);
+        ThothContainer::getInstance()->set('client', $this->clientFactoryBackup);
         parent::tearDown();
     }
 
@@ -78,7 +86,7 @@ class ThothReferenceServiceTest extends PKPTestCase
             'DOI: https://doi.org/10.1001/archinte.163.4.487 PMID: https://www.ncbi.nlm.nih.gov/pubmed/12588210';
 
         $expectedThothReference = new ThothReference();
-        $expectedThothReference->setId('c9521541-6676-4cf4-ad6d-06299682718b');
+        $expectedThothReference->setReferenceId('c9521541-6676-4cf4-ad6d-06299682718b');
         $expectedThothReference->setWorkId($workId);
         $expectedThothReference->setReferenceOrdinal(3);
         $expectedThothReference->setUnstructuredCitation($rawCitation);
@@ -96,7 +104,11 @@ class ThothReferenceServiceTest extends PKPTestCase
             ->method('createReference')
             ->will($this->returnValue('c9521541-6676-4cf4-ad6d-06299682718b'));
 
-        $thothReference = $this->referenceService->register($mockThothClient, $citation, $workId);
+        ThothContainer::getInstance()->set('client', function () use ($mockThothClient) {
+            return $mockThothClient;
+        });
+
+        $thothReference = $this->referenceService->register($citation, $workId);
         $this->assertEquals($expectedThothReference, $thothReference);
     }
 }

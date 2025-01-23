@@ -13,24 +13,25 @@
  * @brief Helper class that encapsulates business logic for Thoth affiliations
  */
 
+use ThothApi\GraphQL\Models\Affiliation as ThothAffiliation;
+
 import('plugins.generic.thoth.classes.facades.ThothService');
-import('plugins.generic.thoth.lib.thothAPI.models.ThothAffiliation');
 
 class ThothAffiliationService
 {
     public function new($params)
     {
         $thothAffiliation = new ThothAffiliation();
-        $thothAffiliation->setId($params['affiliationId'] ?? null);
+        $thothAffiliation->setAffiliationId($params['affiliationId'] ?? null);
         $thothAffiliation->setContributionId($params['contributionId']);
         $thothAffiliation->setInstitutionId($params['institutionId']);
         $thothAffiliation->setAffiliationOrdinal($params['affiliationOrdinal']);
         return $thothAffiliation;
     }
 
-    public function register($thothClient, $affiliation, $thothContributionId)
+    public function register($affiliation, $thothContributionId)
     {
-        $thothInstitutions = ThothService::institution()->getMany($thothClient, [
+        $thothInstitutions = ThothService::institution()->getMany([
             'limit' => 1,
             'filter' => $affiliation
         ]);
@@ -42,12 +43,13 @@ class ThothAffiliationService
         $thothInstitution = array_shift($thothInstitutions);
         $thothAffiliation = $this->new([
             'contributionId' => $thothContributionId,
-            'institutionId' => $thothInstitution->getId(),
+            'institutionId' => $thothInstitution->getInstitutionId(),
             'affiliationOrdinal' => 1
         ]);
 
+        $thothClient = ThothContainer::getInstance()->get('client');
         $thothAffiliationId = $thothClient->createAffiliation($thothAffiliation);
-        $thothAffiliation->setId($thothAffiliationId);
+        $thothAffiliation->setAffiliationId($thothAffiliationId);
 
         return $thothAffiliation;
     }

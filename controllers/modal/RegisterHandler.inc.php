@@ -16,6 +16,7 @@
  */
 
 use APP\components\forms\publication\PublishForm;
+use ThothApi\Exception\QueryException;
 
 import('classes.handler.Handler');
 
@@ -83,14 +84,14 @@ class RegisterHandler extends Handler
         $errors = [];
 
         try {
-            $thothClient = $plugin->getThothClient($submissionContext->getId());
-            $publishers = $thothClient->linkedPublishers();
+            $thothClient = ThothContainer::getInstance()->get('client');
+            $thothAccountDetails = $thothClient->accountDetails();
+            $publishers = $thothAccountDetails['resourceAccess']['linkedPublishers'];
             $imprints = $thothClient->imprints(['publishers' => array_column($publishers, 'publisherId')]);
-
             $errors = array_merge(ThothValidator::validate($this->submission), $errors);
-        } catch (ThothException $e) {
+        } catch (QueryException $e) {
             $errors[] = __('plugins.generic.thoth.connectionError');
-            error_log($e->getMessage());
+            error_log('Failed to send the request to Thoth: ' . $e->getMessage());
         }
 
         $plugin->import('classes.components.forms.RegisterForm');
