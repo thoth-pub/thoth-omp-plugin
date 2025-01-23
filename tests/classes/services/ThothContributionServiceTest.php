@@ -102,7 +102,7 @@ class ThothContributionServiceTest extends PKPTestCase
         $expectedContribution = new ThothContribution();
         $expectedContribution->setContributionType(ThothContribution::CONTRIBUTION_TYPE_AUTHOR);
         $expectedContribution->setMainContribution(true);
-        $expectedContribution->setData('contributionOrdinal', 1);
+        $expectedContribution->setContributionOrdinal(1);
         $expectedContribution->setFirstName('Reza');
         $expectedContribution->setLastName('Negarestani');
         $expectedContribution->setFullName('Reza Negarestani');
@@ -134,7 +134,7 @@ class ThothContributionServiceTest extends PKPTestCase
         $expectedContribution = new ThothContribution();
         $expectedContribution->setContributionType(ThothContribution::CONTRIBUTION_TYPE_EDITOR);
         $expectedContribution->setMainContribution(false);
-        $expectedContribution->setData('contributionOrdinal', 3);
+        $expectedContribution->setContributionOrdinal(3);
         $expectedContribution->setLastName('Steyerl');
         $expectedContribution->setFullName('Hito Steyerl');
 
@@ -158,7 +158,7 @@ class ThothContributionServiceTest extends PKPTestCase
         $expectedContribution->setContributorId('f70f709e-2137-4c87-a2e5-d52b263759ec');
         $expectedContribution->setContributionType(ThothContribution::CONTRIBUTION_TYPE_AUTHOR);
         $expectedContribution->setMainContribution(false);
-        $expectedContribution->setData('contributionOrdinal', 1);
+        $expectedContribution->setContributionOrdinal(1);
         $expectedContribution->setFirstName('Michael');
         $expectedContribution->setLastName('Wilson');
         $expectedContribution->setFullName('Michael Wilson');

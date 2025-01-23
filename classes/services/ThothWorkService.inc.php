@@ -93,7 +93,7 @@ class ThothWorkService
     {
         $work = new ThothWork();
         $work->setWorkId($params['workId'] ?? null);
-        $work->setData('imprintId', $params['imprintId'] ?? null);
+        $work->setImprintId($params['imprintId'] ?? null);
         $work->setWorkType($params['workType']);
         $work->setWorkType($params['workType']);
         $work->setWorkStatus($params['workStatus']);
@@ -122,7 +122,7 @@ class ThothWorkService
     public function registerBook($submission, $thothImprintId)
     {
         $thothBook = $this->newBySubmission($submission);
-        $thothBook->setData('imprintId', $thothImprintId);
+        $thothBook->setImprintId($thothImprintId);
 
         $thothClient = ThothContainer::getInstance()->get('client');
         $thothBookId = $thothClient->createWork($thothBook);
@@ -172,7 +172,7 @@ class ThothWorkService
     public function registerChapter($chapter, $thothImprintId)
     {
         $thothChapter = $this->newByChapter($chapter);
-        $thothChapter->setData('imprintId', $thothImprintId);
+        $thothChapter->setImprintId($thothImprintId);
 
         $thothClient = ThothContainer::getInstance()->get('client');
         $thothChapterId = $thothClient->createWork($thothChapter);
@@ -308,7 +308,7 @@ class ThothWorkService
 
         foreach ($thothRelationsData as $fullTitle => $relatedWork) {
             if (!in_array($fullTitle, $chapterTitles)) {
-                $thothClient->deleteWork($relatedWork);
+                $thothClient->deleteWork($relatedWork['workRelationId']);
             }
         }
 

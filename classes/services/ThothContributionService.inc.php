@@ -28,7 +28,7 @@ class ThothContributionService
         $contribution->setContributorId($params['contributorId'] ?? null);
         $contribution->setContributionType($params['contributionType']);
         $contribution->setMainContribution($params['mainContribution']);
-        $contribution->setData('contributionOrdinal', $params['contributionOrdinal']);
+        $contribution->setContributionOrdinal($params['contributionOrdinal']);
         $contribution->setLastName($params['lastName']);
         $contribution->setFullName($params['fullName']);
         $contribution->setFirstName($params['firstName'] ?? null);

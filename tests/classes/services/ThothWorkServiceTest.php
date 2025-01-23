@@ -284,7 +284,7 @@ class ThothWorkServiceTest extends PKPTestCase
         $expectedThothWork->setWorkId('39e399fb-cd40-461d-97cf-cf7f3a14cc48');
         $expectedThothWork->setWorkType(ThothWork::WORK_TYPE_BOOK_CHAPTER);
         $expectedThothWork->setWorkStatus(ThothWork::WORK_STATUS_ACTIVE);
-        $expectedThothWork->setData('imprintId', '145369a6-916a-4107-ba0f-ce28137659c2');
+        $expectedThothWork->setImprintId('145369a6-916a-4107-ba0f-ce28137659c2');
         $expectedThothWork->setTitle('10. Modification and Enhancement of Consciousness');
         $expectedThothWork->setFullTitle('10. Modification and Enhancement of Consciousness');
 
@@ -305,7 +305,7 @@ class ThothWorkServiceTest extends PKPTestCase
 
         $expectedThothBook = new ThothWork();
         $expectedThothBook->setWorkId('74fde3e2-ca4e-4597-bb0c-aee90648f5a5');
-        $expectedThothBook->setData('imprintId', $thothImprintId);
+        $expectedThothBook->setImprintId($thothImprintId);
         $expectedThothBook->setWorkType(ThothWork::WORK_TYPE_MONOGRAPH);
         $expectedThothBook->setWorkStatus(ThothWork::WORK_STATUS_ACTIVE);
         $expectedThothBook->setTitle('A Designer\'s Log');
@@ -343,7 +343,7 @@ class ThothWorkServiceTest extends PKPTestCase
 
         $expectedThothChapter = new ThothWork();
         $expectedThothChapter->setWorkId('74fde3e2-ca4e-4597-bb0c-aee90648f5a5');
-        $expectedThothChapter->setData('imprintId', $thothImprintId);
+        $expectedThothChapter->setImprintId($thothImprintId);
         $expectedThothChapter->setWorkType(ThothWork::WORK_TYPE_BOOK_CHAPTER);
         $expectedThothChapter->setWorkStatus(ThothWork::WORK_STATUS_ACTIVE);
         $expectedThothChapter->setFullTitle('Chapter 2: Classical Music and the Classical Mind');
@@ -398,7 +398,7 @@ class ThothWorkServiceTest extends PKPTestCase
     {
         $thothWork = new ThothWork();
         $thothWork->setWorkId('39e399fb-cd40-461d-97cf-cf7f3a14cc48');
-        $thothWork->setData('imprintId', '145369a6-916a-4107-ba0f-ce28137659c2');
+        $thothWork->setImprintId('145369a6-916a-4107-ba0f-ce28137659c2');
         $thothWork->setWorkType(ThothWork::WORK_TYPE_EDITED_BOOK);
         $thothWork->setWorkStatus(ThothWork::WORK_STATUS_ACTIVE);
         $thothWork->setFullTitle('Cuba : Restructuring the Economy');
