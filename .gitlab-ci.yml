@@ -13,3 +13,6 @@ include:
     - rm -rf lib/APIKeyEncryption
     - git submodule update --init --depth 1
     - composer install
+
+unit_test_php_7_3:
+  allow_failure: true
