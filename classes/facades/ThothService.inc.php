@@ -14,66 +14,57 @@
  * @brief This facade provides access to all Services for Thoth.
  */
 
-import('plugins.generic.thoth.classes.services.ThothAffiliationService');
-import('plugins.generic.thoth.classes.services.ThothContributionService');
-import('plugins.generic.thoth.classes.services.ThothContributorService');
-import('plugins.generic.thoth.classes.services.ThothInstitutionService');
-import('plugins.generic.thoth.classes.services.ThothLanguageService');
-import('plugins.generic.thoth.classes.services.ThothLocationService');
-import('plugins.generic.thoth.classes.services.ThothPublicationService');
-import('plugins.generic.thoth.classes.services.ThothReferenceService');
-import('plugins.generic.thoth.classes.services.ThothSubjectService');
-import('plugins.generic.thoth.classes.services.ThothWorkService');
+import('plugins.generic.thoth.classes.container.ThothContainer');
 
 class ThothService
 {
     public static function affiliation()
     {
-        return app(ThothAffiliationService::class);
+        return ThothContainer::getInstance()->get('affiliationService');
     }
 
     public static function contribution()
     {
-        return app(ThothContributionService::class);
+        return ThothContainer::getInstance()->get('contributionService');
     }
 
     public static function contributor()
     {
-        return app(ThothContributorService::class);
+        return ThothContainer::getInstance()->get('contributorService');
     }
 
     public static function institution()
     {
-        return app(ThothInstitutionService::class);
+        return ThothContainer::getInstance()->get('institutionService');
     }
 
     public static function language()
     {
-        return app(ThothLanguageService::class);
+        return ThothContainer::getInstance()->get('languageService');
     }
 
     public static function location()
     {
-        return app(ThothLocationService::class);
+        return ThothContainer::getInstance()->get('locationService');
     }
 
     public static function publication()
     {
-        return app(ThothPublicationService::class);
+        return ThothContainer::getInstance()->get('publicationService');
     }
 
     public static function reference()
     {
-        return app(ThothReferenceService::class);
+        return ThothContainer::getInstance()->get('referenceService');
     }
 
     public static function subject()
     {
-        return app(ThothSubjectService::class);
+        return ThothContainer::getInstance()->get('subjectService');
     }
 
     public static function work()
     {
-        return app(ThothWorkService::class);
+        return ThothContainer::getInstance()->get('workService');
     }
 }

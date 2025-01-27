@@ -17,17 +17,17 @@
 use APP\facades\Repo;
 use PKP\citation\Citation;
 use PKP\citation\CitationListTokenizerFilter;
+use ThothApi\GraphQL\Models\Reference as ThothReference;
 
 import('lib.pkp.classes.citation.Citation');
 import('lib.pkp.classes.citation.CitationListTokenizerFilter');
-import('plugins.generic.thoth.lib.thothAPI.models.ThothReference');
 
 class ThothReferenceService
 {
     public function new($params)
     {
         $thothReference = new ThothReference();
-        $thothReference->setId($params['referenceId'] ?? null);
+        $thothReference->setReferenceId($params['referenceId'] ?? null);
         $thothReference->setWorkId($params['workId'] ?? null);
         $thothReference->setReferenceOrdinal($params['referenceOrdinal']);
         $thothReference->setUnstructuredCitation($params['unstructuredCitation']);
@@ -42,18 +42,19 @@ class ThothReferenceService
         return $this->new($params);
     }
 
-    public function register($thothClient, $citation, $thothWorkId)
+    public function register($citation, $thothWorkId)
     {
         $thothReference = $this->newByCitation($citation);
         $thothReference->setWorkId($thothWorkId);
 
+        $thothClient = ThothContainer::getInstance()->get('client');
         $thothReferenceId = $thothClient->createReference($thothReference);
-        $thothReference->setId($thothReferenceId);
+        $thothReference->setReferenceId($thothReferenceId);
 
         return $thothReference;
     }
 
-    public function updateReferences($thothClient, $thothReferences, $publication, $thothWorkId)
+    public function updateReferences($thothReferences, $publication, $thothWorkId)
     {
         $oldPublication = Repo::publication()->get($publication->getId());
 
@@ -61,6 +62,7 @@ class ThothReferenceService
             return;
         }
 
+        $thothClient = ThothContainer::getInstance()->get('client');
         foreach ($thothReferences as $thothReference) {
             $thothClient->deleteReference($thothReference['referenceId']);
         }
@@ -76,7 +78,7 @@ class ThothReferenceService
             if (!empty(trim($citationString))) {
                 $citation = new Citation($citationString);
                 $citation->setSequence($order + 1);
-                $this->register($thothClient, $citation, $thothWorkId);
+                $this->register($citation, $thothWorkId);
             }
         }
     }

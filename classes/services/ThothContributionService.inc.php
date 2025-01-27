@@ -15,9 +15,9 @@
  */
 
 use APP\facades\Repo;
+use ThothApi\GraphQL\Models\Contribution as ThothContribution;
 
 import('plugins.generic.thoth.classes.facades.ThothService');
-import('plugins.generic.thoth.lib.thothAPI.models.ThothContribution');
 import('classes.core.Services');
 
 class ThothContributionService
@@ -25,7 +25,7 @@ class ThothContributionService
     public function new($params)
     {
         $contribution = new ThothContribution();
-        $contribution->setId($params['contributionId'] ?? null);
+        $contribution->setContributionId($params['contributionId'] ?? null);
         $contribution->setWorkId($params['workId'] ?? null);
         $contribution->setContributorId($params['contributorId'] ?? null);
         $contribution->setContributionType($params['contributionType']);
@@ -60,7 +60,7 @@ class ThothContributionService
         return $data;
     }
 
-    public function register($thothClient, $author, $thothWorkId)
+    public function register($author, $thothWorkId)
     {
         $contribution = $this->newByAuthor($author);
         $contribution->setWorkId($thothWorkId);
@@ -69,7 +69,7 @@ class ThothContributionService
             return;
         }
 
-        $contributors = ThothService::contributor()->getMany($thothClient, [
+        $contributors = ThothService::contributor()->getMany([
             'limit' => 1,
             'filter' => (!empty($author->getOrcid())) ?
                 $author->getOrcid() :
@@ -77,23 +77,25 @@ class ThothContributionService
         ]);
 
         $contributor = empty($contributors) ?
-            ThothService::contributor()->register($thothClient, $author) :
+            ThothService::contributor()->register($author) :
             array_shift($contributors);
 
-        $contribution->setContributorId($contributor->getId());
+        $contribution->setContributorId($contributor->getContributorId());
 
+        $thothClient = ThothContainer::getInstance()->get('client');
         $contributionId = $thothClient->createContribution($contribution);
-        $contribution->setId($contributionId);
+        $contribution->setContributionId($contributionId);
 
         if ($affiliation = $author->getLocalizedAffiliation()) {
-            ThothService::affiliation()->register($thothClient, $affiliation, $contributionId);
+            ThothService::affiliation()->register($affiliation, $contributionId);
         }
 
         return $contribution;
     }
 
-    public function updateContributions($thothClient, $thothContributions, $publication, $thothWorkId)
+    public function updateContributions($thothContributions, $publication, $thothWorkId)
     {
+        $thothClient = ThothContainer::getInstance()->get('client');
         $authors = $publication->getData('authors');
 
         $publicationContributions = array_map(function ($author) {
@@ -108,7 +110,7 @@ class ThothContributionService
         foreach ($authors as $author) {
             $publicationContribution = $this->getDataByAuthor($author);
             if (!$thothContribution = $this->contributionInList($publicationContribution, $thothContributions)) {
-                $this->register($thothClient, $author, $thothWorkId);
+                $this->register($author, $thothWorkId);
                 continue;
             }
             if ($thothContribution['biography'] !== $publicationContribution['biography']) {

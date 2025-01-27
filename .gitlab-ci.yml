@@ -11,3 +11,6 @@ include:
 .unit_test_template:
   before_script:
     - composer install
+
+code_formatting_check:
+  image: ubuntu:22.04
