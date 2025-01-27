@@ -17,9 +17,9 @@
  */
 
 use PKP\tests\PKPTestCase;
+use ThothApi\GraphQL\Models\Language as ThothLanguage;
 
 import('plugins.generic.thoth.classes.services.ThothLanguageService');
-import('plugins.generic.thoth.lib.thothAPI.ThothClient');
 
 class ThothLanguageServiceTest extends PKPTestCase
 {
@@ -58,7 +58,7 @@ class ThothLanguageServiceTest extends PKPTestCase
         $workId = '0600200b-865b-4706-a7e5-b5861a60dbc4';
 
         $expectedThothLanguage = new ThothLanguage();
-        $expectedThothLanguage->setId('47b9ecbe-98af-4c01-8b5c-0c222e996429');
+        $expectedThothLanguage->setLanguageId('47b9ecbe-98af-4c01-8b5c-0c222e996429');
         $expectedThothLanguage->setWorkId($workId);
         $expectedThothLanguage->setLanguageCode('ENG');
         $expectedThothLanguage->setLanguageRelation(ThothLanguage::LANGUAGE_RELATION_ORIGINAL);
@@ -75,7 +75,11 @@ class ThothLanguageServiceTest extends PKPTestCase
             ->method('createLanguage')
             ->will($this->returnValue('47b9ecbe-98af-4c01-8b5c-0c222e996429'));
 
-        $thothLanguage = $this->languageService->register($mockThothClient, $submissionLocale, $workId);
+        ThothContainer::getInstance()->set('client', function () use ($mockThothClient) {
+            return $mockThothClient;
+        });
+
+        $thothLanguage = $this->languageService->register($submissionLocale, $workId);
         $this->assertEquals($expectedThothLanguage, $thothLanguage);
     }
 }

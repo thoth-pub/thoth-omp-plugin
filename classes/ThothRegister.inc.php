@@ -18,6 +18,7 @@ use APP\facades\Repo;
 use APP\i18n\AppLocale;
 use APP\notification\Notification;
 use PKP\security\Role;
+use ThothApi\Exception\QueryException;
 
 import('plugins.generic.thoth.classes.facades.ThothService');
 import('plugins.generic.thoth.classes.ThothValidator');
@@ -69,12 +70,13 @@ class ThothRegister
         $errors = [];
 
         try {
-            $thothClient = $this->plugin->getThothClient($submission->getData('contextId'));
-            $publishers = $thothClient->linkedPublishers();
+            $thothClient = ThothContainer::getInstance()->get('client');
+            $thothAccountDetails = $thothClient->accountDetails();
+            $publishers = $thothAccountDetails['resourceAccess']['linkedPublishers'];
             $imprints = $thothClient->imprints(['publishers' => array_column($publishers, 'publisherId')]);
-        } catch (ThothException $e) {
+        } catch (QueryException $e) {
             $errors[] = __('plugins.generic.thoth.connectionError');
-            error_log($e->getMessage());
+            error_log('Failed to send the request to Thoth: ' . $e->getMessage());
         }
 
         if (empty($errors)) {
@@ -101,8 +103,8 @@ class ThothRegister
         $imprintOptions = [];
         foreach ($imprints as $imprint) {
             $imprintOptions[] = [
-                'value' => $imprint['imprintId'],
-                'label' => $imprint['imprintName']
+                'value' => $imprint->getImprintId(),
+                'label' => $imprint->getImprintName()
             ];
         }
 
@@ -120,52 +122,8 @@ class ThothRegister
                 'required' => true,
                 'showWhen' => 'registerConfirmation',
                 'groupId' => 'default',
-                'value' => $imprints[0]['imprintId'] ?? null
+                'value' => $imprintOptions[0]['value'] ?? null
             ]));
-
-        // return false;
-
-        // try {
-        //     $thothClient = $this->plugin->getThothClient($submission->getData('contextId'));
-        //     $publishers = $thothClient->linkedPublishers();
-        //     $imprints = $thothClient->imprints(['publishers' => array_column($publishers, 'publisherId')]);
-
-        //     $imprintOptions = [];
-        //     foreach ($imprints as $imprint) {
-        //         $imprintOptions[] = [
-        //             'value' => $imprint['imprintId'],
-        //             'label' => $imprint['imprintName']
-        //         ];
-        //     }
-
-        //     $form->addField(new \PKP\components\forms\FieldOptions('registerConfirmation', [
-        //         'label' => __('plugins.generic.thoth.register.label'),
-        //         'options' => [
-        //             ['value' => true, 'label' => __('plugins.generic.thoth.register.confirmation')]
-        //         ],
-        //         'value' => false,
-        //         'groupId' => 'default',
-        //     ]))
-        //         ->addField(new \PKP\components\forms\FieldSelect('imprint', [
-        //             'label' => __('plugins.generic.thoth.imprint'),
-        //             'options' => $imprintOptions,
-        //             'required' => true,
-        //             'showWhen' => 'registerConfirmation',
-        //             'groupId' => 'default',
-        //             'value' => $imprints[0]['imprintId'] ?? null
-        //         ]));
-        // } catch (ThothException $e) {
-        //     $warningIconHtml = '<span class="fa fa-exclamation-triangle pkpIcon--inline"></span>';
-        //     $noticeMsg = __('plugins.generic.thoth.connectionError');
-        //     $msg = '<div class="pkpNotification pkpNotification--warning">' . $warningIconHtml . $noticeMsg . '</div>';
-
-        //     $form->addField(new \PKP\components\forms\FieldHTML('registerNotice', [
-        //         'description' => $msg,
-        //         'groupId' => 'default',
-        //     ]));
-
-        //     error_log($e->getMessage());
-        // }
 
         return false;
     }
@@ -249,23 +207,22 @@ class ThothRegister
         }
 
         try {
-            $thothClient = $this->plugin->getThothClient($submissionContext->getId());
-            $thothBook = ThothService::work()->registerBook($thothClient, $submission, $imprint);
-            Repo::submission()->edit($submission, ['thothWorkId' => $thothBook->getId()]);
+            $thothBook = ThothService::work()->registerBook($submission, $imprint);
+            Repo::submission()->edit($submission, ['thothWorkId' => $thothBook->getWorkId()]);
             ThothNotification::notify(
                 $request,
                 $submission,
                 Notification::NOTIFICATION_TYPE_SUCCESS,
                 'plugins.generic.thoth.register.success'
             );
-        } catch (ThothException $e) {
-            error_log($e->getMessage());
+        } catch (QueryException $e) {
+            error_log('Failed to send the request to Thoth: ' . $e->getMessage());
             ThothNotification::notify(
                 $request,
                 $submission,
                 Notification::NOTIFICATION_TYPE_ERROR,
                 'plugins.generic.thoth.register.error',
-                $e->getError()
+                $e->getMessage()
             );
         }
     }

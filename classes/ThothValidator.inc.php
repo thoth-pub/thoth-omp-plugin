@@ -45,7 +45,9 @@ class ThothValidator
         foreach ($publicationFormats as $publicationFormat) {
             try {
                 $isbn = ThothService::publication()->getIsbnByPublicationFormat($publicationFormat);
-                Isbn::validateAsIsbn13($isbn);
+                if ($isbn !== null) {
+                    Isbn::validateAsIsbn13($isbn);
+                }
             } catch (Exception $e) {
                 $errors[] = __('plugins.generic.thoth.validation.isbn', [
                     'isbn' => $isbn,

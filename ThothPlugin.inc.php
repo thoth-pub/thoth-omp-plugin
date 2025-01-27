@@ -16,7 +16,6 @@
  * @brief Plugin for integration with Thoth for communication and synchronization of book data between the two platforms
  */
 
-use APP\plugins\generic\thoth\classes\APIKeyEncryption;
 use PKP\core\JSONMessage;
 
 import('lib.pkp.classes.plugins.GenericPlugin');
@@ -24,7 +23,6 @@ import('plugins.generic.thoth.classes.ThothBadgeRender');
 import('plugins.generic.thoth.classes.ThothNotification');
 import('plugins.generic.thoth.classes.ThothRegister');
 import('plugins.generic.thoth.classes.ThothUpdater');
-import('plugins.generic.thoth.lib.thothAPI.exceptions.ThothException');
 
 class ThothPlugin extends GenericPlugin
 {
@@ -124,26 +122,5 @@ class ThothPlugin extends GenericPlugin
                 return new JSONMessage(true, $form->fetch($request));
         }
         return parent::manage($args, $request);
-    }
-
-    public function getThothClient($contextId = null)
-    {
-        $contextId = $contextId ?? Application::get()->getRequest()->getContext()->getId();
-
-        $email = $this->getSetting($contextId, 'email');
-        $password = $this->getSetting($contextId, 'password');
-
-        if (!$email || !$password) {
-            throw new ThothException('Credentials not configured', 0);
-        }
-
-        $password = APIKeyEncryption::decryptString($password);
-        $testEnvironment = $this->getSetting($contextId, 'testEnvironment');
-
-        import('plugins.generic.thoth.lib.thothAPI.ThothClient');
-        $thothClient = new ThothClient($testEnvironment);
-        $thothClient->login($email, $password);
-
-        return $thothClient;
     }
 }
