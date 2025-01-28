@@ -60,6 +60,9 @@ msgstr "Um trabalho com o DOI \"{$doi}\" já existe."
 msgid "plugins.generic.thoth.validation.landingPageExists"
 msgstr "Um trabalho com a página de destino \"{$landingPage}\" já existe."
 
+msgid "plugins.generic.thoth.validation.isbnExists"
+msgstr "Uma publicação com o ISBN \"{$isbn}\" já existe."
+
 msgid "plugins.generic.thoth.register.confirmation"
 msgstr "Deseja realmente registrar na Thoth os metadados relacionados a essa submissão?"
 

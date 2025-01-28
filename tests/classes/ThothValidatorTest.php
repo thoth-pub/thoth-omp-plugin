@@ -15,6 +15,7 @@
  */
 
 use ThothApi\GraphQL\Client as ThothClient;
+use ThothApi\GraphQL\Models\Publication as ThothPublication;
 use ThothApi\GraphQL\Models\Work as ThothWork;
 
 import('lib.pkp.tests.PKPTestCase');
@@ -128,6 +129,34 @@ class ThothValidatorTest extends PKPTestCase
 
         $this->assertEquals([
             '##plugins.generic.thoth.validation.landingPageExists##',
+        ], $errors);
+    }
+
+    public function testISBNExistsValidationFails()
+    {
+        $isbn = '978-65-89999-01-3';
+
+        $mockThothClient = $this->getMockBuilder(ThothClient::class)
+            ->setMethods([
+                'publications',
+            ])
+            ->getMock();
+        $mockThothClient->expects($this->any())
+            ->method('publications')
+            ->will($this->returnValue([
+                new ThothPublication([
+                    'isbn' => $isbn
+                ])
+            ]));
+
+        ThothContainer::getInstance()->set('client', function () use ($mockThothClient) {
+            return $mockThothClient;
+        });
+
+        $errors = ThothValidator::validateIsbnExists($isbn);
+
+        $this->assertEquals([
+            '##plugins.generic.thoth.validation.isbnExists##',
         ], $errors);
     }
 }
