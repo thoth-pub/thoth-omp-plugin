@@ -14,6 +14,10 @@
  * @brief Test class for the ThothWorkService class
  */
 
+use ThothApi\GraphQL\Client as ThothClient;
+use ThothApi\GraphQL\Models\Work as ThothWork;
+use ThothApi\GraphQL\Models\WorkRelation as ThothWorkRelation;
+
 import('classes.core.Application');
 import('classes.press.Press');
 import('classes.submission.Submission');
@@ -21,8 +25,6 @@ import('lib.pkp.classes.core.PKPRequest');
 import('lib.pkp.classes.core.PKPRouter');
 import('lib.pkp.tests.PKPTestCase');
 import('plugins.generic.thoth.classes.services.ThothWorkService');
-import('plugins.generic.thoth.lib.thothAPI.models.ThothWork');
-import('plugins.generic.thoth.lib.thothAPI.ThothClient');
 
 class ThothWorkServiceTest extends PKPTestCase
 {
@@ -101,7 +103,8 @@ class ThothWorkServiceTest extends PKPTestCase
                 'deleteContribution',
                 'createLanguage',
                 'createWorkRelation',
-                'query'
+                'work',
+                'rawQuery'
             ])
             ->getMock();
         $mockThothClient->expects($this->any())
@@ -120,15 +123,29 @@ class ThothWorkServiceTest extends PKPTestCase
             ->method('createWorkRelation')
             ->will($this->returnValue('3e587b61-58f1-4064-bf80-e40e5c924d27'));
         $mockThothClient->expects($this->any())
-            ->method('query')
-            ->will($this->returnValue([
+            ->method('work')
+            ->will($this->returnValue(new ThothWork([
                 'workId' => '39e399fb-cd40-461d-97cf-cf7f3a14cc48',
                 'imprintId' => '145369a6-916a-4107-ba0f-ce28137659c2',
                 'workType' => ThothWork::WORK_TYPE_BOOK_CHAPTER,
                 'workStatus' => ThothWork::WORK_STATUS_ACTIVE,
                 'fullTitle' => '10. Modification and Enhancement of Consciousness',
                 'title' => '10. Modification and Enhancement of Consciousness'
-            ]));
+            ])));
+        $mockThothClient->expects($this->any())
+            ->method('rawQuery')
+            ->will($this->returnValue(
+                [
+                    'work' => [
+                        'workId' => '39e399fb-cd40-461d-97cf-cf7f3a14cc48',
+                        'imprintId' => '145369a6-916a-4107-ba0f-ce28137659c2',
+                        'workType' => ThothWork::WORK_TYPE_BOOK_CHAPTER,
+                        'workStatus' => ThothWork::WORK_STATUS_ACTIVE,
+                        'fullTitle' => '10. Modification and Enhancement of Consciousness',
+                        'title' => '10. Modification and Enhancement of Consciousness'
+                    ]
+                ]
+            ));
 
         return $mockThothClient;
     }
@@ -264,18 +281,82 @@ class ThothWorkServiceTest extends PKPTestCase
     public function testGetWork()
     {
         $expectedThothWork = new ThothWork();
-        $expectedThothWork->setId('39e399fb-cd40-461d-97cf-cf7f3a14cc48');
-        $expectedThothWork->setImprintId('145369a6-916a-4107-ba0f-ce28137659c2');
+        $expectedThothWork->setWorkId('39e399fb-cd40-461d-97cf-cf7f3a14cc48');
         $expectedThothWork->setWorkType(ThothWork::WORK_TYPE_BOOK_CHAPTER);
         $expectedThothWork->setWorkStatus(ThothWork::WORK_STATUS_ACTIVE);
+        $expectedThothWork->setImprintId('145369a6-916a-4107-ba0f-ce28137659c2');
         $expectedThothWork->setTitle('10. Modification and Enhancement of Consciousness');
         $expectedThothWork->setFullTitle('10. Modification and Enhancement of Consciousness');
 
         $mockThothClient = $this->setUpMockEnvironment();
 
-        $thothWork = $this->workService->get($mockThothClient, '39e399fb-cd40-461d-97cf-cf7f3a14cc48');
+        ThothContainer::getInstance()->set('client', function () use ($mockThothClient) {
+            return $mockThothClient;
+        });
+
+        $thothWork = $this->workService->get('39e399fb-cd40-461d-97cf-cf7f3a14cc48');
 
         $this->assertEquals($expectedThothWork, $thothWork);
+    }
+
+    public function testGetWorkByDoi()
+    {
+        $doi = 'https://doi.org/10.12345/12345678';
+
+        $expectedThothWork = new ThothWork([
+            'doi' => $doi
+        ]);
+
+        $mockThothClient = $this->getMockBuilder(ThothClient::class)
+            ->setMethods([
+                'workByDoi',
+            ])
+            ->getMock();
+        $mockThothClient->expects($this->any())
+            ->method('workByDoi')
+            ->will($this->returnValue(new ThothWork([
+                'doi' => $doi
+            ])));
+
+        ThothContainer::getInstance()->set('client', function () use ($mockThothClient) {
+            return $mockThothClient;
+        });
+
+        $thothWork = $this->workService->getByDoi($doi);
+
+        $this->assertEquals($expectedThothWork, $thothWork);
+    }
+
+    public function testSearchWork()
+    {
+        $title = 'My book title';
+
+        $expectedThothWorks = [
+            new ThothWork([
+                'title' => $title
+            ])
+        ];
+
+        $mockThothClient = $this->getMockBuilder(ThothClient::class)
+            ->setMethods([
+                'works',
+            ])
+            ->getMock();
+        $mockThothClient->expects($this->any())
+            ->method('works')
+            ->will($this->returnValue([
+                new ThothWork([
+                    'title' => $title
+                ])
+            ]));
+
+        ThothContainer::getInstance()->set('client', function () use ($mockThothClient) {
+            return $mockThothClient;
+        });
+
+        $thothWorks = $this->workService->search($title);
+
+        $this->assertEquals($expectedThothWorks, $thothWorks);
     }
 
     public function testRegisterBook()
@@ -283,12 +364,13 @@ class ThothWorkServiceTest extends PKPTestCase
         $thothImprintId = 'f02786d4-3bcc-473e-8d43-3da66c7e877c';
 
         $expectedThothBook = new ThothWork();
-        $expectedThothBook->setId('74fde3e2-ca4e-4597-bb0c-aee90648f5a5');
+        $expectedThothBook->setWorkId('74fde3e2-ca4e-4597-bb0c-aee90648f5a5');
         $expectedThothBook->setImprintId($thothImprintId);
         $expectedThothBook->setWorkType(ThothWork::WORK_TYPE_MONOGRAPH);
         $expectedThothBook->setWorkStatus(ThothWork::WORK_STATUS_ACTIVE);
         $expectedThothBook->setTitle('A Designer\'s Log');
         $expectedThothBook->setSubtitle('Case Studies in Instructional Design');
+        $expectedThothBook->setLongAbstract('');
         $expectedThothBook->setFullTitle('A Designer\'s Log: Case Studies in Instructional Design');
         $expectedThothBook->setLandingPage('https://omp.publicknowledgeproject.org/index.php/press/catalog/book/999');
         $expectedThothBook->setCoverUrl('https://omp.publicknowledgeproject.org/templates/images/book-default.png');
@@ -307,7 +389,11 @@ class ThothWorkServiceTest extends PKPTestCase
 
         $mockThothClient = $this->setUpMockEnvironment();
 
-        $thothBook = $this->workService->registerBook($mockThothClient, $submission, $thothImprintId);
+        ThothContainer::getInstance()->set('client', function () use ($mockThothClient) {
+            return $mockThothClient;
+        });
+
+        $thothBook = $this->workService->registerBook($submission, $thothImprintId);
         $this->assertEquals($expectedThothBook, $thothBook);
     }
 
@@ -316,7 +402,7 @@ class ThothWorkServiceTest extends PKPTestCase
         $thothImprintId = 'f02786d4-3bcc-473e-8d43-3da66c7e877c';
 
         $expectedThothChapter = new ThothWork();
-        $expectedThothChapter->setId('74fde3e2-ca4e-4597-bb0c-aee90648f5a5');
+        $expectedThothChapter->setWorkId('74fde3e2-ca4e-4597-bb0c-aee90648f5a5');
         $expectedThothChapter->setImprintId($thothImprintId);
         $expectedThothChapter->setWorkType(ThothWork::WORK_TYPE_BOOK_CHAPTER);
         $expectedThothChapter->setWorkStatus(ThothWork::WORK_STATUS_ACTIVE);
@@ -329,7 +415,11 @@ class ThothWorkServiceTest extends PKPTestCase
 
         $mockThothClient = $this->setUpMockEnvironment();
 
-        $thothChapter = $this->workService->registerChapter($mockThothClient, $chapter, $thothImprintId);
+        ThothContainer::getInstance()->set('client', function () use ($mockThothClient) {
+            return $mockThothClient;
+        });
+
+        $thothChapter = $this->workService->registerChapter($chapter, $thothImprintId);
         $this->assertEquals($expectedThothChapter, $thothChapter);
     }
 
@@ -339,7 +429,7 @@ class ThothWorkServiceTest extends PKPTestCase
         $relatedWorkId = '7d861db5-22f6-4ef8-abbb-b56ab8397624';
 
         $expectedThothWorkRelation = new ThothWorkRelation();
-        $expectedThothWorkRelation->setId('3e587b61-58f1-4064-bf80-e40e5c924d27');
+        $expectedThothWorkRelation->setWorkRelationId('3e587b61-58f1-4064-bf80-e40e5c924d27');
         $expectedThothWorkRelation->setRelatorWorkId('74fde3e2-ca4e-4597-bb0c-aee90648f5a5');
         $expectedThothWorkRelation->setRelatedWorkId($relatedWorkId);
         $expectedThothWorkRelation->setRelationType(ThothWorkRelation::RELATION_TYPE_IS_CHILD_OF);
@@ -352,8 +442,11 @@ class ThothWorkServiceTest extends PKPTestCase
 
         $mockThothClient = $this->setUpMockEnvironment();
 
+        ThothContainer::getInstance()->set('client', function () use ($mockThothClient) {
+            return $mockThothClient;
+        });
+
         $thothWorkRelation = $this->workService->registerWorkRelation(
-            $mockThothClient,
             $chapter,
             $thothImprintId,
             $relatedWorkId
@@ -364,12 +457,13 @@ class ThothWorkServiceTest extends PKPTestCase
     public function testUpdateBook()
     {
         $thothWork = new ThothWork();
-        $thothWork->setId('39e399fb-cd40-461d-97cf-cf7f3a14cc48');
+        $thothWork->setWorkId('39e399fb-cd40-461d-97cf-cf7f3a14cc48');
         $thothWork->setImprintId('145369a6-916a-4107-ba0f-ce28137659c2');
         $thothWork->setWorkType(ThothWork::WORK_TYPE_EDITED_BOOK);
         $thothWork->setWorkStatus(ThothWork::WORK_STATUS_ACTIVE);
         $thothWork->setFullTitle('Cuba : Restructuring the Economy');
         $thothWork->setTitle('Cuba : Restructuring the Economy');
+        $thothWork->setLongAbstract('');
         $thothWork->setLandingPage('https://omp.publicknowledgeproject.org/index.php/press/catalog/book');
         $thothWork->setCoverUrl('https://omp.publicknowledgeproject.org/templates/images/book-default.png');
 
@@ -379,6 +473,10 @@ class ThothWorkServiceTest extends PKPTestCase
 
         $mockThothClient = $this->setUpMockEnvironment();
 
+        ThothContainer::getInstance()->set('client', function () use ($mockThothClient) {
+            return $mockThothClient;
+        });
+
         $publication = new Publication();
         $publication->setData('title', 'Cuba : Restructuring the Economy', 'en_US');
         $publication->setData('subtitle', 'A Contribution to the Debate', 'en_US');
@@ -387,7 +485,6 @@ class ThothWorkServiceTest extends PKPTestCase
 
         $thothWorkId = '49e58788-95d6-427f-8726-c24f5b15484c';
         $updatedThothWork = $this->workService->updateBook(
-            $mockThothClient,
             $thothWorkId,
             $submission,
             $publication

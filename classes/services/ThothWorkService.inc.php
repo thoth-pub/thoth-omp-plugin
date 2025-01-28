@@ -13,19 +13,14 @@
  * @brief Helper class that encapsulates business logic for Thoth works
  */
 
+use ThothApi\GraphQL\Models\Work as ThothWork;
+use ThothApi\GraphQL\Models\WorkRelation as ThothWorkRelation;
+
 import('plugins.generic.thoth.classes.facades.ThothService');
-import('plugins.generic.thoth.lib.thothAPI.models.ThothWork');
-import('plugins.generic.thoth.lib.thothAPI.models.ThothWorkRelation');
-import('plugins.generic.thoth.classes.services.queryBuilders.ThothWorkQueryBuilder');
 
 class ThothWorkService
 {
-    public function getQueryBuilder($thothClient)
-    {
-        return new ThothWorkQueryBuilder($thothClient);
-    }
-
-    private function getDoiResolvingUrl($doi)
+    public function getDoiResolvingUrl($doi)
     {
         if (empty($doi)) {
             return $doi;
@@ -97,7 +92,7 @@ class ThothWorkService
     public function new($params)
     {
         $work = new ThothWork();
-        $work->setId($params['workId'] ?? null);
+        $work->setWorkId($params['workId'] ?? null);
         $work->setImprintId($params['imprintId'] ?? null);
         $work->setWorkType($params['workType']);
         $work->setWorkType($params['workType']);
@@ -108,7 +103,7 @@ class ThothWorkService
         $work->setEdition($params['edition'] ?? null);
         $work->setPublicationDate($params['publicationDate'] ?? null);
         $work->setSubtitle($params['subtitle'] ?? null);
-        $work->setPageCount($params['pageCount'] ?? null);
+        $work->setPageCount(!empty($params['pageCount']) ? (int) $params['pageCount'] : null);
         $work->setDoi($params['doi'] ?? null);
         $work->setLicense($params['license'] ?? null);
         $work->setCopyrightHolder($params['copyrightHolder'] ?? null);
@@ -118,31 +113,44 @@ class ThothWorkService
         return $work;
     }
 
-    public function get($thothClient, $thothWorkId)
+    public function get($thothWorkId)
     {
-        $thothWorkData = $thothClient->work($thothWorkId);
-        return $this->new($thothWorkData);
+        $thothClient = ThothContainer::getInstance()->get('client');
+        return $thothClient->work($thothWorkId);
     }
 
-    public function registerBook($thothClient, $submission, $thothImprintId)
+    public function search($filter)
+    {
+        $thothClient = ThothContainer::getInstance()->get('client');
+        return $thothClient->works(['filter' => $filter]);
+    }
+
+    public function getByDoi($doi)
+    {
+        $thothClient = ThothContainer::getInstance()->get('client');
+        return $thothClient->workByDoi($doi);
+    }
+
+    public function registerBook($submission, $thothImprintId)
     {
         $thothBook = $this->newBySubmission($submission);
         $thothBook->setImprintId($thothImprintId);
 
+        $thothClient = ThothContainer::getInstance()->get('client');
         $thothBookId = $thothClient->createWork($thothBook);
-        $thothBook->setId($thothBookId);
+        $thothBook->setWorkId($thothBookId);
 
         $authors = DAORegistry::getDAO('AuthorDAO')
             ->getByPublicationId($submission->getData('currentPublicationId'));
         foreach ($authors as $author) {
-            ThothService::contribution()->register($thothClient, $author, $thothBookId);
+            ThothService::contribution()->register($author, $thothBookId);
         }
 
         $chapters = DAORegistry::getDAO('ChapterDAO')
             ->getByPublicationId($submission->getData('currentPublicationId'))
             ->toArray();
         foreach ($chapters as $chapter) {
-            $this->registerWorkRelation($thothClient, $chapter, $thothImprintId, $thothBookId);
+            $this->registerWorkRelation($chapter, $thothImprintId, $thothBookId);
         }
 
         $publicationFormats = Application::getRepresentationDao()
@@ -150,40 +158,41 @@ class ThothWorkService
             ->toArray();
         foreach ($publicationFormats as $publicationFormat) {
             if ($publicationFormat->getIsAvailable()) {
-                ThothService::publication()->register($thothClient, $publicationFormat, $thothBookId);
+                ThothService::publication()->register($publicationFormat, $thothBookId);
             }
         }
 
         $submissionKeywords = DAORegistry::getDAO('SubmissionKeywordDAO')
             ->getKeywords($submission->getData('currentPublicationId'));
         foreach ($submissionKeywords[$submission->getLocale()] ?? [] as $seq => $submissionKeyword) {
-            ThothService::subject()->registerKeyword($thothClient, $submissionKeyword, $thothBookId, $seq + 1);
+            ThothService::subject()->registerKeyword($submissionKeyword, $thothBookId, $seq + 1);
         }
 
         $submissionLocale = $submission->getData('locale');
-        ThothService::language()->register($thothClient, $submissionLocale, $thothBookId);
+        ThothService::language()->register($submissionLocale, $thothBookId);
 
         $citations = DAORegistry::getDAO('CitationDAO')
             ->getByPublicationId($submission->getData('currentPublicationId'))
             ->toArray();
         foreach ($citations as $citation) {
-            ThothService::reference()->register($thothClient, $citation, $thothBookId);
+            ThothService::reference()->register($citation, $thothBookId);
         }
 
         return $thothBook;
     }
 
-    public function registerChapter($thothClient, $chapter, $thothImprintId)
+    public function registerChapter($chapter, $thothImprintId)
     {
         $thothChapter = $this->newByChapter($chapter);
         $thothChapter->setImprintId($thothImprintId);
 
+        $thothClient = ThothContainer::getInstance()->get('client');
         $thothChapterId = $thothClient->createWork($thothChapter);
-        $thothChapter->setId($thothChapterId);
+        $thothChapter->setWorkId($thothChapterId);
 
         $authors = $chapter->getAuthors()->toArray();
         foreach ($authors as $author) {
-            ThothService::contribution()->register($thothClient, $author, $thothChapterId);
+            ThothService::contribution()->register($author, $thothChapterId);
         }
 
         $publication = Services::get('publication')->get($chapter->getData('publicationId'));
@@ -202,7 +211,6 @@ class ThothWorkService
             $publicationFormat = $publicationFormatDao->getById($file->getData('assocId'));
             if ($publicationFormat->getIsAvailable()) {
                 ThothService::publication()->register(
-                    $thothClient,
                     $publicationFormat,
                     $thothChapterId,
                     $chapter->getId()
@@ -213,41 +221,40 @@ class ThothWorkService
         return $thothChapter;
     }
 
-    public function registerWorkRelation($thothClient, $chapter, $thothImprintId, $relatedWorkId)
+    public function registerWorkRelation($chapter, $thothImprintId, $relatedWorkId)
     {
-        $thothChapter = $this->registerChapter($thothClient, $chapter, $thothImprintId);
+        $thothChapter = $this->registerChapter($chapter, $thothImprintId);
 
         $relation = new ThothWorkRelation();
-        $relation->setRelatorWorkId($thothChapter->getId());
+        $relation->setRelatorWorkId($thothChapter->getWorkId());
         $relation->setRelatedWorkId($relatedWorkId);
         $relation->setRelationType(ThothWorkRelation::RELATION_TYPE_IS_CHILD_OF);
         $relation->setRelationOrdinal($chapter->getSequence() + 1);
 
+        $thothClient = ThothContainer::getInstance()->get('client');
         $relationId = $thothClient->createWorkRelation($relation);
-        $relation->setId($relationId);
+        $relation->setWorkRelationId($relationId);
 
         return $relation;
     }
 
-    public function updateBook($thothClient, $thothWorkId, $submission, $publication)
+    public function updateBook($thothWorkId, $submission, $publication)
     {
-        $thothWorkData = [];
-        $thothWorkData = $this->getQueryBuilder($thothClient)
-            ->includeContributions()
-            ->includeRelations(true)
-            ->includeSubjects()
-            ->includeReferences()
-            ->includePublications(true)
-            ->get($thothWorkId);
-        $newThothWork = $this->new(array_merge(
+        $thothClient = ThothContainer::getInstance()->get('client');
+
+        $thothData = $thothClient->rawQuery($this->getCompleteWorkQuery(), ['workId' => $thothWorkId]);
+        $thothWorkData = $thothData['work'];
+        $submissionData = $this->getDataBySubmission($submission, $publication);
+        $mergedWorkData = array_merge(
             $thothWorkData,
-            $this->getDataBySubmission($submission, $publication)
-        ));
+            $submissionData
+        );
+        $newThothWork = $this->new($mergedWorkData);
+
         $thothClient->updateWork($newThothWork);
 
         if (isset($thothWorkData['contributions'])) {
             ThothService::contribution()->updateContributions(
-                $thothClient,
                 $thothWorkData['contributions'],
                 $publication,
                 $thothWorkId
@@ -256,7 +263,6 @@ class ThothWorkService
 
         if (isset($thothWorkData['relations'])) {
             $this->updateRelations(
-                $thothClient,
                 $thothWorkData['relations'],
                 $publication,
                 $thothWorkId,
@@ -266,7 +272,6 @@ class ThothWorkService
 
         if (isset($thothWorkData['subjects'])) {
             ThothService::subject()->updateKeywords(
-                $thothClient,
                 $thothWorkData['subjects'],
                 $publication,
                 $thothWorkId
@@ -275,7 +280,6 @@ class ThothWorkService
 
         if (isset($thothWorkData['references'])) {
             ThothService::reference()->updateReferences(
-                $thothClient,
                 $thothWorkData['references'],
                 $publication,
                 $thothWorkId
@@ -284,7 +288,6 @@ class ThothWorkService
 
         if (isset($thothWorkData['publications'])) {
             ThothService::publication()->updateBookPublications(
-                $thothClient,
                 $thothWorkData['publications'],
                 $publication,
                 $thothWorkId
@@ -294,7 +297,7 @@ class ThothWorkService
         return $newThothWork;
     }
 
-    public function updateRelations($thothClient, $thothRelations, $publication, $thothWorkId, $thothImprintId)
+    public function updateRelations($thothRelations, $publication, $thothWorkId, $thothImprintId)
     {
         $chapterDAO = DAORegistry::getDAO('ChapterDAO');
         $chapters = $chapterDAO->getByPublicationId($publication->getId())->toArray();
@@ -303,14 +306,21 @@ class ThothWorkService
             return;
         }
 
-        $thothRelationsData = array_column($thothRelations, 'relatedWork', 'fullTitle');
+        $thothClient = ThothContainer::getInstance()->get('client');
+
+        $thothRelationsData = [];
+        foreach ($thothRelations as $thothRelation) {
+            $relationFullTitle = $thothRelation['relatedWork']['fullTitle'];
+            $thothRelationsData[$relationFullTitle] = $thothRelation;
+        }
+
         $chapterTitles = array_map(function ($chapter) {
             return $chapter->getLocalizedFullTitle();
         }, $chapters);
 
         foreach ($thothRelationsData as $fullTitle => $relatedWork) {
             if (!in_array($fullTitle, $chapterTitles)) {
-                $thothClient->deleteWork($relatedWork['workId']);
+                $thothClient->deleteWork($relatedWork['workRelationId']);
             }
         }
 
@@ -320,7 +330,7 @@ class ThothWorkService
         foreach ($chapters as $chapter) {
             $chapterTitle = $chapter->getLocalizedFullTitle();
             if (!isset($thothRelationsData[$chapterTitle])) {
-                $this->registerWorkRelation($thothClient, $chapter, $thothImprintId, $thothWorkId);
+                $this->registerWorkRelation($chapter, $thothImprintId, $thothWorkId);
             }
         }
     }
@@ -333,5 +343,126 @@ class ThothWorkService
         ];
 
         return $workTypeMapping[$submissionWorkType];
+    }
+
+    private function getCompleteWorkQuery()
+    {
+        return <<<GQL
+        query(\$workId: Uuid!) {
+            work(workId: \$workId) {
+                ...workFields
+                contributions {
+                    ...contributionFields
+                }
+                relations {
+                    ...relationFields
+                }
+                subjects {
+                    ...subjectFields
+                }
+                references {
+                    ...referenceFields
+                }
+                publications {
+                    ...publicationFields
+                }
+            }
+        }
+
+        fragment workFields on Work {
+            workId
+            workType
+            workStatus
+            fullTitle
+            title
+            subtitle
+            reference
+            edition
+            imprintId
+            doi
+            publicationDate
+            withdrawnDate
+            place
+            pageCount
+            pageBreakdown
+            imageCount
+            tableCount
+            audioCount
+            videoCount
+            license
+            copyrightHolder
+            landingPage
+            lccn
+            oclc
+            shortAbstract
+            longAbstract
+            generalNote
+            bibliographyNote
+            toc
+            coverUrl
+            coverCaption
+            firstPage
+            lastPage
+            pageInterval
+        }
+
+        fragment contributionFields on Contribution {
+            contributionId
+            contributorId
+            workId
+            contributionType
+            mainContribution
+            biography
+            firstName
+            lastName
+            fullName
+            contributionOrdinal
+        }
+
+        fragment relationFields on WorkRelation {
+            workRelationId
+            relatorWorkId
+            relatedWorkId
+            relationType
+            relationOrdinal
+            relatedWork {
+                ...workFields
+            }
+        }
+
+        fragment subjectFields on Subject {
+            subjectId
+            workId
+            subjectType
+            subjectCode
+            subjectOrdinal
+        }
+
+        fragment referenceFields on Reference {
+            referenceId
+            workId
+            referenceOrdinal
+            unstructuredCitation
+        }
+
+        fragment publicationFields on Publication {
+            publicationId
+            publicationType
+            workId
+            isbn
+            locations {
+                ...locationFields
+            }
+        }
+
+        fragment locationFields on Location {
+            locationId
+            publicationId
+            landingPage
+            fullTextUrl
+            locationPlatform
+            canonical
+        }
+        GQL;
     }
 }

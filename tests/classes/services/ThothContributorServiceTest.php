@@ -14,22 +14,29 @@
  * @brief Test class for the ThothContributorService class
  */
 
+use ThothApi\GraphQL\Client as ThothClient;
+use ThothApi\GraphQL\Models\Contributor as ThothContributor;
+
 import('lib.pkp.tests.PKPTestCase');
 import('classes.monograph.Author');
 import('plugins.generic.thoth.classes.services.ThothContributorService');
-import('plugins.generic.thoth.lib.thothAPI.ThothClient');
 
 class ThothContributorServiceTest extends PKPTestCase
 {
+    private $clientFactoryBackup;
+    private $configFactoryBackup;
+
     protected function setUp(): void
     {
         parent::setUp();
+        $this->clientFactoryBackup = ThothContainer::getInstance()->backup('client');
         $this->contributorService = new ThothContributorService();
     }
 
     protected function tearDown(): void
     {
         unset($this->contributorService);
+        ThothContainer::getInstance()->set('client', $this->clientFactoryBackup);
         parent::tearDown();
     }
 
@@ -73,7 +80,7 @@ class ThothContributorServiceTest extends PKPTestCase
     public function testRegisterContributor()
     {
         $expectedContributor = new ThothContributor();
-        $expectedContributor->setId('f70f709e-2137-4c87-a2e5-d52b263759ec');
+        $expectedContributor->setContributorId('f70f709e-2137-4c87-a2e5-d52b263759ec');
         $expectedContributor->setFirstName('Brian');
         $expectedContributor->setLastName('Dupuis');
         $expectedContributor->setFullName('Brian Dupuis');
@@ -91,7 +98,11 @@ class ThothContributorServiceTest extends PKPTestCase
             ->method('createContributor')
             ->will($this->returnValue('f70f709e-2137-4c87-a2e5-d52b263759ec'));
 
-        $contributor = $this->contributorService->register($mockThothClient, $author);
+        ThothContainer::getInstance()->set('client', function () use ($mockThothClient) {
+            return $mockThothClient;
+        });
+
+        $contributor = $this->contributorService->register($author);
         $this->assertEquals($expectedContributor, $contributor);
     }
 
@@ -99,17 +110,18 @@ class ThothContributorServiceTest extends PKPTestCase
     {
         $expectedContributors = [];
         $expectedContributors[] = new ThothContributor();
-        $expectedContributors[0]->setId('59383141-fff9-46e2-bc66-f71e42189380');
+        $expectedContributors[0]->setContributorId('59383141-fff9-46e2-bc66-f71e42189380');
         $expectedContributors[0]->setFirstName('Brenna Clarke');
         $expectedContributors[0]->setLastName('Gray');
         $expectedContributors[0]->setFullName('Brenna Clarke Gray');
         $expectedContributors[0]->setOrcid('https://orcid.org/0000-0002-6079-0484');
         $expectedContributors[0]->setWebsite('http://brennaclarkegray.ca');
         $expectedContributors[] = new ThothContributor();
-        $expectedContributors[1]->setId('5b0d32d4-bfd9-4db1-88fb-4cb91bdaf246');
+        $expectedContributors[1]->setContributorId('5b0d32d4-bfd9-4db1-88fb-4cb91bdaf246');
         $expectedContributors[1]->setFirstName('Dilton Oliveira de');
         $expectedContributors[1]->setLastName('Araújo');
         $expectedContributors[1]->setFullName('Dilton Oliveira de Araújo');
+        $expectedContributors[0]->setOrcid(null);
         $expectedContributors[1]->setWebsite('http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=B00408');
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
@@ -120,25 +132,27 @@ class ThothContributorServiceTest extends PKPTestCase
         $mockThothClient->expects($this->any())
             ->method('contributors')
             ->will($this->returnValue([
-                [
+                new ThothContributor([
                     'contributorId' => '59383141-fff9-46e2-bc66-f71e42189380',
                     'firstName' => 'Brenna Clarke',
                     'lastName' => 'Gray',
                     'fullName' => 'Brenna Clarke Gray',
-                    'orcid' => 'https://orcid.org/0000-0002-6079-0484',
                     'website' => 'http://brennaclarkegray.ca'
-                ],
-                [
+                ]),
+                new ThothContributor([
                     'contributorId' => '5b0d32d4-bfd9-4db1-88fb-4cb91bdaf246',
                     'firstName' => 'Dilton Oliveira de',
                     'lastName' => 'Araújo',
                     'fullName' => 'Dilton Oliveira de Araújo',
-                    'orcid' => null,
                     'website' => 'http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=B00408'
-                ]
+                ])
             ]));
 
-        $contributors = $this->contributorService->getMany($mockThothClient);
+        ThothContainer::getInstance()->set('client', function () use ($mockThothClient) {
+            return $mockThothClient;
+        });
+
+        $contributors = $this->contributorService->getMany();
 
         $this->assertEquals($expectedContributors, $contributors);
     }
