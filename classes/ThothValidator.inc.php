@@ -17,6 +17,7 @@
 require_once(__DIR__ . '/../vendor/autoload.php');
 
 use Biblys\Isbn\Isbn;
+use ThothApi\GraphQL\Models\Work as ThothWork;
 
 import('plugins.generic.thoth.classes.facades.ThothService');
 
@@ -25,6 +26,13 @@ class ThothValidator
     public static function validate($submission)
     {
         $errors = [];
+
+        $publication = $submission->getCurrentPublication();
+        $doi = $publication->getData('doiObject')?->getResolvingUrl();
+
+        if ($doi !== null) {
+            $errors = array_merge($errors, self::validateDoiExists($doi));
+        }
 
         $publicationFormats = Application::getRepresentationDao()
             ->getApprovedByPublicationId($submission->getData('currentPublicationId'))
@@ -54,6 +62,22 @@ class ThothValidator
                     'formatName' => $publicationFormat->getLocalizedName()
                 ]);
             }
+        }
+
+        return $errors;
+    }
+
+    public static function validateDoiExists($doi)
+    {
+        $errors = [];
+
+        try {
+            $work = ThothService::work()->getByDoi($doi);
+            if ($work instanceof ThothWork) {
+                $errors[] = __('plugins.generic.thoth.validation.doiExists', ['doi' => $doi]);
+            }
+        } catch (Exception $e) {
+            return $errors;
         }
 
         return $errors;
