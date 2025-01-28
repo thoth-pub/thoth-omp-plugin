@@ -42,6 +42,12 @@ class ThothPublicationService
         return $publication;
     }
 
+    public function search($filter)
+    {
+        $thothClient = ThothContainer::getInstance()->get('client');
+        return $thothClient->publications(['filter' => $filter]);
+    }
+
     public function register($publicationFormat, $workId, $chapterId = null)
     {
         $thothPublication = $this->newByPublicationFormat($publicationFormat);
