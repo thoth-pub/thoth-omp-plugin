@@ -14,6 +14,9 @@
  * @brief Test class for the ThothValidator class
  */
 
+use ThothApi\GraphQL\Client as ThothClient;
+use ThothApi\GraphQL\Models\Work as ThothWork;
+
 import('lib.pkp.tests.PKPTestCase');
 import('plugins.generic.thoth.classes.ThothValidator');
 import('classes.publicationFormat.PublicationFormat');
@@ -71,6 +74,32 @@ class ThothValidatorTest extends PKPTestCase
         $this->assertEquals([
             '##plugins.generic.thoth.validation.isbn##',
             '##plugins.generic.thoth.validation.isbn##'
+        ], $errors);
+    }
+
+    public function testDOIExistsValidationFails()
+    {
+        $doi = 'https://doi.org/10.12345/12345678';
+
+        $mockThothClient = $this->getMockBuilder(ThothClient::class)
+            ->setMethods([
+                'workByDoi',
+            ])
+            ->getMock();
+        $mockThothClient->expects($this->any())
+            ->method('workByDoi')
+            ->will($this->returnValue(new ThothWork([
+                'doi' => $doi
+            ])));
+
+        ThothContainer::getInstance()->set('client', function () use ($mockThothClient) {
+            return $mockThothClient;
+        });
+
+        $errors = ThothValidator::validateDoiExists($doi);
+
+        $this->assertEquals([
+            '##plugins.generic.thoth.validation.doiExists##',
         ], $errors);
     }
 }

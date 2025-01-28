@@ -20,7 +20,7 @@ import('plugins.generic.thoth.classes.facades.ThothService');
 
 class ThothWorkService
 {
-    private function getDoiResolvingUrl($doi)
+    public function getDoiResolvingUrl($doi)
     {
         if (empty($doi)) {
             return $doi;
@@ -117,6 +117,12 @@ class ThothWorkService
     {
         $thothClient = ThothContainer::getInstance()->get('client');
         return $thothClient->work($thothWorkId);
+    }
+
+    public function getByDoi($doi)
+    {
+        $thothClient = ThothContainer::getInstance()->get('client');
+        return $thothClient->workByDoi($doi);
     }
 
     public function registerBook($submission, $thothImprintId)

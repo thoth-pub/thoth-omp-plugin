@@ -299,6 +299,34 @@ class ThothWorkServiceTest extends PKPTestCase
         $this->assertEquals($expectedThothWork, $thothWork);
     }
 
+    public function testGetWorkByDoi()
+    {
+        $doi = 'https://doi.org/10.12345/12345678';
+
+        $expectedThothWork = new ThothWork([
+            'doi' => $doi
+        ]);
+
+        $mockThothClient = $this->getMockBuilder(ThothClient::class)
+            ->setMethods([
+                'workByDoi',
+            ])
+            ->getMock();
+        $mockThothClient->expects($this->any())
+            ->method('workByDoi')
+            ->will($this->returnValue(new ThothWork([
+                'doi' => $doi
+            ])));
+
+        ThothContainer::getInstance()->set('client', function () use ($mockThothClient) {
+            return $mockThothClient;
+        });
+
+        $thothWork = $this->workService->getByDoi($doi);
+
+        $this->assertEquals($expectedThothWork, $thothWork);
+    }
+
     public function testRegisterBook()
     {
         $thothImprintId = 'f02786d4-3bcc-473e-8d43-3da66c7e877c';
