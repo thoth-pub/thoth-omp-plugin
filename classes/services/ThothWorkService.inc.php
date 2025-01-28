@@ -119,6 +119,12 @@ class ThothWorkService
         return $thothClient->work($thothWorkId);
     }
 
+    public function search($filter)
+    {
+        $thothClient = ThothContainer::getInstance()->get('client');
+        return $thothClient->works(['filter' => $filter]);
+    }
+
     public function getByDoi($doi)
     {
         $thothClient = ThothContainer::getInstance()->get('client');

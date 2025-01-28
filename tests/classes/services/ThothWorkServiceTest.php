@@ -327,6 +327,38 @@ class ThothWorkServiceTest extends PKPTestCase
         $this->assertEquals($expectedThothWork, $thothWork);
     }
 
+    public function testSearchWork()
+    {
+        $title = 'My book title';
+
+        $expectedThothWorks = [
+            new ThothWork([
+                'title' => $title
+            ])
+        ];
+
+        $mockThothClient = $this->getMockBuilder(ThothClient::class)
+            ->setMethods([
+                'works',
+            ])
+            ->getMock();
+        $mockThothClient->expects($this->any())
+            ->method('works')
+            ->will($this->returnValue([
+                new ThothWork([
+                    'title' => $title
+                ])
+            ]));
+
+        ThothContainer::getInstance()->set('client', function () use ($mockThothClient) {
+            return $mockThothClient;
+        });
+
+        $thothWorks = $this->workService->search($title);
+
+        $this->assertEquals($expectedThothWorks, $thothWorks);
+    }
+
     public function testRegisterBook()
     {
         $thothImprintId = 'f02786d4-3bcc-473e-8d43-3da66c7e877c';

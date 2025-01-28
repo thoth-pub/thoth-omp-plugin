@@ -13,6 +13,8 @@
  * @brief Utility class to package all plugin container bindings
  */
 
+require_once(__DIR__ . '/../../vendor/autoload.php');
+
 use ThothApi\GraphQL\Client;
 
 import('plugins.generic.thoth.classes.container.ContainerProvider');

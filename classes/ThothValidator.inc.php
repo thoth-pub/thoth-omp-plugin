@@ -13,8 +13,6 @@
  * @brief Validate submission metadata to Thoth submit
  */
 
-require_once(__DIR__ . '/../vendor/autoload.php');
-
 use Biblys\Isbn\Isbn;
 use ThothApi\GraphQL\Models\Work as ThothWork;
 
@@ -34,6 +32,20 @@ class ThothValidator
             $errors = array_merge($errors, self::validateDoiExists($doiUrl));
         }
 
+        $request = Application::get()->getRequest();
+        $context = $request->getContext();
+        $dispatcher = $request->getDispatcher();
+
+        $landingPage = $dispatcher->url(
+            $request,
+            ROUTE_PAGE,
+            $context->getPath(),
+            'catalog',
+            'book',
+            $submission->getBestId()
+        );
+
+        $errors = array_merge($errors, self::validateLandingPageExists($landingPage));
 
         $publicationFormats = Application::getRepresentationDao()
             ->getApprovedByPublicationId($submission->getData('currentPublicationId'))
@@ -79,6 +91,19 @@ class ThothValidator
             }
         } catch (Exception $e) {
             return $errors;
+        }
+
+        return $errors;
+    }
+
+    public static function validateLandingPageExists($landingPage)
+    {
+        $errors = [];
+
+        $works = ThothService::work()->search($landingPage);
+
+        if (!empty($works)) {
+            $errors[] = __('plugins.generic.thoth.validation.landingPageExists', ['landingPage' => $landingPage]);
         }
 
         return $errors;
