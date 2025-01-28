@@ -164,7 +164,7 @@ class ThothPublicationServiceTest extends PKPTestCase
         $this->assertEquals($expectedPublication, $publication);
     }
 
-    public function testCreateNewContributor()
+    public function testCreateNewPublication()
     {
         $expectedPublication = new ThothPublication();
         $expectedPublication->setPublicationType(ThothPublication::PUBLICATION_TYPE_PDF);
@@ -177,6 +177,36 @@ class ThothPublicationServiceTest extends PKPTestCase
 
         $publication = $this->publicationService->new($params);
         $this->assertEquals($expectedPublication, $publication);
+    }
+
+    public function testSearchPublication()
+    {
+        $isbn = '978-65-89999-01-3';
+
+        $expectedThothPublications = [
+            new ThothPublication([
+                'isbn' => $isbn
+            ])
+        ];
+
+        $mockThothClient = $this->getMockBuilder(ThothClient::class)
+            ->setMethods(['publications'])
+            ->getMock();
+        $mockThothClient->expects($this->any())
+            ->method('publications')
+            ->will($this->returnValue([
+                new ThothPublication([
+                    'isbn' => $isbn
+                ])
+            ]));
+
+        ThothContainer::getInstance()->set('client', function () use ($mockThothClient) {
+            return $mockThothClient;
+        });
+
+        $thothPublications = $this->publicationService->search($isbn);
+
+        $this->assertEquals($expectedThothPublications, $thothPublications);
     }
 
     public function testRegisterPublication()

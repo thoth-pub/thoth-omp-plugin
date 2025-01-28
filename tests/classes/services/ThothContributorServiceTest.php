@@ -137,7 +137,6 @@ class ThothContributorServiceTest extends PKPTestCase
                     'firstName' => 'Brenna Clarke',
                     'lastName' => 'Gray',
                     'fullName' => 'Brenna Clarke Gray',
-                    // 'orcid' => 'https://orcid.org/0000-0002-6079-0484',
                     'website' => 'http://brennaclarkegray.ca'
                 ]),
                 new ThothContributor([
@@ -145,7 +144,6 @@ class ThothContributorServiceTest extends PKPTestCase
                     'firstName' => 'Dilton Oliveira de',
                     'lastName' => 'Araújo',
                     'fullName' => 'Dilton Oliveira de Araújo',
-                    // 'orcid' => null,
                     'website' => 'http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=B00408'
                 ])
             ]));

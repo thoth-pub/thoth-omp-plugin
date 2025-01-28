@@ -15,6 +15,8 @@
  * @brief Plugin for integration with Thoth for communication and synchronization of book data between the two platforms
  */
 
+require_once(__DIR__ . '/vendor/autoload.php');
+
 import('lib.pkp.classes.plugins.GenericPlugin');
 import('plugins.generic.thoth.classes.ThothBadgeRender');
 import('plugins.generic.thoth.classes.ThothNotification');
