@@ -57,6 +57,9 @@ msgstr "\"{$isbn}\" del formato de publicación \"{$formatName}\" no es un ISBN-
 msgid "plugins.generic.thoth.validation.doiExists"
 msgstr "Un trabajo con el DOI \"{$doi}\" ya existe."
 
+msgid "plugins.generic.thoth.validation.landingPageExists"
+msgstr "Un trabajo con la página de destino \"{$landingPage}\" ya existe."
+
 msgid "plugins.generic.thoth.register.confirmation"
 msgstr "¿Desea registrar en Thoth los metadatos relacionados con este envío?"
 

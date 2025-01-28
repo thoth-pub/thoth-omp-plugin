@@ -121,6 +121,12 @@ class ThothWorkService
         return $thothClient->workByDoi($doi);
     }
 
+    public function search($filter)
+    {
+        $thothClient = ThothContainer::getInstance()->get('client');
+        return $thothClient->works(['filter' => $filter]);
+    }
+
     public function registerBook($submission, $thothImprintId)
     {
         $thothBook = $this->newBySubmission($submission);

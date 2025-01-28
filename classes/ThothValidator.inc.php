@@ -34,6 +34,21 @@ class ThothValidator
             $errors = array_merge($errors, self::validateDoiExists($doi));
         }
 
+        $request = Application::get()->getRequest();
+        $context = $request->getContext();
+        $dispatcher = $request->getDispatcher();
+
+        $landingPage = $dispatcher->url(
+            $request,
+            ROUTE_PAGE,
+            $context->getPath(),
+            'catalog',
+            'book',
+            $submission->getBestId()
+        );
+
+        $errors = array_merge($errors, self::validateLandingPageExists($landingPage));
+
         $publicationFormats = Application::getRepresentationDao()
             ->getApprovedByPublicationId($submission->getData('currentPublicationId'))
             ->toArray();
@@ -78,6 +93,19 @@ class ThothValidator
             }
         } catch (Exception $e) {
             return $errors;
+        }
+
+        return $errors;
+    }
+
+    public static function validateLandingPageExists($landingPage)
+    {
+        $errors = [];
+
+        $works = ThothService::work()->search($landingPage);
+
+        if (!empty($works)) {
+            $errors[] = __('plugins.generic.thoth.validation.landingPageExists', ['landingPage' => $landingPage]);
         }
 
         return $errors;

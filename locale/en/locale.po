@@ -57,6 +57,9 @@ msgstr "\"{$isbn}\" of \"{$formatName}\" publication format is not a valid ISBN-
 msgid "plugins.generic.thoth.validation.doiExists"
 msgstr "A work with DOI \"{$doi}\" already exists."
 
+msgid "plugins.generic.thoth.validation.landingPageExists"
+msgstr "A work with the landing page \"{$landingPage}\" already exists."
+
 msgid "plugins.generic.thoth.register.confirmation"
 msgstr "Do you want to register in Thoth the metadata related to this submission?"
 
