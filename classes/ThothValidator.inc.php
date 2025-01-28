@@ -71,6 +71,7 @@ class ThothValidator
                 if ($isbn !== null) {
                     Isbn::validateAsIsbn13($isbn);
                 }
+                $errors = array_merge($errors, self::validateIsbnExists($isbn));
             } catch (Exception $e) {
                 $errors[] = __('plugins.generic.thoth.validation.isbn', [
                     'isbn' => $isbn,
@@ -106,6 +107,19 @@ class ThothValidator
 
         if (!empty($works)) {
             $errors[] = __('plugins.generic.thoth.validation.landingPageExists', ['landingPage' => $landingPage]);
+        }
+
+        return $errors;
+    }
+
+    public static function validateIsbnExists($isbn)
+    {
+        $errors = [];
+
+        $publications = ThothService::publication()->search($isbn);
+
+        if (!empty($publications)) {
+            $errors[] = __('plugins.generic.thoth.validation.isbnExists', ['isbn' => $isbn]);
         }
 
         return $errors;
