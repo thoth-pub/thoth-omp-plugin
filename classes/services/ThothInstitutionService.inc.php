@@ -14,14 +14,14 @@
  * @brief Helper class that encapsulates business logic for Thoth institutions
  */
 
-import('plugins.generic.thoth.lib.thothAPI.models.ThothInstitution');
+use ThothApi\GraphQL\Models\Institution as ThothInstitution;
 
 class ThothInstitutionService
 {
     public function new($params)
     {
         $thothInstitution = new ThothInstitution();
-        $thothInstitution->setId($params['institutionId']);
+        $thothInstitution->setInstitutionId($params['institutionId']);
         $thothInstitution->setInstitutionName($params['institutionName']);
         $thothInstitution->setInstitutionDoi($params['institutionDoi']);
         $thothInstitution->setCountryCode($params['countryCode']);
@@ -29,9 +29,9 @@ class ThothInstitutionService
         return $thothInstitution;
     }
 
-    public function getMany($thothClient, $params = [])
+    public function getMany($params = [])
     {
-        $institutionsData = $thothClient->institutions($params);
-        return array_map([$this, 'new'], $institutionsData);
+        $thothClient = ThothContainer::getInstance()->get('client');
+        return $thothClient->institutions($params);
     }
 }

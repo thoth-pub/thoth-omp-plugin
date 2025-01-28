@@ -16,9 +16,9 @@
 
 use APP\core\Application;
 use APP\facades\Repo;
+use ThothApi\GraphQL\Models\Publication as ThothPublication;
 
 import('plugins.generic.thoth.classes.facades.ThothService');
-import('plugins.generic.thoth.lib.thothAPI.models.ThothPublication');
 
 class ThothPublicationService
 {
@@ -34,7 +34,7 @@ class ThothPublicationService
     public function new($params)
     {
         $publication = new ThothPublication();
-        $publication->setId($params['publicationId'] ?? null);
+        $publication->setPublicationId($params['publicationId'] ?? null);
         $publication->setWorkId($params['workId'] ?? null);
         $publication->setPublicationType($params['publicationType']);
         $publication->setIsbn($params['isbn'] ?? null);
@@ -42,7 +42,13 @@ class ThothPublicationService
         return $publication;
     }
 
-    public function register($thothClient, $publicationFormat, $workId, $chapterId = null)
+    public function search($filter)
+    {
+        $thothClient = ThothContainer::getInstance()->get('client');
+        return $thothClient->publications(['filter' => $filter]);
+    }
+
+    public function register($publicationFormat, $workId, $chapterId = null)
     {
         $thothPublication = $this->newByPublicationFormat($publicationFormat);
         $thothPublication->setWorkId($workId);
@@ -51,11 +57,12 @@ class ThothPublicationService
             $thothPublication->setIsbn(null);
         }
 
+        $thothClient = ThothContainer::getInstance()->get('client');
         $thothPublicationId = $thothClient->createPublication($thothPublication);
-        $thothPublication->setId($thothPublicationId);
+        $thothPublication->setPublicationId($thothPublicationId);
 
         if ($publicationFormat->getRemoteUrl()) {
-            ThothService::location()->register($thothClient, $publicationFormat, $thothPublicationId);
+            ThothService::location()->register($publicationFormat, $thothPublicationId);
             return $thothPublication;
         }
 
@@ -75,7 +82,6 @@ class ThothPublicationService
         $canonical = true;
         foreach ($files as $file) {
             ThothService::location()->register(
-                $thothClient,
                 $publicationFormat,
                 $thothPublicationId,
                 $file->getId(),
@@ -87,7 +93,7 @@ class ThothPublicationService
         return $thothPublication;
     }
 
-    public function updateBookPublications($thothClient, $thothPublications, $publication, $thothWorkId)
+    public function updateBookPublications($thothPublications, $publication, $thothWorkId)
     {
         $publicationFormats = Application::getRepresentationDao()
             ->getApprovedByPublicationId($publication->getId())
@@ -113,7 +119,7 @@ class ThothPublicationService
             });
 
             if (empty($result)) {
-                $this->register($thothClient, $publicationFormat, $thothWorkId);
+                $this->register($publicationFormat, $thothWorkId);
                 continue;
             }
 
@@ -125,7 +131,6 @@ class ThothPublicationService
             }
 
             ThothService::location()->updateLocations(
-                $thothClient,
                 $thothPublication['locations'],
                 $publicationFormat,
                 $thothPublication['publicationId']

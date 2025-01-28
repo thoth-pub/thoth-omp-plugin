@@ -21,8 +21,8 @@ use PKP\form\Form;
 use PKP\form\validation\FormValidatorCSRF;
 use PKP\form\validation\FormValidatorCustom;
 use PKP\form\validation\FormValidatorPost;
-
-import('plugins.generic.thoth.lib.thothAPI.ThothClient');
+use ThothApi\Exception\QueryException;
+use ThothApi\GraphQL\Client;
 
 class ThothSettingsForm extends Form
 {
@@ -53,13 +53,16 @@ class ThothSettingsForm extends Form
             function ($password) use ($form) {
                 $email = trim($this->getData('email'));
                 $testEnvironment = $this->getData('testEnvironment');
-                $thothClient = new ThothClient($testEnvironment);
+                $httpConfig = [];
+                if ($testEnvironment) {
+                    $httpConfig['base_uri'] = 'http://localhost:8000/';
+                }
+
+                $client = new Client($httpConfig);
+
                 try {
-                    $thothClient->login(
-                        $email,
-                        $password
-                    );
-                } catch (ThothException $e) {
+                    $client->login($email, $password);
+                } catch (QueryException $e) {
                     return false;
                 }
                 return true;

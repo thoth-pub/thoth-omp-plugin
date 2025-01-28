@@ -16,6 +16,7 @@
 
 use APP\facades\Repo;
 use APP\notification\Notification;
+use ThothApi\Exception\QueryException;
 
 import('plugins.generic.thoth.classes.facades.ThothService');
 
@@ -41,22 +42,21 @@ class ThothUpdater
         }
 
         try {
-            $thothClient = $this->plugin->getThothClient($submission->getData('contextId'));
-            ThothService::work()->updateBook($thothClient, $thothWorkId, $submission, $publication);
+            ThothService::work()->updateBook($thothWorkId, $submission, $publication);
             ThothNotification::notify(
                 $request,
                 $submission,
                 Notification::NOTIFICATION_TYPE_SUCCESS,
                 'plugins.generic.thoth.update.success'
             );
-        } catch (ThothException $e) {
-            error_log($e->getMessage());
+        } catch (QueryException $e) {
+            error_log('Failed to send the request to Thoth: ' . $e->getMessage());
             ThothNotification::notify(
                 $request,
                 $submission,
                 Notification::NOTIFICATION_TYPE_ERROR,
                 'plugins.generic.thoth.update.error',
-                $e->getError()
+                $e->getMessage()
             );
         }
 

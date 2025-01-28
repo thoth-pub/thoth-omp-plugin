@@ -59,8 +59,8 @@ class RegisterForm extends FormComponent
         $imprintOptions = [];
         foreach ($imprints as $imprint) {
             $imprintOptions[] = [
-                'value' => $imprint['imprintId'],
-                'label' => $imprint['imprintName']
+                'value' => $imprint->getImprintId(),
+                'label' => $imprint->getImprintName()
             ];
         }
 
@@ -86,7 +86,7 @@ class RegisterForm extends FormComponent
                 'options' => $imprintOptions,
                 'required' => true,
                 'groupId' => 'default',
-                'value' => $imprints[0]['imprintId'] ?? null
+                'value' => $imprintOptions[0]['value'] ?? null
             ]));
     }
 
