@@ -1,5 +1,19 @@
 <?php
 
+/**
+ * @file plugins/generic/thoth/tests/classes/repositories/ThothAffiliationRepositoryTest.php
+ *
+ * Copyright (c) 2025 Lepidus Tecnologia
+ * Copyright (c) 2025 Thoth
+ * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ *
+ * @class ThothAffiliationRepositoryTest
+ * @ingroup plugins_generic_thoth_tests
+ * @see ThothAffiliationRepository
+ *
+ * @brief Test class for the ThothAffiliationRepository class
+ */
+
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Models\Affiliation as ThothAffiliation;
 

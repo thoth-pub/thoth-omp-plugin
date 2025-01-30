@@ -1,5 +1,19 @@
 <?php
 
+/**
+ * @file plugins/generic/thoth/tests/classes/repositories/ThothSubjectRepositoryTest.php
+ *
+ * Copyright (c) 2025 Lepidus Tecnologia
+ * Copyright (c) 2025 Thoth
+ * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ *
+ * @class ThothSubjectRepositoryTest
+ * @ingroup plugins_generic_thoth_tests
+ * @see ThothSubjectRepository
+ *
+ * @brief Test class for the ThothSubjectRepository class
+ */
+
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Models\Subject as ThothSubject;
 

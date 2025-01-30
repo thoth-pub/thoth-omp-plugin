@@ -1,5 +1,18 @@
 <?php
 
+/**
+ * @file plugins/generic/thoth/tests/classes/repositories/ThothWorkRepository.inc.php
+ *
+ * Copyright (c) 2025 Lepidus Tecnologia
+ * Copyright (c) 2025 Thoth
+ * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ *
+ * @class ThothWorkRepository
+ * @ingroup plugins_generic_thoth
+ *
+ * @brief A repository to manage Thoth works
+ */
+
 use ThothApi\GraphQL\Models\Work as ThothWork;
 
 class ThothWorkRepository

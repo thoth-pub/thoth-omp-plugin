@@ -1,5 +1,19 @@
 <?php
 
+/**
+ * @file plugins/generic/thoth/tests/classes/repositories/ThothWorkRelationRepositoryTest.php
+ *
+ * Copyright (c) 2025 Lepidus Tecnologia
+ * Copyright (c) 2025 Thoth
+ * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ *
+ * @class ThothWorkRelationRepositoryTest
+ * @ingroup plugins_generic_thoth_tests
+ * @see ThothWorkRelationRepository
+ *
+ * @brief Test class for the ThothWorkRelationRepository class
+ */
+
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Models\WorkRelation as ThothWorkRelation;
 

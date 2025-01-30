@@ -1,5 +1,19 @@
 <?php
 
+/**
+ * @file plugins/generic/thoth/tests/classes/repositories/ThothInstitutionRepositoryTest.php
+ *
+ * Copyright (c) 2025 Lepidus Tecnologia
+ * Copyright (c) 2025 Thoth
+ * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ *
+ * @class ThothInstitutionRepositoryTest
+ * @ingroup plugins_generic_thoth_tests
+ * @see ThothInstitutionRepository
+ *
+ * @brief Test class for the ThothInstitutionRepository class
+ */
+
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Models\Institution as ThothInstitution;
 

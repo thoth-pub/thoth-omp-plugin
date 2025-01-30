@@ -1,5 +1,19 @@
 <?php
 
+/**
+ * @file plugins/generic/thoth/tests/classes/repositories/ThothReferenceRepositoryTest.php
+ *
+ * Copyright (c) 2025 Lepidus Tecnologia
+ * Copyright (c) 2025 Thoth
+ * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ *
+ * @class ThothReferenceRepositoryTest
+ * @ingroup plugins_generic_thoth_tests
+ * @see ThothReferenceRepository
+ *
+ * @brief Test class for the ThothReferenceRepository class
+ */
+
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Models\Reference as ThothReference;
 

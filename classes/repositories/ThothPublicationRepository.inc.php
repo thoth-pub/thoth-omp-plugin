@@ -1,5 +1,18 @@
 <?php
 
+/**
+ * @file plugins/generic/thoth/tests/classes/repositories/ThothPublicationRepository.inc.php
+ *
+ * Copyright (c) 2025 Lepidus Tecnologia
+ * Copyright (c) 2025 Thoth
+ * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ *
+ * @class ThothPublicationRepository
+ * @ingroup plugins_generic_thoth
+ *
+ * @brief A repository to manage Thoth publications
+ */
+
 use ThothApi\GraphQL\Models\Publication as ThothPublication;
 
 class ThothPublicationRepository

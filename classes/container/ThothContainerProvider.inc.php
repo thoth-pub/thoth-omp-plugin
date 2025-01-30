@@ -18,6 +18,16 @@ require_once(__DIR__ . '/../../vendor/autoload.php');
 use ThothApi\GraphQL\Client;
 
 import('plugins.generic.thoth.classes.container.ContainerProvider');
+import('plugins.generic.thoth.classes.repositories.ThothAffiliationRepository');
+import('plugins.generic.thoth.classes.repositories.ThothContributionRepository');
+import('plugins.generic.thoth.classes.repositories.ThothContributorRepository');
+import('plugins.generic.thoth.classes.repositories.ThothInstitutionRepository');
+import('plugins.generic.thoth.classes.repositories.ThothLanguageRepository');
+import('plugins.generic.thoth.classes.repositories.ThothLocationRepository');
+import('plugins.generic.thoth.classes.repositories.ThothPublicationRepository');
+import('plugins.generic.thoth.classes.repositories.ThothReferenceRepository');
+import('plugins.generic.thoth.classes.repositories.ThothSubjectRepository');
+import('plugins.generic.thoth.classes.repositories.ThothWorkRepository');
 import('plugins.generic.thoth.classes.services.ThothAffiliationService');
 import('plugins.generic.thoth.classes.services.ThothContributionService');
 import('plugins.generic.thoth.classes.services.ThothContributorService');
@@ -59,6 +69,46 @@ class ThothContainerProvider implements ContainerProvider
 
             $client = new Client($httpConfig);
             return $client->login($config['email'], $config['password']);
+        });
+
+        $container->set('affiliationRepository', function ($container) {
+            return new ThothAffiliationRepository($container->get('client'));
+        });
+
+        $container->set('contributionRepository', function ($container) {
+            return new ThothContributionRepository($container->get('client'));
+        });
+
+        $container->set('contributorRepository', function ($container) {
+            return new ThothContributorRepository($container->get('client'));
+        });
+
+        $container->set('institutionRepository', function ($container) {
+            return new ThothInstitutionRepository($container->get('client'));
+        });
+
+        $container->set('languageRepository', function ($container) {
+            return new ThothLanguageRepository($container->get('client'));
+        });
+
+        $container->set('locationRepository', function ($container) {
+            return new ThothLocationRepository($container->get('client'));
+        });
+
+        $container->set('publicationRepository', function ($container) {
+            return new ThothPublicationRepository($container->get('client'));
+        });
+
+        $container->set('referenceRepository', function ($container) {
+            return new ThothReferenceRepository($container->get('client'));
+        });
+
+        $container->set('subjectRepository', function ($container) {
+            return new ThothSubjectRepository($container->get('client'));
+        });
+
+        $container->set('workRepository', function ($container) {
+            return new ThothWorkRepository($container->get('client'));
         });
 
         $container->set('affiliationService', function ($container) {
