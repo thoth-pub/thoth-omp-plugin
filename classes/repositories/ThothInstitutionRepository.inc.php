@@ -18,7 +18,7 @@ class ThothInstitutionRepository
 
     public function get($thothInstitutionId)
     {
-        return $this->thothClient->Institution($thothInstitutionId);
+        return $this->thothClient->institution($thothInstitutionId);
     }
 
     public function add($thothInstitution)

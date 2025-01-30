@@ -18,7 +18,7 @@ class ThothContributorRepository
 
     public function get($thothContributorId)
     {
-        return $this->thothClient->Contributor($thothContributorId);
+        return $this->thothClient->contributor($thothContributorId);
     }
 
     public function add($thothContributor)

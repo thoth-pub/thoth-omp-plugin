@@ -18,7 +18,7 @@ class ThothContributionRepository
 
     public function get($thothContributionId)
     {
-        return $this->thothClient->Contribution($thothContributionId);
+        return $this->thothClient->contribution($thothContributionId);
     }
 
     public function add($thothContribution)

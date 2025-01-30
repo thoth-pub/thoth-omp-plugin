@@ -35,10 +35,10 @@ class ThothInstitutionRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['Institution'])
+            ->setMethods(['institution'])
             ->getMock();
         $mockThothClient->expects($this->any())
-            ->method('Institution')
+            ->method('institution')
             ->will($this->returnValue($expectedThothInstitution));
 
         $repository = new ThothInstitutionRepository($mockThothClient);
