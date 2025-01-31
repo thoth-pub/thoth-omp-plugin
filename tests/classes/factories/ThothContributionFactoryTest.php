@@ -18,6 +18,7 @@ use ThothApi\GraphQL\Models\Contribution as ThothContribution;
 
 import('classes.monograph.Author');
 import('lib.pkp.classes.security.UserGroup');
+import('lib.pkp.tests.PKPTestCase');
 import('plugins.generic.thoth.classes.factories.ThothContributionFactory');
 
 class ThothContributionFactoryTest extends PKPTestCase

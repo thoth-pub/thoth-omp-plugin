@@ -15,7 +15,6 @@
 
 use ThothApi\GraphQL\Models\Contribution as ThothContribution;
 
-import('classes.submission.Submission');
 import('classes.core.Services');
 
 class ThothContributionFactory
