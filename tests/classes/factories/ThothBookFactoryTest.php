@@ -1,5 +1,19 @@
 <?php
 
+/**
+ * @file plugins/generic/thoth/tests/classes/factories/ThothBookFactoryTest.php
+ *
+ * Copyright (c) 2024-2025 Lepidus Tecnologia
+ * Copyright (c) 2024-2025 Thoth
+ * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ *
+ * @class ThothBookFactoryTest
+ * @ingroup plugins_generic_thoth_tests
+ * @see ThothBookFactory
+ *
+ * @brief Test class for the ThothBookFactory class
+ */
+
 use ThothApi\GraphQL\Models\Work as ThothWork;
 
 import('classes.press.Press');

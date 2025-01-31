@@ -1,5 +1,18 @@
 <?php
 
+/**
+ * @file plugins/generic/thoth/tests/classes/factories/ThothBookFactory.inc.php
+ *
+ * Copyright (c) 2025 Lepidus Tecnologia
+ * Copyright (c) 2025 Thoth
+ * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ *
+ * @class ThothBookFactory
+ * @ingroup plugins_generic_thoth
+ *
+ * @brief A factory to create Thoth books
+ */
+
 use ThothApi\GraphQL\Models\Work as ThothWork;
 
 import('classes.submission.Submission');
