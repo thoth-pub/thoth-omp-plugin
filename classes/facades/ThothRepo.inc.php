@@ -63,6 +63,11 @@ class ThothRepo
         return ThothContainer::getInstance()->get('subjectRepository');
     }
 
+    public static function workRelation()
+    {
+        return ThothContainer::getInstance()->get('workRelationRepository');
+    }
+
     public static function work()
     {
         return ThothContainer::getInstance()->get('workRepository');

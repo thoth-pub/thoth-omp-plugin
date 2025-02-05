@@ -23,6 +23,16 @@ class ThothService
         return ThothContainer::getInstance()->get('affiliationService');
     }
 
+    public static function book()
+    {
+        return ThothContainer::getInstance()->get('bookService');
+    }
+
+    public static function chapter()
+    {
+        return ThothContainer::getInstance()->get('chapterService');
+    }
+
     public static function contribution()
     {
         return ThothContainer::getInstance()->get('contributionService');
@@ -63,8 +73,8 @@ class ThothService
         return ThothContainer::getInstance()->get('subjectService');
     }
 
-    public static function work()
+    public static function workRelation()
     {
-        return ThothContainer::getInstance()->get('workService');
+        return ThothContainer::getInstance()->get('workRelationService');
     }
 }
