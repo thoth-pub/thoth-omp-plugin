@@ -13,10 +13,15 @@
  * @brief Helper class that encapsulates business logic for Thoth books
  */
 
+use ThothApi\GraphQL\Models\Work as ThothWork;
+
+import('plugins.generic.thoth.classes.facades.ThothService');
+import('lib.pkp.classes.services.PKPSchemaService');
+
 class ThothBookService
 {
-    protected $factory;
-    protected $repository;
+    public $factory;
+    public $repository;
 
     public function __construct($factory, $repository)
     {
@@ -24,13 +29,90 @@ class ThothBookService
         $this->repository = $repository;
     }
 
-    public function register($submission, $request, $thothImprintId)
+    public function register($submission, $thothImprintId)
     {
-        $thothBook = $this->factory->createFromSubmission($submission, $request);
+        $thothBook = $this->factory->createFromSubmission($submission);
         $thothBook->setImprintId($thothImprintId);
 
         $thothBookId = $this->repository->add($thothBook);
+        $thothBook->setWorkId($thothBookId);
+
+        $publication = $submission->getCurrentPublication();
+
+        $authors = DAORegistry::getDAO('AuthorDAO')->getByPublicationId($publication->getId());
+        $primaryContactId = $publication->getData('primaryContactId');
+        foreach ($authors as $author) {
+            ThothService::contribution()->register($author, $thothBookId, $primaryContactId);
+        }
+
+        $publicationFormats = DAORegistry::getDAO('PublicationFormatDAO')
+            ->getApprovedByPublicationId($publication->getId())
+            ->toArray();
+        foreach ($publicationFormats as $publicationFormat) {
+            if ($publicationFormat->getIsAvailable()) {
+                ThothService::publication()->register($publicationFormat, $thothBookId);
+            }
+        }
+
+        $locale = $publication->getData('locale');
+        ThothService::language()->register($locale, $thothBookId);
+
+        $keywords = $publication->getData('keywords');
+        foreach ($keywords[$locale] ?? [] as $seq => $keyword) {
+            ThothService::subject()->register($keyword, ($seq + 1), $thothBookId);
+        }
+
+        $citations = DAORegistry::getDAO('CitationDAO')
+            ->getByPublicationId($publication->getId())
+            ->toArray();
+        foreach ($citations as $citation) {
+            ThothService::reference()->register($citation, $thothBookId);
+        }
+
+        $chapters = DAORegistry::getDAO('ChapterDAO')
+            ->getByPublicationId($publication->getId())
+            ->toArray();
+        foreach ($chapters as $chapter) {
+            ThothService::workRelation()->register($chapter, $thothBook);
+        }
 
         return $thothBookId;
+    }
+
+    public function validate($submission)
+    {
+        $errors = [];
+
+        $thothBook = $this->factory->createFromSubmission($submission);
+        if ($doi = $thothBook->getDoi()) {
+            $retrievedThothBook = $this->repository->getByDoi($doi);
+            if ($retrievedThothBook !== null) {
+                $errors[] = __(
+                    'plugins.generic.thoth.validation.doiExists',
+                    ['doi' => $doi]
+                );
+            }
+        }
+
+        if ($landingPage = $thothBook->getLandingPage()) {
+            $retrievedThothBook = $this->repository->find($landingPage);
+            if ($retrievedThothBook !== null) {
+                $errors[] = __(
+                    'plugins.generic.thoth.validation.landingPageExists',
+                    ['landingPage' => $landingPage]
+                );
+            }
+        }
+
+        $publicationFormats = DAORegistry::getDAO('PublicationFormatDAO')
+            ->getApprovedByPublicationId($submission->getData('currentPublicationId'))
+            ->toArray();
+        foreach ($publicationFormats as $publicationFormat) {
+            if ($publicationFormat->getIsAvailable()) {
+                $errors = array_merge($errors, ThothService::publication()->validate($publicationFormat));
+            }
+        }
+
+        return $errors;
     }
 }

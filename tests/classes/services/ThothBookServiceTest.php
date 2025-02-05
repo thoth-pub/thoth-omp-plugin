@@ -17,17 +17,33 @@
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Models\Work as ThothWork;
 
+import('classes.publication.Publication');
 import('classes.submission.Submission');
 import('lib.pkp.classes.core.PKPRequest');
 import('lib.pkp.tests.PKPTestCase');
 import('plugins.generic.thoth.classes.factories.ThothBookFactory');
-import('plugins.generic.thoth.classes.repositories.ThothWorkRepository');
+import('plugins.generic.thoth.classes.repositories.ThothBookRepository');
 import('plugins.generic.thoth.classes.services.ThothBookService');
 
 class ThothBookServiceTest extends PKPTestCase
 {
+    public function setUp(): void
+    {
+        $this->backup = ThothContainer::getInstance()->backup('client');
+    }
+
+    protected function tearDown(): void
+    {
+        ThothContainer::getInstance()->set('client', $this->backup);
+        parent::tearDown();
+    }
+
     public function testRegisterBook()
     {
+        ThothContainer::getInstance()->set('client', function () {
+            return $this->getMockBuilder(ThothClient::class)->getMock();
+        });
+
         $mockFactory = $this->getMockBuilder(ThothBookFactory::class)
             ->setMethods(['createFromSubmission'])
             ->getMock();
@@ -35,7 +51,7 @@ class ThothBookServiceTest extends PKPTestCase
             ->method('createFromSubmission')
             ->will($this->returnValue(new ThothWork()));
 
-        $mockRepository = $this->getMockBuilder(ThothWorkRepository::class)
+        $mockRepository = $this->getMockBuilder(ThothBookRepository::class)
             ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
             ->setMethods(['add'])
             ->getMock();
@@ -43,13 +59,76 @@ class ThothBookServiceTest extends PKPTestCase
             ->method('add')
             ->will($this->returnValue('d8fa2e63-5513-45e5-84c1-e9c2d89f99d3'));
 
-        $mockSubmission = $this->getMockBuilder(Submission::class)->getMock();
-        $mockRequest = $this->getMockBuilder(PKPRequest::class)->getMock();
+        $mockSubmission = $this->getMockBuilder(Submission::class)
+            ->setMethods(['getCurrentPublication'])
+            ->getMock();
+        $mockSubmission->expects($this->once())
+            ->method('getCurrentPublication')
+            ->will($this->returnValue($this->getMockBuilder(Publication::class)->getMock()));
+
         $thothImprintId = 'f740cf4e-16d1-487c-9a92-615882a591e9';
 
         $service = new ThothBookService($mockFactory, $mockRepository);
-        $thothBookId = $service->register($mockSubmission, $mockRequest, $thothImprintId);
+        $thothBookId = $service->register($mockSubmission, $thothImprintId);
 
         $this->assertSame('d8fa2e63-5513-45e5-84c1-e9c2d89f99d3', $thothBookId);
+    }
+
+    public function testDoiExistsBookValidationFails()
+    {
+        $mockFactory = $this->getMockBuilder(ThothBookFactory::class)
+            ->setMethods(['createFromSubmission'])
+            ->getMock();
+        $mockFactory->expects($this->once())
+            ->method('createFromSubmission')
+            ->will($this->returnValue(new ThothWork([
+                'doi' => 'https://doi.org/10.12345/10101010'
+            ])));
+
+        $mockRepository = $this->getMockBuilder(ThothBookRepository::class)
+            ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
+            ->setMethods(['getByDoi'])
+            ->getMock();
+        $mockRepository->expects($this->once())
+            ->method('getByDoi')
+            ->will($this->returnValue(new ThothWork()));
+
+        $mockSubmission = $this->getMockBuilder(Submission::class)->getMock();
+
+        $service = new ThothBookService($mockFactory, $mockRepository);
+        $errors = $service->validate($mockSubmission);
+
+        $this->assertEquals([
+            '##plugins.generic.thoth.validation.doiExists##',
+        ], $errors);
+    }
+
+    public function testLandingPageExistsBookValidationFails()
+    {
+        $mockFactory = $this->getMockBuilder(ThothBookFactory::class)
+            ->setMethods(['createFromSubmission'])
+            ->getMock();
+        $mockFactory->expects($this->once())
+            ->method('createFromSubmission')
+            ->will($this->returnValue(new ThothWork([
+                'landingPage' => 'http://www.publicknowledge.omp/index.php/publicknowledge/catalog/book/14'
+            ])));
+
+        $mockRepository = $this->getMockBuilder(ThothBookRepository::class)
+            ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
+            ->setMethods(['find'])
+            ->getMock();
+        $mockRepository->expects($this->once())
+            ->method('find')
+            ->will($this->returnValue(new ThothWork()));
+
+        $mockSubmission = $this->getMockBuilder(Submission::class)->getMock();
+
+        $service = new ThothBookService($mockFactory, $mockRepository);
+        $errors = $service->validate($mockSubmission);
+
+        $this->assertEquals([
+            '##plugins.generic.thoth.validation.landingPageExists##',
+        ], $errors);
     }
 }

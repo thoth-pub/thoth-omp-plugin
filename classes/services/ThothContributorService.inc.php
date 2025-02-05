@@ -17,43 +17,18 @@ use ThothApi\GraphQL\Models\Contributor as ThothContributor;
 
 class ThothContributorService
 {
-    public function new($params)
-    {
-        $contributor = new ThothContributor();
-        $contributor->setContributorId($params['contributorId'] ?? null);
-        $contributor->setFirstName($params['firstName'] ?? null);
-        $contributor->setLastName($params['lastName']);
-        $contributor->setFullName($params['fullName']);
-        $contributor->setOrcid($params['orcid'] ?? null);
-        $contributor->setWebsite($params['website'] ?? null);
-        return $contributor;
-    }
+    public $factory;
+    public $repository;
 
-    public function newByAuthor($author)
+    public function __construct($factory, $repository)
     {
-        $params = [];
-        $params['firstName'] = $author->getLocalizedGivenName();
-        $params['lastName'] = $author->getLocalizedData('familyName');
-        $params['fullName'] = $author->getFullName(false);
-        $params['orcid'] = $author->getOrcid();
-        $params['website'] = $author->getUrl();
-        return $this->new($params);
+        $this->factory = $factory;
+        $this->repository = $repository;
     }
 
     public function register($author)
     {
-        $contributor = $this->newByAuthor($author);
-
-        $thothClient = ThothContainer::getInstance()->get('client');
-        $contributorId = $thothClient->createContributor($contributor);
-        $contributor->setContributorId($contributorId);
-
-        return $contributor;
-    }
-
-    public function getMany($params = [])
-    {
-        $thothClient = ThothContainer::getInstance()->get('client');
-        return $thothClient->contributors($params);
+        $thothContributor = $this->factory->createFromAuthor($author);
+        return $this->repository->add($thothContributor);
     }
 }
