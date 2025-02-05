@@ -62,6 +62,34 @@ class ThothLocationRepositoryTest extends PKPTestCase
         $this->assertEquals($expectedThothLocation, $thothLocation);
     }
 
+    public function testHasCanonicalLocation()
+    {
+        $mockThothClient = $this->getMockBuilder(ThothClient::class)
+            ->setMethods(['rawQuery'])
+            ->getMock();
+        $mockThothClient->expects($this->any())
+            ->method('rawQuery')
+            ->will($this->returnValue([
+                'publication' => [
+                    'locations' => [
+                        [
+                            'canonical' => false
+                        ],
+                        [
+                            'canonical' => true
+                        ],
+                    ]
+                ]
+            ]));
+
+        $repository = new ThothLocationRepository($mockThothClient);
+
+        $thothPublicationId = 'dd239ee6-90d6-4487-ac7f-43ec18391c48';
+        $hasCanonical = $repository->hasCanonical($thothPublicationId);
+
+        $this->assertTrue($hasCanonical);
+    }
+
     public function testAddLocation()
     {
         $thothLocation = new ThothLocation([

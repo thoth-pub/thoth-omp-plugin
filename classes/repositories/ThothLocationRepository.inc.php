@@ -34,6 +34,25 @@ class ThothLocationRepository
         return $this->thothClient->location($thothLocationId);
     }
 
+    public function hasCanonical($thothPublicationId)
+    {
+        $query = <<<GQL
+        query(\$publicationId: Uuid!) {
+            publication(publicationId: \$publicationId) {
+                locations {
+                    canonical
+                }
+            }
+        }
+        GQL;
+
+        $result = $this->thothClient->rawQuery($query, ['publicationId' => $thothPublicationId]);
+        $locations = $result['publication']['locations'];
+        $hasCanonical = array_search(true, $locations);
+
+        return $hasCanonical !== false;
+    }
+
     public function add($thothLocation)
     {
         return $this->thothClient->createLocation($thothLocation);
