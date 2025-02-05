@@ -34,6 +34,20 @@ class ThothContributorRepository
         return $this->thothClient->contributor($thothContributorId);
     }
 
+    public function find($filter)
+    {
+        $thothContributors =  $this->thothClient->contributors([
+            'filter' => $filter,
+            'limit' => 1
+        ]);
+
+        if (empty($thothContributors)) {
+            return null;
+        }
+
+        return array_shift($thothContributors);
+    }
+
     public function add($thothContributor)
     {
         return $this->thothClient->createContributor($thothContributor);

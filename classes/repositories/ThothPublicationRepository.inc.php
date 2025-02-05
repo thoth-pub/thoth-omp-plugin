@@ -34,6 +34,20 @@ class ThothPublicationRepository
         return $this->thothClient->publication($thothPublicationId);
     }
 
+    public function find($filter)
+    {
+        $thothPublications =  $this->thothClient->publications([
+            'filter' => $filter,
+            'limit' => 1
+        ]);
+
+        if (empty($thothPublications)) {
+            return null;
+        }
+
+        return array_shift($thothPublications);
+    }
+
     public function add($thothPublication)
     {
         return $this->thothClient->createPublication($thothPublication);

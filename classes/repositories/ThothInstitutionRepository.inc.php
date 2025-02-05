@@ -34,6 +34,20 @@ class ThothInstitutionRepository
         return $this->thothClient->institution($thothInstitutionId);
     }
 
+    public function find($filter)
+    {
+        $thothInstitutions =  $this->thothClient->institutions([
+            'filter' => $filter,
+            'limit' => 1
+        ]);
+
+        if (empty($thothInstitutions)) {
+            return null;
+        }
+
+        return array_shift($thothInstitutions);
+    }
+
     public function add($thothInstitution)
     {
         return $this->thothClient->createInstitution($thothInstitution);

@@ -63,6 +63,30 @@ class ThothContributorRepositoryTest extends PKPTestCase
         $this->assertEquals($expectedThothContributor, $thothContributor);
     }
 
+    public function testFindContributor()
+    {
+        $expectedThothContributor = new ThothContributor([
+            'contributorId' => '57bf024a-a4fd-448a-98d4-029054149103',
+            'firstName' => 'John',
+            'lastName' => 'Doe',
+            'fullName' => 'John Doe',
+            'website' => 'https://john.doe.org/',
+            'orcid' => '0000-0001-2345-678X'
+        ]);
+
+        $mockThothClient = $this->getMockBuilder(ThothClient::class)
+            ->setMethods(['contributors'])
+            ->getMock();
+        $mockThothClient->expects($this->any())
+            ->method('contributors')
+            ->will($this->returnValue([$expectedThothContributor]));
+
+        $repository = new ThothContributorRepository($mockThothClient);
+        $thothContributor = $repository->find('0000-0001-2345-678X');
+
+        $this->assertEquals($expectedThothContributor, $thothContributor);
+    }
+
     public function testAddContributor()
     {
         $thothContributor = new ThothContributor([

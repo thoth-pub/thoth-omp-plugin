@@ -61,6 +61,29 @@ class ThothInstitutionRepositoryTest extends PKPTestCase
         $this->assertEquals($expectedThothInstitution, $thothInstitution);
     }
 
+    public function testFindInstitution()
+    {
+        $expectedThothInstitution = new ThothInstitution([
+            'institutionId' => '8a3a7422-e5fb-4d2d-810d-513987735b4e',
+            'institutionName' => 'My Institution',
+            'institutionDoi' => 'https://doi.org/10.12345/000000001',
+            'countryCode' => 'USA',
+            'ror' => 'https://ror.org/123abcd45'
+        ]);
+
+        $mockThothClient = $this->getMockBuilder(ThothClient::class)
+            ->setMethods(['institutions'])
+            ->getMock();
+        $mockThothClient->expects($this->any())
+            ->method('institutions')
+            ->will($this->returnValue([$expectedThothInstitution]));
+
+        $repository = new ThothInstitutionRepository($mockThothClient);
+        $thothInstitution = $repository->find('https://ror.org/123abcd45');
+
+        $this->assertEquals($expectedThothInstitution, $thothInstitution);
+    }
+
     public function testAddInstitution()
     {
         $thothInstitution = new ThothInstitution([

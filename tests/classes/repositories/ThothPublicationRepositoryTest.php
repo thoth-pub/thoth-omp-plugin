@@ -70,6 +70,26 @@ class ThothPublicationRepositoryTest extends PKPTestCase
         $this->assertEquals($expectedThothPublication, $thothPublication);
     }
 
+    public function testFindPublication()
+    {
+        $expectedThothPublication = new ThothPublication([
+            'isbn' => '978-3-16-148410-0'
+        ]);
+
+        $mockThothClient = $this->getMockBuilder(ThothClient::class)
+            ->setMethods(['publications'])
+            ->getMock();
+        $mockThothClient->expects($this->any())
+            ->method('publications')
+            ->will($this->returnValue([$expectedThothPublication]));
+
+        $repository = new ThothPublicationRepository($mockThothClient);
+
+        $thothPublication = $repository->find('978-3-16-148410-0');
+
+        $this->assertEquals($expectedThothPublication, $thothPublication);
+    }
+
     public function testAddPublication()
     {
         $thothPublication = new ThothPublication([
