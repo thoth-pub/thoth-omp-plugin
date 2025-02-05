@@ -88,7 +88,7 @@ class RegisterHandler extends Handler
             $thothAccountDetails = $thothClient->accountDetails();
             $publishers = $thothAccountDetails['resourceAccess']['linkedPublishers'];
             $imprints = $thothClient->imprints(['publishers' => array_column($publishers, 'publisherId')]);
-            $errors = array_merge(ThothValidator::validate($this->submission), $errors);
+            $errors = array_merge(ThothService::book()->validate($this->submission), $errors);
         } catch (QueryException $e) {
             $errors[] = __('plugins.generic.thoth.connectionError');
             error_log('Failed to send the request to Thoth: ' . $e->getMessage());

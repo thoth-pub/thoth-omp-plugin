@@ -16,7 +16,6 @@
 use ThothApi\Exception\QueryException;
 
 import('plugins.generic.thoth.classes.facades.ThothService');
-import('plugins.generic.thoth.classes.ThothValidator');
 
 class ThothRegister
 {
@@ -64,7 +63,7 @@ class ThothRegister
         }
 
         if (empty($errors)) {
-            $errors = ThothValidator::validate($submission);
+            $errors = ThothService::book()->validate($submission);
         }
 
         if (!empty($errors)) {
@@ -191,10 +190,11 @@ class ThothRegister
         }
 
         try {
-            $thothBook = ThothService::work()->registerBook($submission, $imprint);
+            $thothBookId = ThothService::book()->register($submission, $imprint);
+
             $submission = Services::get('submission')->edit(
                 $submission,
-                ['thothWorkId' => $thothBook->getWorkId()],
+                ['thothWorkId' => $thothBookId],
                 $request
             );
 
