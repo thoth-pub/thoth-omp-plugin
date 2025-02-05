@@ -18,7 +18,7 @@
 require_once(__DIR__ . '/vendor/autoload.php');
 
 import('lib.pkp.classes.plugins.GenericPlugin');
-import('plugins.generic.thoth.classes.ThothBadgeRender');
+import('plugins.generic.thoth.classes.frontend.ThothSectionFilter');
 import('plugins.generic.thoth.classes.ThothNotification');
 import('plugins.generic.thoth.classes.ThothRegister');
 import('plugins.generic.thoth.classes.ThothUpdater');
@@ -30,6 +30,8 @@ class ThothPlugin extends GenericPlugin
         $success = parent::register($category, $path);
 
         if ($success && $this->getEnabled()) {
+            $this->addTemplateFilters();
+
             $thothRegister = new ThothRegister($this);
             HookRegistry::register('Schema::get::submission', [$thothRegister, 'addWorkIdToSchema']);
             HookRegistry::register('Form::config::before', [$thothRegister, 'addThothField']);
@@ -41,9 +43,6 @@ class ThothPlugin extends GenericPlugin
 
             $thothUpdater = new ThothUpdater($this);
             HookRegistry::register('Publication::edit', [$thothUpdater, 'updateWork']);
-
-            $thothBadgeRender = new ThothBadgeRender($this);
-            HookRegistry::register('TemplateManager::display', [$thothBadgeRender, 'addThothBadge']);
 
             $thothNotification = new ThothNotification($this);
             HookRegistry::register('TemplateManager::display', [$thothNotification, 'addNotificationScript']);
@@ -120,5 +119,11 @@ class ThothPlugin extends GenericPlugin
                 return new JSONMessage(true, $form->fetch($request));
         }
         return parent::manage($args, $request);
+    }
+
+    public function addTemplateFilters()
+    {
+        $thothSectionFilter = new ThothSectionFilter($this);
+        HookRegistry::register('TemplateManager::display', [$thothSectionFilter, 'registerFilter']);
     }
 }
