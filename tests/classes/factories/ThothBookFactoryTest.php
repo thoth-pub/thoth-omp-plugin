@@ -17,6 +17,7 @@
 use ThothApi\GraphQL\Models\Work as ThothWork;
 
 import('classes.press.Press');
+import('classes.press.PressDAO');
 import('classes.publication.Publication');
 import('classes.submission.Submission');
 import('lib.pkp.classes.core.Dispatcher');
@@ -26,8 +27,48 @@ import('plugins.generic.thoth.classes.factories.ThothBookFactory');
 
 class ThothBookFactoryTest extends PKPTestCase
 {
-    public function testCreateThothBookFromSubmission()
+    protected function getMockedDAOs()
     {
+        return ['PressDAO'];
+    }
+
+    protected function getMockedRegistryKeys()
+    {
+        return ['request'];
+    }
+
+    private function setUpMockEnvironment()
+    {
+        $mockContext = $this->getMockBuilder(Press::class)
+            ->setMethods(['getPath'])
+            ->getMock();
+        $mockContext->expects($this->any())
+            ->method('getPath')
+            ->will($this->returnValue('press'));
+
+        $mockContextDao = $this->getMockBuilder(PressDAO::class)
+            ->setMethods(['getById'])
+            ->getMock();
+        $mockContextDao->expects($this->any())
+            ->method('getById')
+            ->will($this->returnValue($mockContext));
+        DAORegistry::registerDAO('PressDAO', $mockContextDao);
+
+        $mockDispatcher = $this->getMockBuilder(Dispatcher::class)
+            ->setMethods(['url'])
+            ->getMock();
+        $mockDispatcher->expects($this->once())
+            ->method('url')
+            ->will($this->returnValue('https://omp.publicknowledgeproject.org/index.php/press/catalog/book/3'));
+
+        $mockRequest = $this->getMockBuilder(PKPRequest::class)
+            ->setMethods(['getDispatcher'])
+            ->getMock();
+        $mockRequest->expects($this->any())
+            ->method('getDispatcher')
+            ->will($this->returnValue($mockDispatcher));
+        Registry::set('request', $mockRequest);
+
         $mockPublication = $this->getMockBuilder(Publication::class)
             ->setMethods([
                 'getData',
@@ -79,27 +120,17 @@ class ThothBookFactoryTest extends PKPTestCase
             ->method('getCurrentPublication')
             ->will($this->returnValue($mockPublication));
 
-        $mockDispatcher = $this->getMockBuilder(Dispatcher::class)
-            ->setMethods(['url'])
-            ->getMock();
-        $mockDispatcher->expects($this->any())
-            ->method('url')
-            ->will($this->returnValue('https://omp.publicknowledgeproject.org/index.php/press/catalog/book/3'));
+        $this->mocks = [];
+        $this->mocks['submission'] = $mockSubmission;
+    }
 
-        $mockContext = $this->getMockBuilder(Press::class)->getMock();
-
-        $mockRequest = $this->getMockBuilder(PKPRequest::class)
-            ->setMethods(['getDispatcher', 'getContext'])
-            ->getMock();
-        $mockRequest->expects($this->any())
-            ->method('getDispatcher')
-            ->will($this->returnValue($mockDispatcher));
-        $mockRequest->expects($this->any())
-            ->method('getContext')
-            ->will($this->returnValue($mockContext));
+    public function testCreateThothBookFromSubmission()
+    {
+        $this->setUpMockEnvironment();
+        $mockSubmission = $this->mocks['submission'];
 
         $factory = new ThothBookFactory();
-        $thothWork = $factory->createFromSubmission($mockSubmission, $mockRequest);
+        $thothWork = $factory->createFromSubmission($mockSubmission);
 
         $this->assertEquals(new ThothWork([
             'workType' => ThothWork::WORK_TYPE_MONOGRAPH,

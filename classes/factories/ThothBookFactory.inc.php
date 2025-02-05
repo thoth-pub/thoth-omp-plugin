@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @file plugins/generic/thoth/tests/classes/factories/ThothBookFactory.inc.php
+ * @file plugins/generic/thoth/classes/factories/ThothBookFactory.inc.php
  *
  * Copyright (c) 2025 Lepidus Tecnologia
  * Copyright (c) 2025 Thoth
@@ -16,13 +16,16 @@
 use ThothApi\GraphQL\Models\Work as ThothWork;
 
 import('classes.submission.Submission');
+import('plugins.generic.thoth.classes.formatters.DoiFormatter');
+import('plugins.generic.thoth.classes.formatters.HtmlStripper');
 
 class ThothBookFactory
 {
-    public function createFromSubmission($submission, $request)
+    public function createFromSubmission($submission)
     {
-        $allowedTags = '<b><strong><em><i><u><ul><ol><li><p><h1><h2><h3><h4><h5><h6>';
+        $request = Application::get()->getRequest();
         $publication = $submission->getCurrentPublication();
+        $context = Application::getContextDAO()->getById($submission->getData('contextId'));
 
         return new ThothWork([
             'workType' => $this->getWorkTypeBySubmissionWorkType($submission->getData('workType')),
@@ -30,9 +33,9 @@ class ThothBookFactory
             'fullTitle' => $publication->getLocalizedFullTitle(),
             'title' => $publication->getLocalizedTitle(),
             'subtitle' => $publication->getLocalizedData('subtitle'),
-            'longAbstract' => strip_tags($publication->getLocalizedData('abstract'), $allowedTags),
+            'longAbstract' => HtmlStripper::stripTags($publication->getLocalizedData('abstract')),
             'edition' => $publication->getData('version'),
-            'doi' => $this->getDoiResolvingUrl($publication->getStoredPubId('doi')),
+            'doi' => DoiFormatter::resolveUrl($publication->getStoredPubId('doi')),
             'publicationDate' => $publication->getData('datePublished'),
             'license' => $publication->getData('licenseUrl'),
             'copyrightHolder' => $publication->getLocalizedData('copyrightHolder'),
@@ -40,7 +43,7 @@ class ThothBookFactory
             'landingPage' => $request->getDispatcher()->url(
                 $request,
                 ROUTE_PAGE,
-                $request->getContext()->getPath(),
+                $context->getPath(),
                 'catalog',
                 'book',
                 $submission->getBestId()
@@ -56,18 +59,5 @@ class ThothBookFactory
         ];
 
         return $workTypeMapping[$submissionWorkType];
-    }
-
-    private function getDoiResolvingUrl($doi)
-    {
-        if (empty($doi)) {
-            return $doi;
-        }
-
-        $search = ['%', '"', '#', ' ', '<', '>', '{'];
-        $replace = ['%25', '%22', '%23', '%20', '%3c', '%3e', '%7b'];
-        $encodedDoi = str_replace($search, $replace, $doi);
-
-        return "https://doi.org/$encodedDoi";
     }
 }
