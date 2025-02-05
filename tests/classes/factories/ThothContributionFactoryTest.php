@@ -23,7 +23,7 @@ import('plugins.generic.thoth.classes.factories.ThothContributionFactory');
 
 class ThothContributionFactoryTest extends PKPTestCase
 {
-    public function testCreateThothContributionFromAuthor()
+    private function setUpMockEnvironment()
     {
         $mockUserGroup = $this->getMockBuilder(UserGroup::class)
             ->setMethods(['getData'])
@@ -69,6 +69,14 @@ class ThothContributionFactoryTest extends PKPTestCase
             ->method('getUserGroup')
             ->will($this->returnValue($mockUserGroup));
 
+        $this->mocks = [];
+        $this->mocks['author'] = $mockAuthor;
+    }
+
+    public function testCreateThothContributionFromAuthor()
+    {
+        $this->setUpMockEnvironment();
+        $mockAuthor = $this->mocks['author'];
         $primaryContactId = 1;
 
         $factory = new ThothContributionFactory();

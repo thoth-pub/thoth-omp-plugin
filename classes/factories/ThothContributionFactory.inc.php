@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @file plugins/generic/thoth/tests/classes/factories/ThothContributionFactory.inc.php
+ * @file plugins/generic/thoth/classes/factories/ThothContributionFactory.inc.php
  *
  * Copyright (c) 2025 Lepidus Tecnologia
  * Copyright (c) 2025 Thoth
@@ -16,13 +16,13 @@
 use ThothApi\GraphQL\Models\Contribution as ThothContribution;
 
 import('classes.core.Services');
+import('plugins.generic.thoth.classes.formatters.HtmlStripper');
 
 class ThothContributionFactory
 {
     public function createFromAuthor($author, $primaryContactId = null)
     {
         $userGroupLocaleKey = $author->getUserGroup()->getData('nameLocaleKey');
-        $allowedTags = '<b><strong><em><i><u><ul><ol><li><p><h1><h2><h3><h4><h5><h6>';
 
         return new ThothContribution([
             'contributionType' => $this->getContributionTypeByUserGroupLocaleKey($userGroupLocaleKey),
@@ -31,7 +31,7 @@ class ThothContributionFactory
             'firstName' => $author->getLocalizedGivenName(),
             'lastName' => $author->getLocalizedData('familyName'),
             'fullName' => $author->getFullName(false),
-            'biography' => strip_tags($author->getLocalizedBiography(), $allowedTags)
+            'biography' => HtmlStripper::stripTags($author->getLocalizedBiography())
         ]);
     }
 
