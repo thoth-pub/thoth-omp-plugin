@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @file plugins/generic/thoth/tests/classes/factories/ThothContributorFactory.inc.php
+ * @file plugins/generic/thoth/classes/factories/ThothContributorFactory.inc.php
  *
  * Copyright (c) 2025 Lepidus Tecnologia
  * Copyright (c) 2025 Thoth

@@ -16,12 +16,13 @@
 
 use ThothApi\GraphQL\Models\Contributor as ThothContributor;
 
+import('classes.monograph.Author');
 import('lib.pkp.tests.PKPTestCase');
 import('plugins.generic.thoth.classes.factories.ThothContributorFactory');
 
 class ThothContributorFactoryTest extends PKPTestCase
 {
-    public function testCreateThothContributorFromAuthor()
+    private function setUpMockEnvironment()
     {
         $mockAuthor = $this->getMockBuilder(Author::class)
             ->setMethods([
@@ -49,6 +50,15 @@ class ThothContributorFactoryTest extends PKPTestCase
         $mockAuthor->expects($this->any())
             ->method('getUrl')
             ->will($this->returnValue('https://john.doe.org/'));
+
+        $this->mock = [];
+        $this->mock['author'] = $mockAuthor;
+    }
+
+    public function testCreateThothContributorFromAuthor()
+    {
+        $this->setUpMockEnvironment();
+        $mockAuthor = $this->mock['author'];
 
         $factory = new ThothContributorFactory();
         $thothContributor = $factory->createFromAuthor($mockAuthor);
