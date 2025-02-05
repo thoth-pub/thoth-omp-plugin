@@ -26,17 +26,6 @@ class ThothRegister
         $this->plugin = $plugin;
     }
 
-    public function addWorkIdToSchema($hookName, $args)
-    {
-        $schema = & $args[0];
-        $schema->properties->{'thothWorkId'} = (object) [
-            'type' => 'string',
-            'apiSummary' => true,
-            'validation' => ['nullable'],
-        ];
-        return false;
-    }
-
     public function addThothField($hookName, $form)
     {
         if ($form->id !== 'publish' || !empty($form->errors)) {

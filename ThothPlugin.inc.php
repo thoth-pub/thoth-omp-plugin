@@ -19,6 +19,7 @@ require_once(__DIR__ . '/vendor/autoload.php');
 
 import('lib.pkp.classes.plugins.GenericPlugin');
 import('plugins.generic.thoth.classes.frontend.ThothSectionFilter');
+import('plugins.generic.thoth.classes.schema.ThothSchema');
 import('plugins.generic.thoth.classes.ThothNotification');
 import('plugins.generic.thoth.classes.ThothRegister');
 import('plugins.generic.thoth.classes.ThothUpdater');
@@ -31,9 +32,9 @@ class ThothPlugin extends GenericPlugin
 
         if ($success && $this->getEnabled()) {
             $this->addTemplateFilters();
+            $this->addToSchema();
 
             $thothRegister = new ThothRegister($this);
-            HookRegistry::register('Schema::get::submission', [$thothRegister, 'addWorkIdToSchema']);
             HookRegistry::register('Form::config::before', [$thothRegister, 'addThothField']);
             HookRegistry::register('Publication::validatePublish', [$thothRegister, 'validateRegister']);
             HookRegistry::register('TemplateManager::display', [$thothRegister, 'addResources']);
@@ -125,5 +126,11 @@ class ThothPlugin extends GenericPlugin
     {
         $thothSectionFilter = new ThothSectionFilter($this);
         HookRegistry::register('TemplateManager::display', [$thothSectionFilter, 'registerFilter']);
+    }
+
+    public function addToSchema()
+    {
+        $thothSchema = new ThothSchema();
+        HookRegistry::register('Schema::get::submission', [$thothSchema, 'addWorkIdToSchema']);
     }
 }
