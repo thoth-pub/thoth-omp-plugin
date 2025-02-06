@@ -20,6 +20,7 @@ require_once(__DIR__ . '/vendor/autoload.php');
 import('lib.pkp.classes.plugins.GenericPlugin');
 import('plugins.generic.thoth.classes.api.ThothEndpoint');
 import('plugins.generic.thoth.classes.filters.ThothSectionFilter');
+import('plugins.generic.thoth.classes.listeners.PublishListener');
 import('plugins.generic.thoth.classes.notification.ThothNotification');
 import('plugins.generic.thoth.classes.schema.ThothSchema');
 import('plugins.generic.thoth.classes.workflow.PublishFormConfig');
@@ -38,11 +39,7 @@ class ThothPlugin extends GenericPlugin
             $this->addFormConfig();
             $this->addEndpoints();
             $this->addScripts();
-
-            HookRegistry::register('LoadHandler', [$thothRegister, 'setupHandler']);
-
-            $thothUpdater = new ThothUpdater($this);
-            HookRegistry::register('Publication::edit', [$thothUpdater, 'updateWork']);
+            $this->addListeners();
         }
 
         return $success;
@@ -125,7 +122,7 @@ class ThothPlugin extends GenericPlugin
             $template = $args[1];
 
             $thothSectionFilter = new ThothSectionFilter();
-            $thothSection->registerFilter($templateMgr, $template);
+            $thothSectionFilter->registerFilter($templateMgr, $template, $this);
         });
     }
 
@@ -163,5 +160,12 @@ class ThothPlugin extends GenericPlugin
             $thothSectionFilter->addJavaScript($request, $templateMgr, $this);
             $thothSectionFilter->addStyleSheet($request, $templateMgr, $this);
         });
+    }
+
+    public function addListeners()
+    {
+        $publishListener = new PublishListener();
+        HookRegistry::register('Publication::validatePublish', [$publishListener, 'validate']);
+        HookRegistry::register('Publication::publish', [$publishListener, 'registerThothBook']);
     }
 }
