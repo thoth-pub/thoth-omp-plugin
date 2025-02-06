@@ -18,6 +18,7 @@
 require_once(__DIR__ . '/vendor/autoload.php');
 
 import('lib.pkp.classes.plugins.GenericPlugin');
+import('plugins.generic.thoth.classes.frontend.PublishFormConfig');
 import('plugins.generic.thoth.classes.frontend.ThothSectionFilter');
 import('plugins.generic.thoth.classes.schema.ThothSchema');
 import('plugins.generic.thoth.classes.ThothNotification');
@@ -33,9 +34,9 @@ class ThothPlugin extends GenericPlugin
         if ($success && $this->getEnabled()) {
             $this->addTemplateFilters();
             $this->addToSchema();
+            $this->addFormConfig();
 
             $thothRegister = new ThothRegister($this);
-            HookRegistry::register('Form::config::before', [$thothRegister, 'addThothField']);
             HookRegistry::register('Publication::validatePublish', [$thothRegister, 'validateRegister']);
             HookRegistry::register('TemplateManager::display', [$thothRegister, 'addResources']);
             HookRegistry::register('Publication::publish', [$thothRegister, 'registerOnPublish']);
@@ -132,5 +133,11 @@ class ThothPlugin extends GenericPlugin
     {
         $thothSchema = new ThothSchema();
         HookRegistry::register('Schema::get::submission', [$thothSchema, 'addWorkIdToSchema']);
+    }
+
+    public function addFormConfig()
+    {
+        $publishFormConfig = new PublishFormConfig();
+        HookRegistry::register('Form::config::before', [$publishFormConfig, 'addConfig']);
     }
 }

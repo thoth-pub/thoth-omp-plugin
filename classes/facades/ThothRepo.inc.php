@@ -18,6 +18,11 @@ import('plugins.generic.thoth.classes.container.ThothContainer');
 
 class ThothRepo
 {
+    public static function account()
+    {
+        return ThothContainer::getInstance()->get('accountRepository');
+    }
+
     public static function affiliation()
     {
         return ThothContainer::getInstance()->get('affiliationRepository');
@@ -31,6 +36,11 @@ class ThothRepo
     public static function contributor()
     {
         return ThothContainer::getInstance()->get('contributorRepository');
+    }
+
+    public static function imprint()
+    {
+        return ThothContainer::getInstance()->get('imprintRepository');
     }
 
     public static function institution()
