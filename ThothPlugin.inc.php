@@ -18,6 +18,7 @@
 require_once(__DIR__ . '/vendor/autoload.php');
 
 import('lib.pkp.classes.plugins.GenericPlugin');
+import('plugins.generic.thoth.classes.api.ThothEndpoint');
 import('plugins.generic.thoth.classes.frontend.PublishFormConfig');
 import('plugins.generic.thoth.classes.frontend.ThothSectionFilter');
 import('plugins.generic.thoth.classes.schema.ThothSchema');
@@ -35,13 +36,13 @@ class ThothPlugin extends GenericPlugin
             $this->addTemplateFilters();
             $this->addToSchema();
             $this->addFormConfig();
+            $this->addEndpoints();
 
             $thothRegister = new ThothRegister($this);
             HookRegistry::register('Publication::validatePublish', [$thothRegister, 'validateRegister']);
             HookRegistry::register('TemplateManager::display', [$thothRegister, 'addResources']);
             HookRegistry::register('Publication::publish', [$thothRegister, 'registerOnPublish']);
             HookRegistry::register('LoadHandler', [$thothRegister, 'setupHandler']);
-            HookRegistry::register('APIHandler::endpoints', [$thothRegister, 'addThothEndpoint']);
 
             $thothUpdater = new ThothUpdater($this);
             HookRegistry::register('Publication::edit', [$thothUpdater, 'updateWork']);
@@ -139,5 +140,11 @@ class ThothPlugin extends GenericPlugin
     {
         $publishFormConfig = new PublishFormConfig();
         HookRegistry::register('Form::config::before', [$publishFormConfig, 'addConfig']);
+    }
+
+    public function addEndpoints()
+    {
+        $thothEndpoint = new ThothEndpoint();
+        HookRegistry::register('APIHandler::endpoints', [$thothEndpoint, 'addEndpoints']);
     }
 }
