@@ -14,7 +14,8 @@
  */
 
 import('plugins.generic.thoth.classes.container.Container');
-import('plugins.generic.thoth.classes.container.ThothContainerProvider');
+import('plugins.generic.thoth.classes.container.providers.ThothRepositoryProvider');
+import('plugins.generic.thoth.classes.container.providers.ThothServiceProvider');
 
 class ThothContainer extends Container
 {
@@ -22,7 +23,8 @@ class ThothContainer extends Container
 
     private function __construct()
     {
-        $this->register(new ThothContainerProvider());
+        $this->register(new ThothRepositoryProvider());
+        $this->register(new ThothServiceProvider());
     }
 
     public static function getInstance()

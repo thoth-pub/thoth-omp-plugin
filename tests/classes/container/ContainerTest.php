@@ -15,7 +15,7 @@
  */
 
 import('lib.pkp.tests.PKPTestCase');
-import('plugins.generic.thoth.classes.container.ContainerProvider');
+import('plugins.generic.thoth.classes.container.providers.ContainerProvider');
 import('plugins.generic.thoth.classes.container.Container');
 
 class ContainerTest extends PKPTestCase
