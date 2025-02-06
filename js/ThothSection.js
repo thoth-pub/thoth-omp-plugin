@@ -1,14 +1,14 @@
 /**
- * @file plugins/generic/thoth/js/Workflow.js
+ * @file plugins/generic/thoth/js/ThothSection.js
  *
- * Copyright (c) 2024 Lepidus Tecnologia
- * Copyright (c) 2024 Thoth
+ * Copyright (c) 2024-2025 Lepidus Tecnologia
+ * Copyright (c) 2024-2025 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
- * @class Workflow
+ * @class ThothSection
  * @ingroup thoth
  *
- * @brief Show notifications when submission is published
+ * @brief Handle Thoth section action in workflow page
  */
 
 (function () {
@@ -16,18 +16,18 @@
         return;
     }
 
-    $.pkp.plugins.generic.thothplugin.loading = false;
+    $.pkp.plugins.generic.thothplugin.workflow.loading = false;
 
-    $.pkp.plugins.generic.thothplugin.openRegister = function (publicationId) {
+    $.pkp.plugins.generic.thothplugin.workflow.openRegister = function (publicationId) {
         const focusEl = document.activeElement;
 
-        const sourceUrl = $.pkp.plugins.generic.thothplugin.registerUrl.replace(
+        const sourceUrl = $.pkp.plugins.generic.thothplugin.workflow.registerUrl.replace(
             '__publicationId__',
             publicationId
         );
 
         var opts = {
-            title: $.pkp.plugins.generic.thothplugin.registerTitle,
+            title: $.pkp.plugins.generic.thothplugin.workflow.registerTitle,
             url: sourceUrl,
             closeCallback: () => focusEl.focus(),
             closeOnFormSuccessId: 'register'
@@ -41,10 +41,10 @@
         ).pkpHandler('$.pkp.controllers.modal.AjaxModalHandler', opts);
     }
 
-    $.pkp.plugins.generic.thothplugin.updateMetadata = function (publicationId) {
-        $.pkp.plugins.generic.thothplugin.loading = true;
+    $.pkp.plugins.generic.thothplugin.workflow.updateMetadata = function (publicationId) {
+        $.pkp.plugins.generic.thothplugin.workflow.loading = true;
 
-        const url = $.pkp.plugins.generic.thothplugin.publicationUrl.replace(
+        const url = $.pkp.plugins.generic.thothplugin.workflow.publicationUrl.replace(
             '__publicationId__',
             publicationId
         );

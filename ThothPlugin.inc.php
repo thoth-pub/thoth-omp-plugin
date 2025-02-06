@@ -19,10 +19,10 @@ require_once(__DIR__ . '/vendor/autoload.php');
 
 import('lib.pkp.classes.plugins.GenericPlugin');
 import('plugins.generic.thoth.classes.api.ThothEndpoint');
-import('plugins.generic.thoth.classes.frontend.PublishFormConfig');
-import('plugins.generic.thoth.classes.frontend.ThothSectionFilter');
+import('plugins.generic.thoth.classes.filters.ThothSectionFilter');
 import('plugins.generic.thoth.classes.notification.ThothNotification');
 import('plugins.generic.thoth.classes.schema.ThothSchema');
+import('plugins.generic.thoth.classes.workflow.PublishFormConfig');
 import('plugins.generic.thoth.classes.ThothRegister');
 import('plugins.generic.thoth.classes.ThothUpdater');
 
@@ -39,10 +39,6 @@ class ThothPlugin extends GenericPlugin
             $this->addEndpoints();
             $this->addScripts();
 
-            $thothRegister = new ThothRegister($this);
-            HookRegistry::register('Publication::validatePublish', [$thothRegister, 'validateRegister']);
-            HookRegistry::register('TemplateManager::display', [$thothRegister, 'addResources']);
-            HookRegistry::register('Publication::publish', [$thothRegister, 'registerOnPublish']);
             HookRegistry::register('LoadHandler', [$thothRegister, 'setupHandler']);
 
             $thothUpdater = new ThothUpdater($this);
@@ -124,8 +120,13 @@ class ThothPlugin extends GenericPlugin
 
     public function addTemplateFilters()
     {
-        $thothSectionFilter = new ThothSectionFilter($this);
-        HookRegistry::register('TemplateManager::display', [$thothSectionFilter, 'registerFilter']);
+        HookRegistry::register('TemplateManager::display', function ($hookName, $args) {
+            $templateMgr = $args[0];
+            $template = $args[1];
+
+            $thothSectionFilter = new ThothSectionFilter();
+            $thothSection->registerFilter($templateMgr, $template);
+        });
     }
 
     public function addToSchema()
@@ -150,11 +151,17 @@ class ThothPlugin extends GenericPlugin
     {
         HookRegistry::register('TemplateManager::display', function ($hookName, $args) {
             $templateMgr = $args[0];
+            $template = $args[1];
             $request = Application::get()->getRequest();
 
             $thothNotification = new ThothNotification();
             $thothNotification->addJavaScriptData($request, $templateMgr);
             $thothNotification->addJavaScript($request, $templateMgr, $this);
+
+            $thothSectionFilter = new ThothSectionFilter();
+            $thothSectionFilter->addJavaScriptData($request, $templateMgr, $template);
+            $thothSectionFilter->addJavaScript($request, $templateMgr, $this);
+            $thothSectionFilter->addStyleSheet($request, $templateMgr, $this);
         });
     }
 }
