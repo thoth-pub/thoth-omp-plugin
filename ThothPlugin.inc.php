@@ -168,4 +168,17 @@ class ThothPlugin extends GenericPlugin
         HookRegistry::register('Publication::validatePublish', [$publishListener, 'validate']);
         HookRegistry::register('Publication::publish', [$publishListener, 'registerThothBook']);
     }
+
+    public function addHandlers()
+    {
+        HookRegistry::register('LoadHandler', function ($hookName, $args) {
+            $page = $params[0];
+            if ($this->getEnabled() && $page === 'thoth') {
+                $this->import('controllers/modal/RegisterHandler');
+                define('HANDLER_CLASS', 'RegisterHandler');
+                return true;
+            }
+            return false;
+        });
+    }
 }
