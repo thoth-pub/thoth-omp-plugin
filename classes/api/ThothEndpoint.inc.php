@@ -73,12 +73,13 @@ class ThothEndpoint
             $submissionContext = Services::get('context')->get($submission->getData('contextId'));
         }
 
+        $thothNotification = new ThothNotification();
         try {
             $thothBookId = ThothService::book()->register($submission, $params['imprint']);
             $submission = Services::get('submission')->edit($submission, ['thothWorkId' => $thothBookId], $request);
-            ThothNotification::notifySuccess($request, $submission);
+            $thothNotification->notifySuccess($request, $submission);
         } catch (QueryException $e) {
-            ThothNotification::notifyError($request, $submission, $e->getMessage());
+            $thothNotification->notifyError($request, $submission, $e->getMessage());
             return $response->withStatus(403)->withJsonError('plugins.generic.thoth.register.error');
         }
 

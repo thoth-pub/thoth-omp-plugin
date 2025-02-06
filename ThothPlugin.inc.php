@@ -21,8 +21,8 @@ import('lib.pkp.classes.plugins.GenericPlugin');
 import('plugins.generic.thoth.classes.api.ThothEndpoint');
 import('plugins.generic.thoth.classes.frontend.PublishFormConfig');
 import('plugins.generic.thoth.classes.frontend.ThothSectionFilter');
+import('plugins.generic.thoth.classes.notification.ThothNotification');
 import('plugins.generic.thoth.classes.schema.ThothSchema');
-import('plugins.generic.thoth.classes.ThothNotification');
 import('plugins.generic.thoth.classes.ThothRegister');
 import('plugins.generic.thoth.classes.ThothUpdater');
 
@@ -37,6 +37,7 @@ class ThothPlugin extends GenericPlugin
             $this->addToSchema();
             $this->addFormConfig();
             $this->addEndpoints();
+            $this->addScripts();
 
             $thothRegister = new ThothRegister($this);
             HookRegistry::register('Publication::validatePublish', [$thothRegister, 'validateRegister']);
@@ -46,9 +47,6 @@ class ThothPlugin extends GenericPlugin
 
             $thothUpdater = new ThothUpdater($this);
             HookRegistry::register('Publication::edit', [$thothUpdater, 'updateWork']);
-
-            $thothNotification = new ThothNotification($this);
-            HookRegistry::register('TemplateManager::display', [$thothNotification, 'addNotificationScript']);
         }
 
         return $success;
@@ -146,5 +144,17 @@ class ThothPlugin extends GenericPlugin
     {
         $thothEndpoint = new ThothEndpoint();
         HookRegistry::register('APIHandler::endpoints', [$thothEndpoint, 'addEndpoints']);
+    }
+
+    public function addScripts()
+    {
+        HookRegistry::register('TemplateManager::display', function ($hookName, $args) {
+            $templateMgr = $args[0];
+            $request = Application::get()->getRequest();
+
+            $thothNotification = new ThothNotification();
+            $thothNotification->addJavaScriptData($request, $templateMgr);
+            $thothNotification->addJavaScript($request, $templateMgr, $this);
+        });
     }
 }
