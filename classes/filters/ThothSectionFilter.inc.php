@@ -17,16 +17,13 @@ class ThothSectionFilter
 {
     private $plugin;
 
-    public function __construct($plugin)
-    {
-        $this->plugin = $plugin;
-    }
-
-    public function registerFilter($hookName, $args)
+    public function registerFilter($templateMgr, $template, $plugin)
     {
         if ($template != 'workflow/workflow.tpl') {
             return false;
         }
+
+        $this->plugin = $plugin;
 
         $templateMgr->registerFilter("output", [$this, 'thothSectionFilter']);
 
