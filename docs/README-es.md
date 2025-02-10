@@ -120,6 +120,6 @@ Desarrollado por [Lepidus Tecnologia](https://github.com/lepidus).
 
 Este plugin está licenciado bajo la Licencia Pública General GNU v3.0 - [Consulta el archivo de licencia.](/LICENSE)
 
-Copyright (c) 2024 Lepidus Tecnologia
+Copyright (c) 2024-2025 Lepidus Tecnologia
 
-Copyright (c) 2024 Thoth
+Copyright (c) 2024-2025 Thoth
