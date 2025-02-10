@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @file plugins/generic/thoth/classes/frontend/PublishFormConfig.inc.php
+ * @file plugins/generic/thoth/classes/components/forms/config/PublishFormConfig.inc.php
  *
  * Copyright (c) 2024-2025 Lepidus Tecnologia
  * Copyright (c) 2024-2025 Thoth
@@ -10,8 +10,11 @@
  * @class PublishFormConfig
  * @ingroup plugins_generic_thoth
  *
- * @brief Thoth configs for publish form
+ * @brief Thoth config for publish form
  */
+
+import('plugins.generic.thoth.classes.facades.ThothService');
+import('plugins.generic.thoth.classes.facades.ThothRepo');
 
 class PublishFormConfig
 {

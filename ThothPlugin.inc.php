@@ -19,13 +19,11 @@ require_once(__DIR__ . '/vendor/autoload.php');
 
 import('lib.pkp.classes.plugins.GenericPlugin');
 import('plugins.generic.thoth.classes.api.ThothEndpoint');
+import('plugins.generic.thoth.classes.components.forms.config.PublishFormConfig');
 import('plugins.generic.thoth.classes.filters.ThothSectionFilter');
-import('plugins.generic.thoth.classes.listeners.PublishListener');
+import('plugins.generic.thoth.classes.listeners.PublicationPublishListener');
 import('plugins.generic.thoth.classes.notification.ThothNotification');
 import('plugins.generic.thoth.classes.schema.ThothSchema');
-import('plugins.generic.thoth.classes.workflow.PublishFormConfig');
-import('plugins.generic.thoth.classes.ThothRegister');
-import('plugins.generic.thoth.classes.ThothUpdater');
 
 class ThothPlugin extends GenericPlugin
 {
@@ -40,6 +38,7 @@ class ThothPlugin extends GenericPlugin
             $this->addEndpoints();
             $this->addScripts();
             $this->addListeners();
+            $this->addHandlers();
         }
 
         return $success;
@@ -164,15 +163,15 @@ class ThothPlugin extends GenericPlugin
 
     public function addListeners()
     {
-        $publishListener = new PublishListener();
-        HookRegistry::register('Publication::validatePublish', [$publishListener, 'validate']);
-        HookRegistry::register('Publication::publish', [$publishListener, 'registerThothBook']);
+        $publicationPublishListener = new PublicationPublishListener();
+        HookRegistry::register('Publication::validatePublish', [$publicationPublishListener, 'validate']);
+        HookRegistry::register('Publication::publish', [$publicationPublishListener, 'registerThothBook']);
     }
 
     public function addHandlers()
     {
         HookRegistry::register('LoadHandler', function ($hookName, $args) {
-            $page = $params[0];
+            $page = $args[0];
             if ($this->getEnabled() && $page === 'thoth') {
                 $this->import('controllers/modal/RegisterHandler');
                 define('HANDLER_CLASS', 'RegisterHandler');

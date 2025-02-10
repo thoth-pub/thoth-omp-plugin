@@ -1,7 +1,5 @@
 <?php
 
-use ThothApi\Exception\QueryException;
-
 /**
  * @file plugins/generic/thoth/classes/api/ThothEndpoint.inc.php
  *
@@ -15,6 +13,10 @@ use ThothApi\Exception\QueryException;
  * @brief Thoth endpoints for OMP API
  */
 
+use ThothApi\Exception\QueryException;
+
+import('plugins.generic.thoth.classes.facades.ThothService');
+import('plugins.generic.thoth.classes.facades.ThothRepo');
 import('plugins.generic.thoth.classes.notification.ThothNotification');
 
 class ThothEndpoint

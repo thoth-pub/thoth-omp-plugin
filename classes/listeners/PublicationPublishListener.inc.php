@@ -1,19 +1,19 @@
 <?php
 
 /**
- * @file plugins/generic/thoth/classes/listeners/PublishListener.inc.php
+ * @file plugins/generic/thoth/classes/listeners/PublicationPublishListener.inc.php
  *
  * Copyright (c) 2024-2025 Lepidus Tecnologia
  * Copyright (c) 2024-2025 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
- * @class PublishListener
+ * @class PublicationPublishListener
  * @ingroup plugins_generic_thoth
  *
- * @brief Trigger actions on publish event
+ * @brief Trigger actions on publication publish event
  */
 
-class PublishListener
+class PublicationPublishListener
 {
     public function validate($hookName, $args)
     {

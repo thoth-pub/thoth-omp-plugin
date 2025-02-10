@@ -21,14 +21,14 @@
         </a>
         <pkp-button
             v-if="submission.status !== getConstant('STATUS_PUBLISHED')"
-            @click="$.pkp.plugins.generic.thothplugin.updateMetadata(workingPublication.id)"
+            @click="$.pkp.plugins.generic.thothplugin.workflow.updateMetadata(workingPublication.id)"
         >
             {translate key="plugins.generic.thoth.update"}
         </pkp-button>
-        <spinner v-if="$.pkp.plugins.generic.thothplugin.loading" />
+        <spinner v-if="$.pkp.plugins.generic.thothplugin.workflow.loading" />
     </span>
     <span v-else>
-        <pkp-button @click="$.pkp.plugins.generic.thothplugin.openRegister(workingPublication.id)">
+        <pkp-button @click="$.pkp.plugins.generic.thothplugin.workflow.openRegister(workingPublication.id)">
             {translate key="plugins.generic.thoth.register"}
         </pkp-button>
     </span>
