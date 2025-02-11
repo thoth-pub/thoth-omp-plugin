@@ -20,6 +20,7 @@ import('classes.press.Press');
 import('classes.press.PressDAO');
 import('classes.publication.Publication');
 import('classes.submission.Submission');
+import('classes.submission.SubmissionDAO');
 import('lib.pkp.classes.core.Dispatcher');
 import('lib.pkp.classes.core.PKPRequest');
 import('lib.pkp.tests.PKPTestCase');
@@ -29,7 +30,7 @@ class ThothBookFactoryTest extends PKPTestCase
 {
     protected function getMockedDAOs()
     {
-        return ['PressDAO'];
+        return ['PressDAO', 'SubmissionDAO'];
     }
 
     protected function getMockedRegistryKeys()
@@ -39,6 +40,24 @@ class ThothBookFactoryTest extends PKPTestCase
 
     private function setUpMockEnvironment()
     {
+        $mockSubmission = $this->getMockBuilder(Submission::class)
+            ->setMethods(['getData', 'getBestId'])
+            ->getMock();
+        $mockSubmission->expects($this->any())
+            ->method('getData')
+            ->will($this->returnValue(WORK_TYPE_AUTHORED_WORK));
+        $mockSubmission->expects($this->any())
+            ->method('getBestId')
+            ->will($this->returnValue(3));
+
+        $mockSubmissionDao = $this->getMockBuilder(SubmissionDAO::class)
+            ->setMethods(['getById'])
+            ->getMock();
+        $mockSubmissionDao->expects($this->any())
+            ->method('getById')
+            ->will($this->returnValue($mockSubmission));
+        DAORegistry::registerDAO('SubmissionDAO', $mockSubmissionDao);
+
         $mockContext = $this->getMockBuilder(Press::class)
             ->setMethods(['getPath'])
             ->getMock();
@@ -107,30 +126,17 @@ class ThothBookFactoryTest extends PKPTestCase
             ->with($this->equalTo('doi'))
             ->will($this->returnValue('10.12345/0101010101'));
 
-        $mockSubmission = $this->getMockBuilder(Submission::class)
-            ->setMethods([
-                'getData',
-                'getCurrentPublication'
-            ])
-            ->getMock();
-        $mockSubmission->expects($this->any())
-            ->method('getData')
-            ->will($this->returnValue(WORK_TYPE_AUTHORED_WORK));
-        $mockSubmission->expects($this->any())
-            ->method('getCurrentPublication')
-            ->will($this->returnValue($mockPublication));
-
         $this->mocks = [];
-        $this->mocks['submission'] = $mockSubmission;
+        $this->mocks['publication'] = $mockPublication;
     }
 
-    public function testCreateThothBookFromSubmission()
+    public function testCreateThothBookFromPublication()
     {
         $this->setUpMockEnvironment();
-        $mockSubmission = $this->mocks['submission'];
+        $mockPublication = $this->mocks['publication'];
 
         $factory = new ThothBookFactory();
-        $thothWork = $factory->createFromSubmission($mockSubmission);
+        $thothWork = $factory->createFromPublication($mockPublication);
 
         $this->assertEquals(new ThothWork([
             'workType' => ThothWork::WORK_TYPE_MONOGRAPH,

@@ -77,7 +77,7 @@ class ThothEndpoint
 
         $thothNotification = new ThothNotification();
         try {
-            $thothBookId = ThothService::book()->register($submission, $params['imprint']);
+            $thothBookId = ThothService::book()->register($publication, $params['imprint']);
             $submission = Services::get('submission')->edit($submission, ['thothWorkId' => $thothBookId], $request);
             $thothNotification->notifySuccess($request, $submission);
         } catch (QueryException $e) {

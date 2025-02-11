@@ -24,14 +24,15 @@ class PublishFormConfig
             return;
         }
 
-        $submission = Services::get('submission')->get($form->publication->getData('submissionId'));
+        $publication = $form->publication;
+        $submission = Services::get('submission')->get($publication->getData('submissionId'));
 
         if ($submission->getData('thothWorkId')) {
             return;
         }
 
         try {
-            $errors = ThothService::book()->validate($submission);
+            $errors = ThothService::book()->validate($publication);
 
             if (empty($errors)) {
                 $publishers = ThothRepo::account()->getLinkedPublishers();

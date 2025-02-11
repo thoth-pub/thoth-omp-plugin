@@ -13,6 +13,10 @@
  * @brief Trigger actions on publication publish event
  */
 
+use ThothApi\Exception\QueryException;
+
+import('plugins.generic.thoth.classes.facades.ThothService');
+
 class PublicationPublishListener
 {
     public function validate($hookName, $args)
@@ -33,6 +37,7 @@ class PublicationPublishListener
 
     public function registerThothBook($hookName, $args)
     {
+        $publication = $args[0];
         $submission = $args[2];
         $request = Application::get()->getRequest();
 
@@ -46,10 +51,9 @@ class PublicationPublishListener
         }
 
         $imprint = $request->getUserVar('imprint');
-
         $thothNotification = new ThothNotification();
         try {
-            $thothBookId = ThothService::book()->register($submission, $imprint);
+            $thothBookId = ThothService::book()->register($publication, $imprint);
             $submission = Services::get('submission')->edit($submission, ['thothWorkId' => $thothBookId], $request);
             $thothNotification->notifySuccess($request, $submission);
         } catch (QueryException $e) {

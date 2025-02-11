@@ -85,7 +85,7 @@ class RegisterHandler extends Handler
         $imprints = [];
 
         try {
-            $errors = ThothService::book()->validate($this->submission);
+            $errors = ThothService::book()->validate($this->publication);
 
             if (empty($errors)) {
                 $publishers = ThothRepo::account()->getLinkedPublishers();

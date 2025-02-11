@@ -29,15 +29,13 @@ class ThothBookService
         $this->repository = $repository;
     }
 
-    public function register($submission, $thothImprintId)
+    public function register($publication, $thothImprintId)
     {
-        $thothBook = $this->factory->createFromSubmission($submission);
+        $thothBook = $this->factory->createFromPublication($publication);
         $thothBook->setImprintId($thothImprintId);
 
         $thothBookId = $this->repository->add($thothBook);
         $thothBook->setWorkId($thothBookId);
-
-        $publication = $submission->getCurrentPublication();
 
         $authors = DAORegistry::getDAO('AuthorDAO')->getByPublicationId($publication->getId());
         $primaryContactId = $publication->getData('primaryContactId');
@@ -79,11 +77,11 @@ class ThothBookService
         return $thothBookId;
     }
 
-    public function validate($submission)
+    public function validate($publication)
     {
         $errors = [];
 
-        $thothBook = $this->factory->createFromSubmission($submission);
+        $thothBook = $this->factory->createFromPublication($publication);
         if ($doi = $thothBook->getDoi()) {
             $retrievedThothBook = $this->repository->getByDoi($doi);
             if ($retrievedThothBook !== null) {
@@ -105,11 +103,14 @@ class ThothBookService
         }
 
         $publicationFormats = DAORegistry::getDAO('PublicationFormatDAO')
-            ->getApprovedByPublicationId($submission->getData('currentPublicationId'))
+            ->getApprovedByPublicationId($publication->getId())
             ->toArray();
         foreach ($publicationFormats as $publicationFormat) {
             if ($publicationFormat->getIsAvailable()) {
-                $errors = array_merge($errors, ThothService::publication()->validate($publicationFormat));
+                $errors = array_merge(
+                    $errors,
+                    ThothService::publication()->validate($publicationFormat)
+                );
             }
         }
 

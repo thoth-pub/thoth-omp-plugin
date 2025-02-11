@@ -21,10 +21,10 @@ import('plugins.generic.thoth.classes.formatters.HtmlStripper');
 
 class ThothBookFactory
 {
-    public function createFromSubmission($submission)
+    public function createFromPublication($publication)
     {
         $request = Application::get()->getRequest();
-        $publication = $submission->getCurrentPublication();
+        $submission = DAORegistry::getDAO('SubmissionDAO')->getById($publication->getData('submissionId'));
         $context = Application::getContextDAO()->getById($submission->getData('contextId'));
 
         return new ThothWork([
