@@ -14,6 +14,7 @@
  */
 
 use Biblys\Isbn\Isbn;
+use Biblys\Isbn\IsbnParsingException;
 use Biblys\Isbn\IsbnValidationException;
 use ThothApi\GraphQL\Models\Publication as ThothPublication;
 
@@ -66,16 +67,16 @@ class ThothPublicationService
 
         $thothPublication = $this->factory->createFromPublicationFormat($publicationFormat);
         if ($isbn = $thothPublication->getIsbn()) {
+            $isbnValidationMessage = __(
+                'plugins.generic.thoth.validation.isbn',
+                ['isbn' => $isbn,'formatName' => $publicationFormat->getLocalizedName()]
+            );
             try {
                 Isbn::validateAsIsbn13($isbn);
+            } catch (IsbnParsingException $e) {
+                $errors[] = $isbnValidationMessage;
             } catch (IsbnValidationException $e) {
-                $errors[] = __(
-                    'plugins.generic.thoth.validation.isbn',
-                    [
-                        'isbn' => $isbn,
-                        'formatName' => $publicationFormat->getLocalizedName()
-                    ]
-                );
+                $errors[] = $isbnValidationMessage;
             }
 
             $retrievedThothPublication = $this->repository->find($isbn);
