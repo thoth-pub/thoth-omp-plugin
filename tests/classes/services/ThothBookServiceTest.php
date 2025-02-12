@@ -28,6 +28,7 @@ class ThothBookServiceTest extends PKPTestCase
 {
     public function setUp(): void
     {
+        parent::setUp();
         $this->backup = ThothContainer::getInstance()->backup('client');
     }
 

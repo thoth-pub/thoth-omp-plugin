@@ -34,4 +34,15 @@ class ThothReferenceService
 
         return $this->repository->add($thothReference);
     }
+
+    public function registerByPublication($publication)
+    {
+        $thothBookId = $publication->getData('thothBookId');
+        $citations = DAORegistry::getDAO('CitationDAO')
+            ->getByPublicationId($publication->getId())
+            ->toArray();
+        foreach ($citations as $citation) {
+            ThothService::reference()->register($citation, $thothBookId);
+        }
+    }
 }

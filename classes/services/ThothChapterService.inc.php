@@ -15,6 +15,8 @@
 
 use ThothApi\GraphQL\Models\WorkRelation as ThothWorkRelation;
 
+import('plugins.generic.thoth.classes.facades.ThothService');
+
 class ThothChapterService
 {
     public $factory;
@@ -32,30 +34,10 @@ class ThothChapterService
         $thothChapter->setImprintId($thothImprintId);
 
         $thothChapterId = $this->repository->add($thothChapter);
+        $chapter->setData('thothChapterId', $thothChapterId);
 
-        $authors = $chapter->getAuthors()->toArray();
-        foreach ($authors as $author) {
-            ThothService::contribution()->register($author, $thothChapterId);
-        }
-
-        $publication = Services::get('publication')->get($chapter->getData('publicationId'));
-        $submissionFiles = iterator_to_array(
-            Services::get('submissionFile')->getMany([
-                'assocTypes' => [ASSOC_TYPE_PUBLICATION_FORMAT],
-                'submissionIds' => [$publication->getData('submissionId')],
-            ])
-        );
-        $chapterSubmissionFiles = array_filter($submissionFiles, function ($submissionFile) use ($chapter) {
-            return $submissionFile->getData('chapterId') == $chapter->getId();
-        });
-
-        $publicationFormatDao = DAORegistry::getDAO('PublicationFormatDAO');
-        foreach ($chapterSubmissionFiles as $chapterSubmissionFile) {
-            $publicationFormat = $publicationFormatDao->getById($chapterSubmissionFile->getData('assocId'));
-            if ($publicationFormat->getIsAvailable()) {
-                ThothService::publication()->register($publicationFormat, $thothChapterId, $chapter->getId());
-            }
-        }
+        ThothService::contribution()->registerByChapter($chapter);
+        ThothService::publication()->registerByChapter($chapter);
 
         return $thothChapterId;
     }

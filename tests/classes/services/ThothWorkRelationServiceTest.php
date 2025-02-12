@@ -58,12 +58,11 @@ class ThothWorkRelationServiceTest extends PKPTestCase
             ->will($this->returnValue('91966e15-0203-4eb8-b7e7-02b72c57cedc'));
 
         $mockChapter = $this->getMockBuilder(Chapter::class)->getMock();
+        $thothRelatedWorkId = '813e0519-05ca-455b-b330-af623456dace';
+        $thothImprintId = '41b6a2a4-c3e1-4045-882c-c0f31386dee5';
 
         $service = new ThothWorkRelationService($mockRepository);
-        $thothWorkRelationId = $service->register($mockChapter, new ThothWork([
-            'imprintId' => '681fc72f-fcab-44d3-b269-5a17b53cdde4',
-            'workId' => '6b7317a4-d6db-4388-b683-b5395d587377'
-        ]));
+        $thothWorkRelationId = $service->register($mockChapter, $thothRelatedWorkId, $thothImprintId);
 
         $this->assertSame('91966e15-0203-4eb8-b7e7-02b72c57cedc', $thothWorkRelationId);
     }

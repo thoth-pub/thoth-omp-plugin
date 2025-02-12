@@ -35,4 +35,14 @@ class ThothSubjectService
 
         return $this->repository->add($thothSubject);
     }
+
+    public function registerByPublication($publication)
+    {
+        $thothBookId = $publication->getData('thothBookId');
+        $locale = $publication->getData('locale');
+        $keywords = $publication->getData('keywords');
+        foreach ($keywords[$locale] ?? [] as $seq => $keyword) {
+            $this->register($keyword, ($seq + 1), $thothBookId);
+        }
+    }
 }

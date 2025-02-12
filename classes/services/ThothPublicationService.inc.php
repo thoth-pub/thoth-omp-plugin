@@ -39,26 +39,47 @@ class ThothPublicationService
         }
 
         $thothPublicationId = $this->repository->add($thothPublication);
+        $publicationFormat->setData('thothPublicationId', $thothPublicationId);
 
-        $submissionFiles = array_filter(
-            iterator_to_array(Services::get('submissionFile')->getMany([
-                'assocTypes' => [ASSOC_TYPE_PUBLICATION_FORMAT],
-                'assocIds' => [$publicationFormat->getId()],
-            ])),
-            function ($submissionFile) use ($chapterId) {
-                return $submissionFile->getData('chapterId') == $chapterId;
-            }
-        );
-
-        if (empty($submissionFiles) && $publicationFormat->getRemoteUrl()) {
-            ThothService::location()->register($publicationFormat, $thothPublicationId);
-        }
-
-        foreach ($submissionFiles as $submissionFile) {
-            ThothService::location()->register($publicationFormat, $thothPublicationId, $submissionFile->getId());
-        }
+        ThothService::location()->registerByPublicationFormat($publicationFormat, $chapterId);
 
         return $thothPublicationId;
+    }
+
+    public function registerByPublication($publication)
+    {
+        $thothBookId = $publication->getData('thothBookId');
+        $publicationFormats = DAORegistry::getDAO('PublicationFormatDAO')
+            ->getApprovedByPublicationId($publication->getId())
+            ->toArray();
+        foreach ($publicationFormats as $publicationFormat) {
+            if ($publicationFormat->getIsAvailable()) {
+                $this->register($publicationFormat, $thothBookId);
+            }
+        }
+    }
+
+    public function registerByChapter($chapter)
+    {
+        $publication = Services::get('publication')->get($chapter->getData('publicationId'));
+        $submissionFiles = iterator_to_array(
+            Services::get('submissionFile')->getMany([
+                'assocTypes' => [ASSOC_TYPE_PUBLICATION_FORMAT],
+                'submissionIds' => [$publication->getData('submissionId')],
+            ])
+        );
+        $chapterSubmissionFiles = array_filter($submissionFiles, function ($submissionFile) use ($chapter) {
+            return $submissionFile->getData('chapterId') == $chapter->getId();
+        });
+
+        $thothChapterId = $chapter->getData('thothChapterId');
+        $publicationFormatDao = DAORegistry::getDAO('PublicationFormatDAO');
+        foreach ($chapterSubmissionFiles as $chapterSubmissionFile) {
+            $publicationFormat = $publicationFormatDao->getById($chapterSubmissionFile->getData('assocId'));
+            if ($publicationFormat->getIsAvailable()) {
+                $this->register($publicationFormat, $thothChapterId, $chapter->getId());
+            }
+        }
     }
 
     public function validate($publicationFormat)

@@ -35,4 +35,11 @@ class ThothLanguageService
 
         return $this->repository->add($thothLanguage);
     }
+
+    public function registerByPublication($publication)
+    {
+        $locale = $publication->getData('locale');
+        $thothBookId = $publication->getData('thothBookId');
+        $this->register($locale, $thothBookId);
+    }
 }

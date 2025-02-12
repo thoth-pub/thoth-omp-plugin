@@ -27,6 +27,18 @@ import('plugins.generic.thoth.classes.services.ThothChapterService');
 
 class ThothChapterServiceTest extends PKPTestCase
 {
+    public function setUp(): void
+    {
+        parent::setUp();
+        $this->backup = ThothContainer::getInstance()->backup('client');
+    }
+
+    protected function tearDown(): void
+    {
+        ThothContainer::getInstance()->set('client', $this->backup);
+        parent::tearDown();
+    }
+
     protected function getMockedDAOs()
     {
         return ['PublicationDAO'];
@@ -34,6 +46,10 @@ class ThothChapterServiceTest extends PKPTestCase
 
     public function testRegisterChapter()
     {
+        ThothContainer::getInstance()->set('client', function () {
+            return $this->getMockBuilder(ThothClient::class)->getMock();
+        });
+
         $mockPublication = $this->getMockBuilder(Publication::class)
             ->setMethods(['getData'])
             ->getMock();
@@ -80,10 +96,11 @@ class ThothChapterServiceTest extends PKPTestCase
         $mockChapter->expects($this->once())
             ->method('getAuthors')
             ->will($this->returnValue($mockResult));
-        $mockChapter->expects($this->once())
+        $mockChapter->expects($this->any())
             ->method('getData')
             ->will($this->returnValueMap([
-                ['publicationId', null, 99]
+                ['publicationId', null, 99],
+                ['thothChapterId', null, 'a518bebb-4a2c-48bb-8781-071ece2f2745']
             ]));
 
         $thothImprintId = 'd7991bfa-0ed3-432f-b9bd-0c7d0a4a1dec';

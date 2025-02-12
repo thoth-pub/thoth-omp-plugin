@@ -50,4 +50,23 @@ class ThothContributionService
 
         return $thothContributionId;
     }
+
+    public function registerByPublication($publication)
+    {
+        $authors = DAORegistry::getDAO('AuthorDAO')->getByPublicationId($publication->getId());
+        $primaryContactId = $publication->getData('primaryContactId');
+        $thothBookId = $publication->getData('thothBookId');
+        foreach ($authors as $author) {
+            $this->register($author, $thothBookId, $primaryContactId);
+        }
+    }
+
+    public function registerByChapter($chapter)
+    {
+        $thothChapterId = $chapter->getData('thothChapterId');
+        $authors = $chapter->getAuthors()->toArray();
+        foreach ($authors as $author) {
+            $this->register($author, $thothChapterId);
+        }
+    }
 }

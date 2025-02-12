@@ -35,44 +35,14 @@ class ThothBookService
         $thothBook->setImprintId($thothImprintId);
 
         $thothBookId = $this->repository->add($thothBook);
-        $thothBook->setWorkId($thothBookId);
+        $publication->setData('thothBookId', $thothBookId);
 
-        $authors = DAORegistry::getDAO('AuthorDAO')->getByPublicationId($publication->getId());
-        $primaryContactId = $publication->getData('primaryContactId');
-        foreach ($authors as $author) {
-            ThothService::contribution()->register($author, $thothBookId, $primaryContactId);
-        }
-
-        $publicationFormats = DAORegistry::getDAO('PublicationFormatDAO')
-            ->getApprovedByPublicationId($publication->getId())
-            ->toArray();
-        foreach ($publicationFormats as $publicationFormat) {
-            if ($publicationFormat->getIsAvailable()) {
-                ThothService::publication()->register($publicationFormat, $thothBookId);
-            }
-        }
-
-        $locale = $publication->getData('locale');
-        ThothService::language()->register($locale, $thothBookId);
-
-        $keywords = $publication->getData('keywords');
-        foreach ($keywords[$locale] ?? [] as $seq => $keyword) {
-            ThothService::subject()->register($keyword, ($seq + 1), $thothBookId);
-        }
-
-        $citations = DAORegistry::getDAO('CitationDAO')
-            ->getByPublicationId($publication->getId())
-            ->toArray();
-        foreach ($citations as $citation) {
-            ThothService::reference()->register($citation, $thothBookId);
-        }
-
-        $chapters = DAORegistry::getDAO('ChapterDAO')
-            ->getByPublicationId($publication->getId())
-            ->toArray();
-        foreach ($chapters as $chapter) {
-            ThothService::workRelation()->register($chapter, $thothBook);
-        }
+        ThothService::contribution()->registerByPublication($publication);
+        ThothService::publication()->registerByPublication($publication);
+        ThothService::language()->registerByPublication($publication);
+        ThothService::subject()->registerByPublication($publication);
+        ThothService::reference()->registerByPublication($publication);
+        ThothService::workRelation()->registerByPublication($publication, $thothImprintId);
 
         return $thothBookId;
     }

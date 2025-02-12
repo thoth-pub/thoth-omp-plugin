@@ -26,17 +26,28 @@ class ThothWorkRelationService
         $this->repository = $repository;
     }
 
-    public function register($chapter, $thothBook)
+    public function register($chapter, $thothRelatedWorkId, $thothImprintId)
     {
-        $thothChapterId = ThothService::chapter()->register($chapter, $thothBook->getImprintId());
+        $thothChapterId = ThothService::chapter()->register($chapter, $thothImprintId);
 
         $thothWorkRelation = $this->repository->new([
             'relatorWorkId' => $thothChapterId,
-            'relatedWorkId' => $thothBook->getWorkId(),
+            'relatedWorkId' => $thothRelatedWorkId,
             'relationType' => ThothWorkRelation::RELATION_TYPE_IS_CHILD_OF,
             'relationOrdinal' => ($chapter->getSequence() + 1)
         ]);
 
         return $this->repository->add($thothWorkRelation);
+    }
+
+    public function registerByPublication($publication, $thothImprintId)
+    {
+        $thothBookId = $publication->getData('thothBookId');
+        $chapters = DAORegistry::getDAO('ChapterDAO')
+            ->getByPublicationId($publication->getId())
+            ->toArray();
+        foreach ($chapters as $chapter) {
+            ThothService::workRelation()->register($chapter, $thothBookId, $thothImprintId);
+        }
     }
 }

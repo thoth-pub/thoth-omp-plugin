@@ -23,8 +23,24 @@ import('plugins.generic.thoth.classes.services.ThothPublicationService');
 
 class ThothPublicationServiceTest extends PKPTestCase
 {
+    public function setUp(): void
+    {
+        parent::setUp();
+        $this->backup = ThothContainer::getInstance()->backup('client');
+    }
+
+    protected function tearDown(): void
+    {
+        ThothContainer::getInstance()->set('client', $this->backup);
+        parent::tearDown();
+    }
+
     public function testRegisterPublication()
     {
+        ThothContainer::getInstance()->set('client', function () {
+            return $this->getMockBuilder(ThothClient::class)->getMock();
+        });
+
         $mockFactory = $this->getMockBuilder(ThothPublicationFactory::class)
             ->setMethods(['createFromPublicationFormat'])
             ->getMock();

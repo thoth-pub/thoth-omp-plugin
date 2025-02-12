@@ -34,4 +34,26 @@ class ThothLocationService
 
         return $this->repository->add($thothLocation);
     }
+
+    public function registerByPublicationFormat($publicationFormat, $chapterId = null)
+    {
+        $submissionFiles = array_filter(
+            iterator_to_array(Services::get('submissionFile')->getMany([
+                'assocTypes' => [ASSOC_TYPE_PUBLICATION_FORMAT],
+                'assocIds' => [$publicationFormat->getId()],
+            ])),
+            function ($submissionFile) use ($chapterId) {
+                return $submissionFile->getData('chapterId') == $chapterId;
+            }
+        );
+
+        $thothPublicationId = $publicationFormat->getData('thothPublicationId');
+        if (empty($submissionFiles) && $publicationFormat->getRemoteUrl()) {
+            $this->register($publicationFormat, $thothPublicationId);
+        }
+
+        foreach ($submissionFiles as $submissionFile) {
+            $this->register($publicationFormat, $thothPublicationId, $submissionFile->getId());
+        }
+    }
 }
