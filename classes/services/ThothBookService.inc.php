@@ -47,6 +47,19 @@ class ThothBookService
         return $thothBookId;
     }
 
+    public function update($publication, $thothBookId)
+    {
+        $oldThothBook = $this->repository->get($thothBookId);
+        $newThothBook = $this->factory->createFromPublication($publication);
+
+        $thothBook = $this->repository->new(array_merge(
+            $oldThothBook->getAllData(),
+            $newThothBook->getAllData()
+        ));
+
+        $this->repository->edit($thothBook);
+    }
+
     public function validate($publication)
     {
         $errors = [];

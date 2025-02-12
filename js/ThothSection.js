@@ -65,7 +65,7 @@
                     url: $.pkp.plugins.generic.thothplugin.notification.notificationUrl,
                     success: $.pkp.plugins.generic.thothplugin.notification.showNotification,
                     complete() {
-                        $.pkp.plugins.generic.thothplugin.loading = false;
+                        $.pkp.plugins.generic.thothplugin.workflow.loading = false;
                     },
                     dataType: 'json',
                     async: false
