@@ -3,8 +3,8 @@
 /**
  * @file plugins/generic/thoth/tests/classes/container/ThothContainer.inc.php
  *
- * Copyright (c) 2025 Lepidus Tecnologia
- * Copyright (c) 2025 Thoth
+ * Copyright (c) 2024-2025 Lepidus Tecnologia
+ * Copyright (c) 2024-2025 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothContainer
@@ -14,7 +14,8 @@
  */
 
 import('plugins.generic.thoth.classes.container.Container');
-import('plugins.generic.thoth.classes.container.ThothContainerProvider');
+import('plugins.generic.thoth.classes.container.providers.ThothRepositoryProvider');
+import('plugins.generic.thoth.classes.container.providers.ThothServiceProvider');
 
 class ThothContainer extends Container
 {
@@ -22,7 +23,8 @@ class ThothContainer extends Container
 
     private function __construct()
     {
-        $this->register(new ThothContainerProvider());
+        $this->register(new ThothRepositoryProvider());
+        $this->register(new ThothServiceProvider());
     }
 
     public static function getInstance()

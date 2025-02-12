@@ -3,8 +3,8 @@
 /**
  * @file plugins/generic/thoth/tests/classes/services/ThothReferenceServiceTest.php
  *
- * Copyright (c) 2024 Lepidus Tecnologia
- * Copyright (c) 2024 Thoth
+ * Copyright (c) 2024-2025 Lepidus Tecnologia
+ * Copyright (c) 2024-2025 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothReferenceServiceTest
@@ -18,97 +18,36 @@ use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Models\Reference as ThothReference;
 
 import('lib.pkp.tests.PKPTestCase');
+import('plugins.generic.thoth.classes.repositories.ThothReferenceRepository');
 import('plugins.generic.thoth.classes.services.ThothReferenceService');
 
 class ThothReferenceServiceTest extends PKPTestCase
 {
-    private $clientFactoryBackup;
-    private $configFactoryBackup;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->clientFactoryBackup = ThothContainer::getInstance()->backup('client');
-        $this->referenceService = new ThothReferenceService();
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->referenceService);
-        ThothContainer::getInstance()->set('client', $this->clientFactoryBackup);
-        parent::tearDown();
-    }
-
-    public function testCreateNewThothReference()
-    {
-        $citation = 'Bezsheiko, V. (2021). Effectiveness of influenza vaccination ' .
-            'for healthy adults: Versioning Example. OJS3 Testdrive Journal, 1(3). ' .
-            'https://doi.org/10.1234/td.v1i3.722 (Original work published March 15, 2021)';
-
-        $expectedThothReference = new ThothReference();
-        $expectedThothReference->setReferenceOrdinal(3);
-        $expectedThothReference->setUnstructuredCitation($citation);
-
-        $params = [
-            'referenceOrdinal' => 3,
-            'unstructuredCitation' => $citation
-        ];
-
-        $thothReference = $this->referenceService->new($params);
-
-        $this->assertEquals($expectedThothReference, $thothReference);
-    }
-
-    public function testCreateNewThothReferenceByCitation()
-    {
-        $rawCitation = 'Fendrick AM, Monto AS, Nightengale B, Sarnes M. The economic burden of non-influenza-related ' .
-            'viral respiratory tract infection in the United States. Arch Intern Med. 2003;163(4):487-494. ' .
-            'DOI: https://doi.org/10.1001/archinte.163.4.487 PMID: https://www.ncbi.nlm.nih.gov/pubmed/12588210';
-
-        $expectedThothReference = new ThothReference();
-        $expectedThothReference->setReferenceOrdinal(1);
-        $expectedThothReference->setUnstructuredCitation($rawCitation);
-
-        $citation = DAORegistry::getDAO('CitationDAO')->_newDataObject();
-        $citation->setRawCitation($rawCitation);
-        $citation->setSequence(1);
-
-        $thothReference = $this->referenceService->newByCitation($citation);
-
-        $this->assertEquals($expectedThothReference, $thothReference);
-    }
-
     public function testRegisterReference()
     {
-        $workId = '9a6aab2b-8077-4cd3-9dd1-19c115f2a3ca';
-        $rawCitation = 'Fendrick AM, Monto AS, Nightengale B, Sarnes M. The economic burden of non-influenza-related ' .
-            'viral respiratory tract infection in the United States. Arch Intern Med. 2003;163(4):487-494. ' .
-            'DOI: https://doi.org/10.1001/archinte.163.4.487 PMID: https://www.ncbi.nlm.nih.gov/pubmed/12588210';
-
-        $expectedThothReference = new ThothReference();
-        $expectedThothReference->setReferenceId('c9521541-6676-4cf4-ad6d-06299682718b');
-        $expectedThothReference->setWorkId($workId);
-        $expectedThothReference->setReferenceOrdinal(3);
-        $expectedThothReference->setUnstructuredCitation($rawCitation);
-
-        $citation = DAORegistry::getDAO('CitationDAO')->_newDataObject();
-        $citation->setRawCitation($rawCitation);
-        $citation->setSequence(3);
-
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods([
-                'createReference',
-            ])
+        $mockRepository = $this->getMockBuilder(ThothReferenceRepository::class)
+            ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
+            ->setMethods(['add'])
             ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('createReference')
-            ->will($this->returnValue('c9521541-6676-4cf4-ad6d-06299682718b'));
+        $mockRepository->expects($this->once())
+            ->method('add')
+            ->will($this->returnValue('d667cd9c-27a8-44f8-b976-a0e867c0f607'));
 
-        ThothContainer::getInstance()->set('client', function () use ($mockThothClient) {
-            return $mockThothClient;
-        });
+        $mockCitation = $this->getMockBuilder(Citation::class)
+            ->setMethods(['getSequence', 'getRawCitation'])
+            ->getMock();
+        $mockCitation->expects($this->once())
+            ->method('getSequence')
+            ->will($this->returnValue(1));
+        $mockCitation->expects($this->once())
+            ->method('getRawCitation')
+            ->will($this->returnValue('Roe, Richard. (2019). A reference used in my book. Harvard University.'));
 
-        $thothReference = $this->referenceService->register($citation, $workId);
-        $this->assertEquals($expectedThothReference, $thothReference);
+        $thothWorkId = '5e613aee-c27d-4ac8-b87e-cae5deb11771';
+
+        $service = new ThothReferenceService($mockRepository);
+        $thothReferenceId = $service->register($mockCitation, $thothWorkId);
+
+        $this->assertSame('d667cd9c-27a8-44f8-b976-a0e867c0f607', $thothReferenceId);
     }
 }

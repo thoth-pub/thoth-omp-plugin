@@ -5,8 +5,8 @@
  *
  * Copyright (c) 2014-2020 Simon Fraser University
  * Copyright (c) 2003-2020 John Willinsky
- * Copyright (c) 2024 Lepidus Tecnologia
- * Copyright (c) 2024 Thoth
+ * Copyright (c) 2024-2025 Lepidus Tecnologia
+ * Copyright (c) 2024-2025 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothPlugin
@@ -18,10 +18,13 @@
 require_once(__DIR__ . '/vendor/autoload.php');
 
 import('lib.pkp.classes.plugins.GenericPlugin');
-import('plugins.generic.thoth.classes.ThothBadgeRender');
-import('plugins.generic.thoth.classes.ThothNotification');
-import('plugins.generic.thoth.classes.ThothRegister');
-import('plugins.generic.thoth.classes.ThothUpdater');
+import('plugins.generic.thoth.classes.api.ThothEndpoint');
+import('plugins.generic.thoth.classes.components.forms.config.PublishFormConfig');
+import('plugins.generic.thoth.classes.filters.ThothSectionFilter');
+import('plugins.generic.thoth.classes.listeners.PublicationEditListener');
+import('plugins.generic.thoth.classes.listeners.PublicationPublishListener');
+import('plugins.generic.thoth.classes.notification.ThothNotification');
+import('plugins.generic.thoth.classes.schema.ThothSchema');
 
 class ThothPlugin extends GenericPlugin
 {
@@ -30,23 +33,13 @@ class ThothPlugin extends GenericPlugin
         $success = parent::register($category, $path);
 
         if ($success && $this->getEnabled()) {
-            $thothRegister = new ThothRegister($this);
-            HookRegistry::register('Schema::get::submission', [$thothRegister, 'addWorkIdToSchema']);
-            HookRegistry::register('Form::config::before', [$thothRegister, 'addThothField']);
-            HookRegistry::register('Publication::validatePublish', [$thothRegister, 'validateRegister']);
-            HookRegistry::register('TemplateManager::display', [$thothRegister, 'addResources']);
-            HookRegistry::register('Publication::publish', [$thothRegister, 'registerOnPublish']);
-            HookRegistry::register('LoadHandler', [$thothRegister, 'setupHandler']);
-            HookRegistry::register('APIHandler::endpoints', [$thothRegister, 'addThothEndpoint']);
-
-            $thothUpdater = new ThothUpdater($this);
-            HookRegistry::register('Publication::edit', [$thothUpdater, 'updateWork']);
-
-            $thothBadgeRender = new ThothBadgeRender($this);
-            HookRegistry::register('TemplateManager::display', [$thothBadgeRender, 'addThothBadge']);
-
-            $thothNotification = new ThothNotification($this);
-            HookRegistry::register('TemplateManager::display', [$thothNotification, 'addNotificationScript']);
+            $this->addTemplateFilters();
+            $this->addToSchema();
+            $this->addFormConfig();
+            $this->addEndpoints();
+            $this->addScripts();
+            $this->addListeners();
+            $this->addHandlers();
         }
 
         return $success;
@@ -120,5 +113,75 @@ class ThothPlugin extends GenericPlugin
                 return new JSONMessage(true, $form->fetch($request));
         }
         return parent::manage($args, $request);
+    }
+
+    public function addTemplateFilters()
+    {
+        HookRegistry::register('TemplateManager::display', function ($hookName, $args) {
+            $templateMgr = $args[0];
+            $template = $args[1];
+
+            $thothSectionFilter = new ThothSectionFilter();
+            $thothSectionFilter->registerFilter($templateMgr, $template, $this);
+        });
+    }
+
+    public function addToSchema()
+    {
+        $thothSchema = new ThothSchema();
+        HookRegistry::register('Schema::get::submission', [$thothSchema, 'addWorkIdToSchema']);
+    }
+
+    public function addFormConfig()
+    {
+        $publishFormConfig = new PublishFormConfig();
+        HookRegistry::register('Form::config::before', [$publishFormConfig, 'addConfig']);
+    }
+
+    public function addEndpoints()
+    {
+        $thothEndpoint = new ThothEndpoint();
+        HookRegistry::register('APIHandler::endpoints', [$thothEndpoint, 'addEndpoints']);
+    }
+
+    public function addScripts()
+    {
+        HookRegistry::register('TemplateManager::display', function ($hookName, $args) {
+            $templateMgr = $args[0];
+            $template = $args[1];
+            $request = Application::get()->getRequest();
+
+            $thothNotification = new ThothNotification();
+            $thothNotification->addJavaScriptData($request, $templateMgr);
+            $thothNotification->addJavaScript($request, $templateMgr, $this);
+
+            $thothSectionFilter = new ThothSectionFilter();
+            $thothSectionFilter->addJavaScriptData($request, $templateMgr, $template);
+            $thothSectionFilter->addJavaScript($request, $templateMgr, $this);
+            $thothSectionFilter->addStyleSheet($request, $templateMgr, $this);
+        });
+    }
+
+    public function addListeners()
+    {
+        $publicationPublishListener = new PublicationPublishListener();
+        HookRegistry::register('Publication::validatePublish', [$publicationPublishListener, 'validate']);
+        HookRegistry::register('Publication::publish', [$publicationPublishListener, 'registerThothBook']);
+
+        $publicationEditListener = new PublicationEditListener();
+        HookRegistry::register('Publication::edit', [$publicationEditListener, 'updateThothBook']);
+    }
+
+    public function addHandlers()
+    {
+        HookRegistry::register('LoadHandler', function ($hookName, $args) {
+            $page = $args[0];
+            if ($this->getEnabled() && $page === 'thoth') {
+                $this->import('controllers/modal/RegisterHandler');
+                define('HANDLER_CLASS', 'RegisterHandler');
+                return true;
+            }
+            return false;
+        });
     }
 }

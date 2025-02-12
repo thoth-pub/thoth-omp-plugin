@@ -5,8 +5,8 @@
  *
  * Copyright (c) 2014-2021 Simon Fraser University
  * Copyright (c) 2003-2021 John Willinsky
- * Copyright (c) 2024 Lepidus Tecnologia
- * Copyright (c) 2024 Thoth
+ * Copyright (c) 2024-2025 Lepidus Tecnologia
+ * Copyright (c) 2024-2025 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class RegisterHandler
@@ -19,6 +19,8 @@ use APP\components\forms\publication\PublishForm;
 use ThothApi\Exception\QueryException;
 
 import('classes.handler.Handler');
+import('plugins.generic.thoth.classes.facades.ThothService');
+import('plugins.generic.thoth.classes.facades.ThothRepo');
 
 class RegisterHandler extends Handler
 {
@@ -81,17 +83,17 @@ class RegisterHandler extends Handler
         );
 
         $imprints = [];
-        $errors = [];
 
         try {
-            $thothClient = ThothContainer::getInstance()->get('client');
-            $thothAccountDetails = $thothClient->accountDetails();
-            $publishers = $thothAccountDetails['resourceAccess']['linkedPublishers'];
-            $imprints = $thothClient->imprints(['publishers' => array_column($publishers, 'publisherId')]);
-            $errors = array_merge(ThothValidator::validate($this->submission), $errors);
-        } catch (QueryException $e) {
-            $errors[] = __('plugins.generic.thoth.connectionError');
-            error_log('Failed to send the request to Thoth: ' . $e->getMessage());
+            $errors = ThothService::book()->validate($this->publication);
+
+            if (empty($errors)) {
+                $publishers = ThothRepo::account()->getLinkedPublishers();
+                $imprints = ThothRepo::imprint()->getMany(array_column($publishers, 'publisherId'));
+            }
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            $errors = [__('plugins.generic.thoth.connectionError')];
         }
 
         $plugin->import('classes.components.forms.RegisterForm');

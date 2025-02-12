@@ -3,8 +3,8 @@
 /**
  * @file plugins/generic/thoth/classes/services/ThothAffiliationService.php
  *
- * Copyright (c) 2024 Lepidus Tecnologia
- * Copyright (c) 2024 Thoth
+ * Copyright (c) 2024-2025 Lepidus Tecnologia
+ * Copyright (c) 2024-2025 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothAffiliationService
@@ -13,44 +13,31 @@
  * @brief Helper class that encapsulates business logic for Thoth affiliations
  */
 
-use ThothApi\GraphQL\Models\Affiliation as ThothAffiliation;
-
-import('plugins.generic.thoth.classes.facades.ThothService');
+import('plugins.generic.thoth.classes.facades.ThothRepo');
 
 class ThothAffiliationService
 {
-    public function new($params)
+    public $repository;
+
+    public function __construct($repository)
     {
-        $thothAffiliation = new ThothAffiliation();
-        $thothAffiliation->setAffiliationId($params['affiliationId'] ?? null);
-        $thothAffiliation->setContributionId($params['contributionId']);
-        $thothAffiliation->setInstitutionId($params['institutionId']);
-        $thothAffiliation->setAffiliationOrdinal($params['affiliationOrdinal']);
-        return $thothAffiliation;
+        $this->repository = $repository;
     }
 
     public function register($affiliation, $thothContributionId)
     {
-        $thothInstitutions = ThothService::institution()->getMany([
-            'limit' => 1,
-            'filter' => $affiliation
-        ]);
+        $thothInstitution = ThothRepo::institution()->find($affiliation);
 
-        if (empty($thothInstitutions)) {
+        if ($thothInstitution === null) {
             return null;
         }
 
-        $thothInstitution = array_shift($thothInstitutions);
-        $thothAffiliation = $this->new([
+        $thothAffiliation = $this->repository->new([
             'contributionId' => $thothContributionId,
             'institutionId' => $thothInstitution->getInstitutionId(),
             'affiliationOrdinal' => 1
         ]);
 
-        $thothClient = ThothContainer::getInstance()->get('client');
-        $thothAffiliationId = $thothClient->createAffiliation($thothAffiliation);
-        $thothAffiliation->setAffiliationId($thothAffiliationId);
-
-        return $thothAffiliation;
+        return $this->repository->add($thothAffiliation);
     }
 }

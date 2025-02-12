@@ -3,8 +3,8 @@
 /**
  * @file plugins/generic/thoth/tests/classes/services/ThothPublicationServiceTest.php
  *
- * Copyright (c) 2024 Lepidus Tecnologia
- * Copyright (c) 2024 Thoth
+ * Copyright (c) 2024-2025 Lepidus Tecnologia
+ * Copyright (c) 2024-2025 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothPublicationServiceTest
@@ -17,243 +17,105 @@
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Models\Publication as ThothPublication;
 
-import('classes.core.Services');
-import('classes.monograph.Author');
-import('lib.pkp.classes.services.PKPSchemaService');
 import('lib.pkp.tests.PKPTestCase');
+import('plugins.generic.thoth.classes.repositories.ThothPublicationRepository');
 import('plugins.generic.thoth.classes.services.ThothPublicationService');
 
 class ThothPublicationServiceTest extends PKPTestCase
 {
-    private $clientFactoryBackup;
-    private $configFactoryBackup;
-
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
-        $this->clientFactoryBackup = ThothContainer::getInstance()->backup('client');
-        $this->publicationService = new ThothPublicationService();
+        $this->backup = ThothContainer::getInstance()->backup('client');
     }
 
     protected function tearDown(): void
     {
-        unset($this->publicationService);
-        ThothContainer::getInstance()->set('client', $this->clientFactoryBackup);
+        ThothContainer::getInstance()->set('client', $this->backup);
         parent::tearDown();
-    }
-
-    public function testGetPublicationTypeByPublicationFormat()
-    {
-        $publicationFormat = DAORegistry::getDAO('PublicationFormatDAO')->newDataObject();
-
-        $publicationFormat->setEntryKey('BC');
-        $this->assertEquals(
-            ThothPublication::PUBLICATION_TYPE_PAPERBACK,
-            $this->publicationService->getPublicationTypeByPublicationFormat($publicationFormat)
-        );
-        $publicationFormat->setEntryKey('BB');
-        $this->assertEquals(
-            ThothPublication::PUBLICATION_TYPE_HARDBACK,
-            $this->publicationService->getPublicationTypeByPublicationFormat($publicationFormat)
-        );
-        $publicationFormat->setEntryKey('DA');
-        $publicationFormat->setName('HTML', 'en_US');
-        $this->assertEquals(
-            ThothPublication::PUBLICATION_TYPE_HTML,
-            $this->publicationService->getPublicationTypeByPublicationFormat($publicationFormat)
-        );
-        $publicationFormat->setEntryKey('DA');
-        $publicationFormat->setName('PDF', 'en_US');
-        $this->assertEquals(
-            ThothPublication::PUBLICATION_TYPE_PDF,
-            $this->publicationService->getPublicationTypeByPublicationFormat($publicationFormat)
-        );
-        $publicationFormat->setEntryKey('DA');
-        $publicationFormat->setName('XML', 'en_US');
-        $this->assertEquals(
-            ThothPublication::PUBLICATION_TYPE_XML,
-            $this->publicationService->getPublicationTypeByPublicationFormat($publicationFormat)
-        );
-        $publicationFormat->setEntryKey('DA');
-        $publicationFormat->setName('EPUB', 'en_US');
-        $this->assertEquals(
-            ThothPublication::PUBLICATION_TYPE_EPUB,
-            $this->publicationService->getPublicationTypeByPublicationFormat($publicationFormat)
-        );
-        $publicationFormat->setEntryKey('DA');
-        $publicationFormat->setName('MOBI', 'en_US');
-        $this->assertEquals(
-            ThothPublication::PUBLICATION_TYPE_MOBI,
-            $this->publicationService->getPublicationTypeByPublicationFormat($publicationFormat)
-        );
-        $publicationFormat->setEntryKey('DA');
-        $publicationFormat->setName('AZW3', 'en_US');
-        $this->assertEquals(
-            ThothPublication::PUBLICATION_TYPE_AZW3,
-            $this->publicationService->getPublicationTypeByPublicationFormat($publicationFormat)
-        );
-        $publicationFormat->setEntryKey('DA');
-        $publicationFormat->setName('DOCX', 'en_US');
-        $this->assertEquals(
-            ThothPublication::PUBLICATION_TYPE_DOCX,
-            $this->publicationService->getPublicationTypeByPublicationFormat($publicationFormat)
-        );
-        $publicationFormat->setEntryKey('DA');
-        $publicationFormat->setName('Fiction Book', 'en_US');
-        $this->assertEquals(
-            ThothPublication::PUBLICATION_TYPE_FICTION_BOOK,
-            $this->publicationService->getPublicationTypeByPublicationFormat($publicationFormat)
-        );
-    }
-
-    public function testGetIsbnByPublicationFormat()
-    {
-        $identificationCode = DAORegistry::getDAO('IdentificationCodeDAO')->newDataObject();
-        $identificationCode->setCode('15');
-        $identificationCode->setValue('978-3-95796-140-2');
-
-        $mockResult = $this->getMockBuilder(DAOResultFactory::class)
-            ->setMethods(['toArray'])
-            ->disableOriginalConstructor()
-            ->getMock();
-        $mockResult->expects($this->any())
-            ->method('toArray')
-            ->will($this->returnValue([$identificationCode]));
-
-        $publicationFormat = $mockRequest = $this->getMockBuilder(PublicationFormat::class)
-            ->setMethods(['getIdentificationCodes'])
-            ->getMock();
-        $publicationFormat->expects($this->any())
-            ->method('getIdentificationCodes')
-            ->will($this->returnValue($mockResult));
-
-        $this->assertEquals(
-            '978-3-95796-140-2',
-            $this->publicationService->getIsbnByPublicationFormat($publicationFormat)
-        );
-    }
-
-    public function testCreateNewPublicationByPublicationFormat()
-    {
-        $expectedPublication = new ThothPublication();
-        $expectedPublication->setPublicationType(ThothPublication::PUBLICATION_TYPE_PAPERBACK);
-        $expectedPublication->setIsbn('978-0-615-94946-8');
-
-        $identificationCode = DAORegistry::getDAO('IdentificationCodeDAO')->newDataObject();
-        $identificationCode->setCode('15');
-        $identificationCode->setValue('978-0-615-94946-8');
-
-        $mockResult = $this->getMockBuilder(DAOResultFactory::class)
-            ->setMethods(['toArray'])
-            ->disableOriginalConstructor()
-            ->getMock();
-        $mockResult->expects($this->any())
-            ->method('toArray')
-            ->will($this->returnValue([$identificationCode]));
-
-        $publicationFormat = $mockRequest = $this->getMockBuilder(PublicationFormat::class)
-            ->setMethods(['getIdentificationCodes'])
-            ->getMock();
-        $publicationFormat->expects($this->any())
-            ->method('getIdentificationCodes')
-            ->will($this->returnValue($mockResult));
-        $publicationFormat->setEntryKey('BC');
-
-        $publication = $this->publicationService->newByPublicationFormat($publicationFormat);
-
-        $this->assertEquals($expectedPublication, $publication);
-    }
-
-    public function testCreateNewPublication()
-    {
-        $expectedPublication = new ThothPublication();
-        $expectedPublication->setPublicationType(ThothPublication::PUBLICATION_TYPE_PDF);
-        $expectedPublication->setIsbn('978-0-615-62535-5');
-
-        $params = [
-            'publicationType' => ThothPublication::PUBLICATION_TYPE_PDF,
-            'isbn' => '978-0-615-62535-5',
-        ];
-
-        $publication = $this->publicationService->new($params);
-        $this->assertEquals($expectedPublication, $publication);
-    }
-
-    public function testSearchPublication()
-    {
-        $isbn = '978-65-89999-01-3';
-
-        $expectedThothPublications = [
-            new ThothPublication([
-                'isbn' => $isbn
-            ])
-        ];
-
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['publications'])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('publications')
-            ->will($this->returnValue([
-                new ThothPublication([
-                    'isbn' => $isbn
-                ])
-            ]));
-
-        ThothContainer::getInstance()->set('client', function () use ($mockThothClient) {
-            return $mockThothClient;
-        });
-
-        $thothPublications = $this->publicationService->search($isbn);
-
-        $this->assertEquals($expectedThothPublications, $thothPublications);
     }
 
     public function testRegisterPublication()
     {
-        $workId = '2a065323-76cd-4f54-b83b-19f2a925f426';
-
-        $expectedPublication = new ThothPublication();
-        $expectedPublication->setPublicationId('80359118-9b33-4cf4-a4b4-8784e6d4375a');
-        $expectedPublication->setWorkId($workId);
-        $expectedPublication->setPublicationType(ThothPublication::PUBLICATION_TYPE_HTML);
-        $expectedPublication->setIsbn('978-1-912656-00-4');
-
-        $identificationCode = DAORegistry::getDAO('IdentificationCodeDAO')->newDataObject();
-        $identificationCode->setCode('15');
-        $identificationCode->setValue('978-1-912656-00-4');
-
-        $mockResult = $this->getMockBuilder(DAOResultFactory::class)
-            ->setMethods(['toArray'])
-            ->disableOriginalConstructor()
-            ->getMock();
-        $mockResult->expects($this->any())
-            ->method('toArray')
-            ->will($this->returnValue([$identificationCode]));
-
-        $publicationFormat = $mockRequest = $this->getMockBuilder(PublicationFormat::class)
-            ->setMethods(['getIdentificationCodes'])
-            ->getMock();
-        $publicationFormat->expects($this->any())
-            ->method('getIdentificationCodes')
-            ->will($this->returnValue($mockResult));
-        $publicationFormat->setEntryKey('DA');
-        $publicationFormat->setName('HTML', 'en_US');
-
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods([
-                'createPublication',
-            ])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('createPublication')
-            ->will($this->returnValue('80359118-9b33-4cf4-a4b4-8784e6d4375a'));
-
-        ThothContainer::getInstance()->set('client', function () use ($mockThothClient) {
-            return $mockThothClient;
+        ThothContainer::getInstance()->set('client', function () {
+            return $this->getMockBuilder(ThothClient::class)->getMock();
         });
 
-        $publication = $this->publicationService->register($publicationFormat, $workId);
-        $this->assertEquals($expectedPublication, $publication);
+        $mockFactory = $this->getMockBuilder(ThothPublicationFactory::class)
+            ->setMethods(['createFromPublicationFormat'])
+            ->getMock();
+        $mockFactory->expects($this->once())
+            ->method('createFromPublicationFormat')
+            ->will($this->returnValue(new ThothPublication()));
+
+        $mockRepository = $this->getMockBuilder(ThothPublicationRepository::class)
+            ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
+            ->setMethods(['add'])
+            ->getMock();
+        $mockRepository->expects($this->once())
+            ->method('add')
+            ->will($this->returnValue('4296c934-0f05-4920-a208-a5ab214b908a'));
+
+        $mockPubFormat = $this->getMockBuilder(PublicationFormat::class)->getMock();
+
+        $thothWorkId = '14d026ea-803f-4e51-a813-cea355287ab6';
+
+        $service = new ThothPublicationService($mockFactory, $mockRepository);
+        $thothPublicationId = $service->register($mockPubFormat, $thothWorkId);
+
+        $this->assertSame('4296c934-0f05-4920-a208-a5ab214b908a', $thothPublicationId);
+    }
+
+    public function testIsbnPublicationValidationFails()
+    {
+        $mockFactory = $this->getMockBuilder(ThothPublicationFactory::class)
+            ->setMethods(['createFromPublicationFormat'])
+            ->getMock();
+        $mockFactory->expects($this->once())
+            ->method('createFromPublicationFormat')
+            ->will($this->returnValue(new ThothPublication([
+                'isbn' => '978395796140'
+            ])));
+
+        $mockRepository = $this->getMockBuilder(ThothPublicationRepository::class)
+            ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
+            ->getMock();
+
+        $mockPubFormat = $this->getMockBuilder(PublicationFormat::class)->getMock();
+
+        $service = new ThothPublicationService($mockFactory, $mockRepository);
+        $errors = $service->validate($mockPubFormat);
+
+        $this->assertEquals([
+            '##plugins.generic.thoth.validation.isbn##',
+        ], $errors);
+    }
+
+    public function testIsbnExistsPublicationValidationFails()
+    {
+        $mockFactory = $this->getMockBuilder(ThothPublicationFactory::class)
+            ->setMethods(['createFromPublicationFormat'])
+            ->getMock();
+        $mockFactory->expects($this->once())
+            ->method('createFromPublicationFormat')
+            ->will($this->returnValue(new ThothPublication([
+                'isbn' => '978-3-16-148410-0'
+            ])));
+
+        $mockRepository = $this->getMockBuilder(ThothPublicationRepository::class)
+            ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
+            ->getMock();
+        $mockRepository->expects($this->once())
+            ->method('find')
+            ->will($this->returnValue(new ThothPublication()));
+
+        $mockPubFormat = $this->getMockBuilder(PublicationFormat::class)->getMock();
+
+        $service = new ThothPublicationService($mockFactory, $mockRepository);
+        $errors = $service->validate($mockPubFormat);
+
+        $this->assertEquals([
+            '##plugins.generic.thoth.validation.isbnExists##',
+        ], $errors);
     }
 }
