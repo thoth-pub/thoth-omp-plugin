@@ -45,7 +45,7 @@
         });
     }
 
-    pkp.eventBus.$on('form-success', () => {
+    $.pkp.plugins.generic.thothplugin.notification.triggerNotifications = function () {
         $.ajax({
             type: 'POST',
             url: $.pkp.plugins.generic.thothplugin.notification.notificationUrl,
@@ -53,5 +53,9 @@
             dataType: 'json',
             async: false
         });
+    }
+
+    pkp.eventBus.$on('form-success', () => {
+        $.pkp.plugins.generic.thothplugin.notification.triggerNotifications();
     });
 }());

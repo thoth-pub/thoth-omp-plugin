@@ -16,6 +16,10 @@
         return;
     }
 
+    if (typeof $.pkp.plugins.generic.thothplugin.workflow === 'undefined') {
+        return;
+    }
+
     $.pkp.plugins.generic.thothplugin.workflow.loading = false;
 
     $.pkp.plugins.generic.thothplugin.workflow.openRegister = function (publicationId) {

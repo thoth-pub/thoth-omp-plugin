@@ -36,17 +36,20 @@ class ThothNotification
             ['contents' => __($messageKey)]
         );
 
+        $this->logInfo($request, $submission, $messageKey . '.log', $error);
+    }
+
+    public function logInfo($request, $submission, $messageKey, $error = null)
+    {
         import('lib.pkp.classes.log.SubmissionLog');
         import('classes.log.SubmissionEventLogEntry');
         SubmissionLog::logEvent(
             $request,
             $submission,
             SUBMISSION_LOG_TYPE_DEFAULT,
-            $messageKey . '.log',
+            $messageKey,
             ['reason' => $error]
         );
-
-        return new JSONMessage(false);
     }
 
     public function addJavaScriptData($request, $templateMgr)

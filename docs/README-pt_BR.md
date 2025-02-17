@@ -60,6 +60,12 @@ Após a publicação dos metadados, um link para o livro no Thoth aparecerá no 
 
 ![link](/images/link.png)
 
+### Registro em massa
+
+Na página Thoth, você pode enviar em massa uma seleção de títulos do OMP para o Thoth.
+
+![page](/images/page.png)
+
 ## Mapeamento OMP-Thoth
 
 <details>
