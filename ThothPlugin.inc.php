@@ -18,6 +18,9 @@
 
 use PKP\core\JSONMessage;
 
+import('plugins.generic.thoth.classes.filters.ThothSectionFilter');
+import('plugins.generic.thoth.classes.schema.ThothSchema');
+
 class ThothPlugin extends \PKP\plugins\GenericPlugin
 {
     public function register($category, $path, $mainContextId = null)
@@ -26,6 +29,8 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
 
         if ($success && $this->getEnabled()) {
             $this->addToSchema();
+            HookRegistry::register('TemplateManager::display', [$this, 'addTemplateFilters']);
+            HookRegistry::register('TemplateManager::display', [$this, 'addScripts']);
         }
 
         return $success;
@@ -106,5 +111,26 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
         $thothSchema = new ThothSchema();
         HookRegistry::register('Schema::get::submission', [$thothSchema, 'addWorkIdToSchema']);
         HookRegistry::register('Schema::get::eventLog', [$thothSchema, 'addReasonToSchema']);
+    }
+
+    public function addTemplateFilters($hookName, $args)
+    {
+        $templateMgr = $args[0];
+        $template = $args[1];
+
+        $thothSectionFilter = new ThothSectionFilter();
+        $thothSectionFilter->registerFilter($templateMgr, $template, $this);
+    }
+
+    public function addScripts($hookName, $args)
+    {
+        $templateMgr = $args[0];
+        $template = $args[1];
+        $request = Application::get()->getRequest();
+
+        $thothSectionFilter = new ThothSectionFilter();
+        $thothSectionFilter->addJavaScriptData($request, $templateMgr, $template);
+        $thothSectionFilter->addJavaScript($request, $templateMgr, $this);
+        $thothSectionFilter->addStyleSheet($request, $templateMgr, $this);
     }
 }
