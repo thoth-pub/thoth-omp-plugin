@@ -79,7 +79,7 @@ class RegisterHandler extends Handler
             $request,
             ROUTE_API,
             $submissionContext->getPath(),
-            'submissions/' . $this->submission->getId() . '/publications/' . $this->publication->getId() . '/register'
+            'submissions/' . $this->submission->getId() . '/register'
         );
 
         $imprints = [];
@@ -107,6 +107,6 @@ class RegisterHandler extends Handler
 
         $templateMgr->assign('registerData', $settingsData);
 
-        return $templateMgr->fetchJson($plugin->getTemplateResource('register.tpl'));
+        return $templateMgr->fetchJson($plugin->getTemplateResource('thoth/register.tpl'));
     }
 }

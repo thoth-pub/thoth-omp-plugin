@@ -33,68 +33,98 @@ class ThothEndpoint
         array_unshift(
             $endpoints['PUT'],
             [
-                'pattern' => $handler->getEndpointPattern() . '/{submissionId}/publications/{publicationId}/register',
-                'handler' => [$this, 'addThothBook'],
+                'pattern' => $handler->getEndpointPattern() . '/{submissionId}/register',
+                'handler' => [$this, 'register'],
                 'roles' => [ROLE_ID_MANAGER, ROLE_ID_SUB_EDITOR],
             ]
         );
 
-        $handler->requiresSubmissionAccess[] = 'addThothBook';
+        $handler->requiresSubmissionAccess[] = 'register';
 
         return false;
     }
 
-    public function addThothBook($slimRequest, $response, $args)
+    public function register($slimRequest, $response, $args)
     {
         $request = Application::get()->getRequest();
         $handler = $request->getRouter()->getHandler();
         $submission = $handler->getAuthorizedContextObject(ASSOC_TYPE_SUBMISSION);
-        $publication = Services::get('publication')->get((int) $args['publicationId']);
         $params = $slimRequest->getParsedBody();
 
         if (empty($params['imprint'])) {
             return $response->withStatus(400)->withJson(['imprint' => [__('plugins.generic.thoth.imprint.required')]]);
         }
 
-        if (!$publication) {
+        if (!$submission) {
             return $response->withStatus(404)->withJsonError('api.404.resourceNotFound');
         }
 
-        if ($submission->getId() !== $publication->getData('submissionId')) {
-            return $response->withStatus(403)->withJsonError('api.publications.403.submissionsDidNotMatch');
+        if (!$request->getContext()) {
+            return $response->withStatus(403)->withJsonError('api.submissions.403.contextRequired');
         }
 
         if ($submission->getData('thothWorkId')) {
             return $response->withStatus(403)->withJsonError('plugins.generic.thoth.api.403.alreadyRegistered');
         }
 
-        AppLocale::requireComponents(LOCALE_COMPONENT_PKP_SUBMISSION, LOCALE_COMPONENT_APP_SUBMISSION);
+        $publication = $submission->getCurrentPublication();
 
-        $submissionContext = $request->getContext();
-        if (!$submissionContext || $submissionContext->getId() !== $submission->getData('contextId')) {
-            $submissionContext = Services::get('context')->get($submission->getData('contextId'));
+        $failure = [
+            'id' => $submission->getId(),
+            'errors' => []
+        ];
+
+        try {
+            $failure['errors'] = ThothService::book()->validate($publication);
+        } catch (Exception $e) {
+            $failure['errors'][] = __('plugins.generic.thoth.connectionError');
         }
 
-        $thothNotification = new ThothNotification();
+        if ($failure['errors']) {
+            return $response->withStatus(400)->withJson($failure);
+        }
+
+        AppLocale::requireComponents(LOCALE_COMPONENT_PKP_SUBMISSION, LOCALE_COMPONENT_APP_SUBMISSION);
+
+        $disableNotification = $params['disableNotification'];
         try {
             $thothBookId = ThothService::book()->register($publication, $params['imprint']);
             $submission = Services::get('submission')->edit($submission, ['thothWorkId' => $thothBookId], $request);
-            $thothNotification->notifySuccess($request, $submission);
+            $this->handleNotification($request, $submission, true, $disableNotification);
         } catch (QueryException $e) {
-            $thothNotification->notifyError($request, $submission, $e->getMessage());
-            return $response->withStatus(403)->withJsonError('plugins.generic.thoth.register.error');
+            $this->handleNotification($request, $submission, false, $disableNotification, $e->getMessage());
+            $failure['errors'][] = __('plugins.generic.thoth.register.error.log', ['reason' => $e->getMessage()]);
+            return $response->withStatus(403)->withJson($failure);
         }
 
         $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
 
-        $publicationProps = Services::get('publication')->getFullProperties(
-            $publication,
-            [
-                'request' => $request,
-                'userGroups' => $userGroupDao->getByContextId($submission->getData('contextId'))->toArray(),
-            ]
-        );
+        $submissionProps = Services::get('submission')->getFullProperties($submission, [
+            'request' => $request,
+            'slimRequest' => $slimRequest,
+            'userGroups' => $userGroupDao->getByContextId($submission->getData('contextId'))->toArray(),
+        ]);
 
-        return $response->withJson($publicationProps, 200);
+        return $response->withJson($submissionProps, 200);
+    }
+
+
+    public function handleNotification($request, $submission, $success, $disableNotification, $errorMessage = null)
+    {
+        $thothNotification = new ThothNotification();
+
+        if ($disableNotification) {
+            $thothNotification->logInfo(
+                $request,
+                $submission,
+                $success ? 'plugins.generic.thoth.register.success.log' : 'plugins.generic.thoth.register.error.log',
+                $errorMessage
+            );
+            return;
+        }
+
+        $success
+            ? $thothNotification->notifySuccess($request, $submission)
+            : $thothNotification->notifyError($request, $submission, $errorMessage);
     }
 }
