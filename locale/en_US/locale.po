@@ -4,6 +4,9 @@ msgstr "Thoth Plugin"
 msgid "plugins.generic.thoth.description"
 msgstr "Integrate OMP with Thoth for communication and synchronization of book data between the two platforms."
 
+msgid "plugins.generic.thoth.navigation.thoth"
+msgstr "Thoth"
+
 msgid "plugins.generic.thoth.settings.title"
 msgstr "Thoth API Settings"
 
@@ -42,6 +45,12 @@ msgstr ""
 "There was a problem connecting to Thoth. Please try again later, or "
 "contact your system administrator."
 
+msgid "plugins.generic.thoth.status.registered"
+msgstr "Registered"
+
+msgid "plugins.generic.thoth.status.unregistered"
+msgstr "Unregistered"
+
 msgid "plugins.generic.thoth.register"
 msgstr "Register"
 
@@ -78,7 +87,7 @@ msgstr ""
 "contact your system administrator."
 
 msgid "plugins.generic.thoth.register.error.log"
-msgstr "Error registering metadata in Thoth. Reason: {$reason}"
+msgstr "Error registering metadata in Thoth: {$reason}"
 
 msgid "plugins.generic.thoth.update"
 msgstr "Update Metadata"
@@ -95,7 +104,15 @@ msgstr ""
 "contact your system administrator."
 
 msgid "plugins.generic.thoth.update.error.log"
-msgstr "Error updating metadata in Thoth. Reason: {$reason}"
+msgstr "Error updating metadata in Thoth: {$reason}"
+
+msgid "plugins.generic.thoth.actions.register.label"
+msgstr "Register Submissions"
+
+msgid "plugins.generic.thoth.actions.register.prompt"
+msgstr ""
+"You are about to send submission metadata for {$count} item(s) to "
+"Thoth. Are you sure you want to register these records?"
 
 msgid "plugins.generic.thoth.api.403.alreadyRegistered"
 msgstr "The submission is already registered in Thoth."

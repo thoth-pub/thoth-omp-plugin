@@ -33,13 +33,15 @@ class ThothPlugin extends GenericPlugin
         $success = parent::register($category, $path);
 
         if ($success && $this->getEnabled()) {
-            $this->addTemplateFilters();
+            HookRegistry::register('TemplateManager::display', [$this, 'addScripts']);
+            HookRegistry::register('TemplateManager::display', [$this, 'addTemplateFilters']);
+            HookRegistry::register('TemplateManager::display', [$this, 'addMenu']);
+            HookRegistry::register('LoadHandler', [$this, 'addHandlers']);
+
             $this->addToSchema();
             $this->addFormConfig();
             $this->addEndpoints();
-            $this->addScripts();
             $this->addListeners();
-            $this->addHandlers();
         }
 
         return $success;
@@ -115,21 +117,20 @@ class ThothPlugin extends GenericPlugin
         return parent::manage($args, $request);
     }
 
-    public function addTemplateFilters()
+    public function addTemplateFilters($hookName, $args)
     {
-        HookRegistry::register('TemplateManager::display', function ($hookName, $args) {
-            $templateMgr = $args[0];
-            $template = $args[1];
+        $templateMgr = $args[0];
+        $template = $args[1];
 
-            $thothSectionFilter = new ThothSectionFilter();
-            $thothSectionFilter->registerFilter($templateMgr, $template, $this);
-        });
+        $thothSectionFilter = new ThothSectionFilter();
+        $thothSectionFilter->registerFilter($templateMgr, $template, $this);
     }
 
     public function addToSchema()
     {
         $thothSchema = new ThothSchema();
         HookRegistry::register('Schema::get::submission', [$thothSchema, 'addWorkIdToSchema']);
+        HookRegistry::register('Submission::getBackendListProperties::properties', [$thothSchema, 'addToBackendProps']);
     }
 
     public function addFormConfig()
@@ -144,22 +145,20 @@ class ThothPlugin extends GenericPlugin
         HookRegistry::register('APIHandler::endpoints', [$thothEndpoint, 'addEndpoints']);
     }
 
-    public function addScripts()
+    public function addScripts($hookName, $args)
     {
-        HookRegistry::register('TemplateManager::display', function ($hookName, $args) {
-            $templateMgr = $args[0];
-            $template = $args[1];
-            $request = Application::get()->getRequest();
+        $templateMgr = $args[0];
+        $template = $args[1];
+        $request = Application::get()->getRequest();
 
-            $thothNotification = new ThothNotification();
-            $thothNotification->addJavaScriptData($request, $templateMgr);
-            $thothNotification->addJavaScript($request, $templateMgr, $this);
+        $thothNotification = new ThothNotification();
+        $thothNotification->addJavaScriptData($request, $templateMgr);
+        $thothNotification->addJavaScript($request, $templateMgr, $this);
 
-            $thothSectionFilter = new ThothSectionFilter();
-            $thothSectionFilter->addJavaScriptData($request, $templateMgr, $template);
-            $thothSectionFilter->addJavaScript($request, $templateMgr, $this);
-            $thothSectionFilter->addStyleSheet($request, $templateMgr, $this);
-        });
+        $thothSectionFilter = new ThothSectionFilter();
+        $thothSectionFilter->addJavaScriptData($request, $templateMgr, $template);
+        $thothSectionFilter->addJavaScript($request, $templateMgr, $this);
+        $thothSectionFilter->addStyleSheet($request, $templateMgr, $this);
     }
 
     public function addListeners()
@@ -172,16 +171,56 @@ class ThothPlugin extends GenericPlugin
         HookRegistry::register('Publication::edit', [$publicationEditListener, 'updateThothBook']);
     }
 
-    public function addHandlers()
+    public function addHandlers($hookName, $args)
     {
-        HookRegistry::register('LoadHandler', function ($hookName, $args) {
-            $page = $args[0];
-            if ($this->getEnabled() && $page === 'thoth') {
-                $this->import('controllers/modal/RegisterHandler');
-                define('HANDLER_CLASS', 'RegisterHandler');
-                return true;
-            }
+        $page = $args[0];
+        $op = $args[1];
+
+        if (!$this->getEnabled() || $page !== 'thoth') {
             return false;
-        });
+        }
+
+        if ($op === 'register') {
+            $this->import('controllers/modal/RegisterHandler');
+            define('HANDLER_CLASS', 'RegisterHandler');
+            return true;
+        }
+
+        if ($op === 'index') {
+            $this->import('pages/thoth/ThothHandler');
+            define('HANDLER_CLASS', 'ThothHandler');
+            return true;
+        }
+
+        return false;
+    }
+
+    public function addMenu($hookName, $args)
+    {
+        $templateMgr = $args[0];
+
+        $request = Application::get()->getRequest();
+        $router = $request->getRouter();
+        $userRoles = (array) $router->getHandler()->getAuthorizedContextObject(ASSOC_TYPE_USER_ROLES);
+
+        $menu = $templateMgr->getState('menu');
+
+        if (empty($menu)) {
+            return false;
+        }
+
+        if (in_array(ROLE_ID_MANAGER, $userRoles)) {
+            $menu = array_slice($menu, 0, 2, true) +
+            [
+                'thoth' => [
+                    'name' => __('plugins.generic.thoth.navigation.thoth'),
+                    'url' => $router->url($request, null, 'thoth'),
+                    'isCurrent' => $router->getRequestedPage($request) === 'thoth',
+                ]
+            ] +
+            array_slice($menu, 2, null, true);
+        }
+
+        $templateMgr->setState(['menu' => $menu]);
     }
 }
