@@ -25,4 +25,11 @@ class ThothSchema
         ];
         return false;
     }
+
+    public function addToBackendProps($hookName, $args)
+    {
+        $props = & $args[0];
+
+        $props[] = 'thothWorkId';
+    }
 }
