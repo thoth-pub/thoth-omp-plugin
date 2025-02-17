@@ -18,37 +18,14 @@
 
 use PKP\core\JSONMessage;
 
-import('lib.pkp.classes.plugins.GenericPlugin');
-import('plugins.generic.thoth.classes.ThothBadgeRender');
-import('plugins.generic.thoth.classes.ThothNotification');
-import('plugins.generic.thoth.classes.ThothRegister');
-import('plugins.generic.thoth.classes.ThothUpdater');
-
-class ThothPlugin extends GenericPlugin
+class ThothPlugin extends \PKP\plugins\GenericPlugin
 {
     public function register($category, $path, $mainContextId = null)
     {
         $success = parent::register($category, $path);
 
         if ($success && $this->getEnabled()) {
-            $thothRegister = new ThothRegister($this);
-            HookRegistry::register('Schema::get::submission', [$thothRegister, 'addWorkIdToSchema']);
-            HookRegistry::register('Schema::get::eventLog', [$thothRegister, 'addReasonToSchema']);
-            HookRegistry::register('Form::config::before', [$thothRegister, 'addThothField']);
-            HookRegistry::register('Publication::validatePublish', [$thothRegister, 'validateRegister']);
-            HookRegistry::register('TemplateManager::display', [$thothRegister, 'addResources']);
-            HookRegistry::register('Publication::publish', [$thothRegister, 'registerOnPublish']);
-            HookRegistry::register('LoadHandler', [$thothRegister, 'setupHandler']);
-            HookRegistry::register('APIHandler::endpoints', [$thothRegister, 'addThothEndpoint']);
-
-            $thothUpdater = new ThothUpdater($this);
-            HookRegistry::register('Publication::edit', [$thothUpdater, 'updateWork']);
-
-            $thothBadgeRender = new ThothBadgeRender($this);
-            HookRegistry::register('TemplateManager::display', [$thothBadgeRender, 'addThothBadge']);
-
-            $thothNotification = new ThothNotification($this);
-            HookRegistry::register('TemplateManager::display', [$thothNotification, 'addNotificationScript']);
+            $this->addToSchema();
         }
 
         return $success;
@@ -122,5 +99,12 @@ class ThothPlugin extends GenericPlugin
                 return new JSONMessage(true, $form->fetch($request));
         }
         return parent::manage($args, $request);
+    }
+
+    public function addToSchema()
+    {
+        $thothSchema = new ThothSchema();
+        HookRegistry::register('Schema::get::submission', [$thothSchema, 'addWorkIdToSchema']);
+        HookRegistry::register('Schema::get::eventLog', [$thothSchema, 'addReasonToSchema']);
     }
 }
