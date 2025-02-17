@@ -19,6 +19,7 @@
 use PKP\core\JSONMessage;
 
 import('plugins.generic.thoth.classes.filters.ThothSectionFilter');
+import('plugins.generic.thoth.classes.notification.ThothNotification');
 import('plugins.generic.thoth.classes.schema.ThothSchema');
 
 class ThothPlugin extends \PKP\plugins\GenericPlugin
@@ -132,5 +133,9 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
         $thothSectionFilter->addJavaScriptData($request, $templateMgr, $template);
         $thothSectionFilter->addJavaScript($request, $templateMgr, $this);
         $thothSectionFilter->addStyleSheet($request, $templateMgr, $this);
+
+        $thothNotification = new ThothNotification();
+        $thothNotification->addJavaScriptData($request, $templateMgr);
+        $thothNotification->addJavaScript($request, $templateMgr, $this);
     }
 }
