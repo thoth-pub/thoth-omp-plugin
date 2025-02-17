@@ -8,10 +8,16 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothNotification
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief Manage function to display plugin notifications
  */
+
+use APP\core\Application;
+use APP\facades\Repo;
+use APP\notification\NotificationManager;
+use PKP\log\event\PKPSubmissionEventLogEntry;
 
 class ThothNotification
 {
@@ -22,7 +28,7 @@ class ThothNotification
 
     public function notifyError($request, $submission, $error)
     {
-        error_log("Failed to send the request to Thoth: $error");
+        error_log("Failed to send the request to Thoth: {$error}");
         $this->notify($request, $submission, NOTIFICATION_TYPE_ERROR, 'plugins.generic.thoth.register.error', $error);
     }
 
@@ -41,15 +47,18 @@ class ThothNotification
 
     public function logInfo($request, $submission, $messageKey, $error = null)
     {
-        import('lib.pkp.classes.log.SubmissionLog');
-        import('classes.log.SubmissionEventLogEntry');
-        SubmissionLog::logEvent(
-            $request,
-            $submission,
-            SUBMISSION_LOG_TYPE_DEFAULT,
-            $messageKey,
-            ['reason' => $error]
-        );
+        $currentUser = $request->getUser();
+        $eventLog = Repo::eventLog()->newDataObject([
+            'assocType' => Application::ASSOC_TYPE_SUBMISSION,
+            'assocId' => $submission->getId(),
+            'eventType' => PKPSubmissionEventLogEntry::SUBMISSION_LOG_CREATE_VERSION,
+            'userId' => $currentUser->getId(),
+            'message' => $messageKey,
+            'isTranslated' => false,
+            'reason' => $error,
+            'dateLogged' => Core::getCurrentDate()
+        ]);
+        Repo::eventLog()->add($eventLog);
     }
 
     public function addJavaScriptData($request, $templateMgr)

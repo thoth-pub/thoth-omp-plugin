@@ -20,6 +20,7 @@ use PKP\core\JSONMessage;
 
 import('plugins.generic.thoth.classes.components.forms.config.PublishFormConfig');
 import('plugins.generic.thoth.classes.filters.ThothSectionFilter');
+import('plugins.generic.thoth.classes.listeners.PublicationPublishListener');
 import('plugins.generic.thoth.classes.notification.ThothNotification');
 import('plugins.generic.thoth.classes.schema.ThothSchema');
 
@@ -32,6 +33,7 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
         if ($success && $this->getEnabled()) {
             $this->addToSchema();
             $this->addFormConfig();
+            $this->addListeners();
             HookRegistry::register('TemplateManager::display', [$this, 'addTemplateFilters']);
             HookRegistry::register('TemplateManager::display', [$this, 'addScripts']);
         }
@@ -145,5 +147,12 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
     {
         $publishFormConfig = new PublishFormConfig();
         HookRegistry::register('Form::config::before', [$publishFormConfig, 'addConfig']);
+    }
+
+    public function addListeners()
+    {
+        $publicationPublishListener = new PublicationPublishListener();
+        HookRegistry::register('Publication::validatePublish', [$publicationPublishListener, 'validate']);
+        HookRegistry::register('Publication::publish', [$publicationPublishListener, 'registerThothBook']);
     }
 }
