@@ -1,14 +1,14 @@
 /**
  * @file plugins/generic/thoth/js/Notification.js
  *
- * Copyright (c) 2024 Lepidus Tecnologia
- * Copyright (c) 2024 Thoth
+ * Copyright (c) 2024-2025 Lepidus Tecnologia
+ * Copyright (c) 2024-2025 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class Notification
  * @ingroup thoth
  *
- * @brief Show notifications on form success
+ * @brief Handle notifications for Javascript events
  */
 
 (function () {
@@ -45,7 +45,7 @@
         });
     }
 
-    pkp.eventBus.$on('form-success', () => {
+    $.pkp.plugins.generic.thothplugin.notification.triggerNotifications = function () {
         $.ajax({
             type: 'POST',
             url: $.pkp.plugins.generic.thothplugin.notification.notificationUrl,
@@ -53,5 +53,9 @@
             dataType: 'json',
             async: false
         });
+    }
+
+    pkp.eventBus.$on('form-success', () => {
+        $.pkp.plugins.generic.thothplugin.notification.triggerNotifications();
     });
 }());

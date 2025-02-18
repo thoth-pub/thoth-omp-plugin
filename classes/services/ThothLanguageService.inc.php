@@ -3,8 +3,8 @@
 /**
  * @file plugins/generic/thoth/classes/services/ThothLanguageService.php
  *
- * Copyright (c) 2024 Lepidus Tecnologia
- * Copyright (c) 2024 Thoth
+ * Copyright (c) 2024-2025 Lepidus Tecnologia
+ * Copyright (c) 2024-2025 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothLanguageService
@@ -19,30 +19,29 @@ use ThothApi\GraphQL\Models\Language as ThothLanguage;
 
 class ThothLanguageService
 {
-    public function new($params)
+    public $repository;
+
+    public function __construct($repository)
     {
-        $thothLanguage = new ThothLanguage();
-        $thothLanguage->setLanguageId($params['languageId'] ?? null);
-        $thothLanguage->setWorkId($params['workId'] ?? null);
-        $thothLanguage->setLanguageCode($params['languageCode']);
-        $thothLanguage->setLanguageRelation($params['languageRelation']);
-        $thothLanguage->setMainLanguage($params['mainLanguage']);
-        return $thothLanguage;
+        $this->repository = $repository;
     }
 
-    public function register($submissionLocale, $thothWorkId)
+    public function register($locale, $thothWorkId)
     {
-        $thothLanguage = $this->new([
+        $thothLanguage = $this->repository->new([
             'workId' => $thothWorkId,
-            'languageCode' => strtoupper(LocaleConversion::getIso3FromLocale($submissionLocale)),
+            'languageCode' => strtoupper(LocaleConversion::get3LetterIsoFromLocale($locale)),
             'languageRelation' => ThothLanguage::LANGUAGE_RELATION_ORIGINAL,
             'mainLanguage' => true
         ]);
 
-        $thothClient = ThothContainer::getInstance()->get('client');
-        $thothLanguageId = $thothClient->createLanguage($thothLanguage);
-        $thothLanguage->setLanguageId($thothLanguageId);
+        return $this->repository->add($thothLanguage);
+    }
 
-        return $thothLanguage;
+    public function registerByPublication($publication)
+    {
+        $locale = $publication->getData('locale');
+        $thothBookId = $publication->getData('thothBookId');
+        $this->register($locale, $thothBookId);
     }
 }
