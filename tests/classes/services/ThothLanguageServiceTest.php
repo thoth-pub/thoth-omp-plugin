@@ -3,8 +3,8 @@
 /**
  * @file plugins/generic/thoth/tests/classes/services/ThothLanguageServiceTest.php
  *
- * Copyright (c) 2024 Lepidus Tecnologia
- * Copyright (c) 2024 Thoth
+ * Copyright (c) 2024-2025 Lepidus Tecnologia
+ * Copyright (c) 2024-2025 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothLanguageServiceTest
@@ -17,69 +17,29 @@
  */
 
 use PKP\tests\PKPTestCase;
-use ThothApi\GraphQL\Models\Language as ThothLanguage;
+use ThothApi\GraphQL\Client as ThothClient;
 
+import('plugins.generic.thoth.classes.repositories.ThothLanguageRepository');
 import('plugins.generic.thoth.classes.services.ThothLanguageService');
 
 class ThothLanguageServiceTest extends PKPTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->languageService = new ThothLanguageService();
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->languageService);
-        parent::tearDown();
-    }
-
-    public function testCreateNewLanguage()
-    {
-        $expectedThothLanguage = new ThothLanguage();
-        $expectedThothLanguage->setLanguageCode('ENG');
-        $expectedThothLanguage->setLanguageRelation(ThothLanguage::LANGUAGE_RELATION_ORIGINAL);
-        $expectedThothLanguage->setMainLanguage(true);
-
-        $params = [
-            'languageCode' => 'ENG',
-            'languageRelation' => ThothLanguage::LANGUAGE_RELATION_ORIGINAL,
-            'mainLanguage' => true
-        ];
-
-        $thothLanguage = $this->languageService->new($params);
-
-        $this->assertEquals($expectedThothLanguage, $thothLanguage);
-    }
-
     public function testRegisterLanguage()
     {
-        $workId = '0600200b-865b-4706-a7e5-b5861a60dbc4';
-
-        $expectedThothLanguage = new ThothLanguage();
-        $expectedThothLanguage->setLanguageId('47b9ecbe-98af-4c01-8b5c-0c222e996429');
-        $expectedThothLanguage->setWorkId($workId);
-        $expectedThothLanguage->setLanguageCode('ENG');
-        $expectedThothLanguage->setLanguageRelation(ThothLanguage::LANGUAGE_RELATION_ORIGINAL);
-        $expectedThothLanguage->setMainLanguage(true);
-
-        $submissionLocale = 'en_US';
-
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods([
-                'createLanguage',
-            ])
+        $mockRepository = $this->getMockBuilder(ThothLanguageRepository::class)
+            ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
+            ->setMethods(['add'])
             ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('createLanguage')
-            ->will($this->returnValue('47b9ecbe-98af-4c01-8b5c-0c222e996429'));
+        $mockRepository->expects($this->once())
+            ->method('add')
+            ->will($this->returnValue('d3ddc7b3-d5f3-4394-9c34-320cd222a497'));
 
-        ThothContainer::getInstance()->set('client', function () use ($mockThothClient) {
-            return $mockThothClient;
-        });
+        $locale = 'en_US';
+        $thothWorkId = 'fdd9321f-84e3-4d19-a914-24289e8aec09';
 
-        $thothLanguage = $this->languageService->register($submissionLocale, $workId);
-        $this->assertEquals($expectedThothLanguage, $thothLanguage);
+        $service = new ThothLanguageService($mockRepository);
+        $thothLanguageId = $service->register($locale, $thothWorkId);
+
+        $this->assertSame('d3ddc7b3-d5f3-4394-9c34-320cd222a497', $thothLanguageId);
     }
 }

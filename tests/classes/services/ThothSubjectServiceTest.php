@@ -3,8 +3,8 @@
 /**
  * @file plugins/generic/thoth/tests/classes/services/ThothSubjectServiceTest.php
  *
- * Copyright (c) 2024 Lepidus Tecnologia
- * Copyright (c) 2024 Thoth
+ * Copyright (c) 2024-2025 Lepidus Tecnologia
+ * Copyright (c) 2024-2025 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothSubjectServiceTest
@@ -18,73 +18,29 @@
 
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Subject as ThothSubject;
 
+import('plugins.generic.thoth.classes.repositories.ThothSubjectRepository');
 import('plugins.generic.thoth.classes.services.ThothSubjectService');
 
 class ThothSubjectServiceTest extends PKPTestCase
 {
-    protected function setUp(): void
+    public function testRegisterSubject()
     {
-        parent::setUp();
-        $this->subjectService = new ThothSubjectService();
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->subjectService);
-        parent::tearDown();
-    }
-
-    public function testCreateNewThothSubject()
-    {
-        $expectedThothSubject = new ThothSubject();
-        $expectedThothSubject->setSubjectId('6a9cdd5a-5877-433e-8063-9af0617eaa17');
-        $expectedThothSubject->setWorkId('1ef03055-2890-429a-b870-f9671711bcc4');
-        $expectedThothSubject->setSubjectType(ThothSubject::SUBJECT_TYPE_KEYWORD);
-        $expectedThothSubject->setSubjectCode('Psychology');
-        $expectedThothSubject->setSubjectOrdinal(1);
-
-        $params = [
-            'subjectId' => '6a9cdd5a-5877-433e-8063-9af0617eaa17',
-            'workId' => '1ef03055-2890-429a-b870-f9671711bcc4',
-            'subjectType' => ThothSubject::SUBJECT_TYPE_KEYWORD,
-            'subjectCode' => 'Psychology',
-            'subjectOrdinal' => 1
-        ];
-
-        $thothSubject = $this->subjectService->new($params);
-
-        $this->assertEquals($expectedThothSubject, $thothSubject);
-    }
-
-    public function testRegisterKeyword()
-    {
-        $workId = '1ef03055-2890-429a-b870-f9671711bcc4';
-
-        $expectedThothKeyword = new ThothSubject();
-        $expectedThothKeyword->setSubjectId('6a9cdd5a-5877-433e-8063-9af0617eaa17');
-        $expectedThothKeyword->setWorkId($workId);
-        $expectedThothKeyword->setSubjectType(ThothSubject::SUBJECT_TYPE_KEYWORD);
-        $expectedThothKeyword->setSubjectCode('Psychology');
-        $expectedThothKeyword->setSubjectOrdinal(1);
-
-        $submissionKeyword = 'Psychology';
-
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods([
-                'createSubject',
-            ])
+        $mockRepository = $this->getMockBuilder(ThothSubjectRepository::class)
+            ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
+            ->setMethods(['add'])
             ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('createSubject')
-            ->will($this->returnValue('6a9cdd5a-5877-433e-8063-9af0617eaa17'));
+        $mockRepository->expects($this->once())
+            ->method('add')
+            ->will($this->returnValue('ebad8694-0dbe-48cf-a704-5d7e1f54b63d'));
 
-        ThothContainer::getInstance()->set('client', function () use ($mockThothClient) {
-            return $mockThothClient;
-        });
+        $keyword = 'Psychology';
+        $sequence = 1;
+        $thothWorkId = '114b96c3-6a51-45e6-a18a-f925128cb597';
 
-        $thothKeyword = $this->subjectService->registerKeyword($submissionKeyword, $workId);
-        $this->assertEquals($expectedThothKeyword, $thothKeyword);
+        $service = new ThothSubjectService($mockRepository);
+        $thothSubjectId = $service->register($keyword, $sequence, $thothWorkId);
+
+        $this->assertSame('ebad8694-0dbe-48cf-a704-5d7e1f54b63d', $thothSubjectId);
     }
 }

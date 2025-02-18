@@ -4,6 +4,9 @@ msgstr "Módulo Thoth"
 msgid "plugins.generic.thoth.description"
 msgstr "Integrar OMP con Thoth para la comunicación y sincronización de los datos de los libros entre las dos plataformas."
 
+msgid "plugins.generic.thoth.navigation.thoth"
+msgstr "Thoth"
+
 msgid "plugins.generic.thoth.settings.title"
 msgstr "Configuración de la API de Thoth"
 
@@ -42,6 +45,12 @@ msgstr ""
 "Se ha producido un problema al conectar con Thoth. "
 "Vuelva a intentarlo más tarde o póngase en contacto con el administrador del sistema."
 
+msgid "plugins.generic.thoth.status.registered"
+msgstr "Registrado"
+
+msgid "plugins.generic.thoth.status.unregistered"
+msgstr "No Registrado"
+
 msgid "plugins.generic.thoth.register"
 msgstr "Registrar"
 
@@ -78,7 +87,7 @@ msgstr ""
 "Vuelva a intentarlo más tarde o póngase en contacto con el administrador del sistema."
 
 msgid "plugins.generic.thoth.register.error.log"
-msgstr "Error al registrar metadatos en Thoth. Razón: {$reason}"
+msgstr "Error al registrar metadatos en Thoth: {$reason}"
 
 msgid "plugins.generic.thoth.update"
 msgstr "Actualizar Metadatos"
@@ -95,7 +104,15 @@ msgstr ""
 "Vuelva a intentarlo más tarde o póngase en contacto con el administrador del sistema."
 
 msgid "plugins.generic.thoth.update.error.log"
-msgstr "Error al actualizar metadatos en Thoth. Razón: {$reason}"
+msgstr "Error al actualizar metadatos en Thoth: {$reason}"
+
+msgid "plugins.generic.thoth.actions.register.label"
+msgstr "Registrar Envíos"
+
+msgid "plugins.generic.thoth.actions.register.prompt"
+msgstr ""
+"Está a punto de enviar metadatos de envíos de {$count} elemento(s) a "
+"Thoth. ¿Está seguro de que desea registrar estos registros?"
 
 msgid "plugins.generic.thoth.api.403.alreadyRegistered"
 msgstr "El envío ya está registrado en Thoth."

@@ -61,6 +61,12 @@ After metadata is published, a link to the book on Thoth will appear at the top 
 
 ![link](/images/link.png)
 
+### Bulk register
+
+On the Thoth page, you can bulk submit a selection of titles from OMP into Thoth.
+
+![page](/images/page.png)
+
 ## OMP-Thoth Mapping
 
 <details>

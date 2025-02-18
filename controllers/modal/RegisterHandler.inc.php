@@ -16,13 +16,15 @@
  * @brief A handler to load Thoth register confirmation
  */
 
+use APP\core\Services;
+use APP\handler\Handler;
 use APP\i18n\AppLocale;
 use APP\template\TemplateManager;
 use PKP\plugins\PluginRegistry;
 use PKP\security\Role;
 
-import('classes.handler.Handler');
-import('plugins.generic.thoth.classes.ThothValidator');
+import('plugins.generic.thoth.classes.facades.ThothService');
+import('plugins.generic.thoth.classes.facades.ThothRepository');
 
 class RegisterHandler extends Handler
 {
@@ -74,30 +76,28 @@ class RegisterHandler extends Handler
             !$submissionContext
             || $submissionContext->getId() !== $this->submission->getData('contextId')
         ) {
-            $submissionContext = Repo::context()->get($this->submission->getData('contextId'));
+            $submissionContext = Services::get('context')->get($this->submission->getData('contextId'));
         }
 
         $publicationApiUrl = $request->getDispatcher()->url(
             $request,
             ROUTE_API,
             $submissionContext->getPath(),
-            'submissions/' . $this->submission->getId() . '/publications/' . $this->publication->getId() . '/register'
+            '_submissions/' . $this->submission->getId() . '/register'
         );
 
         $imprints = [];
-        $errors = [];
 
         try {
-            $thothClient = ThothContainer::getInstance()->get('client');
-            $thothAccountDetails = $thothClient->accountDetails();
-            $publishers = $thothAccountDetails['resourceAccess']['linkedPublishers'];
+            $errors = ThothService::book()->validate($this->publication);
 
-            $imprints = $thothClient->imprints(['publishers' => array_column($publishers, 'publisherId')]);
-
-            $errors = array_merge(ThothValidator::validate($this->submission), $errors);
-        } catch (QueryException $e) {
-            $errors[] = __('plugins.generic.thoth.connectionError');
-            error_log('Failed to send the request to Thoth: ' . $e->getMessage());
+            if (empty($errors)) {
+                $publishers = ThothRepository::account()->getLinkedPublishers();
+                $imprints = ThothRepository::imprint()->getMany(array_column($publishers, 'publisherId'));
+            }
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            $errors = [__('plugins.generic.thoth.connectionError')];
         }
 
         $plugin->import('classes.components.forms.RegisterForm');
@@ -111,6 +111,6 @@ class RegisterHandler extends Handler
 
         $templateMgr->assign('registerData', $settingsData);
 
-        return $templateMgr->fetchJson($plugin->getTemplateResource('register.tpl'));
+        return $templateMgr->fetchJson($plugin->getTemplateResource('thoth/register.tpl'));
     }
 }

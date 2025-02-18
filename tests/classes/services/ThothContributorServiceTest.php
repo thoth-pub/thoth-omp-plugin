@@ -3,8 +3,8 @@
 /**
  * @file plugins/generic/thoth/tests/classes/services/ThothContributorServiceTest.php
  *
- * Copyright (c) 2024 Lepidus Tecnologia
- * Copyright (c) 2024 Thoth
+ * Copyright (c) 2024-2025 Lepidus Tecnologia
+ * Copyright (c) 2024-2025 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothContributorServiceTest
@@ -17,166 +17,37 @@
  */
 
 use PKP\tests\PKPTestCase;
+use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Models\Contributor as ThothContributor;
 
+import('plugins.generic.thoth.classes.factories.ThothContributorFactory');
 import('plugins.generic.thoth.classes.services.ThothContributorService');
+import('plugins.generic.thoth.classes.repositories.ThothContributorRepository');
 
 class ThothContributorServiceTest extends PKPTestCase
 {
-    private $clientFactoryBackup;
-    private $configFactoryBackup;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->clientFactoryBackup = ThothContainer::getInstance()->backup('client');
-        $this->contributorService = new ThothContributorService();
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->contributorService);
-        ThothContainer::getInstance()->set('client', $this->clientFactoryBackup);
-        parent::tearDown();
-    }
-
-
-    public function testCreateNewContributor()
-    {
-        $expectedContributor = new ThothContributor();
-        $expectedContributor->setFirstName('Brian');
-        $expectedContributor->setLastName('Dupuis');
-        $expectedContributor->setFullName('Brian Dupuis');
-
-        $params = [
-            'firstName' => 'Brian',
-            'lastName' => 'Dupuis',
-            'fullName' => 'Brian Dupuis'
-        ];
-
-        $contributor = $this->contributorService->new($params);
-        $this->assertEquals($expectedContributor, $contributor);
-    }
-
-    public function testCreateNewContributorByAuthor()
-    {
-        $expectedContributor = new ThothContributor();
-        $expectedContributor->setFirstName('Chantal');
-        $expectedContributor->setLastName('Allan');
-        $expectedContributor->setFullName('Chantal Allan');
-        $expectedContributor->setOrcid('https://orcid.org/0000-0002-1825-0097');
-        $expectedContributor->setWebsite('https://sites.google.com/site/chantalallan');
-
-        $authorMock = Mockery::mock(\APP\author\Author::class)
-            ->makePartial()
-            ->shouldReceive('getLocalizedGivenName')
-            ->withAnyArgs()
-            ->andReturn('Chantal')
-            ->shouldReceive('getLocalizedData')
-            ->with('familyName')
-            ->andReturn('Allan')
-            ->shouldReceive('getFullName')
-            ->withAnyArgs()
-            ->andReturn('Chantal Allan')
-            ->shouldReceive('getOrcid')
-            ->withAnyArgs()
-            ->andReturn('https://orcid.org/0000-0002-1825-0097')
-            ->shouldReceive('getUrl')
-            ->withAnyArgs()
-            ->andReturn('https://sites.google.com/site/chantalallan')
-            ->getMock();
-
-        $contributor = $this->contributorService->newByAuthor($authorMock);
-
-        $this->assertEquals($expectedContributor, $contributor);
-    }
-
     public function testRegisterContributor()
     {
-        $expectedContributor = new ThothContributor();
-        $expectedContributor->setContributorId('f70f709e-2137-4c87-a2e5-d52b263759ec');
-        $expectedContributor->setFirstName('Brian');
-        $expectedContributor->setLastName('Dupuis');
-        $expectedContributor->setFullName('Brian Dupuis');
-
-        $authorMock = Mockery::mock(\APP\author\Author::class)
-            ->makePartial()
-            ->shouldReceive('getLocalizedGivenName')
-            ->withAnyArgs()
-            ->andReturn('Brian')
-            ->shouldReceive('getLocalizedData')
-            ->with('familyName')
-            ->andReturn('Dupuis')
-            ->shouldReceive('getFullName')
-            ->withAnyArgs()
-            ->andReturn('Brian Dupuis')
+        $mockFactory = $this->getMockBuilder(ThothContributorFactory::class)
+            ->setMethods(['createFromAuthor'])
             ->getMock();
+        $mockFactory->expects($this->once())
+            ->method('createFromAuthor')
+            ->will($this->returnValue(new ThothContributor()));
 
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods([
-                'createContributor',
-            ])
+        $mockRepository = $this->getMockBuilder(ThothContributorRepository::class)
+            ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
+            ->setMethods(['add'])
             ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('createContributor')
-            ->will($this->returnValue('f70f709e-2137-4c87-a2e5-d52b263759ec'));
+        $mockRepository->expects($this->once())
+            ->method('add')
+            ->will($this->returnValue('1a1f6581-9c66-4292-9afc-176060dc3e8a'));
 
-        ThothContainer::getInstance()->set('client', function () use ($mockThothClient) {
-            return $mockThothClient;
-        });
+        $mockAuthor = $this->getMockBuilder(Author::class)->getMock();
 
-        $contributor = $this->contributorService->register($authorMock);
-        $this->assertEquals($expectedContributor, $contributor);
-    }
+        $service = new ThothContributorService($mockFactory, $mockRepository);
+        $thothContributorId = $service->register($mockAuthor);
 
-    public function testGetManyContributors()
-    {
-        $expectedContributors = [];
-        $expectedContributors[] = new ThothContributor();
-        $expectedContributors[0]->setContributorId('59383141-fff9-46e2-bc66-f71e42189380');
-        $expectedContributors[0]->setFirstName('Brenna Clarke');
-        $expectedContributors[0]->setLastName('Gray');
-        $expectedContributors[0]->setFullName('Brenna Clarke Gray');
-        $expectedContributors[0]->setOrcid('https://orcid.org/0000-0002-6079-0484');
-        $expectedContributors[0]->setWebsite('http://brennaclarkegray.ca');
-        $expectedContributors[] = new ThothContributor();
-        $expectedContributors[1]->setContributorId('5b0d32d4-bfd9-4db1-88fb-4cb91bdaf246');
-        $expectedContributors[1]->setFirstName('Dilton Oliveira de');
-        $expectedContributors[1]->setLastName('Araújo');
-        $expectedContributors[1]->setFullName('Dilton Oliveira de Araújo');
-        $expectedContributors[1]->setWebsite('http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=B00408');
-
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods([
-                'contributors',
-            ])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('contributors')
-            ->will($this->returnValue([
-                new ThothContributor([
-                    'contributorId' => '59383141-fff9-46e2-bc66-f71e42189380',
-                    'firstName' => 'Brenna Clarke',
-                    'lastName' => 'Gray',
-                    'fullName' => 'Brenna Clarke Gray',
-                    'orcid' => 'https://orcid.org/0000-0002-6079-0484',
-                    'website' => 'http://brennaclarkegray.ca'
-                ]),
-                new ThothContributor([
-                    'contributorId' => '5b0d32d4-bfd9-4db1-88fb-4cb91bdaf246',
-                    'firstName' => 'Dilton Oliveira de',
-                    'lastName' => 'Araújo',
-                    'fullName' => 'Dilton Oliveira de Araújo',
-                    'website' => 'http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=B00408'
-                ])
-            ]));
-
-        ThothContainer::getInstance()->set('client', function () use ($mockThothClient) {
-            return $mockThothClient;
-        });
-
-        $contributors = $this->contributorService->getMany($mockThothClient);
-
-        $this->assertEquals($expectedContributors, $contributors);
+        $this->assertSame('1a1f6581-9c66-4292-9afc-176060dc3e8a', $thothContributorId);
     }
 }
