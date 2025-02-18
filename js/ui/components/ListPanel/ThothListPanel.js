@@ -118,11 +118,12 @@ const thothListTemplate = pkp.Vue.compile(`
 `);
 
 const SubmissionsListPanel = pkp.controllers.Container.components.SubmissionsListPanel;
-const SubmissionFilesListPanel = pkp.controllers.Container.components.SubmissionFilesListPanel;
+const ManageEmailsPage = pkp.controllers.ManageEmailsPage;
 
 const fetch = SubmissionsListPanel.mixins[0];
-const modal = SubmissionFilesListPanel.mixins[0];
+const dialog = ManageEmailsPage.mixins[0];
 const ListPanel = SubmissionsListPanel.components.ListPanel;
+const Modal = ManageEmailsPage.components.Modal;
 const Notification = ListPanel.components.Notification;
 const Pagination = SubmissionsListPanel.components.PkpHeader;
 const PkpHeader = ListPanel.components.PkpHeader;
@@ -133,13 +134,14 @@ pkp.Vue.component('thoth-list-panel', {
     name: 'ThothListPanel',
 	components: {
         ListPanel,
+		Modal,
 		Notification,
 		Pagination,
 		PkpHeader,
 		PkpFilter,
 		Search
     },
-	mixins: [fetch, modal],
+	mixins: [fetch, dialog],
 	props: {
 		csrfToken: {
 			type: String,
@@ -267,15 +269,23 @@ pkp.Vue.component('thoth-list-panel', {
 				pkp.eventBus.$emit('notify',this.__('plugins.generic.thoth.imprint.required'),'warning');
 			} else {
 				this.openDialog({
-					cancelLabel: this.__('common.cancel'),
-					confirmLabel: title,
-					message: message,
-					modalName: 'register',
+					name: 'register',
 					title: title,
-					callback: () => {
-						this.$modal.hide('register');
-						this.registerAll();
-					}
+					message: message,
+					actions: [
+						{
+							label: title,
+							isWarnable: true,
+							callback: () => {
+								this.$modal.hide('register');
+								this.registerAll();
+							},
+						},
+						{
+							label: this.__('common.cancel'),
+							callback: () => this.$modal.hide('register'),
+						},
+					],
 				});
 			}
 

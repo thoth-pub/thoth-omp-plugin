@@ -37,4 +37,11 @@ class ThothSchema
         ];
         return false;
     }
+
+    public function addToSubmissionsListProps($hookName, $args)
+    {
+        $props = & $args[0];
+
+        $props[] = 'thothWorkId';
+    }
 }

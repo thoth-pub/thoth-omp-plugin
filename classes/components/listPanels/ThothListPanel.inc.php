@@ -21,6 +21,7 @@ use APP\facades\Repo;
 use APP\template\TemplateManager;
 use PKP\components\listPanels\ListPanel;
 use PKP\core\PKPApplication;
+use PKP\db\DAO;
 
 class ThothListPanel extends ListPanel
 {
@@ -78,7 +79,9 @@ class ThothListPanel extends ListPanel
 
             foreach ($categoriesCollection as $category) {
                 [$categorySortBy, $categorySortDir] = explode('-', $category->getSortOption());
-                $categorySortDir = empty($categorySortDir) ? $catalogSortDir : ($categorySortDir == SORT_DIRECTION_ASC ? 'ASC' : 'DESC');
+                $categorySortDir = empty($categorySortDir)
+                    ? $catalogSortDir
+                    : ($categorySortDir == DAO::SORT_DIRECTION_ASC ? 'ASC' : 'DESC');
                 $categories[] = [
                     'param' => 'categoryIds',
                     'value' => (int) $category->getId(),
@@ -101,7 +104,9 @@ class ThothListPanel extends ListPanel
                 ->getMany();
             foreach ($seriesResult as $seriesObj) {
                 [$seriesSortBy, $seriesSortDir] = explode('-', $seriesObj->getSortOption());
-                $seriesSortDir = empty($seriesSortDir) ? $catalogSortDir : ($seriesSortDir == SORT_DIRECTION_ASC ? 'ASC' : 'DESC');
+                $seriesSortDir = empty($seriesSortDir)
+                    ? $catalogSortDir
+                    : ($seriesSortDir == DAO::SORT_DIRECTION_ASC ? 'ASC' : 'DESC');
                 $series[] = [
                     'param' => 'seriesIds',
                     'value' => (int) $seriesObj->getId(),
@@ -140,4 +145,6 @@ class ThothListPanel extends ListPanel
 
         return $config;
     }
+
+
 }

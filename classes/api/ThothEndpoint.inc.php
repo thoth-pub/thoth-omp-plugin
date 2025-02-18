@@ -31,20 +31,20 @@ class ThothEndpoint
         $endpoints = & $args[0];
         $handler = $args[1];
 
-        if (!is_a($handler, 'PKP\API\v1\submissions\PKPSubmissionHandler')) {
+        if (!is_a($handler, 'APP\API\v1\_submissions\BackendSubmissionsHandler')) {
             return false;
         }
 
-        array_unshift(
-            $endpoints['PUT'],
-            [
-                'pattern' => $handler->getEndpointPattern() . '/{submissionId}/register',
-                'handler' => [$this, 'register'],
-                'roles' => [Role::ROLE_ID_MANAGER, Role::ROLE_ID_SUB_EDITOR],
-            ]
-        );
+        $rootPattern = '/{contextPath}/api/{version}/_submissions';
 
-        $handler->requiresSubmissionAccess[] = 'register';
+        $endpoints['PUT'][] = [
+            'pattern' => "{$rootPattern}/{submissionId:\d+}/register",
+            'handler' => [$this, 'register'],
+            'roles' => [
+                Role::ROLE_ID_SITE_ADMIN,
+                Role::ROLE_ID_MANAGER,
+            ],
+        ];
 
         return false;
     }
@@ -53,7 +53,8 @@ class ThothEndpoint
     {
         $request = Application::get()->getRequest();
         $handler = $request->getRouter()->getHandler();
-        $submission = $handler->getAuthorizedContextObject(ASSOC_TYPE_SUBMISSION);
+        $submissionId = (int) $args['submissionId'];
+        $submission = Repo::submission()->get($submissionId);
         $params = $slimRequest->getParsedBody();
 
         if (empty($params['imprint'])) {
@@ -102,6 +103,8 @@ class ThothEndpoint
             return $response->withStatus(403)->withJson($failure);
         }
 
+        $submission = Repo::submission()->get($submission->getId());
+
         $userGroups = Repo::userGroup()->getCollector()
             ->filterByContextIds([$submission->getData('contextId')])
             ->getMany();
@@ -109,7 +112,10 @@ class ThothEndpoint
         $genreDao = DAORegistry::getDAO('GenreDAO');
         $genres = $genreDao->getByContextId($submission->getData('contextId'))->toArray();
 
-        return $response->withJson(Repo::submission()->getSchemaMap()->map($submission, $userGroups, $genres), 200);
+        return $response->withJson(
+            Repo::submission()->getSchemaMap()->mapToSubmissionsList($submission, $userGroups, $genres),
+            200
+        );
     }
 
 

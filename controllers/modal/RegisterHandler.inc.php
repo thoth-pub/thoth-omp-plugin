@@ -83,7 +83,7 @@ class RegisterHandler extends Handler
             $request,
             ROUTE_API,
             $submissionContext->getPath(),
-            'submissions/' . $this->submission->getId() . '/register'
+            '_submissions/' . $this->submission->getId() . '/register'
         );
 
         $imprints = [];
