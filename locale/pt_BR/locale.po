@@ -4,6 +4,9 @@ msgstr "Plugin Thoth"
 msgid "plugins.generic.thoth.description"
 msgstr "Integra o OMP com o Thoth para comunicação e sincronização de dados de livros entre as duas plataformas."
 
+msgid "plugins.generic.thoth.navigation.thoth"
+msgstr "Thoth"
+
 msgid "plugins.generic.thoth.settings.title"
 msgstr "Configurações da API Thoth"
 
@@ -42,6 +45,12 @@ msgstr ""
 "Houve um problema ao conectar-se com Thoth. Por favor, tente mais "
 "tarde, ou contate o administrador do sistema."
 
+msgid "plugins.generic.thoth.status.registered"
+msgstr "Registrado"
+
+msgid "plugins.generic.thoth.status.unregistered"
+msgstr "Não Registrado"
+
 msgid "plugins.generic.thoth.register"
 msgstr "Registrar"
 
@@ -78,7 +87,7 @@ msgstr ""
 "tarde, ou contate o administrador do sistema."
 
 msgid "plugins.generic.thoth.register.error.log"
-msgstr "Erro ao registrar metadados no Thoth. Motivo: {$reason}"
+msgstr "Erro ao registrar metadados no Thoth: {$reason}"
 
 msgid "plugins.generic.thoth.update"
 msgstr "Atualizar Metadados"
@@ -95,7 +104,15 @@ msgstr ""
 "tarde, ou contate o administrador do sistema."
 
 msgid "plugins.generic.thoth.update.error.log"
-msgstr "Erro ao atualizar metadados no Thoth. Motivo: {$reason}"
+msgstr "Erro ao atualizar metadados no Thoth: {$reason}"
+
+msgid "plugins.generic.thoth.actions.register.label"
+msgstr "Registrar Submissões"
+
+msgid "plugins.generic.thoth.actions.register.prompt"
+msgstr ""
+"Você está prestes a enviar metadados de submissão de {$count} item(s) para "
+"Thoth. Tem certeza de que deseja registrar esses registros?"
 
 msgid "plugins.generic.thoth.api.403.alreadyRegistered"
 msgstr "A submissão já foi registrada na Thoth."

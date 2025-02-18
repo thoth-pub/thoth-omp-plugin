@@ -16,7 +16,10 @@
  * @brief Plugin for integration with Thoth for communication and synchronization of book data between the two platforms
  */
 
+use APP\core\Application;
 use PKP\core\JSONMessage;
+use PKP\linkAction\LinkAction;
+use PKP\linkAction\request\AjaxModal;
 
 import('plugins.generic.thoth.classes.api.ThothEndpoint');
 import('plugins.generic.thoth.classes.components.forms.config.PublishFormConfig');
@@ -39,6 +42,7 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
             $this->addEndpoints();
             HookRegistry::register('TemplateManager::display', [$this, 'addTemplateFilters']);
             HookRegistry::register('TemplateManager::display', [$this, 'addScripts']);
+            HookRegistry::register('TemplateManager::display', [$this, 'addMenu']);
             HookRegistry::register('LoadHandler', [$this, 'addHandlers']);
         }
 
@@ -120,6 +124,7 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
         $thothSchema = new ThothSchema();
         HookRegistry::register('Schema::get::submission', [$thothSchema, 'addWorkIdToSchema']);
         HookRegistry::register('Schema::get::eventLog', [$thothSchema, 'addReasonToSchema']);
+        HookRegistry::register('Submission::getSubmissionsListProps', [$thothSchema, 'addToSubmissionsListProps']);
     }
 
     public function addTemplateFilters($hookName, $args)
@@ -169,6 +174,35 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
         HookRegistry::register('APIHandler::endpoints', [$thothEndpoint, 'addEndpoints']);
     }
 
+    public function addMenu($hookName, $args)
+    {
+        $templateMgr = $args[0];
+
+        $request = Application::get()->getRequest();
+        $router = $request->getRouter();
+        $userRoles = (array) $router->getHandler()->getAuthorizedContextObject(Application::ASSOC_TYPE_USER_ROLES);
+
+        $menu = $templateMgr->getState('menu');
+
+        if (empty($menu)) {
+            return false;
+        }
+
+        if (in_array(ROLE_ID_MANAGER, $userRoles)) {
+            $menu = array_slice($menu, 0, 3, true) +
+            [
+                'thoth' => [
+                    'name' => __('plugins.generic.thoth.navigation.thoth'),
+                    'url' => $router->url($request, null, 'thoth'),
+                    'isCurrent' => $router->getRequestedPage($request) === 'thoth',
+                ]
+            ] +
+            array_slice($menu, 2, null, true);
+        }
+
+        $templateMgr->setState(['menu' => $menu]);
+    }
+
     public function addHandlers($hookName, $args)
     {
         $page = $args[0];
@@ -181,6 +215,12 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
         if ($op === 'register') {
             $this->import('controllers/modal/RegisterHandler');
             define('HANDLER_CLASS', 'RegisterHandler');
+            return true;
+        }
+
+        if ($op === 'index') {
+            $this->import('pages/thoth/ThothHandler');
+            define('HANDLER_CLASS', 'ThothHandler');
             return true;
         }
 
