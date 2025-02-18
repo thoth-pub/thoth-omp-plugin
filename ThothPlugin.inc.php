@@ -21,6 +21,7 @@ use PKP\core\JSONMessage;
 import('plugins.generic.thoth.classes.api.ThothEndpoint');
 import('plugins.generic.thoth.classes.components.forms.config.PublishFormConfig');
 import('plugins.generic.thoth.classes.filters.ThothSectionFilter');
+import('plugins.generic.thoth.classes.listeners.PublicationEditListener');
 import('plugins.generic.thoth.classes.listeners.PublicationPublishListener');
 import('plugins.generic.thoth.classes.notification.ThothNotification');
 import('plugins.generic.thoth.classes.schema.ThothSchema');
@@ -157,6 +158,9 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
         $publicationPublishListener = new PublicationPublishListener();
         HookRegistry::register('Publication::validatePublish', [$publicationPublishListener, 'validate']);
         HookRegistry::register('Publication::publish', [$publicationPublishListener, 'registerThothBook']);
+
+        $publicationEditListener = new PublicationEditListener();
+        HookRegistry::register('Publication::edit', [$publicationEditListener, 'updateThothBook']);
     }
 
     public function addEndpoints()

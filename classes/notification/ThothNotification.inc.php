@@ -21,7 +21,10 @@ use PKP\log\event\PKPSubmissionEventLogEntry;
 
 class ThothNotification
 {
-    public function notifySuccess($request, $submission)
+    public const NOTIFICATION_TYPE_REGISTER = 'register';
+    public const NOTIFICATION_TYPE_UPDATE = 'update';
+
+    public function notifySuccess($request, $submission, $type)
     {
         $this->notify($request, $submission, NOTIFICATION_TYPE_SUCCESS, 'plugins.generic.thoth.register.success');
     }
