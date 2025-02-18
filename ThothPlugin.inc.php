@@ -38,6 +38,7 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
             $this->addEndpoints();
             HookRegistry::register('TemplateManager::display', [$this, 'addTemplateFilters']);
             HookRegistry::register('TemplateManager::display', [$this, 'addScripts']);
+            HookRegistry::register('LoadHandler', [$this, 'addHandlers']);
         }
 
         return $success;
@@ -162,5 +163,23 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
     {
         $thothEndpoint = new ThothEndpoint();
         HookRegistry::register('APIHandler::endpoints', [$thothEndpoint, 'addEndpoints']);
+    }
+
+    public function addHandlers($hookName, $args)
+    {
+        $page = $args[0];
+        $op = $args[1];
+
+        if (!$this->getEnabled() || $page !== 'thoth') {
+            return false;
+        }
+
+        if ($op === 'register') {
+            $this->import('controllers/modal/RegisterHandler');
+            define('HANDLER_CLASS', 'RegisterHandler');
+            return true;
+        }
+
+        return false;
     }
 }

@@ -31,7 +31,7 @@ class ThothEndpoint
         $endpoints = & $args[0];
         $handler = $args[1];
 
-        if (!is_a($handler, 'PKPSubmissionHandler')) {
+        if (!is_a($handler, 'PKP\API\v1\submissions\PKPSubmissionHandler')) {
             return false;
         }
 
@@ -91,7 +91,7 @@ class ThothEndpoint
 
         AppLocale::requireComponents(LOCALE_COMPONENT_PKP_SUBMISSION, LOCALE_COMPONENT_APP_SUBMISSION);
 
-        $disableNotification = $params['disableNotification'];
+        $disableNotification = $params['disableNotification'] ?? false;
         try {
             $thothBookId = ThothService::book()->register($publication, $params['imprint']);
             Repo::submission()->edit($submission, ['thothWorkId' => $thothBookId]);
