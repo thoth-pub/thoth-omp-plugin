@@ -60,6 +60,12 @@ Após a publicação dos metadados, um link para o livro no Thoth aparecerá no 
 
 ![link](/images/link.png)
 
+### Registro em massa
+
+Na página Thoth, você pode enviar em massa uma seleção de títulos do OMP para o Thoth.
+
+![page](/images/page.png)
+
 ## Mapeamento OMP-Thoth
 
 <details>
@@ -120,6 +126,6 @@ Desenvolvido por [Lepidus Tecnologia](https://github.com/lepidus).
 
 Este plugin está licenciado sob a Licença Pública Geral GNU v3.0 - [Veja o arquivo de licença.](/LICENSE)
 
-Copyright (c) 2024 Lepidus Tecnologia
+Copyright (c) 2024-2025 Lepidus Tecnologia
 
-Copyright (c) 2024 Thoth
+Copyright (c) 2024-2025 Thoth

@@ -5,8 +5,8 @@
  *
  * Copyright (c) 2014-2021 Simon Fraser University
  * Copyright (c) 2000-2021 John Willinsky
- * Copyright (c) 2024 Lepidus Tecnologia
- * Copyright (c) 2024 Thoth
+ * Copyright (c) 2024-2025 Lepidus Tecnologia
+ * Copyright (c) 2024-2025 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothService
@@ -21,6 +21,16 @@ class ThothService
     public static function affiliation()
     {
         return ThothContainer::getInstance()->get('affiliationService');
+    }
+
+    public static function book()
+    {
+        return ThothContainer::getInstance()->get('bookService');
+    }
+
+    public static function chapter()
+    {
+        return ThothContainer::getInstance()->get('chapterService');
     }
 
     public static function contribution()
@@ -63,8 +73,8 @@ class ThothService
         return ThothContainer::getInstance()->get('subjectService');
     }
 
-    public static function work()
+    public static function workRelation()
     {
-        return ThothContainer::getInstance()->get('workService');
+        return ThothContainer::getInstance()->get('workRelationService');
     }
 }
