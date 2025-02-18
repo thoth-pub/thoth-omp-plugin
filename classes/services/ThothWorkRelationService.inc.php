@@ -14,6 +14,7 @@
  * @brief Helper class that encapsulates business logic for Thoth work relations
  */
 
+use PKP\db\DAORegistry;
 use ThothApi\GraphQL\Models\WorkRelation as ThothWorkRelation;
 
 import('plugins.generic.thoth.classes.facades.ThothService');

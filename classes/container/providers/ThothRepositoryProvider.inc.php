@@ -16,7 +16,9 @@
 
 require_once(__DIR__ . '/../../../vendor/autoload.php');
 
+use APP\core\Application;
 use APP\plugins\generic\thoth\lib\APIKeyEncryption;
+use PKP\db\DAORegistry;
 use ThothApi\GraphQL\Client;
 
 import('plugins.generic.thoth.classes.container.providers.ContainerProvider');

@@ -18,6 +18,7 @@ use APP\facades\Repo;
 use Biblys\Isbn\Isbn;
 use Biblys\Isbn\IsbnParsingException;
 use Biblys\Isbn\IsbnValidationException;
+use PKP\db\DAORegistry;
 
 class ThothPublicationService
 {

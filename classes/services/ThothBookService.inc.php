@@ -8,12 +8,13 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothBookService
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief Helper class that encapsulates business logic for Thoth books
  */
 
-use ThothApi\GraphQL\Models\Work as ThothWork;
+use PKP\db\DAORegistry;
 
 import('plugins.generic.thoth.classes.facades.ThothService');
 import('lib.pkp.classes.services.PKPSchemaService');

@@ -8,12 +8,13 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothReferenceService
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief Helper class that encapsulates business logic for Thoth References
  */
 
-use ThothApi\GraphQL\Models\Reference as ThothReference;
+use PKP\db\DAORegistry;
 
 class ThothReferenceService
 {
