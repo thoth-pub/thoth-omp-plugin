@@ -29,9 +29,9 @@ class PublicationPublishListener
             return;
         }
 
-        $imprint = $request->getUserVar('imprint');
-        if (empty($imprint)) {
-            $errors['imprint'] = [__('plugins.generic.thoth.imprint.required')];
+        $thothImprintId = $request->getUserVar('thothImprintId');
+        if (empty($thothImprintId)) {
+            $errors['thothImprintId'] = [__('plugins.generic.thoth.imprint.required')];
         }
     }
 
@@ -50,10 +50,10 @@ class PublicationPublishListener
             return false;
         }
 
-        $imprint = $request->getUserVar('imprint');
+        $thothImprintId = $request->getUserVar('thothImprintId');
         $thothNotification = new ThothNotification();
         try {
-            $thothBookId = ThothService::book()->register($publication, $imprint);
+            $thothBookId = ThothService::book()->register($publication, $thothImprintId);
             $submission = Services::get('submission')->edit($submission, ['thothWorkId' => $thothBookId], $request);
             $thothNotification->notifySuccess($request, $submission);
         } catch (QueryException $e) {

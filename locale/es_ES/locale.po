@@ -31,6 +31,15 @@ msgstr "El administrador de su sitio debe establecer un secreto en el archivo de
 msgid "plugins.generic.thoth.credentialsMissing"
 msgstr "Credenciales de Thoth no configuradas."
 
+msgid "plugins.generic.thoth.workType"
+msgstr "Tipo de Trabajo"
+
+msgid "plugins.generic.thoth.workType.monograph"
+msgstr "Monografía"
+
+msgid "plugins.generic.thoth.workType.textbook"
+msgstr "Libro de Texto"
+
 msgid "plugins.generic.thoth.thothBook"
 msgstr "Libro de Thoth: "
 

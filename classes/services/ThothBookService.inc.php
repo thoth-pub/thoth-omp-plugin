@@ -77,7 +77,10 @@ class ThothBookService
 
         if ($landingPage = $thothBook->getLandingPage()) {
             $retrievedThothBook = $this->repository->find($landingPage);
-            if ($retrievedThothBook !== null) {
+            if (
+                $retrievedThothBook !== null
+                && $retrievedThothBook->getLandingPage() === $landingPage
+            ) {
                 $errors[] = __(
                     'plugins.generic.thoth.validation.landingPageExists',
                     ['landingPage' => $landingPage]

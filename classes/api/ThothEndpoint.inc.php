@@ -51,8 +51,11 @@ class ThothEndpoint
         $submission = $handler->getAuthorizedContextObject(ASSOC_TYPE_SUBMISSION);
         $params = $slimRequest->getParsedBody();
 
-        if (empty($params['imprint'])) {
-            return $response->withStatus(400)->withJson(['imprint' => [__('plugins.generic.thoth.imprint.required')]]);
+        $thothImprintId = $params['thothImprintId'];
+        if (!$thothImprintId) {
+            return $response->withStatus(400)->withJson(
+                ['thothImprintId' => [__('plugins.generic.thoth.imprint.required')]]
+            );
         }
 
         if (!$submission) {
@@ -86,9 +89,9 @@ class ThothEndpoint
 
         AppLocale::requireComponents(LOCALE_COMPONENT_PKP_SUBMISSION, LOCALE_COMPONENT_APP_SUBMISSION);
 
-        $disableNotification = $params['disableNotification'];
+        $disableNotification = $params['disableNotification'] ?? false;
         try {
-            $thothBookId = ThothService::book()->register($publication, $params['imprint']);
+            $thothBookId = ThothService::book()->register($publication, $thothImprintId);
             $submission = Services::get('submission')->edit($submission, ['thothWorkId' => $thothBookId], $request);
             $this->handleNotification($request, $submission, true, $disableNotification);
         } catch (QueryException $e) {

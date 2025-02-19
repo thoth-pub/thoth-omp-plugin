@@ -30,7 +30,9 @@ class ThothChapterFactory
 
         return new ThothWork([
             'workType' => ThothWork::WORK_TYPE_BOOK_CHAPTER,
-            'workStatus' => ThothWork::WORK_STATUS_ACTIVE,
+            'workStatus' => (empty($chapter->getDatePublished()) && empty($publication->getData('datePublished')))
+                ? ThothWork::WORK_STATUS_FORTHCOMING
+                : ThothWork::WORK_STATUS_ACTIVE,
             'fullTitle' => $chapter->getLocalizedFullTitle(),
             'title' => $chapter->getLocalizedTitle(),
             'subtitle' => $chapter->getLocalizedData('subtitle'),
