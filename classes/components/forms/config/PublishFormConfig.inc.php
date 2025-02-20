@@ -15,6 +15,8 @@
  */
 
 use APP\facades\Repo;
+use APP\submission\Submission;
+use ThothApi\GraphQL\Models\Work as ThothWork;
 
 import('plugins.generic.thoth.classes.facades.ThothService');
 import('plugins.generic.thoth.classes.facades.ThothRepository');
@@ -51,12 +53,12 @@ class PublishFormConfig
             return false;
         }
 
-        $this->addFields($form, $imprints);
+        $this->addFields($form, $imprints, $submission->getData('workType'));
 
         return false;
     }
 
-    private function addFields($form, $imprints)
+    private function addFields($form, $imprints, $workType)
     {
         $imprintOptions = [];
         foreach ($imprints as $imprint) {
@@ -74,7 +76,7 @@ class PublishFormConfig
             'value' => false,
             'groupId' => 'default',
         ]))
-            ->addField(new \PKP\components\forms\FieldSelect('imprint', [
+            ->addField(new \PKP\components\forms\FieldSelect('thothImprintId', [
                 'label' => __('plugins.generic.thoth.imprint'),
                 'options' => $imprintOptions,
                 'required' => true,
@@ -82,6 +84,30 @@ class PublishFormConfig
                 'groupId' => 'default',
                 'value' => $imprintOptions[0]['value'] ?? null
             ]));
+
+        if ($workType !== Submission::WORK_TYPE_AUTHORED_WORK) {
+            return;
+        }
+
+        $workTypeOptions = [
+            [
+                'value' => ThothWork::WORK_TYPE_MONOGRAPH,
+                'label' => __('plugins.generic.thoth.workType.monograph')
+            ],
+            [
+                'value' => ThothWork::WORK_TYPE_TEXTBOOK,
+                'label' => __('plugins.generic.thoth.workType.textbook')
+            ],
+        ];
+
+        $form->addField(new \PKP\components\forms\FieldSelect('thothWorkType', [
+            'label' => __('plugins.generic.thoth.workType'),
+            'options' => $workTypeOptions,
+            'required' => true,
+            'showWhen' => 'registerConfirmation',
+            'groupId' => 'default',
+            'value' => $workTypeOptions[0]['value'] ?? null
+        ]));
     }
 
     private function showErrors($form, $errors)

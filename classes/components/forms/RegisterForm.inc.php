@@ -18,9 +18,11 @@
  *   publication.
  */
 
+use APP\submission\Submission;
 use PKP\components\forms\FieldHTML;
 use PKP\components\forms\FieldSelect;
 use PKP\components\forms\FormComponent;
+use ThothApi\GraphQL\Models\Work as ThothWork;
 
 class RegisterForm extends FormComponent
 {
@@ -28,7 +30,7 @@ class RegisterForm extends FormComponent
 
     public $method = 'PUT';
 
-    public function __construct($action, $imprints, $errors)
+    public function __construct($action, $imprints, $workType, $errors)
     {
         $this->action = $action;
 
@@ -81,13 +83,36 @@ class RegisterForm extends FormComponent
                 'description' => $msg,
                 'groupId' => 'default',
             ]))
-            ->addField(new FieldSelect('imprint', [
+            ->addField(new FieldSelect('thothImprintId', [
                 'label' => __('plugins.generic.thoth.imprint'),
                 'options' => $imprintOptions,
                 'required' => true,
                 'groupId' => 'default',
                 'value' => $imprintOptions[0]['value'] ?? null
             ]));
+
+        if ($workType !== Submission::WORK_TYPE_AUTHORED_WORK) {
+            return;
+        }
+
+        $workTypeOptions = [
+            [
+                'value' => ThothWork::WORK_TYPE_MONOGRAPH,
+                'label' => __('plugins.generic.thoth.workType.monograph')
+            ],
+            [
+                'value' => ThothWork::WORK_TYPE_TEXTBOOK,
+                'label' => __('plugins.generic.thoth.workType.textbook')
+            ],
+        ];
+
+        $this->addField(new \PKP\components\forms\FieldSelect('thothWorkType', [
+            'label' => __('plugins.generic.thoth.workType'),
+            'options' => $workTypeOptions,
+            'required' => true,
+            'groupId' => 'default',
+            'value' => $workTypeOptions[0]['value'] ?? null
+        ]));
     }
 
     public function getOptions($list)
