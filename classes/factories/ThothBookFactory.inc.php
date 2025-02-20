@@ -26,10 +26,13 @@ class ThothBookFactory
         $request = Application::get()->getRequest();
         $submission = DAORegistry::getDAO('SubmissionDAO')->getById($publication->getData('submissionId'));
         $context = Application::getContextDAO()->getById($submission->getData('contextId'));
+        $thothWorkType = $request->getUserVar('thothWorkType');
 
         return new ThothWork([
-            'workType' => $this->getWorkTypeBySubmissionWorkType($submission->getData('workType')),
-            'workStatus' => ThothWork::WORK_STATUS_ACTIVE,
+            'workType' => $thothWorkType ?? $this->getWorkTypeBySubmissionWorkType($submission->getData('workType')),
+            'workStatus' => empty($publication->getData('datePublished'))
+                ? ThothWork::WORK_STATUS_FORTHCOMING
+                : ThothWork::WORK_STATUS_ACTIVE,
             'fullTitle' => $publication->getLocalizedFullTitle(),
             'title' => $publication->getLocalizedTitle(),
             'subtitle' => $publication->getLocalizedData('subtitle'),

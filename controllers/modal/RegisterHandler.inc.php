@@ -83,7 +83,7 @@ class RegisterHandler extends Handler
         );
 
         $imprints = [];
-
+        $workType = $this->submission->getData('workType');
         try {
             $errors = ThothService::book()->validate($this->publication);
 
@@ -97,7 +97,7 @@ class RegisterHandler extends Handler
         }
 
         $plugin->import('classes.components.forms.RegisterForm');
-        $registerForm = new RegisterForm($publicationApiUrl, $imprints, $errors);
+        $registerForm = new RegisterForm($publicationApiUrl, $imprints, $workType, $errors);
 
         $settingsData = [
             'components' => [
