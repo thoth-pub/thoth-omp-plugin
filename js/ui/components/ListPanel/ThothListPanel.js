@@ -307,7 +307,7 @@ pkp.Vue.component('thoth-list-panel', {
 					'X-Http-Method-Override': 'PUT',
 				},
 				data: {
-					imprint: this.selectedImprint,
+					thothImprintId: this.selectedImprint,
 					disableNotification: true
 				},
 				success: (response) => this.updateItem(response),

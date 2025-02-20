@@ -27,9 +27,10 @@ class ThothBookFactory
         $request = Application::get()->getRequest();
         $submission = Repo::submission()->get($publication->getData('submissionId'));
         $context = Application::getContextDAO()->getById($submission->getData('contextId'));
+        $thothWorkType = $request->getUserVar('thothWorkType');
 
         return new ThothWork([
-            'workType' => $this->getWorkTypeBySubmissionWorkType($submission->getData('workType')),
+            'workType' => $thothWorkType ?? $this->getWorkTypeBySubmissionWorkType($submission->getData('workType')),
             'workStatus' => empty($publication->getData('datePublished'))
                 ? ThothWork::WORK_STATUS_FORTHCOMING
                 : ThothWork::WORK_STATUS_ACTIVE,

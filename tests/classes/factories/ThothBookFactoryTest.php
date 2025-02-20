@@ -89,6 +89,9 @@ class ThothBookFactoryTest extends PKPTestCase
                     ->andReturn('https://omp.publicknowledgeproject.org/index.php/press/catalog/book/3')
                     ->getMock()
             )
+            ->shouldReceive('getUserVar')
+            ->with('thothWorkType')
+            ->andReturn(null)
             ->getMock();
         Registry::set('request', $mockRequest);
 
