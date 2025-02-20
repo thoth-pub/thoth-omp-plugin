@@ -122,7 +122,9 @@ class ThothBookServiceTest extends PKPTestCase
             ->getMock();
         $mockRepository->expects($this->once())
             ->method('find')
-            ->will($this->returnValue(new ThothWork()));
+            ->will($this->returnValue(new ThothWork([
+                'landingPage' => 'http://www.publicknowledge.omp/index.php/publicknowledge/catalog/book/14'
+            ])));
 
         $mockPublication = $this->getMockBuilder(\APP\publication\Publication::class)->getMock();
 

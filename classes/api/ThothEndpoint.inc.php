@@ -57,8 +57,11 @@ class ThothEndpoint
         $submission = Repo::submission()->get($submissionId);
         $params = $slimRequest->getParsedBody();
 
-        if (empty($params['imprint'])) {
-            return $response->withStatus(400)->withJson(['imprint' => [__('plugins.generic.thoth.imprint.required')]]);
+        $thothImprintId = $params['thothImprintId'];
+        if (!$thothImprintId) {
+            return $response->withStatus(400)->withJson(
+                ['thothImprintId' => [__('plugins.generic.thoth.imprint.required')]]
+            );
         }
 
         if (!$submission) {
@@ -94,7 +97,7 @@ class ThothEndpoint
 
         $disableNotification = $params['disableNotification'] ?? false;
         try {
-            $thothBookId = ThothService::book()->register($publication, $params['imprint']);
+            $thothBookId = ThothService::book()->register($publication, $thothImprintId);
             Repo::submission()->edit($submission, ['thothWorkId' => $thothBookId]);
             $this->handleNotification($request, $submission, true, $disableNotification);
         } catch (QueryException $e) {
