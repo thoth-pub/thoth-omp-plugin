@@ -16,7 +16,7 @@
  * @brief Form for managers to modify Thoth plugin settings
  */
 
-use APP\plugins\generic\thoth\classes\APIKeyEncryption;
+use APP\plugins\generic\thoth\lib\APIKeyEncryption;
 use PKP\form\Form;
 use PKP\form\validation\FormValidatorCSRF;
 use PKP\form\validation\FormValidatorCustom;
