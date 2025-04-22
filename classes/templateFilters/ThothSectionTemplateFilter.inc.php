@@ -13,7 +13,7 @@
  * @brief Template filter to include Thoth section in workflow page
  */
 
-class ThothSectionFilter
+class ThothSectionTemplateFilter
 {
     private $plugin;
 
