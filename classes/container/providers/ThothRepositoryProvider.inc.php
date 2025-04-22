@@ -54,7 +54,7 @@ class ThothRepositoryProvider implements ContainerProvider
 
             $testEnvironment = $pluginSettingsDao->getSetting($contextId, 'ThothPlugin', 'testEnvironment');
             $email = $pluginSettingsDao->getSetting($contextId, 'ThothPlugin', 'email');
-            $password = $pluginSettingsDao->getSetting($contextId, 'ThothPlugin', 'password');
+            $password = $pluginSettingsDao->getSetting($contextId, 'ThothPlugin', 'password') ?? '';
 
             return [
                 'testEnvironment' => $testEnvironment,

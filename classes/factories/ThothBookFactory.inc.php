@@ -16,6 +16,7 @@
 
 use APP\facades\Repo;
 use APP\submission\Submission;
+use PKP\core\Core;
 use ThothApi\GraphQL\Models\Work as ThothWork;
 
 import('plugins.generic.thoth.classes.formatters.HtmlStripper');
@@ -31,9 +32,7 @@ class ThothBookFactory
 
         return new ThothWork([
             'workType' => $thothWorkType ?? $this->getWorkTypeBySubmissionWorkType($submission->getData('workType')),
-            'workStatus' => empty($publication->getData('datePublished'))
-                ? ThothWork::WORK_STATUS_FORTHCOMING
-                : ThothWork::WORK_STATUS_ACTIVE,
+            'workStatus' => $this->getWorkStatusByDatePublished($publication->getData('datePublished')),
             'fullTitle' => $publication->getLocalizedFullTitle(),
             'title' => $publication->getLocalizedTitle(),
             'subtitle' => $publication->getLocalizedData('subtitle'),
@@ -55,7 +54,7 @@ class ThothBookFactory
         ]);
     }
 
-    private function getWorkTypeBySubmissionWorkType($submissionWorkType)
+    public function getWorkTypeBySubmissionWorkType($submissionWorkType)
     {
         $workTypeMapping = [
             Submission::WORK_TYPE_EDITED_VOLUME => ThothWork::WORK_TYPE_EDITED_BOOK,
@@ -63,5 +62,14 @@ class ThothBookFactory
         ];
 
         return $workTypeMapping[$submissionWorkType];
+    }
+
+    public function getWorkStatusByDatePublished($datePublished)
+    {
+        if ($datePublished && $datePublished <= Core::getCurrentDate()) {
+            return ThothWork::WORK_STATUS_ACTIVE;
+        }
+
+        return ThothWork::WORK_STATUS_FORTHCOMING;
     }
 }
