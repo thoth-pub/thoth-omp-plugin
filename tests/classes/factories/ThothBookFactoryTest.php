@@ -154,4 +154,24 @@ class ThothBookFactoryTest extends PKPTestCase
             'longAbstract' => 'This is my book abstract',
         ]), $thothWork);
     }
+
+    public function testGetWorkTypeBySubmissionWorkType()
+    {
+        $factory = new ThothBookFactory();
+        $workType = $factory->getWorkTypeBySubmissionWorkType(WORK_TYPE_AUTHORED_WORK);
+        $this->assertEquals(ThothWork::WORK_TYPE_MONOGRAPH, $workType);
+
+        $workType = $factory->getWorkTypeBySubmissionWorkType(WORK_TYPE_EDITED_VOLUME);
+        $this->assertEquals(ThothWork::WORK_TYPE_EDITED_BOOK, $workType);
+    }
+
+    public function testGetWorkStatusByDatePublished()
+    {
+        $factory = new ThothBookFactory();
+        $workStatus = $factory->getWorkStatusByDatePublished('2020-01-01');
+        $this->assertEquals(ThothWork::WORK_STATUS_ACTIVE, $workStatus);
+
+        $workStatus = $factory->getWorkStatusByDatePublished('2050-12-12');
+        $this->assertEquals(ThothWork::WORK_STATUS_FORTHCOMING, $workStatus);
+    }
 }

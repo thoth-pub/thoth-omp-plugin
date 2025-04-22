@@ -30,9 +30,7 @@ class ThothChapterFactory
 
         return new ThothWork([
             'workType' => ThothWork::WORK_TYPE_BOOK_CHAPTER,
-            'workStatus' => (empty($chapter->getDatePublished()) && empty($publication->getData('datePublished')))
-                ? ThothWork::WORK_STATUS_FORTHCOMING
-                : ThothWork::WORK_STATUS_ACTIVE,
+            'workStatus' => $this->getWorkStatusByDatePublished($chapter, $publication),
             'fullTitle' => $chapter->getLocalizedFullTitle(),
             'title' => $chapter->getLocalizedTitle(),
             'subtitle' => $chapter->getLocalizedData('subtitle'),
@@ -49,5 +47,16 @@ class ThothChapterFactory
                 $submission->getBestId()
             )
         ]);
+    }
+
+    public function getWorkStatusByDatePublished($chapter, $publication)
+    {
+        $dataPublished = $chapter->getDatePublished() ?? $publication->getData('datePublished');
+
+        if ($dataPublished && $dataPublished <= \Core::getCurrentDate()) {
+            return ThothWork::WORK_STATUS_ACTIVE;
+        }
+
+        return ThothWork::WORK_STATUS_FORTHCOMING;
     }
 }

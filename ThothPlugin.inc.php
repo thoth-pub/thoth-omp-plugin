@@ -20,7 +20,7 @@ require_once(__DIR__ . '/vendor/autoload.php');
 import('lib.pkp.classes.plugins.GenericPlugin');
 import('plugins.generic.thoth.classes.api.ThothEndpoint');
 import('plugins.generic.thoth.classes.components.forms.config.PublishFormConfig');
-import('plugins.generic.thoth.classes.filters.ThothSectionFilter');
+import('plugins.generic.thoth.classes.templateFilters.ThothSectionTemplateFilter');
 import('plugins.generic.thoth.classes.listeners.PublicationEditListener');
 import('plugins.generic.thoth.classes.listeners.PublicationPublishListener');
 import('plugins.generic.thoth.classes.notification.ThothNotification');
@@ -122,7 +122,7 @@ class ThothPlugin extends GenericPlugin
         $templateMgr = $args[0];
         $template = $args[1];
 
-        $thothSectionFilter = new ThothSectionFilter();
+        $thothSectionFilter = new ThothSectionTemplateFilter();
         $thothSectionFilter->registerFilter($templateMgr, $template, $this);
     }
 
@@ -155,7 +155,7 @@ class ThothPlugin extends GenericPlugin
         $thothNotification->addJavaScriptData($request, $templateMgr);
         $thothNotification->addJavaScript($request, $templateMgr, $this);
 
-        $thothSectionFilter = new ThothSectionFilter();
+        $thothSectionFilter = new ThothSectionTemplateFilter();
         $thothSectionFilter->addJavaScriptData($request, $templateMgr, $template);
         $thothSectionFilter->addJavaScript($request, $templateMgr, $this);
         $thothSectionFilter->addStyleSheet($request, $templateMgr, $this);
