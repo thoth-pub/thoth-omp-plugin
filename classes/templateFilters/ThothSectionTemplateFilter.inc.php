@@ -1,19 +1,19 @@
 <?php
 
 /**
- * @file plugins/generic/thoth/classes/filters/ThothSectionFilter.inc.php
+ * @file plugins/generic/thoth/classes/filters/ThothSectionTemplateFilter.inc.php
  *
  * Copyright (c) 2024-2025 Lepidus Tecnologia
  * Copyright (c) 2024-2025 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
- * @class ThothSectionFilter
+ * @class ThothSectionTemplateFilter
  * @ingroup plugins_generic_thoth
  *
  * @brief Template filter to include Thoth section in workflow page
  */
 
-class ThothSectionFilter
+class ThothSectionTemplateFilter
 {
     private $plugin;
 
