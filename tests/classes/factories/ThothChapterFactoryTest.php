@@ -166,4 +166,22 @@ class ThothChapterFactoryTest extends PKPTestCase
             'landingPage' => 'https://omp.publicknowledgeproject.org/index.php/press/catalog/book/17'
         ]), $thothChapter);
     }
+
+    public function testGetWorkStatusByDatePublished()
+    {
+        $mockChapter = $this->getMockBuilder(Chapter::class)
+            ->setMethods(['getDatePublished'])
+            ->getMock();
+
+        $mockChapter->expects($this->any())
+            ->method('getDatePublished')
+            ->will($this->onConsecutiveCalls('2024-01-01', '2050-01-01'));
+
+        $factory = new ThothChapterFactory();
+        $workStatus = $factory->getWorkStatusByDatePublished($mockChapter, null);
+        $this->assertEquals(ThothWork::WORK_STATUS_ACTIVE, $workStatus);
+
+        $workStatus = $factory->getWorkStatusByDatePublished($mockChapter, null);
+        $this->assertEquals(ThothWork::WORK_STATUS_FORTHCOMING, $workStatus);
+    }
 }
