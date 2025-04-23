@@ -189,7 +189,9 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
         }
 
         if (in_array(ROLE_ID_MANAGER, $userRoles)) {
-            $menu = array_slice($menu, 0, 3, true) +
+            $offset = array_search("settings", array_keys($menu));
+
+            $menu = array_slice($menu, 0, $offset, true) +
             [
                 'thoth' => [
                     'name' => __('plugins.generic.thoth.navigation.thoth'),
@@ -197,7 +199,7 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
                     'isCurrent' => $router->getRequestedPage($request) === 'thoth',
                 ]
             ] +
-            array_slice($menu, 2, null, true);
+            array_slice($menu, ($offset - 1), null, true);
         }
 
         $templateMgr->setState(['menu' => $menu]);
