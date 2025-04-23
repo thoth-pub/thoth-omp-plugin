@@ -36,7 +36,7 @@ class ThothBookFactory
             'subtitle' => $publication->getLocalizedData('subtitle'),
             'longAbstract' => HtmlStripper::stripTags($publication->getLocalizedData('abstract')),
             'edition' => $publication->getData('version'),
-            'doi' => DoiFormatter::resolveUrl($publication->getStoredPubId('doi')),
+            'doi' => $this->getDoi($publication),
             'publicationDate' => $publication->getData('datePublished'),
             'license' => $publication->getData('licenseUrl'),
             'copyrightHolder' => $publication->getLocalizedData('copyrightHolder'),
@@ -69,5 +69,32 @@ class ThothBookFactory
         }
 
         return ThothWork::WORK_STATUS_FORTHCOMING;
+    }
+
+    public function getDoi($publication)
+    {
+        $doi = $publication->getStoredPubId('doi');
+
+        if ($doi === null) {
+            $publicationFormats = DAORegistry::getDAO('PublicationFormatDAO')
+                ->getByPublicationId($publication->getId())
+                ->toArray();
+
+            foreach ($publicationFormats as $publicationFormat) {
+                $identificationCodes = $publicationFormat->getIdentificationCodes()->toArray();
+                foreach ($identificationCodes as $identificationCode) {
+                    if ($identificationCode->getCode() == '06') {
+                        $doi = $identificationCode->getValue();
+                        break 2;
+                    }
+                }
+            }
+        }
+
+        if ($doi === null) {
+            return $doi;
+        }
+
+        return DoiFormatter::resolveUrl($doi);
     }
 }
