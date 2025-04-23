@@ -85,6 +85,9 @@ class ThothBookFactory
                 foreach ($identificationCodes as $identificationCode) {
                     if ($identificationCode->getCode() == '06') {
                         $doi = $identificationCode->getValue();
+                        if (str_contains($doi, 'doi.org')) {
+                            $doi = str_replace('https://doi.org/', '', $doi);
+                        }
                         break 2;
                     }
                 }
