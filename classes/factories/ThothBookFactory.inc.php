@@ -17,6 +17,7 @@
 use APP\facades\Repo;
 use APP\submission\Submission;
 use PKP\core\Core;
+use PKP\doi\Doi;
 use ThothApi\GraphQL\Models\Work as ThothWork;
 
 import('plugins.generic.thoth.classes.formatters.HtmlStripper');
@@ -38,7 +39,7 @@ class ThothBookFactory
             'subtitle' => $publication->getLocalizedData('subtitle'),
             'longAbstract' => HtmlStripper::stripTags($publication->getLocalizedData('abstract')),
             'edition' => $publication->getData('version'),
-            'doi' => $publication->getData('doiObject')?->getResolvingUrl(),
+            'doi' => $this->getDoi($publication),
             'publicationDate' => $publication->getData('datePublished'),
             'license' => $publication->getData('licenseUrl'),
             'copyrightHolder' => $publication->getLocalizedData('copyrightHolder'),
@@ -71,5 +72,35 @@ class ThothBookFactory
         }
 
         return ThothWork::WORK_STATUS_FORTHCOMING;
+    }
+
+    public function getDoi($publication)
+    {
+        $doiObject = $publication->getData('doiObject');
+
+        if ($doiObject === null) {
+            $publicationFormats = DAORegistry::getDAO('PublicationFormatDAO')
+                ->getByPublicationId($publication->getId());
+            foreach ($publicationFormats as $publicationFormat) {
+                $identificationCodes = $publicationFormat->getIdentificationCodes()->toArray();
+                foreach ($identificationCodes as $identificationCode) {
+                    if ($identificationCode->getCode() == '06') {
+                        $doi = $identificationCode->getValue();
+                        if (str_contains($doi, 'doi.org')) {
+                            $doi = str_replace('https://doi.org/', '', $doi);
+                        }
+                        $doiObject = new Doi();
+                        $doiObject->setDoi($doi);
+                        break 2;
+                    }
+                }
+            }
+        }
+
+        if ($doiObject === null) {
+            return $doiObject;
+        }
+
+        return $doiObject->getResolvingUrl();
     }
 }
