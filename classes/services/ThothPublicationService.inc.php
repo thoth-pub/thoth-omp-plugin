@@ -50,12 +50,10 @@ class ThothPublicationService
     {
         $thothBookId = $publication->getData('thothBookId');
         $publicationFormats = DAORegistry::getDAO('PublicationFormatDAO')
-            ->getApprovedByPublicationId($publication->getId())
+            ->getByPublicationId($publication->getId())
             ->toArray();
         foreach ($publicationFormats as $publicationFormat) {
-            if ($publicationFormat->getIsAvailable()) {
-                $this->register($publicationFormat, $thothBookId);
-            }
+            $this->register($publicationFormat, $thothBookId);
         }
     }
 
@@ -76,9 +74,7 @@ class ThothPublicationService
         $publicationFormatDao = DAORegistry::getDAO('PublicationFormatDAO');
         foreach ($chapterSubmissionFiles as $chapterSubmissionFile) {
             $publicationFormat = $publicationFormatDao->getById($chapterSubmissionFile->getData('assocId'));
-            if ($publicationFormat->getIsAvailable()) {
-                $this->register($publicationFormat, $thothChapterId, $chapter->getId());
-            }
+            $this->register($publicationFormat, $thothChapterId, $chapter->getId());
         }
     }
 
