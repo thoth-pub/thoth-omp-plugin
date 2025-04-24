@@ -34,7 +34,7 @@ class ThothSubjectServiceTest extends PKPTestCase
             ->method('add')
             ->will($this->returnValue('ebad8694-0dbe-48cf-a704-5d7e1f54b63d'));
 
-        $keyword = 'Psychology';
+        $keyword = 'Education';
         $sequence = 1;
         $thothWorkId = '114b96c3-6a51-45e6-a18a-f925128cb597';
 
