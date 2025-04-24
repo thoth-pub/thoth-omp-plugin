@@ -24,12 +24,12 @@ class ThothSubjectService
         $this->repository = $repository;
     }
 
-    public function register($citation, $sequence, $thothWorkId)
+    public function register($subject, $sequence, $thothWorkId)
     {
         $thothSubject = $this->repository->new([
             'workId' => $thothWorkId,
             'subjectType' => ThothSubject::SUBJECT_TYPE_KEYWORD,
-            'subjectCode' => 'Psychology',
+            'subjectCode' => $subject,
             'subjectOrdinal' => $sequence
         ]);
 
