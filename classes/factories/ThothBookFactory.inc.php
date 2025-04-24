@@ -18,6 +18,7 @@ use APP\facades\Repo;
 use APP\submission\Submission;
 use PKP\core\Core;
 use PKP\doi\Doi;
+use PKP\submission\PKPSubmission;
 use ThothApi\GraphQL\Models\Work as ThothWork;
 
 import('plugins.generic.thoth.classes.formatters.HtmlStripper');
@@ -41,8 +42,18 @@ class ThothBookFactory
             'edition' => $publication->getData('version'),
             'doi' => $this->getDoi($publication),
             'publicationDate' => $publication->getData('datePublished'),
-            'license' => $publication->getData('licenseUrl'),
-            'copyrightHolder' => $publication->getLocalizedData('copyrightHolder'),
+            'license' => $publication->getData('licenseUrl')
+                ?? $submission->_getContextLicenseFieldValue(
+                    null,
+                    PKPSubmission::PERMISSIONS_FIELD_LICENSE_URL,
+                    $publication
+                ),
+            'copyrightHolder' => $publication->getLocalizedData('copyrightHolder')
+                ?? $submission->_getContextLicenseFieldValue(
+                    $submission->getData('locale'),
+                    PKPSubmission::PERMISSIONS_FIELD_COPYRIGHT_HOLDER,
+                    $publication
+                ),
             'coverUrl' => $publication->getLocalizedCoverImageUrl($submission->getData('contextId')),
             'landingPage' => $request->getDispatcher()->url(
                 $request,
