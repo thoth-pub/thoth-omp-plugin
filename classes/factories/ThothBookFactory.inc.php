@@ -27,6 +27,7 @@ class ThothBookFactory
         $submission = DAORegistry::getDAO('SubmissionDAO')->getById($publication->getData('submissionId'));
         $context = Application::getContextDAO()->getById($submission->getData('contextId'));
         $thothWorkType = $request->getUserVar('thothWorkType');
+        $locale = $submission->getData('locale');
 
         return new ThothWork([
             'workType' => $thothWorkType ?? $this->getWorkTypeBySubmissionWorkType($submission->getData('workType')),
@@ -38,8 +39,10 @@ class ThothBookFactory
             'edition' => $publication->getData('version'),
             'doi' => $this->getDoi($publication),
             'publicationDate' => $publication->getData('datePublished'),
-            'license' => $publication->getData('licenseUrl'),
-            'copyrightHolder' => $publication->getLocalizedData('copyrightHolder'),
+            'license' => $publication->getData('licenseUrl')
+                ?? $submission->_getContextLicenseFieldValue($locale, PERMISSIONS_FIELD_LICENSE_URL),
+            'copyrightHolder' => $publication->getLocalizedData('copyrightHolder')
+                ?? $submission->_getContextLicenseFieldValue($locale, PERMISSIONS_FIELD_COPYRIGHT_HOLDER),
             'coverUrl' => $publication->getLocalizedCoverImageUrl($submission->getContextId()),
             'landingPage' => $request->getDispatcher()->url(
                 $request,
