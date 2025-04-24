@@ -15,7 +15,7 @@
 
 class HtmlStripper
 {
-    private const ALLOWED_TAGS = '<strong><mark><em><i><u><sup><sub><a><ul><ol><li>';
+    private const ALLOWED_TAGS = '<strong><mark><em><i><u><sup><sub><ul><ol><li>';
 
     public static function stripTags($string)
     {

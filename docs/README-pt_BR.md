@@ -32,7 +32,7 @@ Isso é necessário para usar as credenciais da API fornecidas, que são armazen
 
 ### Orientações
 
-- Apenas tags básicas de HTML são preservadas (`<strong>`, `<mark>`, `<em>`, `<i>`, `<u>`, `<sup>`, `<sub>`, `<a>`, `<ul>`, `<ol>` e `<li>`); todas as outras serão removidas
+- Apenas tags básicas de HTML são preservadas (`<strong>`, `<mark>`, `<em>`, `<i>`, `<u>`, `<sup>`, `<sub>`, `<ul>`, `<ol>` e `<li>`); todas as outras serão removidas
 - O ISBN deve estar devidamente formatado (por exemplo, 978-3-16-148410-0)
 
 ### Configuração
