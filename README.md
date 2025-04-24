@@ -31,6 +31,11 @@ This is required to use the API credentials provided, that are stored encrypted 
 
 ## Usage
 
+### Guidelines
+
+- Only basic HTML tags are preserved (`<strong>`, `<mark>`, `<em>`, `<i>`, `<u>`, `<sup>`, `<sub>`, `<ul>`, `<ol>` and `<li>`); all others will be removed
+- ISBN must be properly formatted (e.g., 978-3-16-148410-0)
+
 ### Configuration
 
 To configure the plugin:
