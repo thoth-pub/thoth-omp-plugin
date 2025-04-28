@@ -131,6 +131,7 @@ class ThothPlugin extends GenericPlugin
     {
         $thothSchema = new ThothSchema();
         HookRegistry::register('Schema::get::submission', [$thothSchema, 'addWorkIdToSchema']);
+        HookRegistry::register('Schema::get::publication', [$thothSchema, 'addPlaceToSchema']);
         HookRegistry::register('Submission::getBackendListProperties::properties', [$thothSchema, 'addToBackendProps']);
     }
 

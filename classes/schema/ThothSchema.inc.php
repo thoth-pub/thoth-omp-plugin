@@ -26,6 +26,17 @@ class ThothSchema
         return false;
     }
 
+    public function addPlaceToSchema($hookName, $args)
+    {
+        $schema = & $args[0];
+        $schema->properties->{'place'} = (object) [
+            'type' => 'string',
+            'apiSummary' => true,
+            'validation' => ['nullable'],
+        ];
+        return false;
+    }
+
     public function addToBackendProps($hookName, $args)
     {
         $props = & $args[0];
