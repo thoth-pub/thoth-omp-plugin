@@ -15,6 +15,7 @@
  */
 
 use APP\facades\Repo;
+use PKP\db\DAORegistry;
 
 import('plugins.generic.thoth.classes.facades.ThothService');
 import('plugins.generic.thoth.classes.facades.ThothRepository');
@@ -58,8 +59,27 @@ class ThothContributionService
     {
         $authors = Repo::author()->getCollector()
             ->filterByPublicationIds([$publication->getId()])
-            ->getMany();
+            ->getMany()
+            ->toArray();
         $primaryContactId = $publication->getData('primaryContactId');
+
+        $chapterDao = DAORegistry::getDAO('ChapterDAO');
+        $chapters = $chapterDao->getByPublicationId($publication->getId())->toArray();
+
+        $chapterAuthorIds = [];
+        foreach ($chapters as $chapter) {
+            $chapterAuthorIds = array_merge($chapterAuthorIds, (array) Repo::author()->getCollector()
+                ->filterByChapterId($chapter->getId())
+                ->filterByPublicationIds([$publication->getId()])
+                ->getIds()
+                ->toArray());
+        }
+        $chapterAuthorIds = array_unique($chapterAuthorIds);
+
+        $authors = array_filter($authors, function ($author) use ($chapterAuthorIds, $primaryContactId) {
+            return $author->getId() === $primaryContactId || !in_array($author->getId(), $chapterAuthorIds);
+        });
+
         $thothBookId = $publication->getData('thothBookId');
         foreach ($authors as $author) {
             $this->register($author, $thothBookId, $primaryContactId);
