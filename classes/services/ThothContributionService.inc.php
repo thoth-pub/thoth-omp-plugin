@@ -55,6 +55,15 @@ class ThothContributionService
     {
         $authors = DAORegistry::getDAO('AuthorDAO')->getByPublicationId($publication->getId());
         $primaryContactId = $publication->getData('primaryContactId');
+
+        $chapterAuthorDao = DAORegistry::getDAO('ChapterAuthorDAO');
+        $chapterAuthors = $chapterAuthorDao->getAuthors($publication->getId())->toArray();
+        $chapterAuthorIds = array_map(fn ($chapterAuthor) => $chapterAuthor->getId(), $chapterAuthors);
+
+        $authors = array_filter($authors, function ($author) use ($chapterAuthorIds, $primaryContactId) {
+            return $author->getId() === $primaryContactId || !in_array($author->getId(), $chapterAuthorIds);
+        });
+
         $thothBookId = $publication->getData('thothBookId');
         foreach ($authors as $author) {
             $this->register($author, $thothBookId, $primaryContactId);

@@ -25,6 +25,6 @@ class HtmlStripperTest extends PKPTestCase
 
         $strippedString = HtmlStripper::stripTags($string);
 
-        $this->assertSame('<p>This is a string with <strong>html tags</strong></p>', $strippedString);
+        $this->assertSame('This is a string with <strong>html tags</strong>', $strippedString);
     }
 }

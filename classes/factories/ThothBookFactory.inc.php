@@ -30,18 +30,26 @@ class ThothBookFactory
 
         return new ThothWork([
             'workType' => $thothWorkType ?? $this->getWorkTypeBySubmissionWorkType($submission->getData('workType')),
-            'workStatus' => empty($publication->getData('datePublished'))
-                ? ThothWork::WORK_STATUS_FORTHCOMING
-                : ThothWork::WORK_STATUS_ACTIVE,
+            'workStatus' => $this->getWorkStatusByDatePublished($publication->getData('datePublished')),
             'fullTitle' => $publication->getLocalizedFullTitle(),
             'title' => $publication->getLocalizedTitle(),
             'subtitle' => $publication->getLocalizedData('subtitle'),
             'longAbstract' => HtmlStripper::stripTags($publication->getLocalizedData('abstract')),
             'edition' => $publication->getData('version'),
-            'doi' => DoiFormatter::resolveUrl($publication->getStoredPubId('doi')),
+            'doi' => $this->getDoi($publication),
             'publicationDate' => $publication->getData('datePublished'),
-            'license' => $publication->getData('licenseUrl'),
-            'copyrightHolder' => $publication->getLocalizedData('copyrightHolder'),
+            'license' => $publication->getData('licenseUrl')
+                ?? $submission->_getContextLicenseFieldValue(
+                    null,
+                    PERMISSIONS_FIELD_LICENSE_URL,
+                    $publication
+                ),
+            'copyrightHolder' => $publication->getLocalizedData('copyrightHolder')
+                ?? $submission->_getContextLicenseFieldValue(
+                    $submission->getData('locale'),
+                    PERMISSIONS_FIELD_COPYRIGHT_HOLDER,
+                    $publication
+                ),
             'coverUrl' => $publication->getLocalizedCoverImageUrl($submission->getContextId()),
             'landingPage' => $request->getDispatcher()->url(
                 $request,
@@ -54,7 +62,7 @@ class ThothBookFactory
         ]);
     }
 
-    private function getWorkTypeBySubmissionWorkType($submissionWorkType)
+    public function getWorkTypeBySubmissionWorkType($submissionWorkType)
     {
         $workTypeMapping = [
             WORK_TYPE_EDITED_VOLUME => ThothWork::WORK_TYPE_EDITED_BOOK,
@@ -62,5 +70,44 @@ class ThothBookFactory
         ];
 
         return $workTypeMapping[$submissionWorkType];
+    }
+
+    public function getWorkStatusByDatePublished($datePublished)
+    {
+        if ($datePublished && $datePublished <= \Core::getCurrentDate()) {
+            return ThothWork::WORK_STATUS_ACTIVE;
+        }
+
+        return ThothWork::WORK_STATUS_FORTHCOMING;
+    }
+
+    public function getDoi($publication)
+    {
+        $doi = $publication->getStoredPubId('doi');
+
+        if ($doi === null) {
+            $publicationFormats = DAORegistry::getDAO('PublicationFormatDAO')
+                ->getByPublicationId($publication->getId())
+                ->toArray();
+
+            foreach ($publicationFormats as $publicationFormat) {
+                $identificationCodes = $publicationFormat->getIdentificationCodes()->toArray();
+                foreach ($identificationCodes as $identificationCode) {
+                    if ($identificationCode->getCode() == '06') {
+                        $doi = $identificationCode->getValue();
+                        if (str_contains($doi, 'doi.org')) {
+                            $doi = str_replace('https://doi.org/', '', $doi);
+                        }
+                        break 2;
+                    }
+                }
+            }
+        }
+
+        if ($doi === null) {
+            return $doi;
+        }
+
+        return DoiFormatter::resolveUrl($doi);
     }
 }
