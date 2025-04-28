@@ -19,6 +19,7 @@
 require_once(__DIR__ . '/../../../vendor/autoload.php');
 
 use APP\submission\Repository as SubmissionRepository;
+use Mockery;
 use PKP\db\DAORegistry;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Models\Work as ThothWork;
@@ -34,7 +35,7 @@ class ThothBookFactoryTest extends PKPTestCase
 
     protected function getMockedDAOs(): array
     {
-        return ['PressDAO'];
+        return ['PressDAO', 'PublicationFormatDAO'];
     }
 
     protected function getMockedRegistryKeys(): array
@@ -165,5 +166,81 @@ class ThothBookFactoryTest extends PKPTestCase
             'coverUrl' => 'https://omp.publicknowledgeproject.org/templates/images/book-default.png',
             'longAbstract' => 'This is my book abstract',
         ]), $thothWork);
+    }
+
+    public function testGetWorkTypeBySubmissionWorkType()
+    {
+        $factory = new ThothBookFactory();
+        $workType = $factory->getWorkTypeBySubmissionWorkType(WORK_TYPE_AUTHORED_WORK);
+        $this->assertEquals(ThothWork::WORK_TYPE_MONOGRAPH, $workType);
+
+        $workType = $factory->getWorkTypeBySubmissionWorkType(WORK_TYPE_EDITED_VOLUME);
+        $this->assertEquals(ThothWork::WORK_TYPE_EDITED_BOOK, $workType);
+    }
+
+    public function testGetWorkStatusByDatePublished()
+    {
+        $factory = new ThothBookFactory();
+        $workStatus = $factory->getWorkStatusByDatePublished('2020-01-01');
+        $this->assertEquals(ThothWork::WORK_STATUS_ACTIVE, $workStatus);
+
+        $workStatus = $factory->getWorkStatusByDatePublished('2050-12-12');
+        $this->assertEquals(ThothWork::WORK_STATUS_FORTHCOMING, $workStatus);
+    }
+
+    public function testGetDoiFromPublication()
+    {
+        $mockPublication = Mockery::mock(\APP\publication\Publication::class)
+            ->shouldReceive('getData')
+            ->with('doiObject')
+            ->andReturn(
+                Mockery::mock(\PKP\doi\Doi::class)
+                    ->makePartial()
+                    ->shouldReceive('getResolvingUrl')
+                    ->withAnyArgs()
+                    ->andReturn('https://doi.org/10.12345/1111122222')
+                    ->getMock()
+            )
+            ->getMock();
+
+        $factory = new ThothBookFactory();
+        $doi = $factory->getDoi($mockPublication);
+        $this->assertEquals('https://doi.org/10.12345/1111122222', $doi);
+    }
+
+    public function testGetDoiFromPublicationFormat()
+    {
+        $mockIdentificationCode = $this->createMock(\APP\publicationFormat\IdentificationCode::class);
+        $mockIdentificationCode->expects($this->once())
+            ->method('getCode')
+            ->willReturn('06');
+        $mockIdentificationCode->expects($this->once())
+            ->method('getValue')
+            ->willReturn('10.12345/123456789');
+
+        $mockIdCodeResult = $this->createMock(\PKP\db\DAOResultFactory::class);
+        $mockIdCodeResult->expects($this->once())
+            ->method('toArray')
+            ->willReturn([$mockIdentificationCode]);
+
+        $mockPubFormat = $this->createMock(\APP\publicationFormat\PublicationFormat::class);
+        $mockPubFormat->expects($this->once())
+            ->method('getIdentificationCodes')
+            ->willReturn($mockIdCodeResult);
+
+        $mockPublicationFormatDao = $this->createMock(\APP\publicationFormat\PublicationFormatDAO::class);
+        $mockPublicationFormatDao->expects($this->any())
+            ->method('getByPublicationId')
+            ->willReturn([9999 => $mockPubFormat]);
+        DAORegistry::registerDAO('PublicationFormatDAO', $mockPublicationFormatDao);
+
+        $mockPublication = $this->createMock(\APP\publication\Publication::class);
+        $mockPublication->expects($this->once())
+            ->method('getId')
+            ->willReturn(9999);
+
+        $factory = new ThothBookFactory();
+        $doi = $factory->getDoi($mockPublication);
+        $this->assertEquals('https://doi.org/10.12345/123456789', $doi);
     }
 }

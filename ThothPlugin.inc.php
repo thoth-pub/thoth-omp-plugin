@@ -23,7 +23,7 @@ use PKP\linkAction\request\AjaxModal;
 
 import('plugins.generic.thoth.classes.api.ThothEndpoint');
 import('plugins.generic.thoth.classes.components.forms.config.PublishFormConfig');
-import('plugins.generic.thoth.classes.filters.ThothSectionFilter');
+import('plugins.generic.thoth.classes.templateFilters.ThothSectionTemplateFilter');
 import('plugins.generic.thoth.classes.listeners.PublicationEditListener');
 import('plugins.generic.thoth.classes.listeners.PublicationPublishListener');
 import('plugins.generic.thoth.classes.notification.ThothNotification');
@@ -132,7 +132,7 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
         $templateMgr = $args[0];
         $template = $args[1];
 
-        $thothSectionFilter = new ThothSectionFilter();
+        $thothSectionFilter = new ThothSectionTemplateFilter();
         $thothSectionFilter->registerFilter($templateMgr, $template, $this);
     }
 
@@ -142,7 +142,7 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
         $template = $args[1];
         $request = Application::get()->getRequest();
 
-        $thothSectionFilter = new ThothSectionFilter();
+        $thothSectionFilter = new ThothSectionTemplateFilter();
         $thothSectionFilter->addJavaScriptData($request, $templateMgr, $template);
         $thothSectionFilter->addJavaScript($request, $templateMgr, $this);
         $thothSectionFilter->addStyleSheet($request, $templateMgr, $this);
@@ -189,7 +189,9 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
         }
 
         if (in_array(ROLE_ID_MANAGER, $userRoles)) {
-            $menu = array_slice($menu, 0, 3, true) +
+            $offset = array_search("settings", array_keys($menu));
+
+            $menu = array_slice($menu, 0, $offset, true) +
             [
                 'thoth' => [
                     'name' => __('plugins.generic.thoth.navigation.thoth'),
@@ -197,7 +199,7 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
                     'isCurrent' => $router->getRequestedPage($request) === 'thoth',
                 ]
             ] +
-            array_slice($menu, 2, null, true);
+            array_slice($menu, ($offset - 1), null, true);
         }
 
         $templateMgr->setState(['menu' => $menu]);

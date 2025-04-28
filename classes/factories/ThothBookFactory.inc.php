@@ -16,6 +16,9 @@
 
 use APP\facades\Repo;
 use APP\submission\Submission;
+use PKP\core\Core;
+use PKP\doi\Doi;
+use PKP\submission\PKPSubmission;
 use ThothApi\GraphQL\Models\Work as ThothWork;
 
 import('plugins.generic.thoth.classes.formatters.HtmlStripper');
@@ -31,18 +34,26 @@ class ThothBookFactory
 
         return new ThothWork([
             'workType' => $thothWorkType ?? $this->getWorkTypeBySubmissionWorkType($submission->getData('workType')),
-            'workStatus' => empty($publication->getData('datePublished'))
-                ? ThothWork::WORK_STATUS_FORTHCOMING
-                : ThothWork::WORK_STATUS_ACTIVE,
+            'workStatus' => $this->getWorkStatusByDatePublished($publication->getData('datePublished')),
             'fullTitle' => $publication->getLocalizedFullTitle(),
             'title' => $publication->getLocalizedTitle(),
             'subtitle' => $publication->getLocalizedData('subtitle'),
             'longAbstract' => HtmlStripper::stripTags($publication->getLocalizedData('abstract')),
             'edition' => $publication->getData('version'),
-            'doi' => $publication->getData('doiObject')?->getResolvingUrl(),
+            'doi' => $this->getDoi($publication),
             'publicationDate' => $publication->getData('datePublished'),
-            'license' => $publication->getData('licenseUrl'),
-            'copyrightHolder' => $publication->getLocalizedData('copyrightHolder'),
+            'license' => $publication->getData('licenseUrl')
+                ?? $submission->_getContextLicenseFieldValue(
+                    null,
+                    PKPSubmission::PERMISSIONS_FIELD_LICENSE_URL,
+                    $publication
+                ),
+            'copyrightHolder' => $publication->getLocalizedData('copyrightHolder')
+                ?? $submission->_getContextLicenseFieldValue(
+                    $submission->getData('locale'),
+                    PKPSubmission::PERMISSIONS_FIELD_COPYRIGHT_HOLDER,
+                    $publication
+                ),
             'coverUrl' => $publication->getLocalizedCoverImageUrl($submission->getData('contextId')),
             'landingPage' => $request->getDispatcher()->url(
                 $request,
@@ -55,7 +66,7 @@ class ThothBookFactory
         ]);
     }
 
-    private function getWorkTypeBySubmissionWorkType($submissionWorkType)
+    public function getWorkTypeBySubmissionWorkType($submissionWorkType)
     {
         $workTypeMapping = [
             Submission::WORK_TYPE_EDITED_VOLUME => ThothWork::WORK_TYPE_EDITED_BOOK,
@@ -63,5 +74,44 @@ class ThothBookFactory
         ];
 
         return $workTypeMapping[$submissionWorkType];
+    }
+
+    public function getWorkStatusByDatePublished($datePublished)
+    {
+        if ($datePublished && $datePublished <= Core::getCurrentDate()) {
+            return ThothWork::WORK_STATUS_ACTIVE;
+        }
+
+        return ThothWork::WORK_STATUS_FORTHCOMING;
+    }
+
+    public function getDoi($publication)
+    {
+        $doiObject = $publication->getData('doiObject');
+
+        if ($doiObject === null) {
+            $publicationFormats = DAORegistry::getDAO('PublicationFormatDAO')
+                ->getByPublicationId($publication->getId());
+            foreach ($publicationFormats as $publicationFormat) {
+                $identificationCodes = $publicationFormat->getIdentificationCodes()->toArray();
+                foreach ($identificationCodes as $identificationCode) {
+                    if ($identificationCode->getCode() == '06') {
+                        $doi = $identificationCode->getValue();
+                        if (str_contains($doi, 'doi.org')) {
+                            $doi = str_replace('https://doi.org/', '', $doi);
+                        }
+                        $doiObject = new Doi();
+                        $doiObject->setDoi($doi);
+                        break 2;
+                    }
+                }
+            }
+        }
+
+        if ($doiObject === null) {
+            return $doiObject;
+        }
+
+        return $doiObject->getResolvingUrl();
     }
 }
