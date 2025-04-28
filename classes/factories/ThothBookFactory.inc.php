@@ -38,6 +38,7 @@ class ThothBookFactory
             'edition' => $publication->getData('version'),
             'doi' => $this->getDoi($publication),
             'publicationDate' => $publication->getData('datePublished'),
+            'place' => $publication->getData('place'),
             'license' => $publication->getData('licenseUrl')
                 ?? $submission->_getContextLicenseFieldValue(
                     null,
