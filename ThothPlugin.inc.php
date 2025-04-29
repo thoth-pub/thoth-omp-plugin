@@ -123,8 +123,9 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
     public function addToSchema()
     {
         $thothSchema = new ThothSchema();
-        HookRegistry::register('Schema::get::submission', [$thothSchema, 'addWorkIdToSchema']);
         HookRegistry::register('Schema::get::eventLog', [$thothSchema, 'addReasonToSchema']);
+        HookRegistry::register('Schema::get::submission', [$thothSchema, 'addWorkIdToSchema']);
+        HookRegistry::register('Schema::get::publication', [$thothSchema, 'addToPublicationSchema']);
         HookRegistry::register('Submission::getSubmissionsListProps', [$thothSchema, 'addToSubmissionsListProps']);
     }
 
