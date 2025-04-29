@@ -22,6 +22,7 @@ use PKP\linkAction\LinkAction;
 use PKP\linkAction\request\AjaxModal;
 
 import('plugins.generic.thoth.classes.api.ThothEndpoint');
+import('plugins.generic.thoth.classes.components.forms.config.CatalogEntryFormConfig');
 import('plugins.generic.thoth.classes.components.forms.config.PublishFormConfig');
 import('plugins.generic.thoth.classes.templateFilters.ThothSectionTemplateFilter');
 import('plugins.generic.thoth.classes.listeners.PublicationEditListener');
@@ -156,6 +157,9 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
     {
         $publishFormConfig = new PublishFormConfig();
         HookRegistry::register('Form::config::before', [$publishFormConfig, 'addConfig']);
+
+        $catalogEntryFormConfig = new CatalogEntryFormConfig();
+        HookRegistry::register('Form::config::before', [$catalogEntryFormConfig, 'addConfig']);
     }
 
     public function addListeners()
