@@ -28,6 +28,10 @@ class CatalogEntryFormConfig
         $form->addField(new \PKP\components\forms\FieldText('place', [
             'label' => __('plugins.generic.thoth.field.place.label'),
             'value' => $publication->getData('place'),
+        ]))
+        ->addField(new \PKP\components\forms\FieldText('pages', [
+            'label' => __('plugins.generic.thoth.field.pages.label'),
+            'value' => $publication->getData('pages'),
         ]));
 
         return false;
