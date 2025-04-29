@@ -107,6 +107,9 @@ class ThothBookFactoryTest extends PKPTestCase
             ->will($this->returnValueMap([
                 ['version', null, 1],
                 ['datePublished', null, '2020-01-01'],
+                ['place', null, 'Salvador, BR'],
+                ['pageCount', null, 64],
+                ['imageCount', null, 32],
                 ['licenseUrl', null, 'https://creativecommons.org/licenses/by-nc/4.0/']
             ]));
         $mockPublication->expects($this->any())
@@ -150,6 +153,9 @@ class ThothBookFactoryTest extends PKPTestCase
             'subtitle' => 'My book subtitle',
             'edition' => 1,
             'publicationDate' => '2020-01-01',
+            'place' => 'Salvador, BR',
+            'pageCount' => 64,
+            'imageCount' => 32,
             'doi' => 'https://doi.org/10.12345/0101010101',
             'license' => 'https://creativecommons.org/licenses/by-nc/4.0/',
             'copyrightHolder' => 'Public Knowledge Press',
