@@ -29,9 +29,9 @@ class CatalogEntryFormConfig
             'label' => __('plugins.generic.thoth.field.place.label'),
             'value' => $publication->getData('place'),
         ]))
-        ->addField(new \PKP\components\forms\FieldText('pages', [
+        ->addField(new \PKP\components\forms\FieldText('pageCount', [
             'label' => __('plugins.generic.thoth.field.pages.label'),
-            'value' => $publication->getData('pages'),
+            'value' => $publication->getData('pageCount'),
         ]));
 
         return false;

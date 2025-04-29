@@ -26,14 +26,22 @@ class ThothSchema
         return false;
     }
 
-    public function addPlaceToSchema($hookName, $args)
+    public function addToPublicationSchema($hookName, $args)
     {
         $schema = & $args[0];
+
         $schema->properties->{'place'} = (object) [
             'type' => 'string',
             'apiSummary' => true,
             'validation' => ['nullable'],
         ];
+
+        $schema->properties->{'pageCount'} = (object) [
+            'type' => 'integer',
+            'apiSummary' => true,
+            'validation' => ['nullable'],
+        ];
+
         return false;
     }
 
