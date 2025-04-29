@@ -40,6 +40,7 @@ class ThothBookFactory
             'publicationDate' => $publication->getData('datePublished'),
             'place' => $publication->getData('place'),
             'pageCount' => $publication->getData('pageCount'),
+            'imageCount' => $publication->getData('imageCount'),
             'license' => $publication->getData('licenseUrl')
                 ?? $submission->_getContextLicenseFieldValue(
                     null,
