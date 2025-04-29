@@ -31,6 +31,15 @@ msgstr "Your site administrator must set a secret in the config file ('api_key_s
 msgid "plugins.generic.thoth.credentialsMissing"
 msgstr "Thoth credentials not configured."
 
+msgid "plugins.generic.thoth.field.place.label"
+msgstr "Place of Publication"
+
+msgid "plugins.generic.thoth.field.pageCount.label"
+msgstr "Page Count"
+
+msgid "plugins.generic.thoth.field.imageCount.label"
+msgstr "Image Count"
+
 msgid "plugins.generic.thoth.workType"
 msgstr "Work Type"
 

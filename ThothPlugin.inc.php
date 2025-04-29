@@ -19,6 +19,7 @@ require_once(__DIR__ . '/vendor/autoload.php');
 
 import('lib.pkp.classes.plugins.GenericPlugin');
 import('plugins.generic.thoth.classes.api.ThothEndpoint');
+import('plugins.generic.thoth.classes.components.forms.config.CatalogEntryFormConfig');
 import('plugins.generic.thoth.classes.components.forms.config.PublishFormConfig');
 import('plugins.generic.thoth.classes.templateFilters.ThothSectionTemplateFilter');
 import('plugins.generic.thoth.classes.listeners.PublicationEditListener');
@@ -130,6 +131,7 @@ class ThothPlugin extends GenericPlugin
     {
         $thothSchema = new ThothSchema();
         HookRegistry::register('Schema::get::submission', [$thothSchema, 'addWorkIdToSchema']);
+        HookRegistry::register('Schema::get::publication', [$thothSchema, 'addToPublicationSchema']);
         HookRegistry::register('Submission::getBackendListProperties::properties', [$thothSchema, 'addToBackendProps']);
     }
 
@@ -137,6 +139,9 @@ class ThothPlugin extends GenericPlugin
     {
         $publishFormConfig = new PublishFormConfig();
         HookRegistry::register('Form::config::before', [$publishFormConfig, 'addConfig']);
+
+        $catalogEntryFormConfig = new CatalogEntryFormConfig();
+        HookRegistry::register('Form::config::before', [$catalogEntryFormConfig, 'addConfig']);
     }
 
     public function addEndpoints()
