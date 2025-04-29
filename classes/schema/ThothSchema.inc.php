@@ -42,6 +42,12 @@ class ThothSchema
             'validation' => ['nullable'],
         ];
 
+        $schema->properties->{'imageCount'} = (object) [
+            'type' => 'integer',
+            'apiSummary' => true,
+            'validation' => ['nullable'],
+        ];
+
         return false;
     }
 
