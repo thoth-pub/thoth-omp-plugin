@@ -30,8 +30,12 @@ class CatalogEntryFormConfig
             'value' => $publication->getData('place'),
         ]))
         ->addField(new \PKP\components\forms\FieldText('pageCount', [
-            'label' => __('plugins.generic.thoth.field.pages.label'),
+            'label' => __('plugins.generic.thoth.field.pageCount.label'),
             'value' => $publication->getData('pageCount'),
+        ]))
+        ->addField(new \PKP\components\forms\FieldText('imageCount', [
+            'label' => __('plugins.generic.thoth.field.imageCount.label'),
+            'value' => $publication->getData('imageCount'),
         ]));
 
         return false;

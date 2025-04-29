@@ -34,8 +34,11 @@ msgstr "Thoth credentials not configured."
 msgid "plugins.generic.thoth.field.place.label"
 msgstr "Place of Publication"
 
-msgid "plugins.generic.thoth.field.pages.label"
+msgid "plugins.generic.thoth.field.pageCount.label"
 msgstr "Page Count"
+
+msgid "plugins.generic.thoth.field.imageCount.label"
+msgstr "Image Count"
 
 msgid "plugins.generic.thoth.workType"
 msgstr "Work Type"

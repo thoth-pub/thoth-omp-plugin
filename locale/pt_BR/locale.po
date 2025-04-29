@@ -34,8 +34,11 @@ msgstr "Credenciais do Thoth não configuradas."
 msgid "plugins.generic.thoth.field.place.label"
 msgstr "Local de Publicação"
 
-msgid "plugins.generic.thoth.field.pages.label"
+msgid "plugins.generic.thoth.field.pageCount.label"
 msgstr "Número de Páginas"
+
+msgid "plugins.generic.thoth.field.imageCount.label"
+msgstr "Número de Imagens"
 
 msgid "plugins.generic.thoth.workType"
 msgstr "Tipo de Trabalho"
