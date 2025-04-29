@@ -137,6 +137,15 @@ class ThothBookFactoryTest extends PKPTestCase
             ->shouldReceive('getLocalizedCoverImageUrl')
             ->withAnyArgs()
             ->andReturn('https://omp.publicknowledgeproject.org/templates/images/book-default.png')
+            ->shouldReceive('getData')
+            ->with('place')
+            ->andReturn('Salvador, BR')
+            ->shouldReceive('getData')
+            ->with('pageCount')
+            ->andReturn(64)
+            ->shouldReceive('getData')
+            ->with('imageCount')
+            ->andReturn(32)
             ->getMock();
 
         $this->mocks = [];
@@ -159,6 +168,9 @@ class ThothBookFactoryTest extends PKPTestCase
             'subtitle' => 'My book subtitle',
             'edition' => 1,
             'publicationDate' => '2020-01-01',
+            'place' => 'Salvador, BR',
+            'pageCount' => 64,
+            'imageCount' => 32,
             'doi' => 'https://doi.org/10.12345/0101010101',
             'license' => 'https://creativecommons.org/licenses/by-nc/4.0/',
             'copyrightHolder' => 'Public Knowledge Press',
