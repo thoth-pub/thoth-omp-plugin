@@ -21,11 +21,12 @@ import('lib.pkp.classes.plugins.GenericPlugin');
 import('plugins.generic.thoth.classes.api.ThothEndpoint');
 import('plugins.generic.thoth.classes.components.forms.config.CatalogEntryFormConfig');
 import('plugins.generic.thoth.classes.components.forms.config.PublishFormConfig');
-import('plugins.generic.thoth.classes.templateFilters.ThothSectionTemplateFilter');
+import('plugins.generic.thoth.classes.formModifiers.AuthorFormModifier');
 import('plugins.generic.thoth.classes.listeners.PublicationEditListener');
 import('plugins.generic.thoth.classes.listeners.PublicationPublishListener');
 import('plugins.generic.thoth.classes.notification.ThothNotification');
 import('plugins.generic.thoth.classes.schema.ThothSchema');
+import('plugins.generic.thoth.classes.templateFilters.ThothSectionTemplateFilter');
 
 class ThothPlugin extends GenericPlugin
 {
@@ -41,6 +42,7 @@ class ThothPlugin extends GenericPlugin
 
             $this->addToSchema();
             $this->addFormConfig();
+            $this->addFormModifiers();
             $this->addEndpoints();
             $this->addListeners();
         }
@@ -142,6 +144,12 @@ class ThothPlugin extends GenericPlugin
 
         $catalogEntryFormConfig = new CatalogEntryFormConfig();
         HookRegistry::register('Form::config::before', [$catalogEntryFormConfig, 'addConfig']);
+    }
+
+    public function addFormModifiers()
+    {
+        $authorFormModifier = new AuthorFormModifier($this);
+        HookRegistry::register('authorform::Constructor', [$authorFormModifier, 'handleFormConstructor']);
     }
 
     public function addEndpoints()
