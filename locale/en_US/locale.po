@@ -40,6 +40,9 @@ msgstr "Page Count"
 msgid "plugins.generic.thoth.field.imageCount.label"
 msgstr "Image Count"
 
+msgid "plugins.generic.thoth.field.mainContributor.label"
+msgstr "Main Contributor."
+
 msgid "plugins.generic.thoth.workType"
 msgstr "Work Type"
 
