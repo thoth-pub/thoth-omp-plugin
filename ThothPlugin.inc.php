@@ -132,8 +132,10 @@ class ThothPlugin extends GenericPlugin
     public function addToSchema()
     {
         $thothSchema = new ThothSchema();
+        HookRegistry::register('Schema::get::author', [$thothSchema, 'addToAuthorSchema']);
         HookRegistry::register('Schema::get::submission', [$thothSchema, 'addWorkIdToSchema']);
         HookRegistry::register('Schema::get::publication', [$thothSchema, 'addToPublicationSchema']);
+        HookRegistry::register('authordao::getAdditionalFieldNames', [$thothSchema, 'addToAdditionalFieldNames']);
         HookRegistry::register('Submission::getBackendListProperties::properties', [$thothSchema, 'addToBackendProps']);
     }
 
@@ -150,6 +152,8 @@ class ThothPlugin extends GenericPlugin
     {
         $authorFormModifier = new AuthorFormModifier($this);
         HookRegistry::register('authorform::Constructor', [$authorFormModifier, 'handleFormConstructor']);
+        HookRegistry::register('authorform::display', [$authorFormModifier, 'handleFormDisplay']);
+        HookRegistry::register('authorform::execute', [$authorFormModifier, 'handleFormExecute']);
     }
 
     public function addEndpoints()
