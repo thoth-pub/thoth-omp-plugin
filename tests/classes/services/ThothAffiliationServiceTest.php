@@ -60,11 +60,11 @@ class ThothAffiliationServiceTest extends PKPTestCase
             ->method('add')
             ->will($this->returnValue('43f98edb-ac8c-45b4-9faa-2941a05c133c'));
 
-        $affiliation = 'My Affiliation Institution';
+        $rorId = 'https://ror.org/00101234';
         $thothContributionId = '7315563c-e5c3-40b2-8558-8d1f9cede901';
 
         $service = new ThothAffiliationService($mockRepository);
-        $thothAffiliationId = $service->register($affiliation, $thothContributionId);
+        $thothAffiliationId = $service->register($rorId, $thothContributionId);
 
         $this->assertSame('43f98edb-ac8c-45b4-9faa-2941a05c133c', $thothAffiliationId);
     }
