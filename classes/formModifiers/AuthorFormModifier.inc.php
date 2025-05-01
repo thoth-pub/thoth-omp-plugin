@@ -39,7 +39,7 @@ class AuthorFormModifier
         $author = $authorForm->getAuthor();
 
         if ($author) {
-            $templateMgr->assign(['mainContributor' => $author->getData('mainContributor')]);
+            $templateMgr->assign(['mainContribution' => $author->getData('mainContribution')]);
         }
 
         return false;
@@ -48,11 +48,12 @@ class AuthorFormModifier
     public function handleFormExecute($hookName, $args)
     {
         $form = & $args[0];
-        $form->readUserVars(['mainContributor']);
-        $author = $form->getAuthor();
-        $mainContributor = $form->getData('mainContributor');
+        $form->readUserVars(['mainContribution']);
 
-        $author->setData('mainContributor', $mainContributor);
+        $author = $form->getAuthor();
+        $mainContribution = $form->getData('mainContribution');
+
+        $author->setData('mainContribution', $mainContribution);
 
         return false;
     }

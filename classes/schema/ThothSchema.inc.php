@@ -57,7 +57,7 @@ class ThothSchema
     {
         $schema = & $args[0];
 
-        $schema->properties->{'mainContributor'} = (object) [
+        $schema->properties->{'mainContribution'} = (object) [
             'type' => 'boolean',
             'apiSummary' => true,
             'validation' => ['nullable']
@@ -78,7 +78,7 @@ class ThothSchema
     public function addToAdditionalFieldNames($hookName, $params)
     {
         $fields = & $params[1];
-        $fields[] = 'mainContributor';
+        $fields[] = 'mainContribution';
 
         return false;
     }
