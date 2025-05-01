@@ -18,11 +18,13 @@ class ThothSchema
     public function addWorkIdToSchema($hookName, $args)
     {
         $schema = & $args[0];
+
         $schema->properties->{'thothWorkId'} = (object) [
             'type' => 'string',
             'apiSummary' => true,
             'validation' => ['nullable'],
         ];
+
         return false;
     }
 
@@ -51,10 +53,33 @@ class ThothSchema
         return false;
     }
 
+    public function addToAuthorSchema($hookName, $args)
+    {
+        $schema = & $args[0];
+
+        $schema->properties->{'mainContribution'} = (object) [
+            'type' => 'boolean',
+            'apiSummary' => true,
+            'validation' => ['nullable']
+        ];
+
+        return false;
+    }
+
     public function addToBackendProps($hookName, $args)
     {
         $props = & $args[0];
-
         $props[] = 'thothWorkId';
+
+        return false;
+
+    }
+
+    public function addToAdditionalFieldNames($hookName, $params)
+    {
+        $fields = & $params[1];
+        $fields[] = 'mainContribution';
+
+        return false;
     }
 }
