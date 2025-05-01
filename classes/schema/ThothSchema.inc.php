@@ -63,6 +63,19 @@ class ThothSchema
         return false;
     }
 
+    public function addToAuthorSchema($hookName, $args)
+    {
+        $schema = & $args[0];
+
+        $schema->properties->{'mainContribution'} = (object) [
+            'type' => 'boolean',
+            'apiSummary' => true,
+            'validation' => ['nullable'],
+        ];
+
+        return false;
+    }
+
     public function addToSubmissionsListProps($hookName, $args)
     {
         $props = & $args[0];

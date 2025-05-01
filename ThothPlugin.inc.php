@@ -24,6 +24,7 @@ use PKP\linkAction\request\AjaxModal;
 import('plugins.generic.thoth.classes.api.ThothEndpoint');
 import('plugins.generic.thoth.classes.components.forms.config.CatalogEntryFormConfig');
 import('plugins.generic.thoth.classes.components.forms.config.PublishFormConfig');
+import('plugins.generic.thoth.classes.components.forms.config.ContributorFormConfig');
 import('plugins.generic.thoth.classes.templateFilters.ThothSectionTemplateFilter');
 import('plugins.generic.thoth.classes.listeners.PublicationEditListener');
 import('plugins.generic.thoth.classes.listeners.PublicationPublishListener');
@@ -126,6 +127,7 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
         HookRegistry::register('Schema::get::eventLog', [$thothSchema, 'addReasonToSchema']);
         HookRegistry::register('Schema::get::submission', [$thothSchema, 'addWorkIdToSchema']);
         HookRegistry::register('Schema::get::publication', [$thothSchema, 'addToPublicationSchema']);
+        HookRegistry::register('Schema::get::author', [$thothSchema, 'addToAuthorSchema']);
         HookRegistry::register('Submission::getSubmissionsListProps', [$thothSchema, 'addToSubmissionsListProps']);
     }
 
@@ -161,6 +163,9 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
 
         $catalogEntryFormConfig = new CatalogEntryFormConfig();
         HookRegistry::register('Form::config::before', [$catalogEntryFormConfig, 'addConfig']);
+
+        $contributorFormConfig = new ContributorFormConfig();
+        HookRegistry::register('Form::config::before', [$contributorFormConfig, 'addConfig']);
     }
 
     public function addListeners()
