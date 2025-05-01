@@ -34,7 +34,8 @@ This is required to use the API credentials provided, that are stored encrypted 
 ### Guidelines
 
 - Only basic HTML tags are preserved (`<strong>`, `<mark>`, `<em>`, `<i>`, `<u>`, `<sup>`, `<sub>`, `<ul>`, `<ol>` and `<li>`); all others will be removed
-- ISBN must be properly formatted (e.g., 978-3-16-148410-0)
+- ISBN must be properly formatted (e.g., 978-3-16-148410-0).
+- To avoid incorrect assignment of affiliations in Thoth, is required the use of the [ROR plugin](https://github.com/withanage/ror) to fill the affiliations in OMP.
 
 ### Configuration
 
