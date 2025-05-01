@@ -34,6 +34,7 @@ Isso é necessário para usar as credenciais da API fornecidas, que são armazen
 
 - Apenas tags básicas de HTML são preservadas (`<strong>`, `<mark>`, `<em>`, `<i>`, `<u>`, `<sup>`, `<sub>`, `<ul>`, `<ol>` e `<li>`); todas as outras serão removidas
 - O ISBN deve estar devidamente formatado (por exemplo, 978-3-16-148410-0)
+- Para evitar a atribuição incorreta de afiliações no Thoth, é necessário o uso do [plugin ROR](https://github.com/withanage/ror) para preencher as afiliações no OMP.
 
 ### Configuração
 
