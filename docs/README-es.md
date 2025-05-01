@@ -34,7 +34,8 @@ Esto es necesario para utilizar las credenciales de la API proporcionadas, que s
 ### Orientaciones
 
 - Solo se conservan las etiquetas HTML básicas (`<strong>`, `<mark>`, `<em>`, `<i>`, `<u>`, `<sup>`, `<sub>`, `<ul>`, `<ol>` y `<li>`); todas las demás serán eliminadas
-- El ISBN debe estar correctamente formateado (por ejemplo, 978-3-16-148410-0)
+- El ISBN debe estar correctamente formateado (por ejemplo, 978-3-16-148410-0).
+- Para evitar la asignación incorrecta de afiliaciones en Thoth, se requiere el uso del [plugin ROR](https://github.com/withanage/ror) para completar las afiliaciones en OMP.
 
 ### Configuración
 

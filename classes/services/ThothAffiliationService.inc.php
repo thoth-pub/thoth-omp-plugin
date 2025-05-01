@@ -25,9 +25,9 @@ class ThothAffiliationService
         $this->repository = $repository;
     }
 
-    public function register($affiliation, $thothContributionId)
+    public function register($rorId, $thothContributionId)
     {
-        $thothInstitution = ThothRepository::institution()->find($affiliation);
+        $thothInstitution = ThothRepository::institution()->find($rorId);
 
         if ($thothInstitution === null) {
             return null;
