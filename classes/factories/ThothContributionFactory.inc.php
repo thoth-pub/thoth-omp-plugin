@@ -37,8 +37,8 @@ class ThothContributionFactory
 
     private function isMainContribution($author, $primaryContactId = null)
     {
-        if ($mainContributor = $author->getData('mainContributor')) {
-            return $mainContributor;
+        if ($mainContribution = $author->getData('mainContribution')) {
+            return $mainContribution;
         }
 
         if ($author instanceof ChapterAuthor) {

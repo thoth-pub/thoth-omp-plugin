@@ -17,7 +17,7 @@
 
 {capture assign="additionalCheckboxes"}
     {$additionalCheckboxes}
-    {fbvElement type="checkbox" label="plugins.generic.thoth.field.mainContributor.label" id="mainContributor" checked=$mainContributor}
+    {fbvElement type="checkbox" label="plugins.generic.thoth.field.mainContribution.label" id="mainContribution" checked=$mainContribution}
 {/capture}
 
 {include file="core:controllers/grid/users/author/form/authorForm.tpl" additionalCheckboxes=$additionalCheckboxes}
