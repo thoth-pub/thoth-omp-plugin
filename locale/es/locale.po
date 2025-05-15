@@ -85,7 +85,7 @@ msgid "plugins.generic.thoth.register.warning"
 msgstr "Los metadatos de envio no pueden ser enviados a Thoth debido a los siguientes errores:"
 
 msgid "plugins.generic.thoth.validation.isbn"
-msgstr "\"{$isbn}\" del formato de publicación \"{$formatName}\" no es un ISBN-13 válido."
+msgstr "\"{$isbn}\" del formato de publicación \"{$formatName}\" no es un ISBN-13 válido. Un ISBN-13 válido debe tener exactamente 17 caracteres (números y guiones)."
 
 msgid "plugins.generic.thoth.validation.doiExists"
 msgstr "Un trabajo con el DOI \"{$doi}\" ya existe."
