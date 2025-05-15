@@ -90,15 +90,12 @@ class ThothBookService
         }
 
         $publicationFormats = DAORegistry::getDAO('PublicationFormatDAO')
-            ->getApprovedByPublicationId($publication->getId())
-            ->toArray();
+            ->getByPublicationId($publication->getId());
         foreach ($publicationFormats as $publicationFormat) {
-            if ($publicationFormat->getIsAvailable()) {
-                $errors = array_merge(
-                    $errors,
-                    ThothService::publication()->validate($publicationFormat)
-                );
-            }
+            $errors = array_merge(
+                $errors,
+                ThothService::publication()->validate($publicationFormat)
+            );
         }
 
         return $errors;
