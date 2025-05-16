@@ -72,7 +72,13 @@ class ThothPublicationFactory
         $identificationCodes = $publicationFormat->getIdentificationCodes()->toArray();
         foreach ($identificationCodes as $identificationCode) {
             if ($identificationCode->getCode() == '15' || $identificationCode->getCode() == '24') {
-                return $identificationCode->getValue();
+                $isbn = $identificationCode->getValue();
+                try {
+                    $isbn13 = \Biblys\Isbn\Isbn::convertToIsbn13($isbn);
+                    return str_replace('-', '', $isbn13) === $isbn ? $isbn13 : $isbn;
+                } catch (Exception $e) {
+                    return $isbn;
+                }
             }
         }
 
