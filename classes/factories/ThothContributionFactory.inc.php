@@ -20,14 +20,14 @@ import('plugins.generic.thoth.classes.formatters.HtmlStripper');
 
 class ThothContributionFactory
 {
-    public function createFromAuthor($author, $primaryContactId = null)
+    public function createFromAuthor($author, $seq, $primaryContactId = null)
     {
         $userGroupLocaleKey = $author->getUserGroup()->getData('nameLocaleKey');
 
         return new ThothContribution([
             'contributionType' => $this->getContributionTypeByUserGroupLocaleKey($userGroupLocaleKey),
             'mainContribution' => $this->isMainContribution($author, $primaryContactId),
-            'contributionOrdinal' => $author->getSequence() + 1,
+            'contributionOrdinal' => $seq + 1,
             'firstName' => $author->getLocalizedGivenName(),
             'lastName' => $author->getLocalizedData('familyName'),
             'fullName' => $author->getFullName(false),

@@ -91,10 +91,12 @@ class ThothEndpoint
 
         $disableNotification = $params['disableNotification'] ?? false;
         try {
-            $thothBookId = ThothService::book()->register($publication, $thothImprintId);
+            $thothBookService = ThothService::book();
+            $thothBookId = $thothBookService->register($publication, $thothImprintId);
             $submission = Services::get('submission')->edit($submission, ['thothWorkId' => $thothBookId], $request);
             $this->handleNotification($request, $submission, true, $disableNotification);
         } catch (QueryException $e) {
+            $thothBookService->deleteRegisteredEntry();
             $this->handleNotification($request, $submission, false, $disableNotification, $e->getMessage());
             $failure['errors'][] = __('plugins.generic.thoth.register.error.log', ['reason' => $e->getMessage()]);
             return $response->withStatus(403)->withJson($failure);

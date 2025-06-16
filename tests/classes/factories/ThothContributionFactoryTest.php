@@ -80,7 +80,7 @@ class ThothContributionFactoryTest extends PKPTestCase
         $primaryContactId = 1;
 
         $factory = new ThothContributionFactory();
-        $thothContribution = $factory->createFromAuthor($mockAuthor, $primaryContactId);
+        $thothContribution = $factory->createFromAuthor($mockAuthor, 0, $primaryContactId);
 
         $this->assertEquals(new ThothContribution([
             'contributionType' => ThothContribution::CONTRIBUTION_TYPE_AUTHOR,

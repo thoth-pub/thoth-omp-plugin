@@ -22,11 +22,22 @@ class ThothBookService
 {
     public $factory;
     public $repository;
+    private $registeredEntryId;
 
     public function __construct($factory, $repository)
     {
         $this->factory = $factory;
         $this->repository = $repository;
+    }
+
+    public function getRegisteredEntryId()
+    {
+        return $this->registeredEntryId;
+    }
+
+    public function setRegisteredEntryId($registeredEntryId)
+    {
+        $this->registeredEntryId = $registeredEntryId;
     }
 
     public function register($publication, $thothImprintId)
@@ -36,6 +47,7 @@ class ThothBookService
 
         $thothBookId = $this->repository->add($thothBook);
         $publication->setData('thothBookId', $thothBookId);
+        $this->setRegisteredEntryId($thothBookId);
 
         ThothService::contribution()->registerByPublication($publication);
         ThothService::publication()->registerByPublication($publication);
@@ -99,5 +111,15 @@ class ThothBookService
         }
 
         return $errors;
+    }
+
+    public function deleteRegisteredEntry()
+    {
+        if ($this->getRegisteredEntryId() === null) {
+            return;
+        }
+
+        $this->repository->delete($this->getRegisteredEntryId());
+        $this->setRegisteredEntryId(null);
     }
 }
