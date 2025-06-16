@@ -60,7 +60,7 @@ class ThothContributionServiceTest extends PKPTestCase
         $thothWorkId = '97fcc25c-361b-46f9-8c4b-016bfa36fb6d';
 
         $service = new ThothContributionService($mockFactory, $mockRepository);
-        $thothContributionId = $service->register($mockAuthor, $thothWorkId);
+        $thothContributionId = $service->register($mockAuthor, 0, $thothWorkId);
 
         $this->assertSame('e2d8dc3b-a5d9-4941-8ebd-52f0a70515bd', $thothContributionId);
     }
