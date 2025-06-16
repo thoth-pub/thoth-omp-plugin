@@ -27,9 +27,9 @@ class ThothContributionService
         $this->repository = $repository;
     }
 
-    public function register($author, $thothWorkId, $primaryContactId = null)
+    public function register($author, $seq, $thothWorkId, $primaryContactId = null)
     {
-        $thothContribution = $this->factory->createFromAuthor($author, $primaryContactId);
+        $thothContribution = $this->factory->createFromAuthor($author, $seq, $primaryContactId);
         $thothContribution->setWorkId($thothWorkId);
 
         $filter = empty($author->getOrcid()) ? $author->getFullName(false) : $author->getOrcid();
@@ -64,18 +64,22 @@ class ThothContributionService
             return $author->getId() === $primaryContactId || !in_array($author->getId(), $chapterAuthorIds);
         });
 
+        $seq = 0;
         $thothBookId = $publication->getData('thothBookId');
         foreach ($authors as $author) {
-            $this->register($author, $thothBookId, $primaryContactId);
+            $this->register($author, $seq, $thothBookId, $primaryContactId);
+            $seq++;
         }
     }
 
     public function registerByChapter($chapter)
     {
+        $seq = 0;
         $thothChapterId = $chapter->getData('thothChapterId');
         $authors = $chapter->getAuthors()->toArray();
         foreach ($authors as $author) {
-            $this->register($author, $thothChapterId);
+            $this->register($author, $seq, $thothChapterId);
+            $seq++;
         }
     }
 }
