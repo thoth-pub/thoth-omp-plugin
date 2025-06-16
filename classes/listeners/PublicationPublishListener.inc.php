@@ -57,10 +57,12 @@ class PublicationPublishListener
         $thothImprintId = $request->getUserVar('thothImprintId');
         $thothNotification = new ThothNotification();
         try {
-            $thothBookId = ThothService::book()->register($publication, $thothImprintId);
+            $thothBookService = ThothService::book();
+            $thothBookId = $thothBookService->register($publication, $thothImprintId);
             Repo::submission()->edit($submission, ['thothWorkId' => $thothBookId]);
             $thothNotification->notifySuccess($request, $submission);
         } catch (QueryException $e) {
+            $thothBookService->deleteRegisteredEntry();
             $thothNotification->notifyError($request, $submission, $e->getMessage());
         }
 
