@@ -93,6 +93,7 @@ class ThothEndpoint
         try {
             $thothBookService = ThothService::book();
             $thothBookId = $thothBookService->register($publication, $thothImprintId);
+            $thothBookService->setActive();
             $submission = Services::get('submission')->edit($submission, ['thothWorkId' => $thothBookId], $request);
             $this->handleNotification($request, $submission, true, $disableNotification);
         } catch (QueryException $e) {

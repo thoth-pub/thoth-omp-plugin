@@ -53,6 +53,10 @@ class ThothPublicationService
             ->getByPublicationId($publication->getId())
             ->toArray();
         foreach ($publicationFormats as $publicationFormat) {
+            if (!$this->canRegister($publicationFormat)) {
+                continue;
+            }
+
             $this->register($publicationFormat, $thothBookId);
         }
     }
@@ -106,5 +110,24 @@ class ThothPublicationService
         }
 
         return $errors;
+    }
+
+    private function canRegister($publicationFormat)
+    {
+        if ($publicationFormat->getPhysicalFormat()) {
+            return true;
+        }
+
+        $submissionFiles = array_filter(
+            iterator_to_array(Services::get('submissionFile')->getMany([
+                'assocTypes' => [ASSOC_TYPE_PUBLICATION_FORMAT],
+                'assocIds' => [$publicationFormat->getId()],
+            ])),
+            function ($submissionFile) {
+                return $submissionFile->getData('chapterId') == null;
+            }
+        );
+
+        return count($submissionFiles) > 0 || !empty($publicationFormat->getRemoteUrl());
     }
 }
