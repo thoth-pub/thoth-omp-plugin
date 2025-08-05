@@ -14,6 +14,7 @@
  * @brief Helper class that encapsulates business logic for Thoth publications
  */
 
+use APP\core\Application;
 use APP\facades\Repo;
 use Biblys\Isbn\Isbn;
 use Biblys\Isbn\IsbnParsingException;
@@ -54,6 +55,10 @@ class ThothPublicationService
         $publicationFormats = DAORegistry::getDAO('PublicationFormatDAO')
             ->getByPublicationId($publication->getId());
         foreach ($publicationFormats as $publicationFormat) {
+            if (!$this->canRegister($publicationFormat)) {
+                continue;
+            }
+
             $this->register($publicationFormat, $thothBookId);
         }
     }
@@ -107,5 +112,27 @@ class ThothPublicationService
         }
 
         return $errors;
+    }
+
+    public function canRegister($publicationFormat)
+    {
+        if ($publicationFormat->getPhysicalFormat()) {
+            return true;
+        }
+
+        $submissionFiles = array_filter(
+            iterator_to_array(Repo::submissionFile()
+                ->getCollector()
+                ->filterByAssoc(
+                    Application::ASSOC_TYPE_PUBLICATION_FORMAT,
+                    [$publicationFormat->getId()]
+                )
+                ->getMany()),
+            function ($submissionFile) {
+                return $submissionFile->getData('chapterId') == null;
+            }
+        );
+
+        return count($submissionFiles) > 0 || !empty($publicationFormat->getRemoteUrl());
     }
 }

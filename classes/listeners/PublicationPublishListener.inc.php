@@ -59,6 +59,7 @@ class PublicationPublishListener
         try {
             $thothBookService = ThothService::book();
             $thothBookId = $thothBookService->register($publication, $thothImprintId);
+            $thothBookService->setActive();
             Repo::submission()->edit($submission, ['thothWorkId' => $thothBookId]);
             $thothNotification->notifySuccess($request, $submission);
         } catch (QueryException $e) {
