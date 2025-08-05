@@ -148,6 +148,7 @@ class ThothBookService
         }
 
         $thothBook = $this->getOriginalThothBook();
+        $thothBook->setWorkId($this->getRegisteredEntryId());
         $thothBook->setWorkStatus(ThothWork::WORK_STATUS_ACTIVE);
         $this->repository->edit($thothBook);
     }
