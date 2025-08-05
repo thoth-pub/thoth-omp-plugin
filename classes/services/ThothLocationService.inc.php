@@ -14,6 +14,7 @@
  * @brief Helper class that encapsulates business logic for Thoth locations
  */
 
+use APP\core\Application;
 use APP\facades\Repo;
 
 class ThothLocationService
