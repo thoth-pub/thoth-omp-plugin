@@ -15,6 +15,7 @@
  */
 
 use PKP\db\DAORegistry;
+use ThothApi\GraphQL\Models\Work as ThothWork;
 
 import('plugins.generic.thoth.classes.facades.ThothService');
 import('lib.pkp.classes.services.PKPSchemaService');
@@ -23,12 +24,24 @@ class ThothBookService
 {
     public $factory;
     public $repository;
+
+    private $originalThothBook;
     private $registeredEntryId;
 
     public function __construct($factory, $repository)
     {
         $this->factory = $factory;
         $this->repository = $repository;
+    }
+
+    public function getOriginalThothBook()
+    {
+        return $this->originalThothBook;
+    }
+
+    public function setOriginalThothBook($originalThothBook)
+    {
+        $this->originalThothBook = $originalThothBook;
     }
 
     public function getRegisteredEntryId()
@@ -45,6 +58,11 @@ class ThothBookService
     {
         $thothBook = $this->factory->createFromPublication($publication);
         $thothBook->setImprintId($thothImprintId);
+
+        if ($thothBook->getWorkStatus() === ThothWork::WORK_STATUS_ACTIVE) {
+            $this->setOriginalThothBook($thothBook);
+            $thothBook->setWorkStatus(ThothWork::WORK_STATUS_FORTHCOMING);
+        }
 
         $thothBookId = $this->repository->add($thothBook);
         $publication->setData('thothBookId', $thothBookId);
@@ -121,5 +139,16 @@ class ThothBookService
 
         $this->repository->delete($this->getRegisteredEntryId());
         $this->setRegisteredEntryId(null);
+    }
+
+    public function setActive()
+    {
+        if ($this->getOriginalThothBook() === null) {
+            return;
+        }
+
+        $thothBook = $this->getOriginalThothBook();
+        $thothBook->setWorkStatus(ThothWork::WORK_STATUS_ACTIVE);
+        $this->repository->edit($thothBook);
     }
 }
