@@ -4,7 +4,7 @@
 	<application>thoth</application>
 	<type>plugins.generic</type>
 	<release>0.1.10.3</release>
-	<date>2025-08-04</date>
+	<date>2025-08-05</date>
 	<lazy-load>1</lazy-load>
 	<class>ThothPlugin</class>
 </version>
