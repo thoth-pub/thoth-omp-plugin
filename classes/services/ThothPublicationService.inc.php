@@ -38,7 +38,15 @@ class ThothPublicationService
             $thothPublication->setIsbn(null);
         }
 
-        $thothPublicationId = $this->repository->add($thothPublication);
+        $thothPublicationId = $this->repository->getIdByType(
+            $thothWorkId,
+            $thothPublication->getPublicationType()
+        );
+
+        if ($thothPublicationId === null) {
+            $thothPublicationId = $this->repository->add($thothPublication);
+        }
+
         $publicationFormat->setData('thothPublicationId', $thothPublicationId);
 
         ThothService::location()->registerByPublicationFormat($publicationFormat, $chapterId);
@@ -74,10 +82,22 @@ class ThothPublicationService
             return $submissionFile->getData('chapterId') == $chapter->getId();
         });
 
+        $publicationFormatIds = array_map(function ($file) {
+            return $file->getData('assocId');
+        }, $chapterSubmissionFiles);
+
         $thothChapterId = $chapter->getData('thothChapterId');
         $publicationFormatDao = DAORegistry::getDAO('PublicationFormatDAO');
-        foreach ($chapterSubmissionFiles as $chapterSubmissionFile) {
-            $publicationFormat = $publicationFormatDao->getById($chapterSubmissionFile->getData('assocId'));
+
+        $publicationFormats = [];
+        foreach (array_unique($publicationFormatIds) as $publicationFormatId) {
+            $publicationFormat = $publicationFormatDao->getById($publicationFormatId);
+            if ($publicationFormat) {
+                $publicationFormats[$publicationFormatId] = $publicationFormat;
+            }
+        }
+
+        foreach ($publicationFormats as $publicationFormat) {
             $this->register($publicationFormat, $thothChapterId, $chapter->getId());
         }
     }
