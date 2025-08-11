@@ -72,6 +72,31 @@ class ThothPublicationRepositoryTest extends PKPTestCase
         $this->assertEquals($expectedThothPublication, $thothPublication);
     }
 
+    public function testGetPublicationIdByType()
+    {
+        $mockThothClient = $this->getMockBuilder(ThothClient::class)
+            ->setMethods(['rawQuery'])
+            ->getMock();
+        $mockThothClient->expects($this->any())
+            ->method('rawQuery')
+            ->will($this->returnValue([
+                'work' => ['publications' => [
+                    [
+                        'publicationId' => 'efac5d7a-2284-4432-ad50-02b70aadec49',
+                    ]
+                ]]
+            ]));
+
+        $repository = new ThothPublicationRepository($mockThothClient);
+
+        $thothPublicationId = $repository->getIdByType(
+            'a2c032c6-b09b-4911-a67b-17f97cb57cc1',
+            ThothPublication::PUBLICATION_TYPE_PDF
+        );
+
+        $this->assertEquals('efac5d7a-2284-4432-ad50-02b70aadec49', $thothPublicationId);
+    }
+
     public function testFindPublication()
     {
         $expectedThothPublication = new ThothPublication([
