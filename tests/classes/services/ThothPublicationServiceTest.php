@@ -52,11 +52,14 @@ class ThothPublicationServiceTest extends PKPTestCase
 
         $mockRepository = $this->getMockBuilder(ThothPublicationRepository::class)
             ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
-            ->setMethods(['add'])
+            ->setMethods(['add', 'getIdByType'])
             ->getMock();
         $mockRepository->expects($this->once())
             ->method('add')
             ->will($this->returnValue('4296c934-0f05-4920-a208-a5ab214b908a'));
+        $mockRepository->expects($this->once())
+            ->method('getIdByType')
+            ->will($this->returnValue(null));
 
         $mockPubFormat = $this->getMockBuilder(PublicationFormat::class)->getMock();
 
