@@ -34,6 +34,28 @@ class ThothPublicationRepository
         return $this->thothClient->publication($thothPublicationId);
     }
 
+    public function getIdByType($thothWorkId, $thothPublicationType)
+    {
+        $query = <<<GRAPHQL
+        query(\$workId: Uuid!, \$publicationType: PublicationType!) {
+            work(workId: \$workId) {
+                publications(publicationTypes: [\$publicationType]) {
+                    publicationId
+                }
+            }
+        }
+        GRAPHQL;
+
+        $variables = [
+            'workId' => $thothWorkId,
+            'publicationType' => $thothPublicationType
+        ];
+
+        $result = $this->thothClient->rawQuery($query, $variables);
+        $thothPublications = $result['work']['publications'];
+        return !empty($thothPublications) ? $thothPublications[0]['publicationId'] : null;
+    }
+
     public function find($filter)
     {
         $thothPublications =  $this->thothClient->publications([
