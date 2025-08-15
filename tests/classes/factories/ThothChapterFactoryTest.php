@@ -137,7 +137,7 @@ class ThothChapterFactoryTest extends PKPTestCase
             )
             ->shouldReceive('getPages')
             ->withAnyArgs()
-            ->andReturn('31')
+            ->andReturn('31 - 50')
             ->getMock();
 
         $this->mocks = [];
@@ -161,7 +161,9 @@ class ThothChapterFactoryTest extends PKPTestCase
             'longAbstract' => 'This is my chapter abstract',
             'publicationDate' => '2024-01-01',
             'doi' => 'https://doi.org/10.12345/11112222',
-            'pageCount' => 31,
+            'firstPage' => '31',
+            'lastPage' => '50',
+            'pageInterval' => '31 - 50',
             'landingPage' => 'https://omp.publicknowledgeproject.org/index.php/press/catalog/book/17'
         ]), $thothChapter);
     }
