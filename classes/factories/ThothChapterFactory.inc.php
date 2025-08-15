@@ -29,6 +29,8 @@ class ThothChapterFactory
         $submission = Repo::submission()->get($publication->getData('submissionId'));
         $context = Application::getContextDAO()->getById($submission->getData('contextId'));
 
+        $pages = $this->extractPages($chapter);
+
         return new ThothWork([
             'workType' => ThothWork::WORK_TYPE_BOOK_CHAPTER,
             'workStatus' => $this->getWorkStatusByDatePublished($chapter, $publication),
@@ -37,7 +39,9 @@ class ThothChapterFactory
             'subtitle' => $chapter->getLocalizedData('subtitle'),
             'longAbstract' => HtmlStripper::stripTags($chapter->getLocalizedData('abstract')),
             'doi' => $chapter->getData('doiObject')?->getResolvingUrl(),
-            'pageCount' => !empty($chapter->getPages()) ? (int) $chapter->getPages() : null,
+            'pageInterval' => $pages['pageInterval'] ?? null,
+            'firstPage' => $pages['firstPage'] ?? null,
+            'lastPage' => $pages['lastPage'] ?? null,
             'publicationDate' => $chapter->getDatePublished() ?? $publication->getData('datePublished'),
             'landingPage' => $request->getDispatcher()->url(
                 $request,
@@ -59,5 +63,27 @@ class ThothChapterFactory
         }
 
         return ThothWork::WORK_STATUS_FORTHCOMING;
+    }
+
+    private function extractPages($chapter): array
+    {
+        $pages = $chapter->getPages();
+
+        if (empty($pages)) {
+            return [];
+        }
+
+        if (strpos($pages, '-') === false) {
+            return [
+                'firstPage' => trim($pages),
+            ];
+        }
+
+        list($firstPage, $lastPage) = explode('-', $pages);
+        return [
+            'pageInterval' => trim($pages),
+            'firstPage' => trim($firstPage),
+            'lastPage' => trim($lastPage)
+        ];
     }
 }
