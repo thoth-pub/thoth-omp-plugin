@@ -1,5 +1,5 @@
 const thothListItemTemplate = pkp.Vue.compile(`
-    <div>
+	<div>
 		<div class="listPanel__itemSummary">
 			<label class="listPanel__selectWrapper">
 				<div class="listPanel__selector">
@@ -87,13 +87,13 @@ const ListItem = SubmissionsListItemComponents.ListItem;
 
 
 pkp.Vue.component('thoth-list-item', {
-    name: 'ThothListItem',
+	name: 'ThothListItem',
 	components: {
 		Expander,
 		List,
 		ListItem
 	},
-    props: {
+	props: {
 		errors: {
 			type: Array,
 			default() {
@@ -136,7 +136,7 @@ pkp.Vue.component('thoth-list-item', {
 			this.$emit('select-item', this.item.id);
 		}
 	},
-    render: function(h) {
+	render: function(h) {
 		return thothListItemTemplate.render.call(this, h);
 	}
 });
