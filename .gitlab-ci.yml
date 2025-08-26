@@ -14,10 +14,10 @@ include:
     - git submodule update --init --depth 1
     - composer install
 
-plugin_unit_test_php_7_3:
+.plugin_unit_test_php_7_3:
   rules:
     - when: never
 
-application_unit_test_php_7_3:
+.application_unit_test_php_7_3:
   rules:
     - when: never
