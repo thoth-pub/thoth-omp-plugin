@@ -1,5 +1,5 @@
 const thothListTemplate = pkp.Vue.compile(`
-    <div>
+	<div>
 		<list-panel
 			:isSidebarVisible="isSidebarVisible"
 			:items="items"
@@ -125,22 +125,22 @@ const dialog = ManageEmailsPage.mixins[0];
 const ListPanel = SubmissionsListPanel.components.ListPanel;
 const Modal = ManageEmailsPage.components.Modal;
 const Notification = ListPanel.components.Notification;
-const Pagination = SubmissionsListPanel.components.PkpHeader;
+const Pagination = SubmissionsListPanel.components.Pagination;
 const PkpHeader = ListPanel.components.PkpHeader;
 const PkpFilter = SubmissionsListPanel.components.PkpFilter;
 const Search = SubmissionsListPanel.components.Search;
 
 pkp.Vue.component('thoth-list-panel', {
-    name: 'ThothListPanel',
+	name: 'ThothListPanel',
 	components: {
-        ListPanel,
+		ListPanel,
 		Modal,
 		Notification,
 		Pagination,
 		PkpHeader,
 		PkpFilter,
 		Search
-    },
+	},
 	mixins: [fetch, dialog],
 	props: {
 		csrfToken: {
@@ -288,7 +288,6 @@ pkp.Vue.component('thoth-list-panel', {
 					],
 				});
 			}
-
 		},
 		registerAll() {
 			this.startedItems = [...this.selected];
@@ -337,7 +336,7 @@ pkp.Vue.component('thoth-list-panel', {
 				&& this.selected.length === this.items.filter((item) => !item.thothWorkId).length;
 		}
 	},
-    render: function(h) {
+	render: function(h) {
 		return thothListTemplate.render.call(this, h);
 	}
 });
