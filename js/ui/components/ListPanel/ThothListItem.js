@@ -87,7 +87,7 @@ const ListItem = SubmissionsListItemComponents.ListItem;
 
 
 pkp.Vue.component('thoth-list-item', {
-    name: 'ThothListItem',
+	name: 'ThothListItem',
 	components: {
 		Expander,
 		List,
