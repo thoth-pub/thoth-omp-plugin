@@ -9,6 +9,7 @@ include:
       - 'templates/groups/omp/unit_tests.yml'
 
 .unit_test_template:
+  before_script:
     - composer install
 
 plugin_unit_tests_omp:
