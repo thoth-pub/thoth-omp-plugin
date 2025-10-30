@@ -10,8 +10,6 @@ include:
 
 .unit_test_template:
   before_script:
-    - rm -rf lib/APIKeyEncryption
-    - git submodule update --init --depth 1
     - composer install
 
 plugin_unit_tests_omp:

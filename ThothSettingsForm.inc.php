@@ -19,7 +19,7 @@ use ThothApi\Exception\QueryException;
 use ThothApi\GraphQL\Client;
 
 import('lib.pkp.classes.form.Form');
-import('plugins.generic.thoth.lib.APIKeyEncryption.APIKeyEncryption');
+import('plugins.generic.thoth.classes.encryption.DataEncryption');
 
 class ThothSettingsForm extends Form
 {
@@ -38,7 +38,8 @@ class ThothSettingsForm extends Form
         $this->contextId = $contextId;
         $this->plugin = $plugin;
 
-        $template = APIKeyEncryption::secretConfigExists() ? 'settingsForm.tpl' : 'tokenError.tpl';
+        $encryption = new DataEncryption();
+        $template = $encryption->secretConfigExists() ? 'settingsForm.tpl' : 'tokenError.tpl';
         parent::__construct($plugin->getTemplateResource($template));
 
         $form = $this;
@@ -75,9 +76,10 @@ class ThothSettingsForm extends Form
     {
         foreach (self::SETTINGS as $setting) {
             if ($setting == 'password') {
+                $encryption = new DataEncryption();
                 $password = $this->plugin->getSetting($this->contextId, $setting);
-                $this->_data[$setting] = (APIKeyEncryption::secretConfigExists() && $password) ?
-                    APIKeyEncryption::decryptString($password) :
+                $this->_data[$setting] = ($encryption->secretConfigExists() && $password) ?
+                    $encryption->decryptString($password) :
                     null;
                 continue;
             }
@@ -99,14 +101,21 @@ class ThothSettingsForm extends Form
 
     public function execute(...$functionArgs)
     {
+        $this->encryptPassword();
         foreach (self::SETTINGS as $setting) {
-            if ($setting == 'password') {
-                $encryptedPassword = APIKeyEncryption::encryptString(trim($this->getData($setting)));
-                $this->plugin->updateSetting($this->contextId, $setting, $encryptedPassword, 'string');
-                continue;
-            }
             $this->plugin->updateSetting($this->contextId, $setting, trim($this->getData($setting)), 'string');
         }
         parent::execute(...$functionArgs);
+    }
+
+    private function encryptPassword()
+    {
+        $encryption = new DataEncryption();
+        $password = $this->getData('password');
+
+        if (!$encryption->textIsEncrypted($password)) {
+            $encryptedPassword = $encryption->encryptString($password);
+            $this->setData('password', $encryptedPassword);
+        }
     }
 }
