@@ -18,6 +18,7 @@ require_once(__DIR__ . '/../../../vendor/autoload.php');
 use ThothApi\GraphQL\Client;
 
 import('plugins.generic.thoth.classes.container.providers.ContainerProvider');
+import('plugins.generic.thoth.classes.encryption.DataEncryption');
 import('plugins.generic.thoth.classes.factories.ThothBookFactory');
 import('plugins.generic.thoth.classes.factories.ThothChapterFactory');
 import('plugins.generic.thoth.classes.factories.ThothContributionFactory');
@@ -39,13 +40,13 @@ import('plugins.generic.thoth.classes.repositories.ThothReferenceRepository');
 import('plugins.generic.thoth.classes.repositories.ThothSubjectRepository');
 import('plugins.generic.thoth.classes.repositories.ThothWorkRelationRepository');
 import('plugins.generic.thoth.classes.repositories.ThothWorkRepository');
-import('plugins.generic.thoth.lib.APIKeyEncryption.APIKeyEncryption');
 
 class ThothRepositoryProvider implements ContainerProvider
 {
     public function register($container)
     {
         $container->set('config', function ($container) {
+            $encryption = new DataEncryption();
             $pluginSettingsDao = & DAORegistry::getDAO('PluginSettingsDAO');
             $contextId = Application::get()->getRequest()->getContext()->getId();
 
@@ -56,7 +57,7 @@ class ThothRepositoryProvider implements ContainerProvider
             return [
                 'testEnvironment' => $testEnvironment,
                 'email' => $email,
-                'password' => APIKeyEncryption::decryptString($password)
+                'password' => $encryption->decryptString($password)
             ];
         });
 
