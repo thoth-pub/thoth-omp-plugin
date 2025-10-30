@@ -26,7 +26,7 @@ class PasswordEncryptionMigration extends Migration
                 if ($this->isJWT($row->setting_value)) {
                     $decodedPayload = $this->decodeJWT($row->setting_value);
                     if ($decodedPayload !== null) {
-                        $row->setting_value = $decodedPayload;
+                        $row->setting_value = json_decode($decodedPayload);
                     }
                 }
 
