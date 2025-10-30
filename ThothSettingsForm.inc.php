@@ -108,7 +108,7 @@ class ThothSettingsForm extends Form
         parent::execute(...$functionArgs);
     }
 
-    private function encryptPassword(): void
+    private function encryptPassword()
     {
         $encryption = new DataEncryption();
         $password = $this->getData('password');

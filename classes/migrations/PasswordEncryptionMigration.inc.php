@@ -39,7 +39,8 @@ class PasswordEncryptionMigration extends Migration
             });
     }
 
-    public function base64URLDecode($data) {
+    public function base64URLDecode($data)
+    {
         $remainder = strlen($data) % 4;
         if ($remainder) {
             $padlen = 4 - $remainder;
@@ -49,7 +50,8 @@ class PasswordEncryptionMigration extends Migration
         return base64_decode($data);
     }
 
-    public function isJWT(string $token): bool {
+    public function isJWT(string $token): bool
+    {
         $parts = explode('.', $token);
         if (count($parts) !== 3) {
             return false;
