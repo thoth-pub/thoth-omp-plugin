@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE install SYSTEM "../../../lib/pkp/dtd/install.dtd">
+
+<install version="0.2.7.0">
+    <migration class="APP\plugins\generic\thoth\classes\migrations\PasswordEncryptionMigration" />
+</install>

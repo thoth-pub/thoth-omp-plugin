@@ -17,7 +17,7 @@
 require_once(__DIR__ . '/../../../vendor/autoload.php');
 
 use APP\core\Application;
-use APP\plugins\generic\thoth\lib\APIKeyEncryption;
+use APP\plugins\generic\thoth\classes\encryption\DataEncryption;
 use PKP\db\DAORegistry;
 use ThothApi\GraphQL\Client;
 
@@ -49,6 +49,7 @@ class ThothRepositoryProvider implements ContainerProvider
     public function register($container)
     {
         $container->set('config', function ($container) {
+            $encryption = new DataEncryption();
             $pluginSettingsDao = & DAORegistry::getDAO('PluginSettingsDAO');
             $contextId = Application::get()->getRequest()->getContext()->getId();
 
@@ -59,7 +60,7 @@ class ThothRepositoryProvider implements ContainerProvider
             return [
                 'testEnvironment' => $testEnvironment,
                 'email' => $email,
-                'password' => APIKeyEncryption::decryptString($password)
+                'password' => $encryption->decryptString($password)
             ];
         });
 

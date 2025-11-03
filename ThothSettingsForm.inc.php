@@ -16,7 +16,7 @@
  * @brief Form for managers to modify Thoth plugin settings
  */
 
-use APP\plugins\generic\thoth\lib\APIKeyEncryption;
+use APP\plugins\generic\thoth\classes\encryption\DataEncryption;
 use PKP\form\Form;
 use PKP\form\validation\FormValidatorCSRF;
 use PKP\form\validation\FormValidatorCustom;
@@ -30,6 +30,8 @@ class ThothSettingsForm extends Form
 
     private $plugin;
 
+    private $encryption;
+
     private const SETTINGS = [
         'email',
         'password',
@@ -40,8 +42,9 @@ class ThothSettingsForm extends Form
     {
         $this->contextId = $contextId;
         $this->plugin = $plugin;
+        $this->encryption = new DataEncryption();
 
-        $template = APIKeyEncryption::secretConfigExists() ? 'settingsForm.tpl' : 'tokenError.tpl';
+        $template = $this->encryption->secretConfigExists() ? 'settingsForm.tpl' : 'tokenError.tpl';
         parent::__construct($plugin->getTemplateResource($template));
 
         $form = $this;
@@ -78,8 +81,8 @@ class ThothSettingsForm extends Form
         foreach (self::SETTINGS as $setting) {
             if ($setting == 'password') {
                 $password = $this->plugin->getSetting($this->contextId, $setting);
-                $this->_data[$setting] = (APIKeyEncryption::secretConfigExists() && $password) ?
-                    APIKeyEncryption::decryptString($password) :
+                $this->_data[$setting] = ($this->encryption->secretConfigExists() && $password) ?
+                    $this->encryption->decryptString($password) :
                     null;
                 continue;
             }
@@ -101,14 +104,20 @@ class ThothSettingsForm extends Form
 
     public function execute(...$functionArgs)
     {
+        $this->encryptPassword();
         foreach (self::SETTINGS as $setting) {
-            if ($setting == 'password') {
-                $encryptedPassword = APIKeyEncryption::encryptString(trim($this->getData($setting)));
-                $this->plugin->updateSetting($this->contextId, $setting, $encryptedPassword, 'string');
-                continue;
-            }
             $this->plugin->updateSetting($this->contextId, $setting, trim($this->getData($setting)), 'string');
         }
         parent::execute(...$functionArgs);
+    }
+
+    private function encryptPassword()
+    {
+        $password = $this->getData('password');
+
+        if (!$this->encryption->textIsEncrypted($password)) {
+            $encryptedPassword = $this->encryption->encryptString($password);
+            $this->setData('password', $encryptedPassword);
+        }
     }
 }
