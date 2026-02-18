@@ -1,5 +1,7 @@
 <?php
 
+
+namespace APP\plugins\generic\thoth\tests\classes\services;
 /**
  * @file plugins/generic/thoth/tests/classes/services/ThothSubjectServiceTest.php
  *
@@ -18,9 +20,8 @@
 
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-
-import('plugins.generic.thoth.classes.repositories.ThothSubjectRepository');
-import('plugins.generic.thoth.classes.services.ThothSubjectService');
+use APP\plugins\generic\thoth\classes\repositories\ThothSubjectRepository;
+use APP\plugins\generic\thoth\classes\services\ThothSubjectService;
 
 class ThothSubjectServiceTest extends PKPTestCase
 {

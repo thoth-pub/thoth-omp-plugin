@@ -1,5 +1,10 @@
 <?php
 
+
+namespace APP\plugins\generic\thoth\tests\classes\container;
+
+use PKP\tests\PKPTestCase;
+use APP\plugins\generic\thoth\classes\container\ThothContainer;
 /**
  * @file plugins/generic/thoth/tests/classes/container/ThothContainerTest.php
  *
@@ -13,9 +18,6 @@
  *
  * @brief Test class for the ThothContainer class
  */
-
-import('lib.pkp.tests.PKPTestCase');
-import('plugins.generic.thoth.classes.container.ThothContainer');
 
 class ThothContainerTest extends PKPTestCase
 {

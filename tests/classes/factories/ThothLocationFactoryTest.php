@@ -1,5 +1,7 @@
 <?php
 
+
+namespace APP\plugins\generic\thoth\tests\classes\factories;
 /**
  * @file plugins/generic/thoth/tests/classes/factories/ThothLocationFactoryTest.php
  *
@@ -23,8 +25,7 @@ use APP\submission\Repository as SubmissionRepository;
 use PKP\db\DAORegistry;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Models\Location as ThothLocation;
-
-import('plugins.generic.thoth.classes.factories.ThothLocationFactory');
+use APP\plugins\generic\thoth\classes\factories\ThothLocationFactory;
 
 class ThothLocationFactoryTest extends PKPTestCase
 {

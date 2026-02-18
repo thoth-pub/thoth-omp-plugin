@@ -1,5 +1,7 @@
 <?php
 
+
+namespace APP\plugins\generic\thoth\tests\classes\factories;
 /**
  * @file plugins/generic/thoth/tests/classes/factories/ThothChapterFactoryTest.php
  *
@@ -23,8 +25,7 @@ use APP\submission\Repository as SubmissionRepository;
 use PKP\db\DAORegistry;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Models\Work as ThothWork;
-
-import('plugins.generic.thoth.classes.factories.ThothChapterFactory');
+use APP\plugins\generic\thoth\classes\factories\ThothChapterFactory;
 
 class ThothChapterFactoryTest extends PKPTestCase
 {

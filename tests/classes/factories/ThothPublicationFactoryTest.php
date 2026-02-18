@@ -1,5 +1,7 @@
 <?php
 
+
+namespace APP\plugins\generic\thoth\tests\classes\factories;
 /**
  * @file plugins/generic/thoth/tests/classes/factories/ThothPublicationFactoryTest.php
  *
@@ -20,8 +22,7 @@ require_once(__DIR__ . '/../../../vendor/autoload.php');
 
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Models\Publication as ThothPublication;
-
-import('plugins.generic.thoth.classes.factories.ThothPublicationFactory');
+use APP\plugins\generic\thoth\classes\factories\ThothPublicationFactory;
 
 class ThothPublicationFactoryTest extends PKPTestCase
 {

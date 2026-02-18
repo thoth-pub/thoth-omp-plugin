@@ -1,5 +1,7 @@
 <?php
 
+
+namespace APP\plugins\generic\thoth\tests\classes\repositories;
 /**
  * @file plugins/generic/thoth/tests/classes/repositories/ThothReferenceRepositoryTest.php
  *
@@ -19,8 +21,7 @@
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Models\Reference as ThothReference;
-
-import('plugins.generic.thoth.classes.repositories.ThothReferenceRepository');
+use APP\plugins\generic\thoth\classes\repositories\ThothReferenceRepository;
 
 class ThothReferenceRepositoryTest extends PKPTestCase
 {

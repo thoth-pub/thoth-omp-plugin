@@ -1,5 +1,7 @@
 <?php
 
+
+namespace APP\plugins\generic\thoth\tests\classes\repositories;
 /**
  * @file plugins/generic/thoth/tests/classes/repositories/ThothImprintRepositoryTest.php
  *
@@ -19,8 +21,7 @@
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Models\Imprint as ThothImprint;
-
-import('plugins.generic.thoth.classes.repositories.ThothImprintRepository');
+use APP\plugins\generic\thoth\classes\repositories\ThothImprintRepository;
 
 class ThothImprintRepositoryTest extends PKPTestCase
 {

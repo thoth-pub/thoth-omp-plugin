@@ -20,16 +20,15 @@ use APP\core\Application;
 use PKP\core\JSONMessage;
 use PKP\linkAction\LinkAction;
 use PKP\linkAction\request\AjaxModal;
-
-import('plugins.generic.thoth.classes.api.ThothEndpoint');
-import('plugins.generic.thoth.classes.components.forms.config.CatalogEntryFormConfig');
-import('plugins.generic.thoth.classes.components.forms.config.PublishFormConfig');
-import('plugins.generic.thoth.classes.components.forms.config.ContributorFormConfig');
-import('plugins.generic.thoth.classes.templateFilters.ThothSectionTemplateFilter');
-import('plugins.generic.thoth.classes.listeners.PublicationEditListener');
-import('plugins.generic.thoth.classes.listeners.PublicationPublishListener');
-import('plugins.generic.thoth.classes.notification.ThothNotification');
-import('plugins.generic.thoth.classes.schema.ThothSchema');
+use APP\plugins\generic\thoth\classes\api\ThothEndpoint;
+use APP\plugins\generic\thoth\classes\components\forms\config\CatalogEntryFormConfig;
+use APP\plugins\generic\thoth\classes\components\forms\config\PublishFormConfig;
+use APP\plugins\generic\thoth\classes\components\forms\config\ContributorFormConfig;
+use APP\plugins\generic\thoth\classes\templateFilters\ThothSectionTemplateFilter;
+use APP\plugins\generic\thoth\classes\listeners\PublicationEditListener;
+use APP\plugins\generic\thoth\classes\listeners\PublicationPublishListener;
+use APP\plugins\generic\thoth\classes\notification\ThothNotification;
+use APP\plugins\generic\thoth\classes\schema\ThothSchema;
 
 class ThothPlugin extends \PKP\plugins\GenericPlugin
 {
@@ -70,8 +69,6 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
         }
 
         $router = $request->getRouter();
-
-        import('lib.pkp.classes.linkAction.request.AjaxModal');
         $linkAction = new LinkAction(
             'settings',
             new AjaxModal(

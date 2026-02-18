@@ -1,5 +1,7 @@
 <?php
 
+
+namespace APP\plugins\generic\thoth\tests\classes\repositories;
 /**
  * @file plugins/generic/thoth/tests/classes/repositories/ThothLocationRepositoryTest.php
  *
@@ -19,8 +21,7 @@
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Models\Location as ThothLocation;
-
-import('plugins.generic.thoth.classes.repositories.ThothLocationRepository');
+use APP\plugins\generic\thoth\classes\repositories\ThothLocationRepository;
 
 class ThothLocationRepositoryTest extends PKPTestCase
 {

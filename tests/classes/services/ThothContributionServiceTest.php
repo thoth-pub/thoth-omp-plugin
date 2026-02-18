@@ -1,5 +1,7 @@
 <?php
 
+
+namespace APP\plugins\generic\thoth\tests\classes\services;
 /**
  * @file plugins/generic/thoth/tests/classes/services/ThothContributionServiceTest.php
  *
@@ -20,10 +22,9 @@ use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Models\Contribution as ThothContribution;
 use ThothApi\GraphQL\Models\Contributor as ThothContributor;
-
-import('plugins.generic.thoth.classes.factories.ThothContributionFactory');
-import('plugins.generic.thoth.classes.services.ThothContributionService');
-import('plugins.generic.thoth.classes.repositories.ThothContributionRepository');
+use APP\plugins\generic\thoth\classes\factories\ThothContributionFactory;
+use APP\plugins\generic\thoth\classes\services\ThothContributionService;
+use APP\plugins\generic\thoth\classes\repositories\ThothContributionRepository;
 
 class ThothContributionServiceTest extends PKPTestCase
 {
