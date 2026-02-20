@@ -178,7 +178,7 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
     public function addEndpoints()
     {
         $thothEndpoint = new ThothEndpoint();
-        HookRegistry::register('APIHandler::endpoints', [$thothEndpoint, 'addEndpoints']);
+        HookRegistry::register('APIHandler::endpoints::plugin', [$thothEndpoint, 'addEndpoints']);
     }
 
     public function addMenu($hookName, $args)
