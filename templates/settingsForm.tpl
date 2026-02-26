@@ -33,9 +33,9 @@
         </h3>
 
 		{fbvFormSection}
-			{fbvElement type="email" id="email" label="plugins.generic.thoth.settings.email" value=$email required="true"}
+			{fbvElement type="email" id="email" label="plugins.generic.thoth.settings.email" value=$email required="true" size=$fbvStyles.size.SMALL}
 			</p>
-			{fbvElement type="text" password="true" id="password" label="plugins.generic.thoth.settings.password" value=$password required="true"}
+			{fbvElement type="text" password="true" id="password" label="plugins.generic.thoth.settings.password" value=$password required="true" size=$fbvStyles.size.SMALL}
 		{/fbvFormSection}
 
 		{fbvFormSection list="true" title="plugins.generic.thoth.settings.testEnvironment"}
