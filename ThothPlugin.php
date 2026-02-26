@@ -31,6 +31,7 @@ use APP\plugins\generic\thoth\classes\templateFilters\ThothSectionTemplateFilter
 use PKP\core\JSONMessage;
 use PKP\linkAction\LinkAction;
 use PKP\linkAction\request\AjaxModal;
+use PKP\plugins\Hook;
 
 class ThothPlugin extends \PKP\plugins\GenericPlugin
 {
@@ -43,10 +44,10 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
             $this->addFormConfig();
             $this->addListeners();
             $this->addEndpoints();
-            HookRegistry::register('TemplateManager::display', [$this, 'addTemplateFilters']);
-            HookRegistry::register('TemplateManager::display', [$this, 'addScripts']);
-            HookRegistry::register('TemplateManager::display', [$this, 'addMenu']);
-            HookRegistry::register('LoadHandler', [$this, 'addHandlers']);
+            Hook::call('TemplateManager::display', [$this, 'addTemplateFilters']);
+            Hook::call('TemplateManager::display', [$this, 'addScripts']);
+            Hook::call('TemplateManager::display', [$this, 'addMenu']);
+            Hook::call('LoadHandler', [$this, 'addHandlers']);
         }
 
         return $success;
@@ -121,11 +122,11 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
     public function addToSchema()
     {
         $thothSchema = new ThothSchema();
-        HookRegistry::register('Schema::get::eventLog', [$thothSchema, 'addReasonToSchema']);
-        HookRegistry::register('Schema::get::submission', [$thothSchema, 'addWorkIdToSchema']);
-        HookRegistry::register('Schema::get::publication', [$thothSchema, 'addToPublicationSchema']);
-        HookRegistry::register('Schema::get::author', [$thothSchema, 'addToAuthorSchema']);
-        HookRegistry::register('Submission::getSubmissionsListProps', [$thothSchema, 'addToSubmissionsListProps']);
+        Hook::call('Schema::get::eventLog', [$thothSchema, 'addReasonToSchema']);
+        Hook::call('Schema::get::submission', [$thothSchema, 'addWorkIdToSchema']);
+        Hook::call('Schema::get::publication', [$thothSchema, 'addToPublicationSchema']);
+        Hook::call('Schema::get::author', [$thothSchema, 'addToAuthorSchema']);
+        Hook::call('Submission::getSubmissionsListProps', [$thothSchema, 'addToSubmissionsListProps']);
     }
 
     public function addTemplateFilters($hookName, $args)
@@ -156,29 +157,29 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
     public function addFormConfig()
     {
         $publishFormConfig = new PublishFormConfig();
-        HookRegistry::register('Form::config::before', [$publishFormConfig, 'addConfig']);
+        Hook::call('Form::config::before', [$publishFormConfig, 'addConfig']);
 
         $catalogEntryFormConfig = new CatalogEntryFormConfig();
-        HookRegistry::register('Form::config::before', [$catalogEntryFormConfig, 'addConfig']);
+        Hook::call('Form::config::before', [$catalogEntryFormConfig, 'addConfig']);
 
         $contributorFormConfig = new ContributorFormConfig();
-        HookRegistry::register('Form::config::before', [$contributorFormConfig, 'addConfig']);
+        Hook::call('Form::config::before', [$contributorFormConfig, 'addConfig']);
     }
 
     public function addListeners()
     {
         $publicationPublishListener = new PublicationPublishListener();
-        HookRegistry::register('Publication::validatePublish', [$publicationPublishListener, 'validate']);
-        HookRegistry::register('Publication::publish', [$publicationPublishListener, 'registerThothBook']);
+        Hook::call('Publication::validatePublish', [$publicationPublishListener, 'validate']);
+        Hook::call('Publication::publish', [$publicationPublishListener, 'registerThothBook']);
 
         $publicationEditListener = new PublicationEditListener();
-        HookRegistry::register('Publication::edit', [$publicationEditListener, 'updateThothBook']);
+        Hook::call('Publication::edit', [$publicationEditListener, 'updateThothBook']);
     }
 
     public function addEndpoints()
     {
         $thothEndpoint = new ThothEndpoint();
-        HookRegistry::register('APIHandler::endpoints::plugin', [$thothEndpoint, 'addEndpoints']);
+        Hook::call('APIHandler::endpoints::plugin', [$thothEndpoint, 'addEndpoints']);
     }
 
     public function addMenu($hookName, $args)

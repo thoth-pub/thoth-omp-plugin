@@ -19,6 +19,7 @@
 namespace APP\plugins\generic\thoth;
 
 use APP\plugins\generic\thoth\classes\encryption\DataEncryption;
+use APP\template\TemplateManager;
 use PKP\form\Form;
 use PKP\form\validation\FormValidatorCSRF;
 use PKP\form\validation\FormValidatorCustom;
