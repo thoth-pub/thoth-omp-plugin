@@ -16,6 +16,8 @@
  * @brief Form for managers to modify Thoth plugin settings
  */
 
+namespace APP\plugins\generic\thoth;
+
 use APP\plugins\generic\thoth\classes\encryption\DataEncryption;
 use PKP\form\Form;
 use PKP\form\validation\FormValidatorCSRF;

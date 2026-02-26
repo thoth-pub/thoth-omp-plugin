@@ -16,19 +16,21 @@
  * @brief Plugin for integration with Thoth for communication and synchronization of book data between the two platforms
  */
 
+namespace APP\plugins\generic\thoth;
+
 use APP\core\Application;
-use PKP\core\JSONMessage;
-use PKP\linkAction\LinkAction;
-use PKP\linkAction\request\AjaxModal;
 use APP\plugins\generic\thoth\classes\api\ThothEndpoint;
 use APP\plugins\generic\thoth\classes\components\forms\config\CatalogEntryFormConfig;
-use APP\plugins\generic\thoth\classes\components\forms\config\PublishFormConfig;
 use APP\plugins\generic\thoth\classes\components\forms\config\ContributorFormConfig;
-use APP\plugins\generic\thoth\classes\templateFilters\ThothSectionTemplateFilter;
+use APP\plugins\generic\thoth\classes\components\forms\config\PublishFormConfig;
 use APP\plugins\generic\thoth\classes\listeners\PublicationEditListener;
 use APP\plugins\generic\thoth\classes\listeners\PublicationPublishListener;
 use APP\plugins\generic\thoth\classes\notification\ThothNotification;
 use APP\plugins\generic\thoth\classes\schema\ThothSchema;
+use APP\plugins\generic\thoth\classes\templateFilters\ThothSectionTemplateFilter;
+use PKP\core\JSONMessage;
+use PKP\linkAction\LinkAction;
+use PKP\linkAction\request\AjaxModal;
 
 class ThothPlugin extends \PKP\plugins\GenericPlugin
 {
@@ -100,8 +102,6 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
         switch ($request->getUserVar('verb')) {
             case 'settings':
                 $context = $request->getContext();
-
-                $this->import('ThothSettingsForm');
                 $form = new ThothSettingsForm($this, $context->getId());
 
                 if ($request->getUserVar('save')) {
@@ -196,7 +196,7 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
         }
 
         if (in_array(ROLE_ID_MANAGER, $userRoles)) {
-            $offset = array_search("settings", array_keys($menu));
+            $offset = array_search('settings', array_keys($menu));
 
             $menu = array_slice($menu, 0, $offset, true) +
             [
