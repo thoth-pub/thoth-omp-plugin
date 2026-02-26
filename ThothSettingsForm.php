@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @file plugins/generic/thoth/ThothSettingsForm.inc.php
+ * @file plugins/generic/thoth/ThothSettingsForm.php
  *
  * Copyright (c) 2014-2020 Simon Fraser University
  * Copyright (c) 2003-2020 John Willinsky
@@ -18,8 +18,8 @@
 
 namespace APP\plugins\generic\thoth;
 
-use APP\plugins\generic\thoth\classes\encryption\DataEncryption;
 use APP\template\TemplateManager;
+use Illuminate\Support\Facades\Crypt;
 use PKP\form\Form;
 use PKP\form\validation\FormValidatorCSRF;
 use PKP\form\validation\FormValidatorCustom;
@@ -27,100 +27,81 @@ use PKP\form\validation\FormValidatorPost;
 use ThothApi\Exception\QueryException;
 use ThothApi\GraphQL\Client;
 
+require_once(dirname(__FILE__) . '/vendor/autoload.php');
+
 class ThothSettingsForm extends Form
 {
-    private $contextId;
-
-    private $plugin;
-
-    private $encryption;
-
     private const SETTINGS = [
         'email',
         'password',
         'testEnvironment',
     ];
 
-    public function __construct($plugin, $contextId)
-    {
-        $this->contextId = $contextId;
-        $this->plugin = $plugin;
-        $this->encryption = new DataEncryption();
+    private const TEST_ENVIRONMENT_URI = 'http://localhost:8000/';
 
-        $template = $this->encryption->secretConfigExists() ? 'settingsForm.tpl' : 'tokenError.tpl';
-        parent::__construct($plugin->getTemplateResource($template));
+    public function __construct(
+        private ThothPlugin $plugin,
+        private int $contextId
+    ) {
+        parent::__construct($plugin->getTemplateResource('settingsForm.tpl'));
 
-        $form = $this;
+        $this->addCheck(new FormValidatorPost($this));
+        $this->addCheck(new FormValidatorCSRF($this));
+
         $this->addCheck(new FormValidatorCustom(
             $this,
             'password',
             'required',
             'plugins.generic.thoth.settings.invalidCredentials',
-            function ($password) use ($form) {
-                $email = trim($this->getData('email'));
-                $testEnvironment = $this->getData('testEnvironment');
-                $httpConfig = [];
-                if ($testEnvironment) {
-                    $httpConfig['base_uri'] = 'http://localhost:8000/';
-                }
-
-                $client = new Client($httpConfig);
-
-                try {
-                    $client->login($email, $password);
-                } catch (QueryException $e) {
-                    return false;
-                }
-                return true;
-            }
+            fn ($password) => $this->validateCredentials(trim($this->getData('email')), $password)
         ));
-
-        $this->addCheck(new FormValidatorPost($this));
-        $this->addCheck(new FormValidatorCSRF($this));
     }
 
-    public function initData()
+    public function initData(): void
     {
         foreach (self::SETTINGS as $setting) {
-            if ($setting == 'password') {
-                $password = $this->plugin->getSetting($this->contextId, $setting);
-                $this->_data[$setting] = ($this->encryption->secretConfigExists() && $password) ?
-                    $this->encryption->decryptString($password) :
-                    null;
-                continue;
-            }
-            $this->_data[$setting] = $this->plugin->getSetting($this->contextId, $setting);
+            $value = $this->plugin->getSetting($this->contextId, $setting);
+            $this->setData(
+                $setting,
+                $setting === 'password' && $value ? Crypt::decrypt($value) : $value
+            );
         }
     }
 
-    public function readInputData()
+    public function readInputData(): void
     {
         $this->readUserVars(self::SETTINGS);
     }
 
-    public function fetch($request, $template = null, $display = false)
+    public function fetch($request, $template = null, $display = false): string
     {
         $templateMgr = TemplateManager::getManager($request);
         $templateMgr->assign('pluginName', $this->plugin->getName());
         return parent::fetch($request, $template, $display);
     }
 
-    public function execute(...$functionArgs)
+    public function execute(...$functionArgs): void
     {
-        $this->encryptPassword();
+        $this->setData('password', Crypt::encrypt($this->getData('password')));
+
         foreach (self::SETTINGS as $setting) {
             $this->plugin->updateSetting($this->contextId, $setting, trim($this->getData($setting)), 'string');
         }
+
         parent::execute(...$functionArgs);
     }
 
-    private function encryptPassword()
+    private function validateCredentials(string $email, string $password): bool
     {
-        $password = $this->getData('password');
+        $httpConfig = $this->getData('testEnvironment')
+            ? ['base_uri' => self::TEST_ENVIRONMENT_URI]
+            : [];
 
-        if (!$this->encryption->textIsEncrypted($password)) {
-            $encryptedPassword = $this->encryption->encryptString($password);
-            $this->setData('password', $encryptedPassword);
+        try {
+            (new Client($httpConfig))->login($email, $password);
+            return true;
+        } catch (QueryException) {
+            return false;
         }
     }
 }
