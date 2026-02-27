@@ -1,9 +1,28 @@
 <?php
 
 
+/**
+ * @file plugins/generic/thoth/tests/classes/container/providers/ThothServiceProvider.inc.php
+ *
+ * Copyright (c) 2024-2025 Lepidus Tecnologia
+ * Copyright (c) 2024-2025 Thoth
+ * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ *
+ * @class ThothServiceProvider
+ *
+ * @ingroup plugins_generic_thoth
+ *
+ * @brief Utility class to package all plugin container bindings for services
+ */
+
 namespace APP\plugins\generic\thoth\classes\container\providers;
 
-use APP\plugins\generic\thoth\classes\container\providers\ContainerProvider;
+use APP\plugins\generic\thoth\classes\factories\ThothBookFactory;
+use APP\plugins\generic\thoth\classes\factories\ThothChapterFactory;
+use APP\plugins\generic\thoth\classes\factories\ThothContributionFactory;
+use APP\plugins\generic\thoth\classes\factories\ThothContributorFactory;
+use APP\plugins\generic\thoth\classes\factories\ThothLocationFactory;
+use APP\plugins\generic\thoth\classes\factories\ThothPublicationFactory;
 use APP\plugins\generic\thoth\classes\services\ThothAffiliationService;
 use APP\plugins\generic\thoth\classes\services\ThothBookService;
 use APP\plugins\generic\thoth\classes\services\ThothChapterService;
@@ -15,18 +34,6 @@ use APP\plugins\generic\thoth\classes\services\ThothPublicationService;
 use APP\plugins\generic\thoth\classes\services\ThothReferenceService;
 use APP\plugins\generic\thoth\classes\services\ThothSubjectService;
 use APP\plugins\generic\thoth\classes\services\ThothWorkRelationService;
-/**
- * @file plugins/generic/thoth/tests/classes/container/providers/ThothServiceProvider.inc.php
- *
- * Copyright (c) 2024-2025 Lepidus Tecnologia
- * Copyright (c) 2024-2025 Thoth
- * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
- *
- * @class ThothServiceProvider
- * @ingroup plugins_generic_thoth
- *
- * @brief Utility class to package all plugin container bindings for services
- */
 
 class ThothServiceProvider implements ContainerProvider
 {

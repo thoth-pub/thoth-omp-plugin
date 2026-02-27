@@ -1,7 +1,5 @@
 <?php
 
-
-namespace APP\plugins\generic\thoth\classes\factories;
 /**
  * @file plugins/generic/thoth/classes/factories/ThothContributionFactory.inc.php
  *
@@ -16,8 +14,10 @@ namespace APP\plugins\generic\thoth\classes\factories;
  * @brief A factory to create Thoth contributions
  */
 
-use ThothApi\GraphQL\Models\Contribution as ThothContribution;
+namespace APP\plugins\generic\thoth\classes\factories;
+
 use APP\plugins\generic\thoth\classes\formatters\HtmlStripper;
+use ThothApi\GraphQL\Models\Contribution as ThothContribution;
 
 class ThothContributionFactory
 {

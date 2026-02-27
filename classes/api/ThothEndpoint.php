@@ -1,29 +1,30 @@
 <?php
 
 
-namespace APP\plugins\generic\thoth\classes\api;
 /**
  * @file plugins/generic/thoth/classes/api/ThothEndpoint.inc.php
- *
- * Copyright (c) 2024-2025 Lepidus Tecnologia
- * Copyright (c) 2024-2025 Thoth
- * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
- *
- * @class ThothEndpoint
- *
- * @ingroup plugins_generic_thoth
- *
- * @brief Thoth endpoints for OMP API
- */
+*
+* Copyright (c) 2024-2025 Lepidus Tecnologia
+* Copyright (c) 2024-2025 Thoth
+* Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+*
+* @class ThothEndpoint
+*
+* @ingroup plugins_generic_thoth
+*
+* @brief Thoth endpoints for OMP API
+*/
+
+namespace APP\plugins\generic\thoth\classes\api;
 
 use APP\core\Application;
 use APP\facades\Repo;
 use APP\i18n\AppLocale;
+use APP\plugins\generic\thoth\classes\facades\ThothService;
+use APP\plugins\generic\thoth\classes\notification\ThothNotification;
 use PKP\db\DAORegistry;
 use PKP\security\Role;
 use ThothApi\Exception\QueryException;
-use APP\plugins\generic\thoth\classes\facades\ThothService;
-use APP\plugins\generic\thoth\classes\notification\ThothNotification;
 
 class ThothEndpoint
 {

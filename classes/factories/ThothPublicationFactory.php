@@ -1,7 +1,5 @@
 <?php
 
-
-namespace APP\plugins\generic\thoth\classes\factories;
 /**
  * @file plugins/generic/thoth/classes/factories/ThothPublicationFactory.inc.php
  *
@@ -10,10 +8,13 @@ namespace APP\plugins\generic\thoth\classes\factories;
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothPublicationFactory
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief A factory to create Thoth publications
  */
+
+namespace APP\plugins\generic\thoth\classes\factories;
 
 use ThothApi\GraphQL\Models\Publication as ThothPublication;
 

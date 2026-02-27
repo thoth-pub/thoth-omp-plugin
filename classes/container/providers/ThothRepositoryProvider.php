@@ -1,7 +1,5 @@
 <?php
 
-
-namespace APP\plugins\generic\thoth\classes\container\providers;
 /**
  * @file plugins/generic/thoth/tests/classes/container/providers/ThothRepositoryProvider.inc.php
  *
@@ -16,19 +14,12 @@ namespace APP\plugins\generic\thoth\classes\container\providers;
  * @brief Utility class to package all plugin container bindings for repositories
  */
 
+namespace APP\plugins\generic\thoth\classes\container\providers;
+
 require_once(__DIR__ . '/../../../vendor/autoload.php');
 
 use APP\core\Application;
 use APP\plugins\generic\thoth\classes\encryption\DataEncryption;
-use PKP\db\DAORegistry;
-use ThothApi\GraphQL\Client;
-use APP\plugins\generic\thoth\classes\container\providers\ContainerProvider;
-use APP\plugins\generic\thoth\classes\factories\ThothBookFactory;
-use APP\plugins\generic\thoth\classes\factories\ThothChapterFactory;
-use APP\plugins\generic\thoth\classes\factories\ThothContributionFactory;
-use APP\plugins\generic\thoth\classes\factories\ThothContributorFactory;
-use APP\plugins\generic\thoth\classes\factories\ThothLocationFactory;
-use APP\plugins\generic\thoth\classes\factories\ThothPublicationFactory;
 use APP\plugins\generic\thoth\classes\repositories\ThothAccountRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothAffiliationRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothBookRepository;
@@ -44,6 +35,9 @@ use APP\plugins\generic\thoth\classes\repositories\ThothReferenceRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothSubjectRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothWorkRelationRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothWorkRepository;
+use Illuminate\Support\Facades\Crypt;
+use PKP\db\DAORegistry;
+use ThothApi\GraphQL\Client;
 
 class ThothRepositoryProvider implements ContainerProvider
 {
@@ -61,7 +55,7 @@ class ThothRepositoryProvider implements ContainerProvider
             return [
                 'testEnvironment' => $testEnvironment,
                 'email' => $email,
-                'password' => $encryption->decryptString($password)
+                'password' => Crypt::decrypt($password)
             ];
         });
 

@@ -1,28 +1,30 @@
 <?php
 
-
-namespace APP\plugins\generic\thoth\classes\factories;
 /**
  * @file plugins/generic/thoth/classes/factories/ThothBookFactory.inc.php
- *
- * Copyright (c) 2024-2025 Lepidus Tecnologia
- * Copyright (c) 2024-2025 Thoth
- * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
- *
- * @class ThothBookFactory
- *
- * @ingroup plugins_generic_thoth
- *
- * @brief A factory to create Thoth books
- */
+*
+* Copyright (c) 2024-2025 Lepidus Tecnologia
+* Copyright (c) 2024-2025 Thoth
+* Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+*
+* @class ThothBookFactory
+*
+* @ingroup plugins_generic_thoth
+*
+* @brief A factory to create Thoth books
+*/
 
+namespace APP\plugins\generic\thoth\classes\factories;
+
+use APP\core\Application;
 use APP\facades\Repo;
+use APP\plugins\generic\thoth\classes\formatters\HtmlStripper;
 use APP\submission\Submission;
 use PKP\core\Core;
+use PKP\db\DAORegistry;
 use PKP\doi\Doi;
 use PKP\submission\PKPSubmission;
 use ThothApi\GraphQL\Models\Work as ThothWork;
-use APP\plugins\generic\thoth\classes\formatters\HtmlStripper;
 
 class ThothBookFactory
 {
@@ -65,7 +67,7 @@ class ThothBookFactory
                 $context->getPath(),
                 'catalog',
                 'book',
-                $submission->getBestId()
+                [$submission->getBestId()]
             )
         ]);
     }

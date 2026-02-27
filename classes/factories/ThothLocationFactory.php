@@ -1,7 +1,5 @@
 <?php
 
-
-namespace APP\plugins\generic\thoth\classes\factories;
 /**
  * @file plugins/generic/thoth/classes/factories/ThothLocationFactory.inc.php
  *
@@ -15,6 +13,8 @@ namespace APP\plugins\generic\thoth\classes\factories;
  *
  * @brief A factory to create Thoth locations
  */
+
+namespace APP\plugins\generic\thoth\classes\factories;
 
 use APP\facades\Repo;
 use ThothApi\GraphQL\Models\Location as ThothLocation;

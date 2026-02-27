@@ -1,7 +1,5 @@
 <?php
 
-
-namespace APP\plugins\generic\thoth\classes\factories;
 /**
  * @file plugins/generic/thoth/classes/factories/ThothContributorFactory.inc.php
  *
@@ -15,6 +13,8 @@ namespace APP\plugins\generic\thoth\classes\factories;
  *
  * @brief A factory to create Thoth contributors
  */
+
+namespace APP\plugins\generic\thoth\classes\factories;
 
 use ThothApi\GraphQL\Models\Contributor as ThothContributor;
 
