@@ -18,20 +18,10 @@
 
 namespace APP\plugins\generic\thoth;
 
-use APP\core\Application;
-use APP\plugins\generic\thoth\classes\api\ThothEndpoint;
-use APP\plugins\generic\thoth\classes\components\forms\config\CatalogEntryFormConfig;
-use APP\plugins\generic\thoth\classes\components\forms\config\ContributorFormConfig;
-use APP\plugins\generic\thoth\classes\components\forms\config\PublishFormConfig;
-use APP\plugins\generic\thoth\classes\listeners\PublicationEditListener;
-use APP\plugins\generic\thoth\classes\listeners\PublicationPublishListener;
-use APP\plugins\generic\thoth\classes\notification\ThothNotification;
-use APP\plugins\generic\thoth\classes\schema\ThothSchema;
-use APP\plugins\generic\thoth\classes\templateFilters\ThothSectionTemplateFilter;
+use APP\plugins\generic\thoth\classes\hooks\HookRegistrant;
 use PKP\core\JSONMessage;
 use PKP\linkAction\LinkAction;
 use PKP\linkAction\request\AjaxModal;
-use PKP\plugins\Hook;
 
 class ThothPlugin extends \PKP\plugins\GenericPlugin
 {
@@ -40,14 +30,8 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
         $success = parent::register($category, $path);
 
         if ($success && $this->getEnabled()) {
-            $this->addToSchema();
-            $this->addFormConfig();
-            $this->addListeners();
-            $this->addEndpoints();
-            Hook::call('TemplateManager::display', [$this, 'addTemplateFilters']);
-            Hook::call('TemplateManager::display', [$this, 'addScripts']);
-            Hook::call('TemplateManager::display', [$this, 'addMenu']);
-            Hook::call('LoadHandler', [$this, 'addHandlers']);
+            $hookRegistrant = new HookRegistrant($this);
+            $hookRegistrant->register();
         }
 
         return $success;
@@ -100,140 +84,23 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
 
     public function manage($args, $request)
     {
-        switch ($request->getUserVar('verb')) {
-            case 'settings':
-                $context = $request->getContext();
-                $form = new ThothSettingsForm($this, $context->getId());
-
-                if ($request->getUserVar('save')) {
-                    $form->readInputData();
-                    if ($form->validate()) {
-                        $form->execute();
-                        return new JSONMessage(true);
-                    }
-                } else {
-                    $form->initData();
-                }
-                return new JSONMessage(true, $form->fetch($request));
-        }
-        return parent::manage($args, $request);
-    }
-
-    public function addToSchema()
-    {
-        $thothSchema = new ThothSchema();
-        Hook::call('Schema::get::eventLog', [$thothSchema, 'addReasonToSchema']);
-        Hook::call('Schema::get::submission', [$thothSchema, 'addWorkIdToSchema']);
-        Hook::call('Schema::get::publication', [$thothSchema, 'addToPublicationSchema']);
-        Hook::call('Schema::get::author', [$thothSchema, 'addToAuthorSchema']);
-        Hook::call('Submission::getSubmissionsListProps', [$thothSchema, 'addToSubmissionsListProps']);
-    }
-
-    public function addTemplateFilters($hookName, $args)
-    {
-        $templateMgr = $args[0];
-        $template = $args[1];
-
-        $thothSectionFilter = new ThothSectionTemplateFilter();
-        $thothSectionFilter->registerFilter($templateMgr, $template, $this);
-    }
-
-    public function addScripts($hookName, $args)
-    {
-        $templateMgr = $args[0];
-        $template = $args[1];
-        $request = Application::get()->getRequest();
-
-        $thothSectionFilter = new ThothSectionTemplateFilter();
-        $thothSectionFilter->addJavaScriptData($request, $templateMgr, $template);
-        $thothSectionFilter->addJavaScript($request, $templateMgr, $this);
-        $thothSectionFilter->addStyleSheet($request, $templateMgr, $this);
-
-        $thothNotification = new ThothNotification();
-        $thothNotification->addJavaScriptData($request, $templateMgr);
-        $thothNotification->addJavaScript($request, $templateMgr, $this);
-    }
-
-    public function addFormConfig()
-    {
-        $publishFormConfig = new PublishFormConfig();
-        Hook::call('Form::config::before', [$publishFormConfig, 'addConfig']);
-
-        $catalogEntryFormConfig = new CatalogEntryFormConfig();
-        Hook::call('Form::config::before', [$catalogEntryFormConfig, 'addConfig']);
-
-        $contributorFormConfig = new ContributorFormConfig();
-        Hook::call('Form::config::before', [$contributorFormConfig, 'addConfig']);
-    }
-
-    public function addListeners()
-    {
-        $publicationPublishListener = new PublicationPublishListener();
-        Hook::call('Publication::validatePublish', [$publicationPublishListener, 'validate']);
-        Hook::call('Publication::publish', [$publicationPublishListener, 'registerThothBook']);
-
-        $publicationEditListener = new PublicationEditListener();
-        Hook::call('Publication::edit', [$publicationEditListener, 'updateThothBook']);
-    }
-
-    public function addEndpoints()
-    {
-        $thothEndpoint = new ThothEndpoint();
-        Hook::call('APIHandler::endpoints::plugin', [$thothEndpoint, 'addEndpoints']);
-    }
-
-    public function addMenu($hookName, $args)
-    {
-        $templateMgr = $args[0];
-
-        $request = Application::get()->getRequest();
-        $router = $request->getRouter();
-        $userRoles = (array) $router->getHandler()->getAuthorizedContextObject(Application::ASSOC_TYPE_USER_ROLES);
-
-        $menu = $templateMgr->getState('menu');
-
-        if (empty($menu)) {
-            return false;
+        if ($request->getUserVar('verb') !== 'settings') {
+            return parent::manage($args, $request);
         }
 
-        if (in_array(ROLE_ID_MANAGER, $userRoles)) {
-            $offset = array_search('settings', array_keys($menu));
+        $context = $request->getContext();
+        $form = new ThothSettingsForm($this, $context->getId());
 
-            $menu = array_slice($menu, 0, $offset, true) +
-            [
-                'thoth' => [
-                    'name' => __('plugins.generic.thoth.navigation.thoth'),
-                    'url' => $router->url($request, null, 'thoth'),
-                    'isCurrent' => $router->getRequestedPage($request) === 'thoth',
-                ]
-            ] +
-            array_slice($menu, ($offset - 1), null, true);
+        if ($request->getUserVar('save')) {
+            $form->readInputData();
+            if ($form->validate()) {
+                $form->execute();
+                return new JSONMessage(true);
+            }
+        } else {
+            $form->initData();
         }
 
-        $templateMgr->setState(['menu' => $menu]);
-    }
-
-    public function addHandlers($hookName, $args)
-    {
-        $page = $args[0];
-        $op = $args[1];
-
-        if (!$this->getEnabled() || $page !== 'thoth') {
-            return false;
-        }
-
-        if ($op === 'register') {
-            $this->import('controllers/modal/RegisterHandler');
-            define('HANDLER_CLASS', 'RegisterHandler');
-            return true;
-        }
-
-        if ($op === 'index') {
-            $this->import('pages/thoth/ThothHandler');
-            define('HANDLER_CLASS', 'ThothHandler');
-            return true;
-        }
-
-        return false;
+        return new JSONMessage(true, $form->fetch($request));
     }
 }
