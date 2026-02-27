@@ -1,7 +1,7 @@
 <?php
 
-
 namespace APP\plugins\generic\thoth\classes\services;
+
 /**
  * @file plugins/generic/thoth/classes/services/ThothSubjectService.php
  *
@@ -10,6 +10,7 @@ namespace APP\plugins\generic\thoth\classes\services;
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothSubjectService
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief Helper class that encapsulates business logic for Thoth Subjects
@@ -44,7 +45,7 @@ class ThothSubjectService
         $locale = $publication->getData('locale');
         $keywords = $publication->getData('keywords');
         foreach ($keywords[$locale] ?? [] as $seq => $keyword) {
-            $this->register($keyword, ($seq + 1), $thothBookId);
+            $this->register($keyword['name'], ($seq + 1), $thothBookId);
         }
     }
 }

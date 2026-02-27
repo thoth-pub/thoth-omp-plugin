@@ -16,6 +16,7 @@
 
 namespace APP\plugins\generic\thoth\classes\factories;
 
+use APP\core\Application;
 use APP\facades\Repo;
 use ThothApi\GraphQL\Models\Location as ThothLocation;
 
@@ -44,7 +45,7 @@ class ThothLocationFactory
                 'catalog',
                 'view',
                 [$submission->getBestId(), $publicationFormat->getBestId(), $fileId]
-            ) : $publicationFormat->getRemoteUrl();
+            ) : $publicationFormat->getData('urlRemote');
 
         return new ThothLocation([
             'landingPage' => $landingPage,

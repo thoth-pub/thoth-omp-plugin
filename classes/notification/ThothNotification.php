@@ -1,7 +1,7 @@
 <?php
 
-
 namespace APP\plugins\generic\thoth\classes\notification;
+
 /**
  * @file plugins/generic/thoth/classes/notification/ThothNotification.php
  *
@@ -19,19 +19,32 @@ namespace APP\plugins\generic\thoth\classes\notification;
 use APP\core\Application;
 use APP\facades\Repo;
 use APP\notification\NotificationManager;
+use PKP\core\Core;
 use PKP\log\event\PKPSubmissionEventLogEntry;
+use PKP\notification\Notification;
 
 class ThothNotification
 {
     public function notifySuccess($request, $submission)
     {
-        $this->notify($request, $submission, NOTIFICATION_TYPE_SUCCESS, 'plugins.generic.thoth.register.success');
+        $this->notify(
+            $request,
+            $submission,
+            Notification::NOTIFICATION_TYPE_SUCCESS,
+            'plugins.generic.thoth.register.success'
+        );
     }
 
     public function notifyError($request, $submission, $error)
     {
         error_log("Failed to send the request to Thoth: {$error}");
-        $this->notify($request, $submission, NOTIFICATION_TYPE_ERROR, 'plugins.generic.thoth.register.error', $error);
+        $this->notify(
+            $request,
+            $submission,
+            Notification::NOTIFICATION_TYPE_ERROR,
+            'plugins.generic.thoth.register.error',
+            $error
+        );
     }
 
     public function notify($request, $submission, $notificationType, $messageKey, $error = null)

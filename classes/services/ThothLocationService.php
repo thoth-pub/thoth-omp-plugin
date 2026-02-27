@@ -1,7 +1,7 @@
 <?php
 
-
 namespace APP\plugins\generic\thoth\classes\services;
+
 /**
  * @file plugins/generic/thoth/classes/services/ThothLocationService.php
  *
@@ -55,7 +55,7 @@ class ThothLocationService
         );
 
         $thothPublicationId = $publicationFormat->getData('thothPublicationId');
-        if (empty($submissionFiles) && $publicationFormat->getRemoteUrl()) {
+        if (empty($submissionFiles) && $publicationFormat->getData('urlRemote')) {
             $this->register($publicationFormat, $thothPublicationId);
         }
 

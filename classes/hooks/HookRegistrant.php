@@ -76,7 +76,7 @@ class HookRegistrant
 
     private function registerEndpoints(): void
     {
-        Hook::add('APIHandler::endpoints::plugin', (new ThothEndpoint())->addEndpoints(...));
+        Hook::add('APIHandler::endpoints::_submissions', (new ThothEndpoint())->addEndpoints(...));
     }
 
     private function registerTemplateHooks(): void

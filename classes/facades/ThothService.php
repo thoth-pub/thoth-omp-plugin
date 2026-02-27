@@ -1,22 +1,22 @@
 <?php
 
+/**
+ * @file plugins/generic/thoth/classes/facades/ThothService.inc.php
+*
+* Copyright (c) 2014-2021 Simon Fraser University
+* Copyright (c) 2000-2021 John Willinsky
+* Copyright (c) 2024-2025 Lepidus Tecnologia
+* Copyright (c) 2024-2025 Thoth
+* Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+*
+* @class ThothService
+*
+* @brief This facade provides access to all Services for Thoth.
+*/
 
 namespace APP\plugins\generic\thoth\classes\facades;
 
 use APP\plugins\generic\thoth\classes\container\ThothContainer;
-/**
- * @file plugins/generic/thoth/classes/facades/ThothService.inc.php
- *
- * Copyright (c) 2014-2021 Simon Fraser University
- * Copyright (c) 2000-2021 John Willinsky
- * Copyright (c) 2024-2025 Lepidus Tecnologia
- * Copyright (c) 2024-2025 Thoth
- * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
- *
- * @class ThothService
- *
- * @brief This facade provides access to all Services for Thoth.
- */
 
 class ThothService
 {

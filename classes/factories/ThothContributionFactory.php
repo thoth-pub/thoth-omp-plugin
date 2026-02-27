@@ -23,7 +23,7 @@ class ThothContributionFactory
 {
     public function createFromAuthor($author, $seq, $primaryContactId = null)
     {
-        $userGroupLocaleKey = $author->getUserGroup()->getData('nameLocaleKey');
+        $userGroupLocaleKey = $author->getUserGroup()->nameLocaleKey;
 
         return new ThothContribution([
             'contributionType' => $this->getContributionTypeByUserGroupLocaleKey($userGroupLocaleKey),

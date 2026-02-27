@@ -1,7 +1,7 @@
 <?php
 
-
 namespace APP\plugins\generic\thoth\classes\formatters;
+
 /**
  * @file plugins/generic/thoth/classes/formatters/HtmlStripper.php
  *
@@ -22,6 +22,6 @@ class HtmlStripper
 
     public static function stripTags($string)
     {
-        return strip_tags($string, self::ALLOWED_TAGS);
+        return strip_tags($string ?? '', self::ALLOWED_TAGS);
     }
 }

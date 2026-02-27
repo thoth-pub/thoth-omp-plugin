@@ -1,7 +1,7 @@
 <?php
 
-
 namespace APP\plugins\generic\thoth\classes\services;
+
 /**
  * @file plugins/generic/thoth/classes/services/ThothPublicationService.php
  *
@@ -18,6 +18,7 @@ namespace APP\plugins\generic\thoth\classes\services;
 
 use APP\core\Application;
 use APP\facades\Repo;
+use APP\plugins\generic\thoth\classes\facades\ThothService;
 use Biblys\Isbn\Isbn;
 use Biblys\Isbn\IsbnParsingException;
 use Biblys\Isbn\IsbnValidationException;
@@ -156,6 +157,6 @@ class ThothPublicationService
             }
         );
 
-        return count($submissionFiles) > 0 || !empty($publicationFormat->getRemoteUrl());
+        return count($submissionFiles) > 0 || !empty($publicationFormat->getData('urlRemote'));
     }
 }

@@ -16,6 +16,7 @@
 
 namespace APP\plugins\generic\thoth\classes\factories;
 
+use APP\core\Application;
 use APP\facades\Repo;
 use APP\plugins\generic\thoth\classes\formatters\HtmlStripper;
 use PKP\core\Core;
@@ -50,7 +51,7 @@ class ThothChapterFactory
                 $context->getPath(),
                 'catalog',
                 'book',
-                $submission->getBestId()
+                [$submission->getBestId()]
             )
         ]);
     }
