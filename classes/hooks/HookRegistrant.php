@@ -84,19 +84,9 @@ class HookRegistrant
         $thothMenuHandler = new ThothMenuHandler();
         $thothPageHandler = new ThothPageHandler($this->plugin);
 
-        Hook::add('TemplateManager::display', $this->addTemplateFilters(...));
         Hook::add('TemplateManager::display', $this->addScripts(...));
         Hook::add('TemplateManager::display', $thothMenuHandler->addMenu(...));
         Hook::add('LoadHandler', $thothPageHandler->addHandlers(...));
-    }
-
-    private function addTemplateFilters($hookName, $args): void
-    {
-        $templateMgr = $args[0];
-        $template = $args[1];
-
-        $thothSectionFilter = new ThothSectionTemplateFilter();
-        $thothSectionFilter->registerFilter($templateMgr, $template, $this->plugin);
     }
 
     private function addScripts($hookName, $args): void

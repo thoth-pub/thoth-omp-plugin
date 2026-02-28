@@ -1,0 +1,6 @@
+[
+  "common.view",
+  "plugins.generic.thoth.register",
+  "plugins.generic.thoth.thothBook",
+  "plugins.generic.thoth.update"
+]

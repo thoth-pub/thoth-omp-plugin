@@ -3,7 +3,7 @@
 
 namespace APP\plugins\generic\thoth\classes\templateFilters;
 /**
- * @file plugins/generic/thoth/classes/filters/ThothSectionTemplateFilter.inc.php
+ * @file plugins/generic/thoth/classes/filters/ThothSectionTemplateFilter.php
  *
  * Copyright (c) 2024-2025 Lepidus Tecnologia
  * Copyright (c) 2024-2025 Thoth
@@ -12,7 +12,7 @@ namespace APP\plugins\generic\thoth\classes\templateFilters;
  * @class ThothSectionTemplateFilter
  * @ingroup plugins_generic_thoth
  *
- * @brief Template filter to include Thoth section in workflow page
+ * @brief Provide data for the Thoth section in the workflow page
  */
 
 class ThothSectionTemplateFilter
@@ -21,39 +21,14 @@ class ThothSectionTemplateFilter
 
     public function registerFilter($templateMgr, $template, $plugin)
     {
-        if ($template != 'workflow/workflow.tpl') {
-            return false;
-        }
-
-        $this->plugin = $plugin;
-
-        $templateMgr->registerFilter("output", [$this, 'thothSectionFilter']);
-
         return false;
-    }
-
-    public function thothSectionFilter($output, $templateMgr)
-    {
-        $regex = '/<span\s+class="pkpPublication__status">([\s\S]*?)<\/span>[^<]+<\/span>/';
-        if (preg_match($regex, $output, $matches, PREG_OFFSET_CAPTURE)) {
-            $match = $matches[0][0];
-            $offset = $matches[0][1];
-            $newOutput = substr($output, 0, $offset + strlen($match));
-            $newOutput .= $templateMgr->fetch($this->plugin->getTemplateResource('thothSection.tpl'));
-            $newOutput .= substr($output, $offset + strlen($match));
-            $output = $newOutput;
-            $templateMgr->unregisterFilter('output', array($this, 'thothSectionFilter'));
-        }
-        return $output;
     }
 
     public function addJavaScriptData($request, $templateMgr, $template)
     {
-        if ($template != 'workflow/workflow.tpl') {
+        if ($template != 'dashboard/editors.tpl') {
             return false;
         }
-
-        $submission = $templateMgr->getTemplateVars('submission');
 
         $registerTitle = __('plugins.generic.thoth.register');
         $registerUrl = $request->getDispatcher()->url(
@@ -63,13 +38,13 @@ class ThothSectionTemplateFilter
             'thoth',
             'register',
             null,
-            ['submissionId' => $submission->getId(), 'publicationId' => '__publicationId__']
+            ['submissionId' => '__submissionId__', 'publicationId' => '__publicationId__']
         );
         $publicationUrl = $request->getDispatcher()->url(
             $request,
             ROUTE_API,
             $request->getContext()->getData('urlPath'),
-            'submissions/' . $submission->getId() . '/publications/__publicationId__'
+            'submissions/__submissionId__/publications/__publicationId__'
         );
 
         $data = [
@@ -78,9 +53,10 @@ class ThothSectionTemplateFilter
             'publicationUrl' => $publicationUrl
         ];
 
-        $output = '$.pkp.plugins.generic = $.pkp.plugins.generic || {};';
-        $output .= '$.pkp.plugins.generic.thothplugin = $.pkp.plugins.generic.thothplugin || {};';
-        $output .= '$.pkp.plugins.generic.thothplugin.workflow = ' . json_encode($data) . ';';
+        $output = 'pkp.plugins = pkp.plugins || {};';
+        $output .= 'pkp.plugins.generic = pkp.plugins.generic || {};';
+        $output .= 'pkp.plugins.generic.thoth = pkp.plugins.generic.thoth || {};';
+        $output .= 'pkp.plugins.generic.thoth.workflow = ' . json_encode($data) . ';';
 
         $templateMgr->addJavaScript(
             'workflowData',
@@ -95,21 +71,25 @@ class ThothSectionTemplateFilter
     public function addJavaScript($request, $templateMgr, $plugin)
     {
         $templateMgr->addJavaScript(
-            'thoth-section-js',
-            $request->getBaseUrl() . '/' . $plugin->getPluginPath() . '/js/ThothSection.js',
+            'thothPlugin',
+            $request->getBaseUrl() . '/' . $plugin->getPluginPath() . '/public/build/build.iife.js',
             [
-                'contexts' => 'backend',
-                'priority' => STYLE_SEQUENCE_LATE,
+                'inline' => false,
+                'contexts' => ['backend'],
+                'priority' => STYLE_SEQUENCE_LAST,
             ]
         );
     }
 
     public function addStyleSheet($request, $templateMgr, $plugin)
     {
-        $templateMgr->addStyleSheet(
-            'thoth-section-css',
-            $request->getBaseUrl() . '/' . $plugin->getPluginPath() . '/styles/thothSection.css',
-            ['contexts' => 'backend']
-        );
+        $cssFile = $plugin->getPluginPath() . '/public/build/build.css';
+        if (file_exists(BASE_SYS_DIR . '/' . $cssFile)) {
+            $templateMgr->addStyleSheet(
+                'thothPluginStyle',
+                $request->getBaseUrl() . '/' . $cssFile,
+                ['contexts' => ['backend']]
+            );
+        }
     }
 }
