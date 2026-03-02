@@ -140,3 +140,24 @@ msgstr ""
 
 msgid "plugins.generic.thoth.api.403.alreadyRegistered"
 msgstr "The submission is already registered in Thoth."
+
+msgid "plugins.generic.thoth.workStatus"
+msgstr "Thoth Status"
+
+msgid "plugins.generic.thoth.workStatus.active"
+msgstr "Active"
+
+msgid "plugins.generic.thoth.workStatus.forthcoming"
+msgstr "Forthcoming"
+
+msgid "plugins.generic.thoth.workStatus.withdrawn"
+msgstr "Withdrawn"
+
+msgid "plugins.generic.thoth.workStatus.superseded"
+msgstr "Superseded"
+
+msgid "plugins.generic.thoth.workStatus.postponedIndefinitely"
+msgstr "Postponed Indefinitely"
+
+msgid "plugins.generic.thoth.workStatus.cancelled"
+msgstr "Cancelled"

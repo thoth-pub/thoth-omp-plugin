@@ -1,6 +1,13 @@
 [
-  "common.view",
   "plugins.generic.thoth.register",
-  "plugins.generic.thoth.thothBook",
-  "plugins.generic.thoth.update"
+  "plugins.generic.thoth.status.unregistered",
+  "plugins.generic.thoth.update",
+  "plugins.generic.thoth.workStatus",
+  "plugins.generic.thoth.workStatus.active",
+  "plugins.generic.thoth.workStatus.cancelled",
+  "plugins.generic.thoth.workStatus.forthcoming",
+  "plugins.generic.thoth.workStatus.postponedIndefinitely",
+  "plugins.generic.thoth.workStatus.superseded",
+  "plugins.generic.thoth.workStatus.withdrawn",
+  "semicolon"
 ]

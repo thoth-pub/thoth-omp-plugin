@@ -46,11 +46,18 @@ class ThothSectionTemplateFilter
             $request->getContext()->getData('urlPath'),
             'submissions/__submissionId__/publications/__publicationId__'
         );
+        $workStatusUrl = $request->getDispatcher()->url(
+            $request,
+            ROUTE_API,
+            $request->getContext()->getData('urlPath'),
+            '_submissions/__submissionId__/thothWorkStatus'
+        );
 
         $data = [
             'registerTitle' => $registerTitle,
             'registerUrl' => $registerUrl,
-            'publicationUrl' => $publicationUrl
+            'publicationUrl' => $publicationUrl,
+            'workStatusUrl' => $workStatusUrl
         ];
 
         $output = 'pkp.plugins = pkp.plugins || {};';

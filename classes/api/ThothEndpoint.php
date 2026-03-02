@@ -19,6 +19,7 @@ namespace APP\plugins\generic\thoth\classes\api;
 use APP\core\Application;
 use APP\facades\Repo;
 use APP\i18n\AppLocale;
+use APP\plugins\generic\thoth\classes\facades\ThothRepository;
 use APP\plugins\generic\thoth\classes\facades\ThothService;
 use APP\plugins\generic\thoth\classes\notification\ThothNotification;
 use Illuminate\Http\JsonResponse;
@@ -42,6 +43,19 @@ class ThothEndpoint
             [
                 Role::ROLE_ID_SITE_ADMIN,
                 Role::ROLE_ID_MANAGER,
+            ]
+        );
+
+        $apiHandler->addRoute(
+            'GET',
+            '{submissionId}/thothWorkStatus',
+            $this->getWorkStatus(...),
+            'thoth.workStatus',
+            [
+                Role::ROLE_ID_SITE_ADMIN,
+                Role::ROLE_ID_MANAGER,
+                Role::ROLE_ID_SUB_EDITOR,
+                Role::ROLE_ID_ASSISTANT,
             ]
         );
 
@@ -129,6 +143,40 @@ class ThothEndpoint
             Repo::submission()->getSchemaMap()->mapToSubmissionsList($submission, $userGroups, $genres),
             Response::HTTP_OK
         );
+    }
+
+    public function getWorkStatus(IlluminateRequest $illuminateRequest): JsonResponse
+    {
+        $submissionId = (int) $illuminateRequest->route('submissionId');
+        $submission = Repo::submission()->get($submissionId);
+
+        if (!$submission) {
+            return response()->json(
+                ['error' => __('api.404.resourceNotFound')],
+                Response::HTTP_NOT_FOUND
+            );
+        }
+
+        $thothWorkId = $submission->getData('thothWorkId');
+        if (!$thothWorkId) {
+            return response()->json(
+                ['error' => __('plugins.generic.thoth.status.unregistered')],
+                Response::HTTP_NOT_FOUND
+            );
+        }
+
+        try {
+            $thothWork = ThothRepository::work()->get($thothWorkId);
+            return response()->json(
+                ['workStatus' => $thothWork->getWorkStatus()],
+                Response::HTTP_OK
+            );
+        } catch (\Exception $e) {
+            return response()->json(
+                ['error' => __('plugins.generic.thoth.connectionError')],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
     }
 
     public function handleNotification($request, $submission, $success, $disableNotification, $errorMessage = null)

@@ -1,123 +1,90 @@
 <template>
-	<div class="thoth-section border border-light p-4">
-		<div class="flex items-center gap-x-3">
-			<span class="text-lg-bold">
-				{{ t('plugins.generic.thoth.thothBook') }}
-			</span>
-			<span v-if="submission.thothWorkId" class="flex items-center gap-x-2">
-				<a
-					class="pkpButton"
-					target="_blank"
-					:href="'https://thoth.pub/books/' + submission.thothWorkId"
-				>
-					{{ t('common.view') }}
-				</a>
-				<PkpButton
-					v-if="!isPublished"
-					:disabled="isLoading"
-					@click="updateMetadata"
-				>
-					{{ t('plugins.generic.thoth.update') }}
-				</PkpButton>
-				<PkpSpinner v-if="isLoading" />
-			</span>
-			<span v-else>
-				<PkpButton @click="openRegister">
-					{{ t('plugins.generic.thoth.register') }}
-				</PkpButton>
-			</span>
-		</div>
+	<div class="flex items-center">
+		<span class="text-lg-bold">
+			{{ t('semicolon', {label: t('plugins.generic.thoth.workStatus')}) }}
+		</span>
+		<span
+			class="ms-2 h-[1em] w-[1em] rounded-full"
+			:class="statusColor"
+			aria-hidden="true"
+		/>
+		<span class="ms-1 text-base-normal">{{ statusLabel }}</span>
 	</div>
 </template>
 
 <script setup>
-import {ref, computed} from 'vue';
+import {ref, computed, onMounted} from 'vue';
 
 const {useLocalize} = pkp.modules.useLocalize;
 const {t} = useLocalize();
 
 const props = defineProps({
 	submission: {type: Object, required: true},
-	selectedPublicationId: {type: Number, required: true},
-	registerUrl: {type: String, required: true},
-	publicationUrl: {type: String, required: true},
-	registerTitle: {type: String, required: true},
+	workStatusUrl: {type: String, required: true},
 });
 
-const isLoading = ref(false);
-const isPublished = computed(
-	() => props.submission.status === pkp.const.STATUS_PUBLISHED,
-);
+const workStatus = ref(null);
 
-function openRegister() {
-	const focusEl = document.activeElement;
-	const sourceUrl = props.registerUrl.replace(
-		'__publicationId__',
-		props.selectedPublicationId,
-	);
+const workStatusLocaleMap = {
+	ACTIVE: 'plugins.generic.thoth.workStatus.active',
+	FORTHCOMING: 'plugins.generic.thoth.workStatus.forthcoming',
+	WITHDRAWN: 'plugins.generic.thoth.workStatus.withdrawn',
+	SUPERSEDED: 'plugins.generic.thoth.workStatus.superseded',
+	POSTPONED_INDEFINITELY:
+		'plugins.generic.thoth.workStatus.postponedIndefinitely',
+	CANCELLED: 'plugins.generic.thoth.workStatus.cancelled',
+};
 
-	const opts = {
-		title: props.registerTitle,
-		url: sourceUrl,
-		closeCallback: () => focusEl.focus(),
-		closeOnFormSuccessId: 'register',
-	};
+const statusLabel = computed(() => {
+	if (!props.submission.thothWorkId) {
+		return t('plugins.generic.thoth.status.unregistered');
+	}
+	if (!workStatus.value) {
+		return '...';
+	}
+	const localeKey = workStatusLocaleMap[workStatus.value];
+	return localeKey ? t(localeKey) : workStatus.value;
+});
 
-	$(
-		'<div id="' +
-			$.pkp.classes.Helper.uuid() +
-			'" ' +
-			'class="pkp_modal pkpModalWrapper" tabIndex="-1"></div>',
-	).pkpHandler('$.pkp.controllers.modal.AjaxModalHandler', opts);
-}
+const statusColor = computed(() => {
+	if (!props.submission.thothWorkId || !workStatus.value) {
+		return 'bg-stage-declined';
+	}
 
-function updateMetadata() {
-	isLoading.value = true;
+	switch (workStatus.value) {
+		case 'ACTIVE':
+			return 'bg-stage-published';
+		case 'FORTHCOMING':
+			return 'bg-stage-scheduled-for-publishing';
+		default:
+			return 'bg-stage-declined';
+	}
+});
 
-	const url = props.publicationUrl.replace(
-		'__publicationId__',
-		props.selectedPublicationId,
-	);
+function fetchWorkStatus() {
+	if (!props.submission.thothWorkId) {
+		return;
+	}
 
 	$.ajax({
-		method: 'PUT',
-		url: url,
+		method: 'GET',
+		url: props.workStatusUrl,
 		headers: {
 			'X-Csrf-Token': pkp.currentUser.csrfToken,
-			'X-Http-Method-Override': 'PUT',
 		},
-		error: function (r) {
-			pkp.eventBus.$emit('notify', r.responseJSON.errorMessage, 'warning');
-		},
-		complete() {
-			if (
-				typeof $.pkp.plugins.generic.thothplugin !== 'undefined' &&
-				typeof $.pkp.plugins.generic.thothplugin.notification !== 'undefined'
-			) {
-				$.ajax({
-					type: 'POST',
-					url: $.pkp.plugins.generic.thothplugin.notification.notificationUrl,
-					success:
-						$.pkp.plugins.generic.thothplugin.notification.showNotification,
-					complete() {
-						isLoading.value = false;
-					},
-					dataType: 'json',
-					async: false,
-				});
-			} else {
-				isLoading.value = false;
-			}
+		success(response) {
+			workStatus.value = response.workStatus;
 		},
 	});
 }
 
+onMounted(() => {
+	fetchWorkStatus();
+});
+
 pkp.eventBus.$on('form-success', (formId) => {
 	if (formId === 'register') {
-		const workflowStore = pkp.registry.getPiniaStore('workflow');
-		if (workflowStore) {
-			workflowStore.refreshSubmission();
-		}
+		fetchWorkStatus();
 	}
 });
 </script>

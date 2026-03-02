@@ -140,3 +140,24 @@ msgstr ""
 
 msgid "plugins.generic.thoth.api.403.alreadyRegistered"
 msgstr "El envío ya está registrado en Thoth."
+
+msgid "plugins.generic.thoth.workStatus"
+msgstr "Estado en Thoth"
+
+msgid "plugins.generic.thoth.workStatus.active"
+msgstr "Activo"
+
+msgid "plugins.generic.thoth.workStatus.forthcoming"
+msgstr "Próximamente"
+
+msgid "plugins.generic.thoth.workStatus.withdrawn"
+msgstr "Retirado"
+
+msgid "plugins.generic.thoth.workStatus.superseded"
+msgstr "Reemplazado"
+
+msgid "plugins.generic.thoth.workStatus.postponedIndefinitely"
+msgstr "Pospuesto Indefinidamente"
+
+msgid "plugins.generic.thoth.workStatus.cancelled"
+msgstr "Cancelado"
