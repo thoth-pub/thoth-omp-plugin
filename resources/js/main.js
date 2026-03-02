@@ -9,10 +9,8 @@
  */
 
 import ThothSection from './Components/ThothSection.vue';
-import ThothRegisterButton from './Components/ThothRegisterButton.vue';
 
 pkp.registry.registerComponent('ThothSection', ThothSection);
-pkp.registry.registerComponent('ThothRegisterButton', ThothRegisterButton);
 
 pkp.registry.storeExtend('workflow', (piniaContext) => {
 	const workflowStore = piniaContext.store;
@@ -24,7 +22,7 @@ pkp.registry.storeExtend('workflow', (piniaContext) => {
 				return primaryControlsLeft;
 			}
 
-			const {submission} = args;
+			const {submission, selectedPublicationId} = args;
 
 			if (
 				submission.status !== pkp.const.STATUS_PUBLISHED &&
@@ -38,49 +36,19 @@ pkp.registry.storeExtend('workflow', (piniaContext) => {
 			const workStatusUrl = (thothData.workStatusUrl || '')
 				.replace('__submissionId__', submission.id);
 
-			return [
-				...primaryControlsLeft,
-				{
-					component: 'ThothSection',
-					props: {
-						submission,
-						workStatusUrl,
-					},
-				},
-			];
-		},
-	);
-
-	workflowStore.extender.extendFn(
-		'getPrimaryControlsRight',
-		(primaryControlsRight, args) => {
-			if (args?.selectedMenuState?.primaryMenuItem !== 'publication') {
-				return primaryControlsRight;
-			}
-
-			const {submission, selectedPublicationId} = args;
-
-			if (
-				submission.status !== pkp.const.STATUS_PUBLISHED &&
-				!submission.thothWorkId
-			) {
-				return primaryControlsRight;
-			}
-
-			const thothData = pkp.plugins?.generic?.thoth?.workflow || {};
-
 			const registerUrl = (thothData.registerUrl || '')
 				.replace('__submissionId__', submission.id);
 			const publicationUrl = (thothData.publicationUrl || '')
 				.replace('__submissionId__', submission.id);
 
 			return [
-				...primaryControlsRight,
+				...primaryControlsLeft,
 				{
-					component: 'ThothRegisterButton',
+					component: 'ThothSection',
 					props: {
 						submission,
 						selectedPublicationId,
+						workStatusUrl,
 						registerUrl,
 						publicationUrl,
 						registerTitle: thothData.registerTitle || '',
