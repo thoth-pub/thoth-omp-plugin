@@ -16,6 +16,8 @@
 
 namespace APP\plugins\generic\thoth\classes\hooks;
 
+use APP\plugins\generic\thoth\classes\handlers\modal\RegisterHandler;
+use APP\plugins\generic\thoth\classes\handlers\pages\ThothHandler;
 use PKP\plugins\GenericPlugin;
 
 class ThothPageHandler
@@ -31,20 +33,20 @@ class ThothPageHandler
     {
         $page = $args[0];
         $op = $args[1];
+        $handler = &$args[3];
+
 
         if (!$this->plugin->getEnabled() || $page !== 'thoth') {
             return false;
         }
 
         if ($op === 'register') {
-            $this->plugin->import('controllers/modal/RegisterHandler');
-            define('HANDLER_CLASS', 'RegisterHandler');
+            $handler = new RegisterHandler($this);
             return true;
         }
 
         if ($op === 'index') {
-            $this->plugin->import('pages/thoth/ThothHandler');
-            define('HANDLER_CLASS', 'ThothHandler');
+            $handler = new ThothHandler($this);
             return true;
         }
 

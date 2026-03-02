@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @file controllers/modal/RegisterHandler.php
+ * @file classes/handlers/modal/RegisterHandler.php
  *
  * Copyright (c) 2014-2021 Simon Fraser University
  * Copyright (c) 2003-2021 John Willinsky
@@ -16,7 +16,7 @@
  * @brief A handler to load Thoth register confirmation
  */
 
-namespace APP\plugins\generic\thoth\controllers\modal;
+namespace APP\plugins\generic\thoth\classes\handlers\modal;
 
 use APP\core\Application;
 use APP\handler\Handler;
@@ -50,6 +50,8 @@ class RegisterHandler extends Handler
 
     /**
      * @copydoc PKPHandler::initialize()
+     *
+     * @param null|mixed $args
      */
     public function initialize($request, $args = null)
     {

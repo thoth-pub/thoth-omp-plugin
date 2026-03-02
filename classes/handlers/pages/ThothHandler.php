@@ -1,9 +1,7 @@
 <?php
 
-
-namespace APP\plugins\generic\thoth\pages\thoth;
 /**
- * @file plugins/generic/thoth/pages/ThothHandler.inc.php
+ * @file plugins/generic/thoth/classes/handlers/pages/ThothHandler.inc.php
  *
  * Copyright (c) 2014-2021 Simon Fraser University
  * Copyright (c) 2003-2021 John Willinsky
@@ -12,24 +10,25 @@ namespace APP\plugins\generic\thoth\pages\thoth;
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothHandler
- *
- * @ingroup plugins_generic_thoth
- *
- * @brief Handle requests for Thoth functions
- */
+*
+* @ingroup plugins_generic_thoth
+*
+* @brief Handle requests for Thoth functions
+*/
+
+namespace APP\plugins\generic\thoth\classes\handlers\pages;
 
 use APP\core\Application;
 use APP\facades\Repo;
 use APP\handler\Handler;
 use APP\i18n\AppLocale;
+use APP\plugins\generic\thoth\classes\components\listPanels\ThothListPanel;
+use APP\plugins\generic\thoth\classes\facades\ThothRepository;
 use APP\template\TemplateManager;
 use PKP\db\DAORegistry;
 use PKP\plugins\PluginRegistry;
-use PKP\security\Role;
-use APP\plugins\generic\thoth\classes\components\listPanels\ThothListPanel;
-use APP\plugins\generic\thoth\classes\facades\ThothService;
-use APP\plugins\generic\thoth\classes\facades\ThothRepository;
 use PKP\security\authorization\PKPSiteAccessPolicy;
+use PKP\security\Role;
 
 class ThothHandler extends Handler
 {
