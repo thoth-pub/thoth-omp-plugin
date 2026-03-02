@@ -1,14 +1,12 @@
 <?php
 
-
-namespace APP\plugins\generic\thoth\controllers\modal;
 /**
- * @file controllers/modals/RegisterHandler.inc.php
+ * @file controllers/modal/RegisterHandler.php
  *
  * Copyright (c) 2014-2021 Simon Fraser University
  * Copyright (c) 2003-2021 John Willinsky
- * Copyright (c) 2024 Lepidus Tecnologia
- * Copyright (c) 2024 Thoth
+ * Copyright (c) 2024-2025 Lepidus Tecnologia
+ * Copyright (c) 2024-2025 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class RegisterHandler
@@ -18,16 +16,22 @@ namespace APP\plugins\generic\thoth\controllers\modal;
  * @brief A handler to load Thoth register confirmation
  */
 
-use APP\core\Services;
+namespace APP\plugins\generic\thoth\controllers\modal;
+
+use APP\core\Application;
 use APP\handler\Handler;
-use APP\i18n\AppLocale;
-use APP\template\TemplateManager;
-use PKP\plugins\PluginRegistry;
-use PKP\security\Role;
-use APP\plugins\generic\thoth\classes\facades\ThothService;
+use APP\plugins\generic\thoth\classes\components\forms\RegisterForm;
 use APP\plugins\generic\thoth\classes\facades\ThothRepository;
-use PKP\security\authorization\SubmissionAccessPolicy;
+use APP\plugins\generic\thoth\classes\facades\ThothService;
+use APP\template\TemplateManager;
+use Exception;
+use PKP\core\JSONMessage;
+use PKP\core\PKPApplication;
+use PKP\core\PKPRequest;
+use PKP\plugins\PluginRegistry;
 use PKP\security\authorization\PublicationAccessPolicy;
+use PKP\security\authorization\SubmissionAccessPolicy;
+use PKP\security\Role;
 
 class RegisterHandler extends Handler
 {
@@ -44,14 +48,20 @@ class RegisterHandler extends Handler
         );
     }
 
-    public function initialize($request)
+    /**
+     * @copydoc PKPHandler::initialize()
+     */
+    public function initialize($request, $args = null)
     {
-        parent::initialize($request);
-        $this->submission = $this->getAuthorizedContextObject(ASSOC_TYPE_SUBMISSION);
-        $this->publication = $this->getAuthorizedContextObject(ASSOC_TYPE_PUBLICATION);
+        parent::initialize($request, $args);
+        $this->submission = $this->getAuthorizedContextObject(Application::ASSOC_TYPE_SUBMISSION);
+        $this->publication = $this->getAuthorizedContextObject(Application::ASSOC_TYPE_PUBLICATION);
         $this->setupTemplate($request);
     }
 
+    /**
+     * @copydoc PKPHandler::authorize()
+     */
     public function authorize($request, &$args, $roleAssignments)
     {
         $this->addPolicy(new SubmissionAccessPolicy($request, $args, $roleAssignments));
@@ -59,15 +69,16 @@ class RegisterHandler extends Handler
         return parent::authorize($request, $args, $roleAssignments);
     }
 
+    /**
+     * Display a Thoth registration confirmation form
+     *
+     * @param array $args
+     * @param PKPRequest $request
+     *
+     * @return JSONMessage JSON object
+     */
     public function register($args, $request)
     {
-        AppLocale::requireComponents(
-            LOCALE_COMPONENT_PKP_SUBMISSION,
-            LOCALE_COMPONENT_APP_SUBMISSION,
-            LOCALE_COMPONENT_PKP_EDITOR,
-            LOCALE_COMPONENT_APP_EDITOR
-        );
-
         $plugin = PluginRegistry::getPlugin('generic', 'thothplugin');
 
         $templateMgr = TemplateManager::getManager($request);
@@ -77,12 +88,12 @@ class RegisterHandler extends Handler
             !$submissionContext
             || $submissionContext->getId() !== $this->submission->getData('contextId')
         ) {
-            $submissionContext = Services::get('context')->get($this->submission->getData('contextId'));
+            $submissionContext = app()->get('context')->get($this->submission->getData('contextId'));
         }
 
         $publicationApiUrl = $request->getDispatcher()->url(
             $request,
-            ROUTE_API,
+            PKPApplication::ROUTE_API,
             $submissionContext->getPath(),
             '_submissions/' . $this->submission->getId() . '/register'
         );
@@ -101,7 +112,6 @@ class RegisterHandler extends Handler
             $errors = [__('plugins.generic.thoth.connectionError')];
         }
 
-        $plugin->import('classes.components.forms.RegisterForm');
         $registerForm = new RegisterForm($publicationApiUrl, $imprints, $workType, $errors);
 
         $settingsData = [
