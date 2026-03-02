@@ -32,7 +32,10 @@
 import {ref, computed, onMounted} from 'vue';
 
 const {useLocalize} = pkp.modules.useLocalize;
+const {useModal} = pkp.modules.useModal;
+const {useDataChanged} = pkp.modules.useDataChanged;
 const {t} = useLocalize();
+const {triggerDataChange} = useDataChanged();
 
 const props = defineProps({
 	submission: {type: Object, required: true},
@@ -104,25 +107,28 @@ function fetchWorkStatus() {
 }
 
 function openRegister() {
-	const focusEl = document.activeElement;
+	const {openSideModal} = useModal();
 	const sourceUrl = props.registerUrl.replace(
 		'__publicationId__',
 		props.selectedPublicationId,
 	);
 
-	const opts = {
-		title: props.registerTitle,
-		url: sourceUrl,
-		closeCallback: () => focusEl.focus(),
-		closeOnFormSuccessId: 'register',
-	};
-
-	$(
-		'<div id="' +
-			$.pkp.classes.Helper.uuid() +
-			'" ' +
-			'class="pkp_modal pkpModalWrapper" tabIndex="-1"></div>',
-	).pkpHandler('$.pkp.controllers.modal.AjaxModalHandler', opts);
+	openSideModal(
+		'LegacyAjax',
+		{
+			legacyOptions: {
+				title: props.registerTitle,
+				url: sourceUrl,
+				closeOnFormSuccessId: 'register',
+			},
+		},
+		{
+			onClose: async () => {
+				await triggerDataChange();
+				fetchWorkStatus();
+			},
+		},
+	);
 }
 
 function updateMetadata() {
@@ -168,15 +174,5 @@ function updateMetadata() {
 
 onMounted(() => {
 	fetchWorkStatus();
-});
-
-pkp.eventBus.$on('form-success', (formId) => {
-	if (formId === 'register') {
-		fetchWorkStatus();
-		const workflowStore = pkp.registry.getPiniaStore('workflow');
-		if (workflowStore) {
-			workflowStore.refreshSubmission();
-		}
-	}
 });
 </script>
