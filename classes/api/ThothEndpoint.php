@@ -18,7 +18,6 @@ namespace APP\plugins\generic\thoth\classes\api;
 
 use APP\core\Application;
 use APP\facades\Repo;
-use APP\i18n\AppLocale;
 use APP\plugins\generic\thoth\classes\facades\ThothRepository;
 use APP\plugins\generic\thoth\classes\facades\ThothService;
 use APP\plugins\generic\thoth\classes\notification\ThothNotification;
@@ -29,6 +28,7 @@ use PKP\core\PKPBaseController;
 use PKP\db\DAORegistry;
 use PKP\handler\APIHandler;
 use PKP\security\Role;
+use PKP\userGroup\UserGroup;
 use ThothApi\Exception\QueryException;
 
 class ThothEndpoint
@@ -114,8 +114,6 @@ class ThothEndpoint
             return response()->json($failure, Response::HTTP_BAD_REQUEST);
         }
 
-        AppLocale::requireComponents(LOCALE_COMPONENT_PKP_SUBMISSION, LOCALE_COMPONENT_APP_SUBMISSION);
-
         $disableNotification = $illuminateRequest->input('disableNotification', false);
         try {
             $thothBookService = ThothService::book();
@@ -132,15 +130,21 @@ class ThothEndpoint
 
         $submission = Repo::submission()->get($submission->getId());
 
-        $userGroups = Repo::userGroup()->getCollector()
-            ->filterByContextIds([$submission->getData('contextId')])
-            ->getMany();
+        $userGroups = UserGroup::withContextIds($submission->getData('contextId'))->get();
 
         $genreDao = DAORegistry::getDAO('GenreDAO');
         $genres = $genreDao->getByContextId($submission->getData('contextId'))->toArray();
 
+        $routeController = PKPBaseController::getRouteController();
+        $userRoles = (array) $routeController->getAuthorizedContextObject(Application::ASSOC_TYPE_USER_ROLES);
+
         return response()->json(
-            Repo::submission()->getSchemaMap()->mapToSubmissionsList($submission, $userGroups, $genres),
+            Repo::submission()->getSchemaMap()->map(
+                $submission,
+                $userGroups,
+                $genres,
+                $userRoles
+            ),
             Response::HTTP_OK
         );
     }
