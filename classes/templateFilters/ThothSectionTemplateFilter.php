@@ -1,7 +1,5 @@
 <?php
 
-
-namespace APP\plugins\generic\thoth\classes\templateFilters;
 /**
  * @file plugins/generic/thoth/classes/filters/ThothSectionTemplateFilter.php
  *
@@ -14,6 +12,8 @@ namespace APP\plugins\generic\thoth\classes\templateFilters;
  *
  * @brief Provide data for the Thoth section in the workflow page
  */
+
+namespace APP\plugins\generic\thoth\classes\templateFilters;
 
 class ThothSectionTemplateFilter
 {

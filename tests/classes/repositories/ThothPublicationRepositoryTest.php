@@ -1,7 +1,5 @@
 <?php
 
-
-namespace APP\plugins\generic\thoth\tests\classes\repositories;
 /**
  * @file plugins/generic/thoth/tests/classes/repositories/ThothPublicationRepositoryTest.php
  *
@@ -17,6 +15,8 @@ namespace APP\plugins\generic\thoth\tests\classes\repositories;
  *
  * @brief Test class for the ThothPublicationRepository class
  */
+
+namespace APP\plugins\generic\thoth\tests\classes\repositories;
 
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;

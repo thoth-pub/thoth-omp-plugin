@@ -1,7 +1,5 @@
 <?php
 
-
-namespace APP\plugins\generic\thoth\classes\services;
 /**
  * @file plugins/generic/thoth/classes/services/ThothBookService.php
  *
@@ -15,6 +13,8 @@ namespace APP\plugins\generic\thoth\classes\services;
  *
  * @brief Helper class that encapsulates business logic for Thoth books
  */
+
+namespace APP\plugins\generic\thoth\classes\services;
 
 use PKP\db\DAORegistry;
 use ThothApi\GraphQL\Models\Work as ThothWork;

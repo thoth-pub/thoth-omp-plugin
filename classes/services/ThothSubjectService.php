@@ -1,7 +1,5 @@
 <?php
 
-namespace APP\plugins\generic\thoth\classes\services;
-
 /**
  * @file plugins/generic/thoth/classes/services/ThothSubjectService.php
  *
@@ -15,6 +13,8 @@ namespace APP\plugins\generic\thoth\classes\services;
  *
  * @brief Helper class that encapsulates business logic for Thoth Subjects
  */
+
+namespace APP\plugins\generic\thoth\classes\services;
 
 use ThothApi\GraphQL\Models\Subject as ThothSubject;
 

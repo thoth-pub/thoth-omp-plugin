@@ -1,7 +1,5 @@
 <?php
 
-
-namespace APP\plugins\generic\thoth\classes\services;
 /**
  * @file plugins/generic/thoth/classes/services/ThothLanguageService.php
  *
@@ -15,6 +13,8 @@ namespace APP\plugins\generic\thoth\classes\services;
  *
  * @brief Helper class that encapsulates business logic for Thoth languages
  */
+
+namespace APP\plugins\generic\thoth\classes\services;
 
 use PKP\i18n\LocaleConversion;
 use ThothApi\GraphQL\Models\Language as ThothLanguage;

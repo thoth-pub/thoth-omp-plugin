@@ -1,7 +1,5 @@
 <?php
 
-
-namespace APP\plugins\generic\thoth\tests\classes\services;
 /**
  * @file plugins/generic/thoth/tests/classes/services/ThothReferenceServiceTest.php
  *
@@ -17,6 +15,8 @@ namespace APP\plugins\generic\thoth\tests\classes\services;
  *
  * @brief Test class for the ThothReferenceService class
  */
+
+namespace APP\plugins\generic\thoth\tests\classes\services;
 
 use PKP\citation\Citation;
 use PKP\tests\PKPTestCase;

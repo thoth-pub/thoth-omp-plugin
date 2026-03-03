@@ -1,7 +1,5 @@
 <?php
 
-
-namespace APP\plugins\generic\thoth\classes\components\forms;
 /**
  * @file plugins/generic/thoth/classes/components/form/RegisterForm.inc.php
  *
@@ -19,6 +17,8 @@ namespace APP\plugins\generic\thoth\classes\components\forms;
  *   It may also be used for scheduling a publication in an issue for later
  *   publication.
  */
+
+namespace APP\plugins\generic\thoth\classes\components\forms;
 
 use APP\submission\Submission;
 use PKP\components\forms\FieldHTML;

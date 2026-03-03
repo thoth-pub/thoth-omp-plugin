@@ -1,9 +1,5 @@
 <?php
 
-
-namespace APP\plugins\generic\thoth\classes\services;
-
-use APP\plugins\generic\thoth\classes\facades\ThothRepository;
 /**
  * @file plugins/generic/thoth/classes/services/ThothAffiliationService.php
  *
@@ -17,6 +13,10 @@ use APP\plugins\generic\thoth\classes\facades\ThothRepository;
  *
  * @brief Helper class that encapsulates business logic for Thoth affiliations
  */
+
+namespace APP\plugins\generic\thoth\classes\services;
+
+use APP\plugins\generic\thoth\classes\facades\ThothRepository;
 
 class ThothAffiliationService
 {

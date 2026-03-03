@@ -1,7 +1,5 @@
 <?php
 
-
-namespace APP\plugins\generic\thoth\classes\components\forms\config;
 /**
  * @file plugins/generic/thoth/classes/components/forms/config/ContributorFormConfig.inc.php
  *
@@ -14,6 +12,8 @@ namespace APP\plugins\generic\thoth\classes\components\forms\config;
  *
  * @brief Thoth configuration for contributor form
  */
+
+namespace APP\plugins\generic\thoth\classes\components\forms\config;
 
 use APP\facades\Repo;
 

@@ -1,7 +1,5 @@
 <?php
 
-
-namespace APP\plugins\generic\thoth\tests\classes\services;
 /**
  * @file plugins/generic/thoth/tests/classes/services/ThothLocationServiceTest.php
  *
@@ -17,6 +15,8 @@ namespace APP\plugins\generic\thoth\tests\classes\services;
  *
  * @brief Test class for the ThothLocationService class
  */
+
+namespace APP\plugins\generic\thoth\tests\classes\services;
 
 use APP\publicationFormat\PublicationFormat;
 use PKP\tests\PKPTestCase;

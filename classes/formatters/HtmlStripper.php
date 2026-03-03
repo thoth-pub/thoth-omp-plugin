@@ -1,7 +1,5 @@
 <?php
 
-namespace APP\plugins\generic\thoth\classes\formatters;
-
 /**
  * @file plugins/generic/thoth/classes/formatters/HtmlStripper.php
  *
@@ -15,6 +13,8 @@ namespace APP\plugins\generic\thoth\classes\formatters;
  *
  * @brief Helper class for removing HTML tags from strings
  */
+
+namespace APP\plugins\generic\thoth\classes\formatters;
 
 class HtmlStripper
 {

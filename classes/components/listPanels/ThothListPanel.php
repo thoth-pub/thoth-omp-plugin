@@ -1,7 +1,5 @@
 <?php
 
-
-namespace APP\plugins\generic\thoth\classes\components\listPanels;
 /**
  * @file plugins/generic/thoth/classes/components/listPanel/ThothListPanel.inc.php
  *
@@ -17,6 +15,8 @@ namespace APP\plugins\generic\thoth\classes\components\listPanels;
  *
  * @brief A ListPanel component for register submissions in Thoth
  */
+
+namespace APP\plugins\generic\thoth\classes\components\listPanels;
 
 use APP\core\Application;
 use APP\facades\Repo;

@@ -1,7 +1,5 @@
 <?php
 
-
-namespace APP\plugins\generic\thoth\tests\classes\services;
 /**
  * @file plugins/generic/thoth/tests/classes/services/ThothChapterServiceTest.php
  *
@@ -17,6 +15,8 @@ namespace APP\plugins\generic\thoth\tests\classes\services;
  *
  * @brief Test class for the ThothChapterService class
  */
+
+namespace APP\plugins\generic\thoth\tests\classes\services;
 
 use Mockery;
 use Illuminate\Support\LazyCollection;

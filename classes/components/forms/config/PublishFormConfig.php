@@ -1,7 +1,5 @@
 <?php
 
-
-namespace APP\plugins\generic\thoth\classes\components\forms\config;
 /**
  * @file plugins/generic/thoth/classes/components/forms/config/PublishFormConfig.inc.php
  *
@@ -15,6 +13,8 @@ namespace APP\plugins\generic\thoth\classes\components\forms\config;
  *
  * @brief Thoth config for publish form
  */
+
+namespace APP\plugins\generic\thoth\classes\components\forms\config;
 
 use APP\facades\Repo;
 use APP\submission\Submission;

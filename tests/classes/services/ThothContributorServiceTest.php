@@ -1,7 +1,5 @@
 <?php
 
-
-namespace APP\plugins\generic\thoth\tests\classes\services;
 /**
  * @file plugins/generic/thoth/tests/classes/services/ThothContributorServiceTest.php
  *
@@ -17,6 +15,8 @@ namespace APP\plugins\generic\thoth\tests\classes\services;
  *
  * @brief Test class for the ThothContributorService class
  */
+
+namespace APP\plugins\generic\thoth\tests\classes\services;
 
 use APP\author\Author;
 use PKP\tests\PKPTestCase;

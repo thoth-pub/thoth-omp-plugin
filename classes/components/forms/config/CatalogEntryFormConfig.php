@@ -1,7 +1,5 @@
 <?php
 
-
-namespace APP\plugins\generic\thoth\classes\components\forms\config;
 /**
  * @file plugins/generic/thoth/classes/components/forms/config/CatalogEntryFormConfig.inc.php
  *
@@ -14,6 +12,8 @@ namespace APP\plugins\generic\thoth\classes\components\forms\config;
  *
  * @brief Thoth config for catalog entry form
  */
+
+namespace APP\plugins\generic\thoth\classes\components\forms\config;
 
 use APP\facades\Repo;
 

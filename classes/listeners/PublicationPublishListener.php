@@ -1,7 +1,5 @@
 <?php
 
-
-namespace APP\plugins\generic\thoth\classes\listeners;
 /**
  * @file plugins/generic/thoth/classes/listeners/PublicationPublishListener.inc.php
  *
@@ -15,6 +13,8 @@ namespace APP\plugins\generic\thoth\classes\listeners;
  *
  * @brief Trigger actions on publication publish event
  */
+
+namespace APP\plugins\generic\thoth\classes\listeners;
 
 use APP\core\Application;
 use APP\facades\Repo;

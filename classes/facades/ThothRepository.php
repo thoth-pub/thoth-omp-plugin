@@ -1,9 +1,5 @@
 <?php
 
-
-namespace APP\plugins\generic\thoth\classes\facades;
-
-use APP\plugins\generic\thoth\classes\container\ThothContainer;
 /**
  * @file plugins/generic/thoth/classes/facades/ThothRepository.inc.php
  *
@@ -17,6 +13,10 @@ use APP\plugins\generic\thoth\classes\container\ThothContainer;
  *
  * @brief This facade provides access to all repositories for Thoth.
  */
+
+namespace APP\plugins\generic\thoth\classes\facades;
+
+use APP\plugins\generic\thoth\classes\container\ThothContainer;
 
 class ThothRepository
 {

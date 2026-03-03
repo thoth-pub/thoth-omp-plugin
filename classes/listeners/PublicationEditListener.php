@@ -1,7 +1,5 @@
 <?php
 
-
-namespace APP\plugins\generic\thoth\classes\listeners;
 /**
  * @file plugins/generic/thoth/classes/listeners/PublicationEditListener.inc.php
  *
@@ -15,6 +13,8 @@ namespace APP\plugins\generic\thoth\classes\listeners;
  *
  * @brief Trigger actions on publication edit event
  */
+
+namespace APP\plugins\generic\thoth\classes\listeners;
 
 use APP\facades\Repo;
 use ThothApi\Exception\QueryException;

@@ -1,7 +1,5 @@
 <?php
 
-
-namespace APP\plugins\generic\thoth\classes\services;
 /**
  * @file plugins/generic/thoth/classes/services/ThothContributorService.php
  *
@@ -10,10 +8,13 @@ namespace APP\plugins\generic\thoth\classes\services;
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothContributorService
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief Helper class that encapsulates business logic for Thoth contributors
  */
+
+namespace APP\plugins\generic\thoth\classes\services;
 
 use ThothApi\GraphQL\Models\Contributor as ThothContributor;
 

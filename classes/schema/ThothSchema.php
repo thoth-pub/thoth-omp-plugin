@@ -1,7 +1,5 @@
 <?php
 
-
-namespace APP\plugins\generic\thoth\classes\schema;
 /**
  * @file plugins/generic/thoth/classes/schema/ThothSchema.inc.php
  *
@@ -15,6 +13,8 @@ namespace APP\plugins\generic\thoth\classes\schema;
  *
  * @brief Class to add Thoth properties for storage in the database
  */
+
+namespace APP\plugins\generic\thoth\classes\schema;
 
 class ThothSchema
 {

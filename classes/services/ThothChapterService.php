@@ -1,7 +1,5 @@
 <?php
 
-
-namespace APP\plugins\generic\thoth\classes\services;
 /**
  * @file plugins/generic/thoth/classes/services/ThothChapterService.php
  *
@@ -14,6 +12,8 @@ namespace APP\plugins\generic\thoth\classes\services;
  *
  * @brief Helper class that encapsulates business logic for Thoth Chapters
  */
+
+namespace APP\plugins\generic\thoth\classes\services;
 
 use ThothApi\GraphQL\Models\WorkRelation as ThothWorkRelation;
 use APP\plugins\generic\thoth\classes\facades\ThothService;

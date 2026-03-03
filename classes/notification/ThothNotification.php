@@ -1,7 +1,5 @@
 <?php
 
-namespace APP\plugins\generic\thoth\classes\notification;
-
 /**
  * @file plugins/generic/thoth/classes/notification/ThothNotification.php
  *
@@ -15,6 +13,8 @@ namespace APP\plugins\generic\thoth\classes\notification;
  *
  * @brief Manage function to display plugin notifications
  */
+
+namespace APP\plugins\generic\thoth\classes\notification;
 
 use APP\core\Application;
 use APP\facades\Repo;

@@ -1,7 +1,5 @@
 <?php
 
-
-namespace APP\plugins\generic\thoth\tests\classes\formatters;
 /**
  * @file plugins/generic/thoth/tests/classes/formatters/HtmlStripperTest.php
  *
@@ -17,6 +15,8 @@ namespace APP\plugins\generic\thoth\tests\classes\formatters;
  *
  * @brief Test class for the HtmlStripper class
  */
+
+namespace APP\plugins\generic\thoth\tests\classes\formatters;
 
 use PKP\tests\PKPTestCase;
 use APP\plugins\generic\thoth\classes\formatters\HtmlStripper;

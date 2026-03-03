@@ -1,12 +1,5 @@
 <?php
 
-
-namespace APP\plugins\generic\thoth\tests\classes\container;
-
-use Exception;
-use PKP\tests\PKPTestCase;
-use APP\plugins\generic\thoth\classes\container\providers\ContainerProvider;
-use APP\plugins\generic\thoth\classes\container\Container;
 /**
  * @file plugins/generic/thoth/tests/classes/container/ContainerTest.php
  *
@@ -20,6 +13,13 @@ use APP\plugins\generic\thoth\classes\container\Container;
  *
  * @brief Test class for the Container class
  */
+
+namespace APP\plugins\generic\thoth\tests\classes\container;
+
+use Exception;
+use PKP\tests\PKPTestCase;
+use APP\plugins\generic\thoth\classes\container\providers\ContainerProvider;
+use APP\plugins\generic\thoth\classes\container\Container;
 
 class ContainerTest extends PKPTestCase
 {

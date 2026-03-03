@@ -1,7 +1,5 @@
 <?php
 
-
-namespace APP\plugins\generic\thoth\classes\repositories;
 /**
  * @file plugins/generic/thoth/tests/classes/repositories/ThothBookRepository.inc.php
  *
@@ -15,6 +13,8 @@ namespace APP\plugins\generic\thoth\classes\repositories;
  *
  * @brief A repository to manage Thoth books
  */
+
+namespace APP\plugins\generic\thoth\classes\repositories;
 
 use ThothApi\Exception\QueryException;
 use APP\plugins\generic\thoth\classes\repositories\ThothWorkRepository;

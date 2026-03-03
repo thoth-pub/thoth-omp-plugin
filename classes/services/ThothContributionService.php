@@ -1,7 +1,5 @@
 <?php
 
-
-namespace APP\plugins\generic\thoth\classes\services;
 /**
  * @file plugins/generic/thoth/classes/services/ThothContributionService.php
  *
@@ -15,6 +13,8 @@ namespace APP\plugins\generic\thoth\classes\services;
  *
  * @brief Helper class that encapsulates business logic for Thoth contributions
  */
+
+namespace APP\plugins\generic\thoth\classes\services;
 
 use APP\facades\Repo;
 use PKP\db\DAORegistry;

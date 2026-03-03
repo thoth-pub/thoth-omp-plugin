@@ -1,10 +1,5 @@
 <?php
 
-
-namespace APP\plugins\generic\thoth\classes\container;
-
-use Exception;
-
 /**
  * @file plugins/generic/thoth/tests/classes/container/Container.inc.php
  *
@@ -18,6 +13,10 @@ use Exception;
  *
  * @brief Simple dependency injection container implementation
  */
+
+namespace APP\plugins\generic\thoth\classes\container;
+
+use Exception;
 
 class Container
 {

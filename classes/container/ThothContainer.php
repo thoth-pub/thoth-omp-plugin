@@ -1,11 +1,5 @@
 <?php
 
-
-namespace APP\plugins\generic\thoth\classes\container;
-
-use APP\plugins\generic\thoth\classes\container\Container;
-use APP\plugins\generic\thoth\classes\container\providers\ThothRepositoryProvider;
-use APP\plugins\generic\thoth\classes\container\providers\ThothServiceProvider;
 /**
  * @file plugins/generic/thoth/tests/classes/container/ThothContainer.inc.php
  *
@@ -19,6 +13,12 @@ use APP\plugins\generic\thoth\classes\container\providers\ThothServiceProvider;
  *
  * @brief Singleton implementation for dependency injection container
  */
+
+namespace APP\plugins\generic\thoth\classes\container;
+
+use APP\plugins\generic\thoth\classes\container\Container;
+use APP\plugins\generic\thoth\classes\container\providers\ThothRepositoryProvider;
+use APP\plugins\generic\thoth\classes\container\providers\ThothServiceProvider;
 
 class ThothContainer extends Container
 {
