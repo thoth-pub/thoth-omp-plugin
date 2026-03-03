@@ -10,6 +10,15 @@
 		/>
 		<span class="ms-1 text-lg-normal">{{ statusLabel }}</span>
 		<PkpButton
+			v-if="submission.thothWorkId"
+			is-link
+			element="a"
+			target="_blank"
+			:href="thothWorkUrl"
+		>
+			{{ t('common.view') }}
+		</PkpButton>
+		<PkpButton
 			v-if="submission.thothWorkId && !isPublished"
 			:disabled="isLoading"
 			is-link
@@ -52,6 +61,13 @@ const isLoading = ref(false);
 const isPublished = computed(
 	() => props.submission.status === pkp.const.STATUS_PUBLISHED,
 );
+
+const thothWorkUrl = computed(() => {
+	if (!props.submission.thothWorkId) {
+		return null;
+	}
+	return 'https://thoth.pub/books/' + props.submission.thothWorkId;
+});
 
 const workStatusLocaleMap = {
 	ACTIVE: 'plugins.generic.thoth.workStatus.active',

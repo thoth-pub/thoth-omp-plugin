@@ -1,4 +1,5 @@
 [
+  "common.view",
   "plugins.generic.thoth.register",
   "plugins.generic.thoth.status.unregistered",
   "plugins.generic.thoth.update",
