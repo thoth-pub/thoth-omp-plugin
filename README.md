@@ -10,16 +10,7 @@ This plugin is compatible with the following PKP applications:
 
 - OMP 3.3.0-x
 - OMP 3.4.0-x
-
-## Requirements
-
-### Press Requirements
-
-1. **api_key_secret**
-
-The OMP instance must have the `api_key_secret` configuration set up, you may contact your system administrator to do that (see [this post](https://forum.pkp.sfu.ca/t/how-to-generate-a-api-key-secret-code-in-ojs-3/72008)).
-
-This is required to use the API credentials provided, that are stored encrypted in the OMP database.
+- OMP 3.5.0-x
 
 ## Installation
 
@@ -35,7 +26,6 @@ This is required to use the API credentials provided, that are stored encrypted 
 
 - Only basic HTML tags are preserved (`<strong>`, `<mark>`, `<em>`, `<i>`, `<u>`, `<sup>`, `<sub>`, `<ul>`, `<ol>` and `<li>`); all others will be removed
 - ISBN must be properly formatted (e.g., 978-3-16-148410-0).
-- To avoid incorrect assignment of affiliations in Thoth, is required the use of the [ROR plugin](https://github.com/withanage/ror) to fill the affiliations in OMP.
 
 ### Configuration
 
@@ -133,6 +123,6 @@ Developed by [Lepidus Tecnologia](https://github.com/lepidus).
 
 This plugin is licensed under the GNU General Public License v3.0 - [See the License file.](/LICENSE)
 
-Copyright (c) 2024 Lepidus Tecnologia
+Copyright (c) 2024-2025 Lepidus Tecnologia
 
-Copyright (c) 2024 Thoth
+Copyright (c) 2024-2025 Thoth
