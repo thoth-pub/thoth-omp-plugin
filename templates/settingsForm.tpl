@@ -28,18 +28,19 @@
 	{include file="controllers/notification/inPlaceNotification.tpl" notificationId="thothSettingsFormNotification"}
 
 	{fbvFormArea id="thothSettings"}
-		<h3>
-            {translate key="plugins.generic.thoth.settings.title" }
-        </h3>
-
-		{fbvFormSection}
+		{fbvFormSection title="plugins.generic.thoth.settings.email"}
 			{fbvElement type="email" id="email" label="plugins.generic.thoth.settings.email" value=$email required="true" size=$fbvStyles.size.SMALL}
-			</p>
+		{/fbvFormSection}	
+		{fbvFormSection title="plugins.generic.thoth.settings.password"}
 			{fbvElement type="text" password="true" id="password" label="plugins.generic.thoth.settings.password" value=$password required="true" size=$fbvStyles.size.SMALL}
 		{/fbvFormSection}
 
-		{fbvFormSection list="true" title="plugins.generic.thoth.settings.testEnvironment"}
-			{fbvElement type="checkbox" id="testEnvironment" label="plugins.generic.thoth.settings.testEnvironment.description" checked=$testEnvironment}
+		{fbvFormSection list="true" title="plugins.generic.thoth.settings.customThothApi"}
+			{fbvElement type="checkbox" id="customThothApi" label="plugins.generic.thoth.settings.customThothApi.description" checked=$customThothApi}
+		{/fbvFormSection}
+
+		{fbvFormSection title="plugins.generic.thoth.settings.customThothApiUrl"}
+			{fbvElement type="text" id="customThothApiUrl" label="plugins.generic.thoth.settings.customThothApiUrl" value=$customThothApiUrl size=$fbvStyles.size.SMALL}
 		{/fbvFormSection}
 	{/fbvFormArea}
 

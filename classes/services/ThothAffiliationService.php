@@ -32,8 +32,6 @@ class ThothAffiliationService
     {
         $ror = $affiliation->getRor();
 
-        error_log($ror);
-
         if (empty($ror)) {
             return null;
         }

@@ -10,11 +10,14 @@ msgstr "Thoth"
 msgid "plugins.generic.thoth.settings.title"
 msgstr "Configurações da API Thoth"
 
-msgid "plugins.generic.thoth.settings.testEnvironment"
-msgstr "Ambiente de testes"
+msgid "plugins.generic.thoth.settings.customThothApi"
+msgstr "URL personalizada da API Thoth"
 
-msgid "plugins.generic.thoth.settings.testEnvironment.description"
-msgstr "Marque essa opção caso possua uma instância local da API do Thoth. (http://localhost:8000)"
+msgid "plugins.generic.thoth.settings.customThothApi.description"
+msgstr "Usar uma API Thoth personalizada em vez da API oficial da Thoth."
+
+msgid "plugins.generic.thoth.settings.customThothApiUrl"
+msgstr "URL da API Thoth"
 
 msgid "plugins.generic.thoth.settings.email"
 msgstr "Email"

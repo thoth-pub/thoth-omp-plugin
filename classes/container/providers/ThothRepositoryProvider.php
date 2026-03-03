@@ -46,12 +46,14 @@ class ThothRepositoryProvider implements ContainerProvider
             $pluginSettingsDao = & DAORegistry::getDAO('PluginSettingsDAO');
             $contextId = Application::get()->getRequest()->getContext()->getId();
 
-            $testEnvironment = $pluginSettingsDao->getSetting($contextId, 'ThothPlugin', 'testEnvironment');
+            $customThothApi = $pluginSettingsDao->getSetting($contextId, 'ThothPlugin', 'customThothApi');
+            $customThothApiUrl = $pluginSettingsDao->getSetting($contextId, 'ThothPlugin', 'customThothApiUrl');
             $email = $pluginSettingsDao->getSetting($contextId, 'ThothPlugin', 'email');
             $password = $pluginSettingsDao->getSetting($contextId, 'ThothPlugin', 'password') ?? '';
 
             return [
-                'testEnvironment' => $testEnvironment,
+                'customThothApi' => $customThothApi,
+                'customThothApiUrl' => $customThothApiUrl,
                 'email' => $email,
                 'password' => Crypt::decrypt($password)
             ];
@@ -61,8 +63,8 @@ class ThothRepositoryProvider implements ContainerProvider
             $config = $container->get('config');
 
             $httpConfig = [];
-            if ($config['testEnvironment']) {
-                $httpConfig['base_uri'] = 'http://localhost:8000/';
+            if ($config['customThothApi'] && $config['customThothApiUrl']) {
+                $httpConfig['base_uri'] = trim($config['customThothApiUrl']);
             }
 
             $client = new Client($httpConfig);

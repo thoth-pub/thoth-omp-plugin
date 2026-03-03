@@ -19,6 +19,7 @@
 namespace APP\plugins\generic\thoth;
 
 use APP\template\TemplateManager;
+use GuzzleHttp\Exception\ConnectException;
 use Illuminate\Support\Facades\Crypt;
 use PKP\form\Form;
 use PKP\form\validation\FormValidatorCSRF;
@@ -34,10 +35,9 @@ class ThothSettingsForm extends Form
     private const SETTINGS = [
         'email',
         'password',
-        'testEnvironment',
+        'customThothApi',
+        'customThothApiUrl',
     ];
-
-    private const TEST_ENVIRONMENT_URI = 'http://localhost:8000/';
 
     public function __construct(
         private ThothPlugin $plugin,
@@ -54,6 +54,17 @@ class ThothSettingsForm extends Form
             'required',
             'plugins.generic.thoth.settings.invalidCredentials',
             fn ($password) => $this->validateCredentials(trim($this->getData('email')), $password)
+        ));
+
+        $this->addCheck(new FormValidatorCustom(
+            $this,
+            'customThothApiUrl',
+            'optional',
+            'validator.url',
+            function ($customThothApiUrl) {
+                $validator = new \PKP\validation\ValidatorUrl();
+                return $validator->isValid($customThothApiUrl);
+            }
         ));
     }
 
@@ -93,14 +104,17 @@ class ThothSettingsForm extends Form
 
     private function validateCredentials(string $email, string $password): bool
     {
-        $httpConfig = $this->getData('testEnvironment')
-            ? ['base_uri' => self::TEST_ENVIRONMENT_URI]
-            : [];
+        $httpConfig = [];
+        if ($this->getData('customThothApi') && $this->getData('customThothApiUrl')) {
+            $httpConfig['base_uri'] = trim($this->getData('customThothApiUrl'));
+        }
 
         try {
             (new Client($httpConfig))->login($email, $password);
             return true;
         } catch (QueryException) {
+            return false;
+        } catch (ConnectException) {
             return false;
         }
     }
