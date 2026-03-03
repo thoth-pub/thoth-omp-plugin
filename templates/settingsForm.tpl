@@ -25,7 +25,7 @@
 >
 	{csrf}
 
-	{include file="controllers/notification/inPlaceNotification.tpl" notificationId="thothSettingsFormNotification"}
+	{include file="common/formErrors.tpl"}
 
 	{fbvFormArea id="thothSettings"}
 		{fbvFormSection title="plugins.generic.thoth.settings.email"}

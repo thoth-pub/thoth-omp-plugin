@@ -19,6 +19,15 @@ msgstr "Usar uma API Thoth personalizada em vez da API oficial da Thoth."
 msgid "plugins.generic.thoth.settings.customThothApiUrl"
 msgstr "URL da API Thoth"
 
+msgid "plugins.generic.thoth.settings.customThothApiUrl.required"
+msgstr "A URL personalizada da API Thoth é obrigatória quando a opção de API personalizada está habilitada."
+
+msgid "plugins.generic.thoth.settings.customThothApiUrl.invalid"
+msgstr "A URL personalizada da API Thoth fornecida não é uma URL válida."
+
+msgid "plugins.generic.thoth.settings.customThothApiUrl.unreachable"
+msgstr "Não foi possível conectar à URL personalizada da API Thoth. Verifique se a URL está correta e se o serviço está disponível."
+
 msgid "plugins.generic.thoth.settings.email"
 msgstr "Email"
 

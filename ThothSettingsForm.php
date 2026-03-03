@@ -19,12 +19,13 @@
 namespace APP\plugins\generic\thoth;
 
 use APP\template\TemplateManager;
-use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Crypt;
 use PKP\form\Form;
 use PKP\form\validation\FormValidatorCSRF;
 use PKP\form\validation\FormValidatorCustom;
 use PKP\form\validation\FormValidatorPost;
+use PKP\form\validation\FormValidatorUrl;
 use ThothApi\Exception\QueryException;
 use ThothApi\GraphQL\Client;
 
@@ -50,21 +51,43 @@ class ThothSettingsForm extends Form
 
         $this->addCheck(new FormValidatorCustom(
             $this,
-            'password',
+            'customThothApiUrl',
             'required',
-            'plugins.generic.thoth.settings.invalidCredentials',
-            fn ($password) => $this->validateCredentials(trim($this->getData('email')), $password)
+            'plugins.generic.thoth.settings.customThothApiUrl.required',
+            function ($customThothApiUrl) {
+                if (!$this->getData('customThothApi')) {
+                    return true;
+                }
+                return !empty(trim($customThothApiUrl));
+            }
+        ));
+
+        $this->addCheck(new FormValidatorUrl(
+            $this,
+            'customThothApiUrl',
+            'optional',
+            'plugins.generic.thoth.settings.customThothApiUrl.invalid'
         ));
 
         $this->addCheck(new FormValidatorCustom(
             $this,
             'customThothApiUrl',
             'optional',
-            'validator.url',
+            'plugins.generic.thoth.settings.customThothApiUrl.unreachable',
             function ($customThothApiUrl) {
-                $validator = new \PKP\validation\ValidatorUrl();
-                return $validator->isValid($customThothApiUrl);
+                if (!$this->getData('customThothApi')) {
+                    return true;
+                }
+                return $this->validateCustomThothApiUrl(trim($customThothApiUrl));
             }
+        ));
+
+        $this->addCheck(new FormValidatorCustom(
+            $this,
+            'password',
+            'required',
+            'plugins.generic.thoth.settings.invalidCredentials',
+            fn ($password) => $this->validateCredentials(trim($this->getData('email')), $password)
         ));
     }
 
@@ -114,7 +137,17 @@ class ThothSettingsForm extends Form
             return true;
         } catch (QueryException) {
             return false;
-        } catch (ConnectException) {
+        } catch (GuzzleException) {
+            return false;
+        }
+    }
+
+    private function validateCustomThothApiUrl(string $customThothApiUrl): bool
+    {
+        try {
+            (new Client(['base_uri' => $customThothApiUrl]))->publisherCount();
+            return true;
+        } catch (GuzzleException) {
             return false;
         }
     }
