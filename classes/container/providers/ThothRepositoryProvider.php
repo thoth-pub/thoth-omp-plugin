@@ -19,7 +19,6 @@ namespace APP\plugins\generic\thoth\classes\container\providers;
 require_once(__DIR__ . '/../../../vendor/autoload.php');
 
 use APP\core\Application;
-use APP\plugins\generic\thoth\classes\encryption\DataEncryption;
 use APP\plugins\generic\thoth\classes\repositories\ThothAccountRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothAffiliationRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothBookRepository;
@@ -44,7 +43,6 @@ class ThothRepositoryProvider implements ContainerProvider
     public function register($container)
     {
         $container->set('config', function ($container) {
-            $encryption = new DataEncryption();
             $pluginSettingsDao = & DAORegistry::getDAO('PluginSettingsDAO');
             $contextId = Application::get()->getRequest()->getContext()->getId();
 
