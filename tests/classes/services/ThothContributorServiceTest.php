@@ -18,6 +18,7 @@ namespace APP\plugins\generic\thoth\tests\classes\services;
  * @brief Test class for the ThothContributorService class
  */
 
+use APP\author\Author;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Models\Contributor as ThothContributor;
@@ -30,19 +31,19 @@ class ThothContributorServiceTest extends PKPTestCase
     public function testRegisterContributor()
     {
         $mockFactory = $this->getMockBuilder(ThothContributorFactory::class)
-            ->setMethods(['createFromAuthor'])
+            ->onlyMethods(['createFromAuthor'])
             ->getMock();
         $mockFactory->expects($this->once())
             ->method('createFromAuthor')
-            ->will($this->returnValue(new ThothContributor()));
+            ->willReturn(new ThothContributor());
 
         $mockRepository = $this->getMockBuilder(ThothContributorRepository::class)
             ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
-            ->setMethods(['add'])
+            ->onlyMethods(['add'])
             ->getMock();
         $mockRepository->expects($this->once())
             ->method('add')
-            ->will($this->returnValue('1a1f6581-9c66-4292-9afc-176060dc3e8a'));
+            ->willReturn('1a1f6581-9c66-4292-9afc-176060dc3e8a');
 
         $mockAuthor = $this->getMockBuilder(Author::class)->getMock();
 

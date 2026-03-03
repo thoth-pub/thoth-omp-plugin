@@ -21,12 +21,14 @@ namespace APP\plugins\generic\thoth\tests\classes\services;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Models\Institution as ThothInstitution;
+use APP\plugins\generic\thoth\classes\container\ThothContainer;
 use APP\plugins\generic\thoth\classes\repositories\ThothAffiliationRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothInstitutionRepository;
 use APP\plugins\generic\thoth\classes\services\ThothAffiliationService;
 
 class ThothAffiliationServiceTest extends PKPTestCase
 {
+    protected mixed $backup = null;
     public function setUp(): void
     {
         parent::setUp();
@@ -44,22 +46,22 @@ class ThothAffiliationServiceTest extends PKPTestCase
         ThothContainer::getInstance()->set('institutionRepository', function () {
             $mockRepository = $this->getMockBuilder(ThothInstitutionRepository::class)
                 ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
-                ->setMethods(['find'])
+                ->onlyMethods(['find'])
                 ->getMock();
             $mockRepository->expects($this->once())
                 ->method('find')
-                ->will($this->returnValue(new ThothInstitution()));
+                ->willReturn(new ThothInstitution());
 
             return $mockRepository;
         });
 
         $mockRepository = $this->getMockBuilder(ThothAffiliationRepository::class)
             ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
-            ->setMethods(['add'])
+            ->onlyMethods(['add'])
             ->getMock();
         $mockRepository->expects($this->once())
             ->method('add')
-            ->will($this->returnValue('43f98edb-ac8c-45b4-9faa-2941a05c133c'));
+            ->willReturn('43f98edb-ac8c-45b4-9faa-2941a05c133c');
 
         $rorId = 'https://ror.org/00101234';
         $thothContributionId = '7315563c-e5c3-40b2-8558-8d1f9cede901';

@@ -20,8 +20,12 @@ namespace APP\plugins\generic\thoth\tests\classes\factories;
 
 require_once(__DIR__ . '/../../../vendor/autoload.php');
 
+use APP\press\Press;
+use APP\press\PressDAO;
 use APP\submission\Repository as SubmissionRepository;
+use APP\submission\Submission;
 use Mockery;
+use PKP\core\Registry;
 use PKP\db\DAORegistry;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Models\Work as ThothWork;
@@ -29,6 +33,7 @@ use APP\plugins\generic\thoth\classes\factories\ThothBookFactory;
 
 class ThothBookFactoryTest extends PKPTestCase
 {
+    protected array $mocks = [];
     protected function getMockedContainerKeys(): array
     {
         return [...parent::getMockedContainerKeys(), SubmissionRepository::class];
@@ -67,21 +72,21 @@ class ThothBookFactoryTest extends PKPTestCase
         app()->instance(SubmissionRepository::class, $submissionRepoMock);
 
         $mockContext = $this->getMockBuilder(Press::class)
-            ->setMethods(['getPath'])
+            ->onlyMethods(['getPath'])
             ->getMock();
         $mockContext->expects($this->any())
             ->method('getPath')
-            ->will($this->returnValue('press'));
+            ->willReturn('press');
 
         $mockContextDao = $this->getMockBuilder(PressDAO::class)
-            ->setMethods(['getById'])
+            ->onlyMethods(['getById'])
             ->getMock();
         $mockContextDao->expects($this->any())
             ->method('getById')
-            ->will($this->returnValue($mockContext));
+            ->willReturn($mockContext);
         DAORegistry::registerDAO('PressDAO', $mockContextDao);
 
-        $mockRequest = Mockery::mock(\PKP\core\PKPRequest::class)
+        $mockRequest = Mockery::mock(\APP\core\Request::class)
             ->shouldReceive('getDispatcher')
             ->withAnyArgs()
             ->andReturn(
@@ -184,10 +189,10 @@ class ThothBookFactoryTest extends PKPTestCase
     public function testGetWorkTypeBySubmissionWorkType()
     {
         $factory = new ThothBookFactory();
-        $workType = $factory->getWorkTypeBySubmissionWorkType(WORK_TYPE_AUTHORED_WORK);
+        $workType = $factory->getWorkTypeBySubmissionWorkType(Submission::WORK_TYPE_AUTHORED_WORK);
         $this->assertEquals(ThothWork::WORK_TYPE_MONOGRAPH, $workType);
 
-        $workType = $factory->getWorkTypeBySubmissionWorkType(WORK_TYPE_EDITED_VOLUME);
+        $workType = $factory->getWorkTypeBySubmissionWorkType(Submission::WORK_TYPE_EDITED_VOLUME);
         $this->assertEquals(ThothWork::WORK_TYPE_EDITED_BOOK, $workType);
     }
 

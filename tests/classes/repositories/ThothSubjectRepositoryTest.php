@@ -54,11 +54,11 @@ class ThothSubjectRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['subject'])
+            ->onlyMethods(['subject'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('subject')
-            ->will($this->returnValue($expectedThothSubject));
+            ->willReturn($expectedThothSubject);
 
         $repository = new ThothSubjectRepository($mockThothClient);
 
@@ -77,11 +77,11 @@ class ThothSubjectRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['createSubject'])
+            ->onlyMethods(['createSubject'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('createSubject')
-            ->will($this->returnValue('bded83ea-19f9-4c6d-a249-682d6c5bad5d'));
+            ->willReturn('bded83ea-19f9-4c6d-a249-682d6c5bad5d');
 
         $repository = new ThothSubjectRepository($mockThothClient);
 
@@ -101,11 +101,11 @@ class ThothSubjectRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['updateSubject'])
+            ->onlyMethods(['updateSubject'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('updateSubject')
-            ->will($this->returnValue('8f9e7255-010c-4c6f-a6df-035a501513a9'));
+            ->willReturn('8f9e7255-010c-4c6f-a6df-035a501513a9');
 
         $repository = new ThothSubjectRepository($mockThothClient);
 
@@ -117,11 +117,11 @@ class ThothSubjectRepositoryTest extends PKPTestCase
     public function testDeleteSubject()
     {
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['deleteSubject'])
+            ->onlyMethods(['deleteSubject'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('deleteSubject')
-            ->will($this->returnValue('cc51bb07-772c-4f3d-8192-cd0983065a90'));
+            ->willReturn('cc51bb07-772c-4f3d-8192-cd0983065a90');
 
         $repository = new ThothSubjectRepository($mockThothClient);
 

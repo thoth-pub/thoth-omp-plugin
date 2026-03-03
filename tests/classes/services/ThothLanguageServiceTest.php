@@ -29,11 +29,11 @@ class ThothLanguageServiceTest extends PKPTestCase
     {
         $mockRepository = $this->getMockBuilder(ThothLanguageRepository::class)
             ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
-            ->setMethods(['add'])
+            ->onlyMethods(['add'])
             ->getMock();
         $mockRepository->expects($this->once())
             ->method('add')
-            ->will($this->returnValue('d3ddc7b3-d5f3-4394-9c34-320cd222a497'));
+            ->willReturn('d3ddc7b3-d5f3-4394-9c34-320cd222a497');
 
         $locale = 'en_US';
         $thothWorkId = 'fdd9321f-84e3-4d19-a914-24289e8aec09';

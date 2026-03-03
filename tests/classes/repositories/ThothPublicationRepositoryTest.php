@@ -60,11 +60,11 @@ class ThothPublicationRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['publication'])
+            ->onlyMethods(['publication'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('publication')
-            ->will($this->returnValue($expectedThothPublication));
+            ->willReturn($expectedThothPublication);
 
         $repository = new ThothPublicationRepository($mockThothClient);
 
@@ -76,17 +76,17 @@ class ThothPublicationRepositoryTest extends PKPTestCase
     public function testGetPublicationIdByType()
     {
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['rawQuery'])
+            ->onlyMethods(['rawQuery'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('rawQuery')
-            ->will($this->returnValue([
+            ->willReturn([
                 'work' => ['publications' => [
                     [
                         'publicationId' => 'efac5d7a-2284-4432-ad50-02b70aadec49',
                     ]
                 ]]
-            ]));
+            ]);
 
         $repository = new ThothPublicationRepository($mockThothClient);
 
@@ -105,11 +105,11 @@ class ThothPublicationRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['publications'])
+            ->onlyMethods(['publications'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('publications')
-            ->will($this->returnValue([$expectedThothPublication]));
+            ->willReturn([$expectedThothPublication]);
 
         $repository = new ThothPublicationRepository($mockThothClient);
 
@@ -131,11 +131,11 @@ class ThothPublicationRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['createPublication'])
+            ->onlyMethods(['createPublication'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('createPublication')
-            ->will($this->returnValue('36fcfd7a-2284-4432-ad50-02b70aadec49'));
+            ->willReturn('36fcfd7a-2284-4432-ad50-02b70aadec49');
 
         $repository = new ThothPublicationRepository($mockThothClient);
 
@@ -154,11 +154,11 @@ class ThothPublicationRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['updatePublication'])
+            ->onlyMethods(['updatePublication'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('updatePublication')
-            ->will($this->returnValue('fc6618f1-f4db-44f9-bbe3-75438f4bd536'));
+            ->willReturn('fc6618f1-f4db-44f9-bbe3-75438f4bd536');
 
         $repository = new ThothPublicationRepository($mockThothClient);
 
@@ -170,11 +170,11 @@ class ThothPublicationRepositoryTest extends PKPTestCase
     public function testDeletePublication()
     {
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['deletePublication'])
+            ->onlyMethods(['deletePublication'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('deletePublication')
-            ->will($this->returnValue('5f708d25-249a-4e67-aaf6-ce80b85ed2ee'));
+            ->willReturn('5f708d25-249a-4e67-aaf6-ce80b85ed2ee');
 
         $repository = new ThothPublicationRepository($mockThothClient);
 

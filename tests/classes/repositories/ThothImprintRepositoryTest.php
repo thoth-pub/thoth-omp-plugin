@@ -34,11 +34,11 @@ class ThothImprintRepositoryTest extends PKPTestCase
         ];
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['imprints'])
+            ->onlyMethods(['imprints'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('imprints')
-            ->will($this->returnValue($expectedThothImprints));
+            ->willReturn($expectedThothImprints);
 
         $thothPublisherIds = ['fffa1c59-4823-48ea-9d1c-596006a119b5'];
 

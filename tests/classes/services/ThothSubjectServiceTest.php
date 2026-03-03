@@ -29,11 +29,11 @@ class ThothSubjectServiceTest extends PKPTestCase
     {
         $mockRepository = $this->getMockBuilder(ThothSubjectRepository::class)
             ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
-            ->setMethods(['add'])
+            ->onlyMethods(['add'])
             ->getMock();
         $mockRepository->expects($this->once())
             ->method('add')
-            ->will($this->returnValue('ebad8694-0dbe-48cf-a704-5d7e1f54b63d'));
+            ->willReturn('ebad8694-0dbe-48cf-a704-5d7e1f54b63d');
 
         $keyword = 'Education';
         $sequence = 1;

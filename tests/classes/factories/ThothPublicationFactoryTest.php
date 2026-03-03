@@ -26,38 +26,39 @@ use APP\plugins\generic\thoth\classes\factories\ThothPublicationFactory;
 
 class ThothPublicationFactoryTest extends PKPTestCase
 {
+    protected array $mocks = [];
     private function setUpMockEnvironment()
     {
         $mockIdentificationCode = $this->getMockBuilder(\APP\publicationFormat\IdentificationCode::class)
-            ->setMethods(['getCode', 'getValue'])
+            ->onlyMethods(['getCode', 'getValue'])
             ->getMock();
         $mockIdentificationCode->expects($this->any())
             ->method('getCode')
-            ->will($this->returnValue('15'));
+            ->willReturn('15');
         $mockIdentificationCode->expects($this->any())
             ->method('getValue')
-            ->will($this->returnValue('978-3-16-148410-0'));
+            ->willReturn('978-3-16-148410-0');
 
         $mockResult = $this->getMockBuilder(\PKP\db\DAOResultFactory::class)
-            ->setMethods(['toArray'])
+            ->onlyMethods(['toArray'])
             ->disableOriginalConstructor()
             ->getMock();
         $mockResult->expects($this->any())
             ->method('toArray')
-            ->will($this->returnValue([$mockIdentificationCode]));
+            ->willReturn([$mockIdentificationCode]);
 
         $mockPubFormat = $this->getMockBuilder(\APP\publicationFormat\PublicationFormat::class)
-            ->setMethods(['getEntryKey', 'getLocalizedName', 'getIdentificationCodes'])
+            ->onlyMethods(['getEntryKey', 'getLocalizedName', 'getIdentificationCodes'])
             ->getMock();
         $mockPubFormat->expects($this->any())
             ->method('getEntryKey')
-            ->will($this->returnValue('DA'));
+            ->willReturn('DA');
         $mockPubFormat->expects($this->any())
             ->method('getLocalizedName')
-            ->will($this->returnValue('PDF'));
+            ->willReturn('PDF');
         $mockPubFormat->expects($this->any())
             ->method('getIdentificationCodes')
-            ->will($this->returnValue($mockResult));
+            ->willReturn($mockResult);
 
         $this->mocks = [];
         $this->mocks['publicationFormat'] = $mockPubFormat;

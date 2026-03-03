@@ -27,11 +27,11 @@ class ThothAccountRepositoryTest extends PKPTestCase
     public function testGetLinkedPublishers()
     {
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['accountDetails'])
+            ->onlyMethods(['accountDetails'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('accountDetails')
-            ->will($this->returnValue([
+            ->willReturn([
                 'resourceAccess' => [
                     'linkedPublishers' => [
                         [
@@ -39,7 +39,7 @@ class ThothAccountRepositoryTest extends PKPTestCase
                         ]
                     ]
                 ]
-            ]));
+            ]);
 
         $repository = new ThothAccountRepository($mockThothClient);
 

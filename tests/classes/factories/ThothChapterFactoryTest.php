@@ -20,8 +20,11 @@ namespace APP\plugins\generic\thoth\tests\classes\factories;
 
 require_once(__DIR__ . '/../../../vendor/autoload.php');
 
+use APP\monograph\Chapter;
 use APP\publication\Repository as PublicationRepository;
 use APP\submission\Repository as SubmissionRepository;
+use Mockery;
+use PKP\core\Registry;
 use PKP\db\DAORegistry;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Models\Work as ThothWork;
@@ -29,6 +32,7 @@ use APP\plugins\generic\thoth\classes\factories\ThothChapterFactory;
 
 class ThothChapterFactoryTest extends PKPTestCase
 {
+    protected array $mocks = [];
     protected function getMockedContainerKeys(): array
     {
         return [...parent::getMockedContainerKeys(), SubmissionRepository::class, PublicationRepository::class];
@@ -78,33 +82,33 @@ class ThothChapterFactoryTest extends PKPTestCase
         app()->instance(SubmissionRepository::class, $submissionRepoMock);
 
         $mockContext = $this->getMockBuilder(\APP\press\Press::class)
-            ->setMethods(['getPath'])
+            ->onlyMethods(['getPath'])
             ->getMock();
         $mockContext->expects($this->any())
             ->method('getPath')
-            ->will($this->returnValue('press'));
+            ->willReturn('press');
 
         $mockContextDao = $this->getMockBuilder(\APP\press\PressDAO::class)
-            ->setMethods(['getById'])
+            ->onlyMethods(['getById'])
             ->getMock();
         $mockContextDao->expects($this->any())
             ->method('getById')
-            ->will($this->returnValue($mockContext));
+            ->willReturn($mockContext);
         DAORegistry::registerDAO('PressDAO', $mockContextDao);
 
         $mockDispatcher = $this->getMockBuilder(\PKP\core\Dispatcher::class)
-            ->setMethods(['url'])
+            ->onlyMethods(['url'])
             ->getMock();
         $mockDispatcher->expects($this->once())
             ->method('url')
-            ->will($this->returnValue('https://omp.publicknowledgeproject.org/index.php/press/catalog/book/17'));
+            ->willReturn('https://omp.publicknowledgeproject.org/index.php/press/catalog/book/17');
 
-        $mockRequest = $this->getMockBuilder(\PKP\core\PKPRequest::class)
-            ->setMethods(['getDispatcher'])
+        $mockRequest = $this->getMockBuilder(\APP\core\Request::class)
+            ->onlyMethods(['getDispatcher'])
             ->getMock();
         $mockRequest->expects($this->any())
             ->method('getDispatcher')
-            ->will($this->returnValue($mockDispatcher));
+            ->willReturn($mockDispatcher);
         Registry::set('request', $mockRequest);
 
         $mockChapter = Mockery::mock(\APP\monograph\Chapter::class)
@@ -172,12 +176,12 @@ class ThothChapterFactoryTest extends PKPTestCase
     public function testGetWorkStatusByDatePublished()
     {
         $mockChapter = $this->getMockBuilder(Chapter::class)
-            ->setMethods(['getDatePublished'])
+            ->onlyMethods(['getDatePublished'])
             ->getMock();
 
         $mockChapter->expects($this->any())
             ->method('getDatePublished')
-            ->will($this->onConsecutiveCalls('2024-01-01', '2050-01-01'));
+            ->willReturnOnConsecutiveCalls('2024-01-01', '2050-01-01');
 
         $factory = new ThothChapterFactory();
         $workStatus = $factory->getWorkStatusByDatePublished($mockChapter, null);

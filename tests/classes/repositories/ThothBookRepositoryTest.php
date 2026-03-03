@@ -32,11 +32,11 @@ class ThothBookRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['bookByDoi'])
+            ->onlyMethods(['bookByDoi'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('bookByDoi')
-            ->will($this->returnValue($expectedThothBook));
+            ->willReturn($expectedThothBook);
 
         $repository = new ThothBookRepository($mockThothClient);
 
@@ -52,11 +52,11 @@ class ThothBookRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['books'])
+            ->onlyMethods(['books'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('books')
-            ->will($this->returnValue([$expectedThothBook]));
+            ->willReturn([$expectedThothBook]);
 
         $repository = new ThothBookRepository($mockThothClient);
 

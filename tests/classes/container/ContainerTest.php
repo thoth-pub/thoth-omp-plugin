@@ -3,6 +3,7 @@
 
 namespace APP\plugins\generic\thoth\tests\classes\container;
 
+use Exception;
 use PKP\tests\PKPTestCase;
 use APP\plugins\generic\thoth\classes\container\providers\ContainerProvider;
 use APP\plugins\generic\thoth\classes\container\Container;

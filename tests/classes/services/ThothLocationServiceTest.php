@@ -18,9 +18,11 @@ namespace APP\plugins\generic\thoth\tests\classes\services;
  * @brief Test class for the ThothLocationService class
  */
 
+use APP\publicationFormat\PublicationFormat;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Models\Location as ThothLocation;
+use APP\plugins\generic\thoth\classes\factories\ThothLocationFactory;
 use APP\plugins\generic\thoth\classes\repositories\ThothLocationRepository;
 use APP\plugins\generic\thoth\classes\services\ThothLocationService;
 
@@ -29,22 +31,22 @@ class ThothLocationServiceTest extends PKPTestCase
     public function testRegisterLocation()
     {
         $mockFactory = $this->getMockBuilder(ThothLocationFactory::class)
-            ->setMethods(['createFromPublicationFormat'])
+            ->onlyMethods(['createFromPublicationFormat'])
             ->getMock();
         $mockFactory->expects($this->once())
             ->method('createFromPublicationFormat')
-            ->will($this->returnValue(new ThothLocation()));
+            ->willReturn(new ThothLocation());
 
         $mockRepository = $this->getMockBuilder(ThothLocationRepository::class)
             ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
-            ->setMethods(['hasCanonical', 'add'])
+            ->onlyMethods(['hasCanonical', 'add'])
             ->getMock();
         $mockRepository->expects($this->once())
             ->method('hasCanonical')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $mockRepository->expects($this->once())
             ->method('add')
-            ->will($this->returnValue('6f40cf3f-c7eb-437a-9c09-08a7f6923ec0'));
+            ->willReturn('6f40cf3f-c7eb-437a-9c09-08a7f6923ec0');
 
         $mockPubFormat = $this->getMockBuilder(PublicationFormat::class)->getMock();
 

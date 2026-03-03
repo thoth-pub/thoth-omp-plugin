@@ -53,11 +53,11 @@ class ThothWorkRelationRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['createWorkRelation'])
+            ->onlyMethods(['createWorkRelation'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('createWorkRelation')
-            ->will($this->returnValue('bded83ea-19f9-4c6d-a249-682d6c5bad5d'));
+            ->willReturn('bded83ea-19f9-4c6d-a249-682d6c5bad5d');
 
         $repository = new ThothWorkRelationRepository($mockThothClient);
 
@@ -77,11 +77,11 @@ class ThothWorkRelationRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['updateWorkRelation'])
+            ->onlyMethods(['updateWorkRelation'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('updateWorkRelation')
-            ->will($this->returnValue('98d1efa2-475b-4cde-a180-d4fe8a470d25'));
+            ->willReturn('98d1efa2-475b-4cde-a180-d4fe8a470d25');
 
         $repository = new ThothWorkRelationRepository($mockThothClient);
 
@@ -93,11 +93,11 @@ class ThothWorkRelationRepositoryTest extends PKPTestCase
     public function testDeleteWorkRelation()
     {
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['deleteWorkRelation'])
+            ->onlyMethods(['deleteWorkRelation'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('deleteWorkRelation')
-            ->will($this->returnValue('0dce314b-83d6-4663-be58-ac41e1ebae20'));
+            ->willReturn('0dce314b-83d6-4663-be58-ac41e1ebae20');
 
         $repository = new ThothWorkRelationRepository($mockThothClient);
 

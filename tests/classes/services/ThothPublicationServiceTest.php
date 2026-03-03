@@ -18,14 +18,18 @@ namespace APP\plugins\generic\thoth\tests\classes\services;
  * @brief Test class for the ThothPublicationService class
  */
 
+use APP\publicationFormat\PublicationFormat;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Models\Publication as ThothPublication;
+use APP\plugins\generic\thoth\classes\container\ThothContainer;
+use APP\plugins\generic\thoth\classes\factories\ThothPublicationFactory;
 use APP\plugins\generic\thoth\classes\repositories\ThothPublicationRepository;
 use APP\plugins\generic\thoth\classes\services\ThothPublicationService;
 
 class ThothPublicationServiceTest extends PKPTestCase
 {
+    protected mixed $backup = null;
     public function setUp(): void
     {
         parent::setUp();
@@ -45,22 +49,22 @@ class ThothPublicationServiceTest extends PKPTestCase
         });
 
         $mockFactory = $this->getMockBuilder(ThothPublicationFactory::class)
-            ->setMethods(['createFromPublicationFormat'])
+            ->onlyMethods(['createFromPublicationFormat'])
             ->getMock();
         $mockFactory->expects($this->once())
             ->method('createFromPublicationFormat')
-            ->will($this->returnValue(new ThothPublication()));
+            ->willReturn(new ThothPublication());
 
         $mockRepository = $this->getMockBuilder(ThothPublicationRepository::class)
             ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
-            ->setMethods(['add', 'getIdByType'])
+            ->onlyMethods(['add', 'getIdByType'])
             ->getMock();
         $mockRepository->expects($this->once())
             ->method('add')
-            ->will($this->returnValue('4296c934-0f05-4920-a208-a5ab214b908a'));
+            ->willReturn('4296c934-0f05-4920-a208-a5ab214b908a');
         $mockRepository->expects($this->once())
             ->method('getIdByType')
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $mockPubFormat = $this->getMockBuilder(PublicationFormat::class)->getMock();
 
@@ -75,13 +79,13 @@ class ThothPublicationServiceTest extends PKPTestCase
     public function testIsbnPublicationValidationFails()
     {
         $mockFactory = $this->getMockBuilder(ThothPublicationFactory::class)
-            ->setMethods(['createFromPublicationFormat'])
+            ->onlyMethods(['createFromPublicationFormat'])
             ->getMock();
         $mockFactory->expects($this->once())
             ->method('createFromPublicationFormat')
-            ->will($this->returnValue(new ThothPublication([
+            ->willReturn(new ThothPublication([
                 'isbn' => '978395796140'
-            ])));
+            ]));
 
         $mockRepository = $this->getMockBuilder(ThothPublicationRepository::class)
             ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
@@ -100,20 +104,20 @@ class ThothPublicationServiceTest extends PKPTestCase
     public function testIsbnExistsPublicationValidationFails()
     {
         $mockFactory = $this->getMockBuilder(ThothPublicationFactory::class)
-            ->setMethods(['createFromPublicationFormat'])
+            ->onlyMethods(['createFromPublicationFormat'])
             ->getMock();
         $mockFactory->expects($this->once())
             ->method('createFromPublicationFormat')
-            ->will($this->returnValue(new ThothPublication([
+            ->willReturn(new ThothPublication([
                 'isbn' => '978-3-16-148410-0'
-            ])));
+            ]));
 
         $mockRepository = $this->getMockBuilder(ThothPublicationRepository::class)
             ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
             ->getMock();
         $mockRepository->expects($this->once())
             ->method('find')
-            ->will($this->returnValue(new ThothPublication()));
+            ->willReturn(new ThothPublication());
 
         $mockPubFormat = $this->getMockBuilder(PublicationFormat::class)->getMock();
 

@@ -20,6 +20,7 @@ namespace APP\plugins\generic\thoth\tests\classes\services;
 
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
+use APP\plugins\generic\thoth\classes\container\ThothContainer;
 use APP\plugins\generic\thoth\classes\factories\ThothChapterFactory;
 use APP\plugins\generic\thoth\classes\repositories\ThothWorkRelationRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothChapterRepository;
@@ -40,22 +41,22 @@ class ThothWorkRelationServiceTest extends PKPTestCase
                         ])
                         ->getMock(),
                 ])
-                ->setMethods(['register'])
+                ->onlyMethods(['register'])
                 ->getMock();
             $mockService->expects($this->any())
                 ->method('register')
-                ->will($this->returnValue('dccd9dfd-fee2-4e85-b1f8-0440f9b43ce8'));
+                ->willReturn('dccd9dfd-fee2-4e85-b1f8-0440f9b43ce8');
 
             return $mockService;
         });
 
         $mockRepository = $this->getMockBuilder(ThothWorkRelationRepository::class)
             ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
-            ->setMethods(['add'])
+            ->onlyMethods(['add'])
             ->getMock();
         $mockRepository->expects($this->once())
             ->method('add')
-            ->will($this->returnValue('91966e15-0203-4eb8-b7e7-02b72c57cedc'));
+            ->willReturn('91966e15-0203-4eb8-b7e7-02b72c57cedc');
 
         $mockChapter = $this->getMockBuilder(\APP\monograph\Chapter::class)->getMock();
         $thothRelatedWorkId = '813e0519-05ca-455b-b330-af623456dace';
