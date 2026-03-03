@@ -125,7 +125,7 @@ class ThothEndpoint
             $thothBookService->deleteRegisteredEntry();
             $this->handleNotification($request, $submission, false, $disableNotification, $e->getMessage());
             $failure['errors'][] = __('plugins.generic.thoth.register.error.log', ['reason' => $e->getMessage()]);
-            return response()->json($failure, Response::HTTP_FORBIDDEN);
+            return response()->json($failure, Response::HTTP_BAD_REQUEST);
         }
 
         $submission = Repo::submission()->get($submission->getId());

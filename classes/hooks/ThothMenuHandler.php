@@ -36,15 +36,25 @@ class ThothMenuHandler
 
         $offset = array_search('settings', array_keys($menu));
 
-        $menu = array_slice($menu, 0, $offset, true) +
-            [
-                'thoth' => [
-                    'name' => __('plugins.generic.thoth.navigation.thoth'),
-                    'url' => $router->url($request, null, 'thoth'),
-                    'isCurrent' => $router->getRequestedPage($request) === 'thoth',
-                ]
-            ] +
-            array_slice($menu, ($offset - 1), null, true);
+        if ($offset === false || count($menu) <= $offset) {
+            $menu['thoth'] = [
+                'name' => __('plugins.generic.thoth.navigation.thoth'),
+                'url' => $router->url($request, null, 'thoth'),
+                'isCurrent' => $router->getRequestedPage($request) === 'thoth',
+                'icon' => 'Book',
+            ];
+        } else {
+            $menu = array_slice($menu, 0, $offset, true) +
+                [
+                    'thoth' => [
+                        'name' => __('plugins.generic.thoth.navigation.thoth'),
+                        'url' => $router->url($request, null, 'thoth'),
+                        'isCurrent' => $router->getRequestedPage($request) === 'thoth',
+                        'icon' => 'Book',
+                    ]
+                ] +
+                array_slice($menu, $offset, null, true);
+        }
 
         $templateMgr->setState(['menu' => $menu]);
 

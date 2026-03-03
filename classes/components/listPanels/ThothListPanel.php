@@ -20,9 +20,7 @@ namespace APP\plugins\generic\thoth\classes\components\listPanels;
 
 use APP\core\Application;
 use APP\facades\Repo;
-use APP\template\TemplateManager;
 use PKP\components\listPanels\ListPanel;
-use PKP\core\PKPApplication;
 use PKP\db\DAO;
 
 class ThothListPanel extends ListPanel
@@ -37,6 +35,8 @@ class ThothListPanel extends ListPanel
 
     public $imprintOptions = [];
 
+    public $isSidebarVisible = true;
+
     public function getConfig()
     {
         $request = Application::get()->getRequest();
@@ -49,10 +49,7 @@ class ThothListPanel extends ListPanel
         $config['getParams'] = $this->getParams;
         $config['itemsMax'] = $this->itemsMax;
         $config['imprintOptions'] = $this->imprintOptions;
-        $config['csrfToken'] = $request->getSession()->getCSRFToken();
-        $config['errors'] = [];
-        $config['filters'] = [];
-
+        $config['csrfToken'] = $request->getSession()->token();
         $config['filters'] = [];
 
         $config['filters'][] = [
@@ -124,26 +121,6 @@ class ThothListPanel extends ListPanel
                 ];
             }
         }
-
-        $searchSubmissionsApiUrl = $request->getDispatcher()->url(
-            $request,
-            PKPApplication::ROUTE_API,
-            $context->getPath(),
-            'submissions'
-        );
-
-        $templateMgr = TemplateManager::getManager($request);
-        $templateMgr->setLocaleKeys([
-            'common.selectAll',
-            'common.selectNone',
-            'plugins.generic.thoth.imprint',
-            'plugins.generic.thoth.imprint.required',
-            'plugins.generic.thoth.register',
-            'plugins.generic.thoth.status.registered',
-            'plugins.generic.thoth.status.unregistered',
-            'plugins.generic.thoth.actions.register.label',
-            'plugins.generic.thoth.actions.register.prompt',
-        ]);
 
         return $config;
     }

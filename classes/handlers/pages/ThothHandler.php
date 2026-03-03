@@ -29,6 +29,7 @@ use PKP\db\DAORegistry;
 use PKP\plugins\PluginRegistry;
 use PKP\security\authorization\PKPSiteAccessPolicy;
 use PKP\security\Role;
+use PKP\userGroup\UserGroup;
 
 class ThothHandler extends Handler
 {
@@ -50,10 +51,10 @@ class ThothHandler extends Handler
         return parent::authorize($request, $args, $roleAssignments);
     }
 
-    public function initialize($request)
+    public function initialize($request, $args = null)
     {
         $this->setupTemplate($request);
-        parent::initialize($request);
+        parent::initialize($request, $args);
     }
 
     public function index($args, $request)
@@ -64,9 +65,6 @@ class ThothHandler extends Handler
 
         $plugin = PluginRegistry::getPlugin('generic', 'thothplugin');
         $templateMgr = TemplateManager::getManager($request);
-
-        $this->addScripts($request, $templateMgr, $plugin);
-        $this->addStyles($request, $templateMgr, $plugin);
 
         try {
             $publishers = ThothRepository::account()->getLinkedPublishers();
@@ -110,15 +108,18 @@ class ThothHandler extends Handler
         $total = $collector->getCount();
         $submissions = $collector->limit($thothList->count)->getMany();
 
-        $userGroups = Repo::userGroup()->getCollector()
-            ->filterByContextIds([$context->getId()])
-            ->getMany();
+        $userGroups = UserGroup::withContextIds($context->getId())->get();
 
         $genreDao = DAORegistry::getDAO('GenreDAO');
         $genres = $genreDao->getByContextId($context->getId())->toArray();
 
         $items = Repo::submission()->getSchemaMap()
-            ->mapMany($submissions, $userGroups, $genres)
+            ->mapMany(
+                $submissions,
+                $userGroups,
+                $genres,
+                $this->getAuthorizedContextObject(Application::ASSOC_TYPE_USER_ROLES)
+            )
             ->values();
 
         $thothList->set([
@@ -126,7 +127,6 @@ class ThothHandler extends Handler
             'itemsMax' => $total,
         ]);
 
-        $templateMgr = TemplateManager::getManager($request);
         $templateMgr->setState([
             'components' => [
                 'thoth' => $thothList->getConfig()
@@ -137,84 +137,4 @@ class ThothHandler extends Handler
         return $templateMgr->display($plugin->getTemplateResource('thoth/index.tpl'));
     }
 
-    private function addScripts($request, $templateMgr, $plugin)
-    {
-        $templateMgr->addJavaScript(
-            'thoth-list-item-component',
-            $request->getBaseUrl() . '/' .
-            $plugin->getPluginPath() .
-            '/js/ui/components/ListPanel/ThothListItem.js',
-            [
-                'contexts' => 'backend',
-                'priority' => STYLE_SEQUENCE_LAST,
-            ]
-        );
-
-        $templateMgr->addJavaScript(
-            'thoth-list-panel-component',
-            $request->getBaseUrl() . '/' .
-            $plugin->getPluginPath() .
-            '/js/ui/components/ListPanel/ThothListPanel.js',
-            [
-                'contexts' => 'backend',
-                'priority' => STYLE_SEQUENCE_LAST,
-            ]
-        );
-    }
-
-    private function addStyles($request, $templateMgr, $plugin)
-    {
-        $templateMgr->addStyleSheet(
-            'thoth-list-panel-component',
-            '
-                .listPanel--thoth .listPanel__itemIdentity {
-                    position: relative;
-                    padding: 0;
-                }
-
-                .listPanel__selectWrapper {
-                    display: flex;
-                    align-items: center;
-                    margin-left: -1rem;
-                    overflow: hidden;
-                }
-
-                .listPanel__selector {
-                    width: 3rem;
-                    padding-left: 1rem;
-                }
-
-                .listPanel__item--thoth_notice {
-                    margin-top: .5em;
-                    font-size: .75rem;
-                    line-height: 1.5em;
-                    color: #222;
-                }
-
-                .listPanel__itemMetadata {
-                    font-size: .75rem;
-                    line-height: 1.5em;
-                    color: #222;
-                    margin-left: 0.75rem;
-                }
-
-                .listPanel__itemMetadata--badge {
-                    margin-right: 0.25rem;
-                }
-
-                .listPanel__itemExpanded--thoth, .listPanel__item--thoth_notice {
-                    padding-left: 2rem;
-                }
-
-                .listPanel__block--option {
-                    display: block;
-                }
-            ',
-            [
-                'contexts' => 'backend',
-                'inline' => true,
-                'priority' => STYLE_SEQUENCE_LAST,
-            ]
-        );
-    }
 }

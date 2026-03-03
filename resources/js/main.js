@@ -9,8 +9,10 @@
  */
 
 import ThothSection from './Components/ThothSection.vue';
+import ThothListPanel from './Components/ThothListPanel.vue';
 
 pkp.registry.registerComponent('ThothSection', ThothSection);
+pkp.registry.registerComponent('ThothListPanel', ThothListPanel);
 
 pkp.registry.storeExtend('workflow', (piniaContext) => {
 	const workflowStore = piniaContext.store;
