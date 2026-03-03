@@ -49,8 +49,10 @@ class ThothContributionService
 
         $thothContributionId = $this->repository->add($thothContribution);
 
-        if ($rorId = $author->getData('rorId')) {
-            ThothService::affiliation()->register($rorId, $thothContributionId);
+        $affiliationOrdinal = 1;
+        foreach ($author->getAffiliations() as $affiliation) {
+            ThothService::affiliation()->register($affiliation, $thothContributionId, $affiliationOrdinal);
+            $affiliationOrdinal++;
         }
 
         return $thothContributionId;

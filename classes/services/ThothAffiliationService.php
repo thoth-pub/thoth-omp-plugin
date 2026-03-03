@@ -17,6 +17,7 @@
 namespace APP\plugins\generic\thoth\classes\services;
 
 use APP\plugins\generic\thoth\classes\facades\ThothRepository;
+use PKP\affiliation\Affiliation;
 
 class ThothAffiliationService
 {
@@ -27,9 +28,17 @@ class ThothAffiliationService
         $this->repository = $repository;
     }
 
-    public function register($rorId, $thothContributionId)
+    public function register(Affiliation $affiliation, $thothContributionId, $affiliationOrdinal)
     {
-        $thothInstitution = ThothRepository::institution()->find($rorId);
+        $ror = $affiliation->getRor();
+
+        error_log($ror);
+
+        if (empty($ror)) {
+            return null;
+        }
+
+        $thothInstitution = ThothRepository::institution()->find($ror);
 
         if ($thothInstitution === null) {
             return null;
@@ -38,7 +47,7 @@ class ThothAffiliationService
         $thothAffiliation = $this->repository->new([
             'contributionId' => $thothContributionId,
             'institutionId' => $thothInstitution->getInstitutionId(),
-            'affiliationOrdinal' => 1
+            'affiliationOrdinal' => $affiliationOrdinal
         ]);
 
         return $this->repository->add($thothAffiliation);
