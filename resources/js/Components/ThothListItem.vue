@@ -39,8 +39,8 @@
 				<div class="listPanel__itemMetadata">
 					<PkpBadge
 						class="listPanel__itemMetadata--badge"
-						:is-success="!!item.thothWorkId"
-						:is-warnable="hasErrors"
+						:style="badgeStyle"
+						has-dot
 					>
 						{{ statusLabel }}
 					</PkpBadge>
@@ -85,12 +85,16 @@
 </template>
 
 <script setup>
-import {ref, computed} from 'vue';
+import {ref, computed, watch} from 'vue';
 
 const {useLocalize} = pkp.modules.useLocalize;
 const {t, localize} = useLocalize();
 
 const props = defineProps({
+	apiUrl: {
+		type: String,
+		required: true,
+	},
 	errors: {
 		type: Array,
 		default: () => [],
@@ -112,6 +116,17 @@ const props = defineProps({
 defineEmits(['select-item']);
 
 const expanded = ref(false);
+const workStatus = ref(null);
+
+const workStatusLocaleMap = {
+	ACTIVE: 'plugins.generic.thoth.workStatus.active',
+	FORTHCOMING: 'plugins.generic.thoth.workStatus.forthcoming',
+	WITHDRAWN: 'plugins.generic.thoth.workStatus.withdrawn',
+	SUPERSEDED: 'plugins.generic.thoth.workStatus.superseded',
+	POSTPONED_INDEFINITELY:
+		'plugins.generic.thoth.workStatus.postponedIndefinitely',
+	CANCELLED: 'plugins.generic.thoth.workStatus.cancelled',
+};
 
 const hasErrors = computed(() => props.errors && props.errors.length > 0);
 
@@ -123,11 +138,63 @@ const currentPublication = computed(() =>
 
 const statusLabel = computed(() => {
 	if (props.item.thothWorkId) {
-		return t('plugins.generic.thoth.status.registered');
+		if (!workStatus.value) {
+			return '...';
+		}
+		const localeKey = workStatusLocaleMap[workStatus.value];
+		return localeKey ? t(localeKey) : workStatus.value;
 	}
 	if (hasErrors.value) {
 		return t('common.error');
 	}
 	return t('plugins.generic.thoth.status.unregistered');
 });
+
+const workStatusColorMap = {
+	ACTIVE: '#00B24E',
+	FORTHCOMING: '#DED15D',
+	WITHDRAWN: '#D00A0A',
+	CANCELLED: '#D00A0A',
+	SUPERSEDED: '#777777',
+	POSTPONED_INDEFINITELY: '#E08914',
+};
+
+const badgeStyle = computed(() => {
+	let color;
+
+	if (!props.item.thothWorkId) {
+		color = hasErrors.value ? '#D00A0A' : '#777777';
+	} else {
+		color = workStatusColorMap[workStatus.value] || '#777777';
+	}
+
+	return {borderColor: color, color: color};
+});
+
+function fetchWorkStatus() {
+	if (!props.item.thothWorkId) {
+		return;
+	}
+
+	$.ajax({
+		method: 'GET',
+		url: `${props.apiUrl}/${props.item.id}/thothWorkStatus`,
+		headers: {
+			'X-Csrf-Token': pkp.currentUser.csrfToken,
+		},
+		success(response) {
+			workStatus.value = response.workStatus;
+		},
+	});
+}
+
+watch(
+	() => props.item.thothWorkId,
+	(newVal) => {
+		if (newVal) {
+			fetchWorkStatus();
+		}
+	},
+	{immediate: true},
+);
 </script>

@@ -88,6 +88,7 @@
 		<template #item="{item}">
 			<ThothListItem
 				:key="item.id"
+				:api-url="apiUrl"
 				:item="item"
 				:errors="errors[item.id] || []"
 				:is-loading="startedItems.includes(item.id)"
@@ -391,6 +392,10 @@ function setErrors(itemId, response) {
 
 .listPanel__itemMetadata--badge {
 	margin-right: 0.25rem;
+}
+
+.listPanel__itemMetadata--badge > div {
+	color: #222;
 }
 
 .listPanel__itemExpanded--thoth {

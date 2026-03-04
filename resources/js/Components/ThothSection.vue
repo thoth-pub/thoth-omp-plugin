@@ -100,6 +100,13 @@ const statusColor = computed(() => {
 			return 'bg-stage-published';
 		case 'FORTHCOMING':
 			return 'bg-stage-scheduled-for-publishing';
+		case 'WITHDRAWN':
+		case 'CANCELLED':
+			return 'bg-stage-declined';
+		case 'SUPERSEDED':
+			return 'bg-stage-incomplete-submission';
+		case 'POSTPONED_INDEFINITELY':
+			return 'bg-stage-in-review';
 		default:
 			return 'bg-stage-declined';
 	}

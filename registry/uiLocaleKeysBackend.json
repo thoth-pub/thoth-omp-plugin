@@ -13,7 +13,6 @@
   "plugins.generic.thoth.imprint",
   "plugins.generic.thoth.imprint.required",
   "plugins.generic.thoth.register",
-  "plugins.generic.thoth.status.registered",
   "plugins.generic.thoth.status.unregistered",
   "plugins.generic.thoth.update",
   "plugins.generic.thoth.workStatus",
