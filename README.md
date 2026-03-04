@@ -76,7 +76,7 @@ On the Thoth management page, you can submit a selection of titles from OMP into
 - Only basic HTML tags are preserved in text fields: `<strong>`, `<mark>`, `<em>`, `<i>`, `<u>`, `<sup>`, `<sub>`, `<ul>`, `<ol>`, and `<li>`. All other tags will be stripped.
 - ISBN must be properly formatted as ISBN-13 (e.g., `978-3-16-148410-0`).
 
-## OMP-Thoth Mapping
+## OMP-Thoth Mapping of Data Fields
 
 <details>
 <summary>Click here to see the data relationship between OMP and Thoth</summary>
@@ -154,7 +154,7 @@ php lib/pkp/lib/vendor/phpunit/phpunit/phpunit --configuration lib/pkp/tests/php
 
 ## Credits
 
-This plugin was idealized and sponsored by [Thoth](https://thoth.pub/).
+This plugin was idealized and sponsored by [Thoth Open Metadata](https://thoth.pub/).
 
 Developed by [Lepidus Tecnologia](https://github.com/lepidus).
 
@@ -164,4 +164,4 @@ This plugin is licensed under the GNU General Public License v3.0 - [See the Lic
 
 Copyright (c) 2024-2026 Lepidus Tecnologia
 
-Copyright (c) 2024-2026 Thoth
+Copyright (c) 2024-2026 Thoth Open Metadata

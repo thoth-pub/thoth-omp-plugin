@@ -1,0 +1,142 @@
+msgid "plugins.generic.thoth.name"
+msgstr "Thoth Plugin"
+
+msgid "plugins.generic.thoth.description"
+msgstr "Integra OMP con Thoth per la comunicazione e la sincronizzazione dei dati dei libri tra le due piattaforme."
+
+msgid "plugins.generic.thoth.navigation.thoth"
+msgstr "Thoth"
+
+msgid "plugins.generic.thoth.settings.title"
+msgstr "Impostazioni API Thoth"
+
+msgid "plugins.generic.thoth.settings.testEnvironment"
+msgstr "Ambiente di test"
+
+msgid "plugins.generic.thoth.settings.testEnvironment.description"
+msgstr "Selezionare questa opzione se si dispone di un'istanza locale dell'API Thoth. (http://localhost:8000)"
+
+msgid "plugins.generic.thoth.settings.email"
+msgstr "Email"
+
+msgid "plugins.generic.thoth.settings.password"
+msgstr "Password"
+
+msgid "plugins.generic.thoth.settings.invalidCredentials"
+msgstr "Credenziali non valide"
+
+msgid "plugins.generic.thoth.settings.secretKeyEmpty"
+msgstr "L'amministratore del sito deve impostare una chiave segreta nel file di configurazione (‘api_key_secret’)."
+
+msgid "plugins.generic.thoth.credentialsMissing"
+msgstr "Credenziali Thoth non configurate."
+
+msgid "plugins.generic.thoth.field.place.label"
+msgstr "Luogo di pubblicazione"
+
+msgid "plugins.generic.thoth.field.pageCount.label"
+msgstr "Numero di pagine"
+
+msgid "plugins.generic.thoth.field.imageCount.label"
+msgstr "Numero di immagini"
+
+msgid "plugins.generic.thoth.field.mainContribution"
+msgstr "Autore principale (main contribution) Thoth"
+
+msgid "plugins.generic.thoth.field.mainContribution.label"
+msgstr "Identifica questo autore come main contribution in Thoth."
+
+msgid "plugins.generic.thoth.workType"
+msgstr "Tipo di opera"
+
+msgid "plugins.generic.thoth.workType.monograph"
+msgstr "Monografia"
+
+msgid "plugins.generic.thoth.workType.textbook"
+msgstr "Textbook"
+
+msgid "plugins.generic.thoth.thothBook"
+msgstr "Libro Thoth: "
+
+msgid "plugins.generic.thoth.imprint"
+msgstr "Imprint"
+
+msgid "plugins.generic.thoth.imprint.required"
+msgstr "Seleziona un imprint."
+
+msgid "plugins.generic.thoth.connectionError"
+msgstr ""
+"Si è verificato un problema durante la connessione a Thoth. Riprova più tardi o "
+"contatta l'amministratore di sistema."
+
+msgid "plugins.generic.thoth.status.registered"
+msgstr "Registrato"
+
+msgid "plugins.generic.thoth.status.unregistered"
+msgstr "Non registrato"
+
+msgid "plugins.generic.thoth.register"
+msgstr "Registra"
+
+msgid "plugins.generic.thoth.register.label"
+msgstr "Registrazione in Thoth"
+
+msgid "plugins.generic.thoth.register.warning"
+msgstr "I metadati della proposta non possono essere inviati a Thoth a causa dei seguenti errori:"
+
+msgid "plugins.generic.thoth.validation.isbn"
+msgstr "\"{$isbn}\" del formato di pubblicazione \"{$formatName}\" non è un ISBN-13 valido."
+
+msgid "plugins.generic.thoth.validation.doiExists"
+msgstr "Esiste già un'opera con DOI \"{$doi}\"."
+
+msgid "plugins.generic.thoth.validation.landingPageExists"
+msgstr "Esiste già un'opera con la pagina di destinazione \"{$landingPage}\"."
+
+msgid "plugins.generic.thoth.validation.isbnExists"
+msgstr "Esiste già una pubblicazione con ISBN \"{$isbn}\"."
+
+msgid "plugins.generic.thoth.register.confirmation"
+msgstr "Vuoi registrare in Thoth i metadati relativi a questa proposta?"
+
+msgid "plugins.generic.thoth.register.success"
+msgstr "Metadati della proposta inviati con successo a Thoth."
+
+msgid "plugins.generic.thoth.register.success.log"
+msgstr "Metadati della proposta registrati in Thoth."
+
+msgid "plugins.generic.thoth.register.error"
+msgstr ""
+"Si è verificato un problema durante l'invio dei metadati della proposta a Thoth. Riprova più tardi o "
+"contatta l'amministratore di sistema."
+
+msgid "plugins.generic.thoth.register.error.log"
+msgstr "Errore durante la registrazione dei metadati in Thoth: {$reason}"
+
+msgid "plugins.generic.thoth.update"
+msgstr "Aggiorna metadati"
+
+msgid "plugins.generic.thoth.update.success"
+msgstr "Metadati aggiornati con successo in Thoth."
+
+msgid "plugins.generic.thoth.update.success.log"
+msgstr "Metadati della proposta aggiornati in Thoth."
+
+msgid "plugins.generic.thoth.update.error"
+msgstr ""
+"Si è verificato un problema durante l'aggiornamento dei metadati in Thoth. Riprova più tardi o "
+"contatta l'amministratore di sistema."
+
+msgid "plugins.generic.thoth.update.error.log"
+msgstr "Errore durante l'aggiornamento dei metadati in Thoth: {$reason}"
+
+msgid "plugins.generic.thoth.actions.register.label"
+msgstr "Registra proposte"
+
+msgid "plugins.generic.thoth.actions.register.prompt"
+msgstr ""
+"Stai per inviare i metadati della proposta per {$count} elementi a "
+"Thoth. Sei sicuro di voler registrare questi record?"
+
+msgid "plugins.generic.thoth.api.403.alreadyRegistered"
+msgstr "La proposta è già registrata in Thoth."
