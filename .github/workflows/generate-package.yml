@@ -33,7 +33,7 @@ jobs:
         run: |
           mkdir $PLUGIN_NAME
           shopt -s extglob
-          cp -r !($PLUGIN_NAME|.git*|.|..|tests) $PLUGIN_NAME
+          cp -r !($PLUGIN_NAME|.git*|.|..|tests|cypress|resources|CLAUDE.md|package.json|package-lock.json|vite.config.js|i18nExtractKeys.vite.js) $PLUGIN_NAME
           wget -O composer.phar https://getcomposer.org/composer-stable.phar
           php composer.phar install -d ${PLUGIN_NAME}
           tar -zcvf $PLUGIN_NAME.tar.gz $PLUGIN_NAME

@@ -3,8 +3,8 @@
 /**
  * @file plugins/generic/thoth/tests/classes/repositories/ThothImprintRepositoryTest.php
  *
- * Copyright (c) 2024-2025 Lepidus Tecnologia
- * Copyright (c) 2024-2025 Thoth
+ * Copyright (c) 2024-2026 Lepidus Tecnologia
+ * Copyright (c) 2024-2026 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothImprintRepositoryTest
@@ -16,11 +16,12 @@
  * @brief Test class for the ThothImprintRepository class
  */
 
+namespace APP\plugins\generic\thoth\tests\classes\repositories;
+
+use APP\plugins\generic\thoth\classes\repositories\ThothImprintRepository;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Models\Imprint as ThothImprint;
-
-import('plugins.generic.thoth.classes.repositories.ThothImprintRepository');
 
 class ThothImprintRepositoryTest extends PKPTestCase
 {
@@ -33,11 +34,11 @@ class ThothImprintRepositoryTest extends PKPTestCase
         ];
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['imprints'])
+            ->onlyMethods(['imprints'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('imprints')
-            ->will($this->returnValue($expectedThothImprints));
+            ->willReturn($expectedThothImprints);
 
         $thothPublisherIds = ['fffa1c59-4823-48ea-9d1c-596006a119b5'];
 

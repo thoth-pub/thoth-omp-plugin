@@ -10,11 +10,23 @@ msgstr "Thoth"
 msgid "plugins.generic.thoth.settings.title"
 msgstr "Configurações da API Thoth"
 
-msgid "plugins.generic.thoth.settings.testEnvironment"
-msgstr "Ambiente de testes"
+msgid "plugins.generic.thoth.settings.customThothApi"
+msgstr "URL personalizada da API Thoth"
 
-msgid "plugins.generic.thoth.settings.testEnvironment.description"
-msgstr "Marque essa opção caso possua uma instância local da API do Thoth. (http://localhost:8000)"
+msgid "plugins.generic.thoth.settings.customThothApi.description"
+msgstr "Usar uma API Thoth personalizada em vez da API oficial da Thoth."
+
+msgid "plugins.generic.thoth.settings.customThothApiUrl"
+msgstr "URL da API Thoth"
+
+msgid "plugins.generic.thoth.settings.customThothApiUrl.required"
+msgstr "A URL personalizada da API Thoth é obrigatória quando a opção de API personalizada está habilitada."
+
+msgid "plugins.generic.thoth.settings.customThothApiUrl.invalid"
+msgstr "A URL personalizada da API Thoth fornecida não é uma URL válida."
+
+msgid "plugins.generic.thoth.settings.customThothApiUrl.unreachable"
+msgstr "Não foi possível conectar à URL personalizada da API Thoth. Verifique se a URL está correta e se o serviço está disponível."
 
 msgid "plugins.generic.thoth.settings.email"
 msgstr "Email"
@@ -140,3 +152,24 @@ msgstr ""
 
 msgid "plugins.generic.thoth.api.403.alreadyRegistered"
 msgstr "A submissão já foi registrada na Thoth."
+
+msgid "plugins.generic.thoth.workStatus"
+msgstr "Status na Thoth"
+
+msgid "plugins.generic.thoth.workStatus.active"
+msgstr "Ativo"
+
+msgid "plugins.generic.thoth.workStatus.forthcoming"
+msgstr "Em breve"
+
+msgid "plugins.generic.thoth.workStatus.withdrawn"
+msgstr "Retirado"
+
+msgid "plugins.generic.thoth.workStatus.superseded"
+msgstr "Substituído"
+
+msgid "plugins.generic.thoth.workStatus.postponedIndefinitely"
+msgstr "Adiado Indefinidamente"
+
+msgid "plugins.generic.thoth.workStatus.cancelled"
+msgstr "Cancelado"

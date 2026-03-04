@@ -3,8 +3,8 @@
 /**
  * @file plugins/generic/thoth/tests/classes/repositories/ThothLanguageRepositoryTest.php
  *
- * Copyright (c) 2024-2025 Lepidus Tecnologia
- * Copyright (c) 2024-2025 Thoth
+ * Copyright (c) 2024-2026 Lepidus Tecnologia
+ * Copyright (c) 2024-2026 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothLanguageRepositoryTest
@@ -16,11 +16,12 @@
  * @brief Test class for the ThothLanguageRepository class
  */
 
+namespace APP\plugins\generic\thoth\tests\classes\repositories;
+
+use APP\plugins\generic\thoth\classes\repositories\ThothLanguageRepository;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Models\Language as ThothLanguage;
-
-import('plugins.generic.thoth.classes.repositories.ThothLanguageRepository');
 
 class ThothLanguageRepositoryTest extends PKPTestCase
 {
@@ -49,11 +50,11 @@ class ThothLanguageRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['language'])
+            ->onlyMethods(['language'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('language')
-            ->will($this->returnValue($expectedThothLanguage));
+            ->willReturn($expectedThothLanguage);
 
         $repository = new ThothLanguageRepository($mockThothClient);
         $thothLanguage = $repository->get('8a3a7422-e5fb-4d2d-810d-513987735b4e');
@@ -70,11 +71,11 @@ class ThothLanguageRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['createLanguage'])
+            ->onlyMethods(['createLanguage'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('createLanguage')
-            ->will($this->returnValue('531ee83b-2a71-41f5-b4db-3af150c6ecde'));
+            ->willReturn('531ee83b-2a71-41f5-b4db-3af150c6ecde');
 
         $repository = new ThothLanguageRepository($mockThothClient);
         $thothLanguageId = $repository->add($thothLanguage);
@@ -92,11 +93,11 @@ class ThothLanguageRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['updateLanguage'])
+            ->onlyMethods(['updateLanguage'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('updateLanguage')
-            ->will($this->returnValue('39200d3a-397d-4d39-a6b2-86089520615a'));
+            ->willReturn('39200d3a-397d-4d39-a6b2-86089520615a');
 
         $repository = new ThothLanguageRepository($mockThothClient);
         $thothLanguageId = $repository->edit($thothPatchLanguage);
@@ -107,11 +108,11 @@ class ThothLanguageRepositoryTest extends PKPTestCase
     public function testDeleteLanguage()
     {
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['deleteLanguage'])
+            ->onlyMethods(['deleteLanguage'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('deleteLanguage')
-            ->will($this->returnValue('dbad156c-f368-4ef7-8ccd-1c488b5e5189'));
+            ->willReturn('dbad156c-f368-4ef7-8ccd-1c488b5e5189');
 
         $repository = new ThothLanguageRepository($mockThothClient);
         $thothLanguageId = $repository->delete('dbad156c-f368-4ef7-8ccd-1c488b5e5189');

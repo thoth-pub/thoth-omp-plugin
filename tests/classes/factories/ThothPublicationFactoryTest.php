@@ -3,8 +3,8 @@
 /**
  * @file plugins/generic/thoth/tests/classes/factories/ThothPublicationFactoryTest.php
  *
- * Copyright (c) 2024-2025 Lepidus Tecnologia
- * Copyright (c) 2024-2025 Thoth
+ * Copyright (c) 2024-2026 Lepidus Tecnologia
+ * Copyright (c) 2024-2026 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothPublicationFactoryTest
@@ -16,47 +16,49 @@
  * @brief Test class for the ThothPublicationFactory class
  */
 
+namespace APP\plugins\generic\thoth\tests\classes\factories;
+
 require_once(__DIR__ . '/../../../vendor/autoload.php');
 
+use APP\plugins\generic\thoth\classes\factories\ThothPublicationFactory;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Models\Publication as ThothPublication;
 
-import('plugins.generic.thoth.classes.factories.ThothPublicationFactory');
-
 class ThothPublicationFactoryTest extends PKPTestCase
 {
+    protected array $mocks = [];
     private function setUpMockEnvironment()
     {
         $mockIdentificationCode = $this->getMockBuilder(\APP\publicationFormat\IdentificationCode::class)
-            ->setMethods(['getCode', 'getValue'])
+            ->onlyMethods(['getCode', 'getValue'])
             ->getMock();
         $mockIdentificationCode->expects($this->any())
             ->method('getCode')
-            ->will($this->returnValue('15'));
+            ->willReturn('15');
         $mockIdentificationCode->expects($this->any())
             ->method('getValue')
-            ->will($this->returnValue('978-3-16-148410-0'));
+            ->willReturn('978-3-16-148410-0');
 
         $mockResult = $this->getMockBuilder(\PKP\db\DAOResultFactory::class)
-            ->setMethods(['toArray'])
+            ->onlyMethods(['toArray'])
             ->disableOriginalConstructor()
             ->getMock();
         $mockResult->expects($this->any())
             ->method('toArray')
-            ->will($this->returnValue([$mockIdentificationCode]));
+            ->willReturn([$mockIdentificationCode]);
 
         $mockPubFormat = $this->getMockBuilder(\APP\publicationFormat\PublicationFormat::class)
-            ->setMethods(['getEntryKey', 'getLocalizedName', 'getIdentificationCodes'])
+            ->onlyMethods(['getEntryKey', 'getLocalizedName', 'getIdentificationCodes'])
             ->getMock();
         $mockPubFormat->expects($this->any())
             ->method('getEntryKey')
-            ->will($this->returnValue('DA'));
+            ->willReturn('DA');
         $mockPubFormat->expects($this->any())
             ->method('getLocalizedName')
-            ->will($this->returnValue('PDF'));
+            ->willReturn('PDF');
         $mockPubFormat->expects($this->any())
             ->method('getIdentificationCodes')
-            ->will($this->returnValue($mockResult));
+            ->willReturn($mockResult);
 
         $this->mocks = [];
         $this->mocks['publicationFormat'] = $mockPubFormat;

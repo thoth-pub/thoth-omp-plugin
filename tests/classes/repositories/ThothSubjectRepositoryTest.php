@@ -3,8 +3,8 @@
 /**
  * @file plugins/generic/thoth/tests/classes/repositories/ThothSubjectRepositoryTest.php
  *
- * Copyright (c) 2024-2025 Lepidus Tecnologia
- * Copyright (c) 2024-2025 Thoth
+ * Copyright (c) 2024-2026 Lepidus Tecnologia
+ * Copyright (c) 2024-2026 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothSubjectRepositoryTest
@@ -16,11 +16,12 @@
  * @brief Test class for the ThothSubjectRepository class
  */
 
+namespace APP\plugins\generic\thoth\tests\classes\repositories;
+
+use APP\plugins\generic\thoth\classes\repositories\ThothSubjectRepository;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Models\Subject as ThothSubject;
-
-import('plugins.generic.thoth.classes.repositories.ThothSubjectRepository');
 
 class ThothSubjectRepositoryTest extends PKPTestCase
 {
@@ -53,11 +54,11 @@ class ThothSubjectRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['subject'])
+            ->onlyMethods(['subject'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('subject')
-            ->will($this->returnValue($expectedThothSubject));
+            ->willReturn($expectedThothSubject);
 
         $repository = new ThothSubjectRepository($mockThothClient);
 
@@ -76,11 +77,11 @@ class ThothSubjectRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['createSubject'])
+            ->onlyMethods(['createSubject'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('createSubject')
-            ->will($this->returnValue('bded83ea-19f9-4c6d-a249-682d6c5bad5d'));
+            ->willReturn('bded83ea-19f9-4c6d-a249-682d6c5bad5d');
 
         $repository = new ThothSubjectRepository($mockThothClient);
 
@@ -100,11 +101,11 @@ class ThothSubjectRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['updateSubject'])
+            ->onlyMethods(['updateSubject'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('updateSubject')
-            ->will($this->returnValue('8f9e7255-010c-4c6f-a6df-035a501513a9'));
+            ->willReturn('8f9e7255-010c-4c6f-a6df-035a501513a9');
 
         $repository = new ThothSubjectRepository($mockThothClient);
 
@@ -116,11 +117,11 @@ class ThothSubjectRepositoryTest extends PKPTestCase
     public function testDeleteSubject()
     {
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['deleteSubject'])
+            ->onlyMethods(['deleteSubject'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('deleteSubject')
-            ->will($this->returnValue('cc51bb07-772c-4f3d-8192-cd0983065a90'));
+            ->willReturn('cc51bb07-772c-4f3d-8192-cd0983065a90');
 
         $repository = new ThothSubjectRepository($mockThothClient);
 

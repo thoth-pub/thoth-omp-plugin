@@ -3,8 +3,8 @@
 /**
  * @file plugins/generic/thoth/tests/classes/services/ThothSubjectServiceTest.php
  *
- * Copyright (c) 2024-2025 Lepidus Tecnologia
- * Copyright (c) 2024-2025 Thoth
+ * Copyright (c) 2024-2026 Lepidus Tecnologia
+ * Copyright (c) 2024-2026 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothSubjectServiceTest
@@ -16,11 +16,12 @@
  * @brief Test class for the ThothSubjectService class
  */
 
+namespace APP\plugins\generic\thoth\tests\classes\services;
+
+use APP\plugins\generic\thoth\classes\repositories\ThothSubjectRepository;
+use APP\plugins\generic\thoth\classes\services\ThothSubjectService;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-
-import('plugins.generic.thoth.classes.repositories.ThothSubjectRepository');
-import('plugins.generic.thoth.classes.services.ThothSubjectService');
 
 class ThothSubjectServiceTest extends PKPTestCase
 {
@@ -28,11 +29,11 @@ class ThothSubjectServiceTest extends PKPTestCase
     {
         $mockRepository = $this->getMockBuilder(ThothSubjectRepository::class)
             ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
-            ->setMethods(['add'])
+            ->onlyMethods(['add'])
             ->getMock();
         $mockRepository->expects($this->once())
             ->method('add')
-            ->will($this->returnValue('ebad8694-0dbe-48cf-a704-5d7e1f54b63d'));
+            ->willReturn('ebad8694-0dbe-48cf-a704-5d7e1f54b63d');
 
         $keyword = 'Education';
         $sequence = 1;

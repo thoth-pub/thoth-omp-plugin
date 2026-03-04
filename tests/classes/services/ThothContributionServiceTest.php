@@ -3,8 +3,8 @@
 /**
  * @file plugins/generic/thoth/tests/classes/services/ThothContributionServiceTest.php
  *
- * Copyright (c) 2024-2025 Lepidus Tecnologia
- * Copyright (c) 2024-2025 Thoth
+ * Copyright (c) 2024-2026 Lepidus Tecnologia
+ * Copyright (c) 2024-2026 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothContributionServiceTest
@@ -16,14 +16,17 @@
  * @brief Test class for the ThothContributionService class
  */
 
+namespace APP\plugins\generic\thoth\tests\classes\services;
+
+use APP\plugins\generic\thoth\classes\container\ThothContainer;
+use APP\plugins\generic\thoth\classes\factories\ThothContributionFactory;
+use APP\plugins\generic\thoth\classes\repositories\ThothContributionRepository;
+use APP\plugins\generic\thoth\classes\repositories\ThothContributorRepository;
+use APP\plugins\generic\thoth\classes\services\ThothContributionService;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Models\Contribution as ThothContribution;
 use ThothApi\GraphQL\Models\Contributor as ThothContributor;
-
-import('plugins.generic.thoth.classes.factories.ThothContributionFactory');
-import('plugins.generic.thoth.classes.services.ThothContributionService');
-import('plugins.generic.thoth.classes.repositories.ThothContributionRepository');
 
 class ThothContributionServiceTest extends PKPTestCase
 {
@@ -32,31 +35,34 @@ class ThothContributionServiceTest extends PKPTestCase
         ThothContainer::getInstance()->set('contributorRepository', function () {
             $mockRepository = $this->getMockBuilder(ThothContributorRepository::class)
                 ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
-                ->setMethods(['find'])
+                ->onlyMethods(['find'])
                 ->getMock();
             $mockRepository->expects($this->once())
                 ->method('find')
-                ->will($this->returnValue(new ThothContributor()));
+                ->willReturn(new ThothContributor());
 
             return $mockRepository;
         });
 
         $mockFactory = $this->getMockBuilder(ThothContributionFactory::class)
-            ->setMethods(['createFromAuthor'])
+            ->onlyMethods(['createFromAuthor'])
             ->getMock();
         $mockFactory->expects($this->once())
             ->method('createFromAuthor')
-            ->will($this->returnValue(new ThothContribution()));
+            ->willReturn(new ThothContribution());
 
         $mockRepository = $this->getMockBuilder(ThothContributionRepository::class)
             ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
-            ->setMethods(['add'])
+            ->onlyMethods(['add'])
             ->getMock();
         $mockRepository->expects($this->once())
             ->method('add')
-            ->will($this->returnValue('e2d8dc3b-a5d9-4941-8ebd-52f0a70515bd'));
+            ->willReturn('e2d8dc3b-a5d9-4941-8ebd-52f0a70515bd');
 
         $mockAuthor = $this->getMockBuilder(\APP\author\Author::class)->getMock();
+        $mockAuthor->expects($this->once())
+            ->method('getAffiliations')
+            ->willReturn([]);
         $thothWorkId = '97fcc25c-361b-46f9-8c4b-016bfa36fb6d';
 
         $service = new ThothContributionService($mockFactory, $mockRepository);

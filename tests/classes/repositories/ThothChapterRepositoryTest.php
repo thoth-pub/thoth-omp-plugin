@@ -3,8 +3,8 @@
 /**
  * @file plugins/generic/thoth/tests/classes/repositories/ThothChapterRepositoryTest.php
  *
- * Copyright (c) 2024-2025 Lepidus Tecnologia
- * Copyright (c) 2024-2025 Thoth
+ * Copyright (c) 2024-2026 Lepidus Tecnologia
+ * Copyright (c) 2024-2026 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothChapterRepositoryTest
@@ -16,11 +16,12 @@
  * @brief Test class for the ThothChapterRepository class
  */
 
+namespace APP\plugins\generic\thoth\tests\classes\repositories;
+
+use APP\plugins\generic\thoth\classes\repositories\ThothChapterRepository;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Models\Work as ThothWork;
-
-import('plugins.generic.thoth.classes.repositories.ThothChapterRepository');
 
 class ThothChapterRepositoryTest extends PKPTestCase
 {
@@ -31,11 +32,11 @@ class ThothChapterRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['chapterByDoi'])
+            ->onlyMethods(['chapterByDoi'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('chapterByDoi')
-            ->will($this->returnValue($expectedThothChapter));
+            ->willReturn($expectedThothChapter);
 
         $repository = new ThothChapterRepository($mockThothClient);
 
@@ -51,11 +52,11 @@ class ThothChapterRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['chapters'])
+            ->onlyMethods(['chapters'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('chapters')
-            ->will($this->returnValue([$expectedThothChapter]));
+            ->willReturn([$expectedThothChapter]);
 
         $repository = new ThothChapterRepository($mockThothClient);
 

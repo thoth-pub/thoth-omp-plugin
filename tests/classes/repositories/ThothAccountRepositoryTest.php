@@ -3,8 +3,8 @@
 /**
  * @file plugins/generic/thoth/tests/classes/repositories/ThothAccountRepositoryTest.php
  *
- * Copyright (c) 2024-2025 Lepidus Tecnologia
- * Copyright (c) 2024-2025 Thoth
+ * Copyright (c) 2024-2026 Lepidus Tecnologia
+ * Copyright (c) 2024-2026 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothAccountRepositoryTest
@@ -16,21 +16,22 @@
  * @brief Test class for the ThothAccountRepository class
  */
 
+namespace APP\plugins\generic\thoth\tests\classes\repositories;
+
+use APP\plugins\generic\thoth\classes\repositories\ThothAccountRepository;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-
-import('plugins.generic.thoth.classes.repositories.ThothAccountRepository');
 
 class ThothAccountRepositoryTest extends PKPTestCase
 {
     public function testGetLinkedPublishers()
     {
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['accountDetails'])
+            ->onlyMethods(['accountDetails'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('accountDetails')
-            ->will($this->returnValue([
+            ->willReturn([
                 'resourceAccess' => [
                     'linkedPublishers' => [
                         [
@@ -38,7 +39,7 @@ class ThothAccountRepositoryTest extends PKPTestCase
                         ]
                     ]
                 ]
-            ]));
+            ]);
 
         $repository = new ThothAccountRepository($mockThothClient);
 
