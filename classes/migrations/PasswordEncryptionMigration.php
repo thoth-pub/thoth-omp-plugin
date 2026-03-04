@@ -2,16 +2,20 @@
 
 namespace APP\plugins\generic\thoth\classes\migrations;
 
+use Exception;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Facades\DB;
-use APP\plugins\generic\thoth\classes\encryption\DataEncryption;
+use PKP\config\Config;
 
 class PasswordEncryptionMigration extends Migration
 {
+    private const ENCRYPTION_CIPHER = 'AES-256-CBC';
+    private const BASE64_PREFIX = 'base64:';
+
     public function up(): void
     {
-        $encrypter = new DataEncryption();
-        if (!$encrypter->secretConfigExists()) {
+        if (!$this->secretConfigExists()) {
             return;
         }
 
@@ -19,8 +23,8 @@ class PasswordEncryptionMigration extends Migration
             ->where('plugin_name', 'thothplugin')
             ->where('setting_name', 'password')
             ->get(['context_id', 'setting_value'])
-            ->each(function ($row) use ($encrypter) {
-                if (empty($row->setting_value) || $encrypter->textIsEncrypted($row->setting_value)) {
+            ->each(function ($row) {
+                if (empty($row->setting_value) || $this->textIsEncrypted($row->setting_value)) {
                     return;
                 }
 
@@ -31,13 +35,71 @@ class PasswordEncryptionMigration extends Migration
                     }
                 }
 
-                $encryptedValue = $encrypter->encryptString($row->setting_value);
+                $encryptedValue = $this->encryptString($row->setting_value);
                 DB::table('plugin_settings')
                     ->where('plugin_name', 'thothplugin')
                     ->where('context_id', $row->context_id)
                     ->where('setting_name', 'password')
                     ->update(['setting_value' => $encryptedValue]);
             });
+    }
+
+    private function secretConfigExists(): bool
+    {
+        try {
+            $this->getSecretFromConfig();
+        } catch (Exception $e) {
+            return false;
+        }
+        return true;
+    }
+
+    private function getSecretFromConfig(): string
+    {
+        $secret = Config::getVar('security', 'api_key_secret');
+        if ($secret === '') {
+            throw new Exception(
+                "A secret must be set in the config file ('api_key_secret')"
+                . ' so that keys can be encrypted and decrypted'
+            );
+        }
+
+        return hash('sha256', $secret, true);
+    }
+
+    private function textIsEncrypted(string $text): bool
+    {
+        if (!str_starts_with($text, self::BASE64_PREFIX)) {
+            return false;
+        }
+
+        try {
+            $this->decryptString($text);
+            return true;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+    private function encryptString(string $plainText): string
+    {
+        $secret = $this->getSecretFromConfig();
+        $encrypter = new Encrypter($secret, self::ENCRYPTION_CIPHER);
+
+        $encryptedString = $encrypter->encrypt($plainText);
+
+        return self::BASE64_PREFIX . base64_encode($encryptedString);
+    }
+
+    private function decryptString(string $encryptedText): string
+    {
+        $secret = $this->getSecretFromConfig();
+        $encrypter = new Encrypter($secret, self::ENCRYPTION_CIPHER);
+
+        $encryptedText = str_replace(self::BASE64_PREFIX, '', $encryptedText);
+        $payload = base64_decode($encryptedText);
+
+        return $encrypter->decrypt($payload);
     }
 
     public function base64URLDecode($data)
@@ -74,7 +136,7 @@ class PasswordEncryptionMigration extends Migration
 
     public function decodeJWT($string): ?string
     {
-        list($header, $payload, $signature) = explode('.', $string);
+        [$header, $payload, $signature] = explode('.', $string);
         $decodedPayload = $this->base64URLDecode($payload);
         return $decodedPayload ? $decodedPayload : null;
     }

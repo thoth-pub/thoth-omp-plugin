@@ -1,0 +1,14 @@
+{
+  "name": "thoth-plugin",
+  "version": "1.0.0",
+  "description": "Thoth integration plugin for OMP",
+  "private": true,
+  "scripts": {
+    "dev": "vite build --watch --minify=false",
+    "build": "vite build"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "vite": "^6.1.0"
+  }
+}

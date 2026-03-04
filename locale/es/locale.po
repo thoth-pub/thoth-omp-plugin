@@ -10,11 +10,23 @@ msgstr "Thoth"
 msgid "plugins.generic.thoth.settings.title"
 msgstr "Configuración de la API de Thoth"
 
-msgid "plugins.generic.thoth.settings.testEnvironment"
-msgstr "Entorno de prueba"
+msgid "plugins.generic.thoth.settings.customThothApi"
+msgstr "URL personalizada de la API de Thoth"
 
-msgid "plugins.generic.thoth.settings.testEnvironment.description"
-msgstr "Marque esta opción si dispone de una instancia local de la API Thoth. (http://localhost:8000)"
+msgid "plugins.generic.thoth.settings.customThothApi.description"
+msgstr "Utilizar una URL personalizada de la API de Thoth en lugar de la API oficial de Thoth."
+
+msgid "plugins.generic.thoth.settings.customThothApiUrl"
+msgstr "URL de la API de Thoth"
+
+msgid "plugins.generic.thoth.settings.customThothApiUrl.required"
+msgstr "La URL personalizada de la API de Thoth es obligatoria cuando la opción de API personalizada está habilitada."
+
+msgid "plugins.generic.thoth.settings.customThothApiUrl.invalid"
+msgstr "La URL personalizada de la API de Thoth proporcionada no es una URL válida."
+
+msgid "plugins.generic.thoth.settings.customThothApiUrl.unreachable"
+msgstr "No se pudo conectar a la URL personalizada de la API de Thoth. Verifique que la URL es correcta y que el servicio está disponible."
 
 msgid "plugins.generic.thoth.settings.email"
 msgstr "Correo electrónico"
@@ -140,3 +152,24 @@ msgstr ""
 
 msgid "plugins.generic.thoth.api.403.alreadyRegistered"
 msgstr "El envío ya está registrado en Thoth."
+
+msgid "plugins.generic.thoth.workStatus"
+msgstr "Estado en Thoth"
+
+msgid "plugins.generic.thoth.workStatus.active"
+msgstr "Activo"
+
+msgid "plugins.generic.thoth.workStatus.forthcoming"
+msgstr "Próximamente"
+
+msgid "plugins.generic.thoth.workStatus.withdrawn"
+msgstr "Retirado"
+
+msgid "plugins.generic.thoth.workStatus.superseded"
+msgstr "Reemplazado"
+
+msgid "plugins.generic.thoth.workStatus.postponedIndefinitely"
+msgstr "Pospuesto Indefinidamente"
+
+msgid "plugins.generic.thoth.workStatus.cancelled"
+msgstr "Cancelado"

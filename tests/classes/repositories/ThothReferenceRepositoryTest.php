@@ -3,8 +3,8 @@
 /**
  * @file plugins/generic/thoth/tests/classes/repositories/ThothReferenceRepositoryTest.php
  *
- * Copyright (c) 2024-2025 Lepidus Tecnologia
- * Copyright (c) 2024-2025 Thoth
+ * Copyright (c) 2024-2026 Lepidus Tecnologia
+ * Copyright (c) 2024-2026 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothReferenceRepositoryTest
@@ -16,11 +16,12 @@
  * @brief Test class for the ThothReferenceRepository class
  */
 
+namespace APP\plugins\generic\thoth\tests\classes\repositories;
+
+use APP\plugins\generic\thoth\classes\repositories\ThothReferenceRepository;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Models\Reference as ThothReference;
-
-import('plugins.generic.thoth.classes.repositories.ThothReferenceRepository');
 
 class ThothReferenceRepositoryTest extends PKPTestCase
 {
@@ -51,11 +52,11 @@ class ThothReferenceRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['reference'])
+            ->onlyMethods(['reference'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('reference')
-            ->will($this->returnValue($expectedThothReference));
+            ->willReturn($expectedThothReference);
 
         $repository = new ThothReferenceRepository($mockThothClient);
 
@@ -73,11 +74,11 @@ class ThothReferenceRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['createReference'])
+            ->onlyMethods(['createReference'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('createReference')
-            ->will($this->returnValue('730cf906-472c-4aee-9ebd-67b41e590161'));
+            ->willReturn('730cf906-472c-4aee-9ebd-67b41e590161');
 
         $repository = new ThothReferenceRepository($mockThothClient);
 
@@ -96,11 +97,11 @@ class ThothReferenceRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['updateReference'])
+            ->onlyMethods(['updateReference'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('updateReference')
-            ->will($this->returnValue('071ace7c-b65b-4bb8-b883-fb2d695d1ad9'));
+            ->willReturn('071ace7c-b65b-4bb8-b883-fb2d695d1ad9');
 
         $repository = new ThothReferenceRepository($mockThothClient);
 
@@ -112,11 +113,11 @@ class ThothReferenceRepositoryTest extends PKPTestCase
     public function testDeleteReference()
     {
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['deleteReference'])
+            ->onlyMethods(['deleteReference'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('deleteReference')
-            ->will($this->returnValue('45896198-2823-4260-95b9-1ff5f4898b7c'));
+            ->willReturn('45896198-2823-4260-95b9-1ff5f4898b7c');
 
         $repository = new ThothReferenceRepository($mockThothClient);
 

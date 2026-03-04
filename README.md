@@ -2,7 +2,11 @@
 
 # Thoth OMP Plugin
 
-Enables metadata exchange between OMP and Thoth Open Metadata to facilitate easy transfer and subsequent enhancement of book- and chapter-level data in the free-to-use self-service [Thoth](https://thoth.pub/) metadata platform, enabling OMP users to generate metadata in multiple book-specific formats including ONIX, MARC, KBART, Crossref XML, etc.
+[![Current Version](https://img.shields.io/badge/version-v0.3.0.0-blue)](https://github.com/thoth-pub/thoth-omp-plugin/releases)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-green.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![OMP compatibility](https://img.shields.io/badge/OMP-3.3_%7C_3.4_%7C_3.5-blue)](https://pkp.sfu.ca/software/omp/)
+
+Integrates [OMP (Open Monograph Press)](https://pkp.sfu.ca/software/omp/) with [Thoth](https://thoth.pub/), an open metadata management platform for books. This plugin enables the registration and synchronization of book- and chapter-level metadata directly from OMP into Thoth, where it can be disseminated in multiple industry-standard formats including ONIX, MARC, KBART, and Crossref XML.
 
 ## Compatibility
 
@@ -10,16 +14,7 @@ This plugin is compatible with the following PKP applications:
 
 - OMP 3.3.0-x
 - OMP 3.4.0-x
-
-## Requirements
-
-### Press Requirements
-
-1. **api_key_secret**
-
-The OMP instance must have the `api_key_secret` configuration set up, you may contact your system administrator to do that (see [this post](https://forum.pkp.sfu.ca/t/how-to-generate-a-api-key-secret-code-in-ojs-3/72008)).
-
-This is required to use the API credentials provided, that are stored encrypted in the OMP database.
+- OMP 3.5.0-x
 
 ## Installation
 
@@ -31,52 +26,60 @@ This is required to use the API credentials provided, that are stored encrypted 
 
 ## Usage
 
-### Guidelines
-
-- Only basic HTML tags are preserved (`<strong>`, `<mark>`, `<em>`, `<i>`, `<u>`, `<sup>`, `<sub>`, `<ul>`, `<ol>` and `<li>`); all others will be removed
-- ISBN must be properly formatted (e.g., 978-3-16-148410-0).
-- To avoid incorrect assignment of affiliations in Thoth, is required the use of the [ROR plugin](https://github.com/withanage/ror) to fill the affiliations in OMP.
-
 ### Configuration
 
-To configure the plugin:
+After enabling the plugin, go to the plugin settings and fill in:
 
-- **E-mail** and **Password**: Enter the credentials for a Thoth account to connect with the API.
-- **Test Environment**: Check this option if you are using a local instance of the Thoth API for testing purposes.
+- **Email** and **Password**: Credentials for a Thoth account to connect with the API.
+- **Custom Thoth API**: Check this option to use a custom Thoth API instead of the official one.
+- **Thoth API URL**: The URL of the custom Thoth API (only required when the custom API option is enabled).
 
-![settings](/images/settings.png)
+<img src="/docs/images/plugin_settings.png" alt="Plugin settings form with email, password, custom API and URL fields" width="700">
 
-### Managing Monographs
+### Registering Monographs
 
-- **Unpublished Monographs**: Register metadata in Thoth during the publishing process by selecting the option to register metadata in the publish modal and choosing an imprint.
+#### Unpublished Monographs
 
-![publish](/images/publish.png)
+Register metadata in Thoth during the publishing process by selecting the option to register metadata in the publish modal and choosing an imprint.
 
-- **Published Monographs**: Register metadata for published monographs by using the 'Register' button next to the publication status.
+<img src="/docs/images/register_field.png" alt="Publish modal with Thoth registration option" width="700">
 
-![button](/images/button.png)
-![register](/images/register.png)
+#### Published Monographs
+
+Register metadata for already-published monographs by using the 'Register' button next to the publication status.
+
+<img src="/docs/images/register_button.png" alt="Register button in the publication workflow" width="700">
+<img src="/docs/images/register_modal.png" alt="Registration modal with imprint selection" width="700">
 
 ### Updating Metadata
 
-To update metadata in Thoth, unpublish the monograph, edit the data, and the changes will be automatically updated in Thoth.
+Once a monograph is registered, metadata updates are **automatic**. Unpublish the monograph, edit the data, and the changes will be synchronized with Thoth upon republication.
+
+It is also possible to manually update the metadata in Thoth by clicking the 'Update Metadata' button next to the publication status.
+
+<img src="/docs/images/update_button.png" alt="Update Metadata button in the publication workflow" width="700">
 
 ### Accessing Thoth Book Records
 
-After metadata is published, a link to the book on Thoth will appear at the top of the publication.
+After metadata is registered, a link to the book on Thoth will appear at the top of the publication workflow.
 
-![link](/images/link.png)
+<img src="/docs/images/view_button.png" alt="View link to the Thoth book record" width="700">
 
-### Bulk register
+### Bulk Registration
 
-On the Thoth page, you can bulk submit a selection of titles from OMP into Thoth.
+On the Thoth management page, you can submit a selection of titles from OMP into Thoth in bulk.
 
-![page](/images/page.png)
+<img src="/docs/images/bulk_register_page.png" alt="Thoth management page with bulk registration" width="700">
+
+### Guidelines
+
+- Only basic HTML tags are preserved in text fields: `<strong>`, `<mark>`, `<em>`, `<i>`, `<u>`, `<sup>`, `<sub>`, `<ul>`, `<ol>`, and `<li>`. All other tags will be stripped.
+- ISBN must be properly formatted as ISBN-13 (e.g., `978-3-16-148410-0`).
 
 ## OMP-Thoth Mapping of Data Fields
 
 <details>
-    <summary>Click here to see the data relationship between Thoth and OMP</summary>
+<summary>Click here to see the data relationship between OMP and Thoth</summary>
 
 | OMP               |                    |   | Thoth                  |                     |             |
 | ----------------- | ------------------ | - | ---------------------- | ------------------- | ----------- |
@@ -122,6 +125,32 @@ On the Thoth page, you can bulk submit a selection of titles from OMP into Thoth
 | Citation          |                    |   | Reference              |                     |             |
 
 </details>
+
+## Development
+
+### Requirements
+
+- PHP 8.1+
+- [Composer](https://getcomposer.org/)
+- [Node.js](https://nodejs.org/) (for building frontend assets)
+
+### Setup
+
+```bash
+# Install PHP dependencies
+composer install
+
+# Install Node.js dependencies and build frontend assets
+npm install
+npm run build
+```
+
+### Running Tests
+
+```bash
+# From the OMP root directory
+php lib/pkp/lib/vendor/phpunit/phpunit/phpunit --configuration lib/pkp/tests/phpunit.xml -v plugins/generic/thoth/tests
+```
 
 ## Credits
 

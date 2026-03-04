@@ -3,8 +3,8 @@
 /**
  * @file plugins/generic/thoth/tests/classes/services/ThothLanguageServiceTest.php
  *
- * Copyright (c) 2024-2025 Lepidus Tecnologia
- * Copyright (c) 2024-2025 Thoth
+ * Copyright (c) 2024-2026 Lepidus Tecnologia
+ * Copyright (c) 2024-2026 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothLanguageServiceTest
@@ -16,11 +16,12 @@
  * @brief Test class for the ThothLanguageService class
  */
 
+namespace APP\plugins\generic\thoth\tests\classes\services;
+
+use APP\plugins\generic\thoth\classes\repositories\ThothLanguageRepository;
+use APP\plugins\generic\thoth\classes\services\ThothLanguageService;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-
-import('plugins.generic.thoth.classes.repositories.ThothLanguageRepository');
-import('plugins.generic.thoth.classes.services.ThothLanguageService');
 
 class ThothLanguageServiceTest extends PKPTestCase
 {
@@ -28,11 +29,11 @@ class ThothLanguageServiceTest extends PKPTestCase
     {
         $mockRepository = $this->getMockBuilder(ThothLanguageRepository::class)
             ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
-            ->setMethods(['add'])
+            ->onlyMethods(['add'])
             ->getMock();
         $mockRepository->expects($this->once())
             ->method('add')
-            ->will($this->returnValue('d3ddc7b3-d5f3-4394-9c34-320cd222a497'));
+            ->willReturn('d3ddc7b3-d5f3-4394-9c34-320cd222a497');
 
         $locale = 'en_US';
         $thothWorkId = 'fdd9321f-84e3-4d19-a914-24289e8aec09';

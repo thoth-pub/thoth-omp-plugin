@@ -3,8 +3,8 @@
 <version>
 	<application>thoth</application>
 	<type>plugins.generic</type>
-	<release>0.2.9.0</release>
-	<date>2025-11-03</date>
+	<release>0.3.0.0</release>
+	<date>2026-03-04</date>
 	<lazy-load>1</lazy-load>
 	<class>ThothPlugin</class>
 </version>

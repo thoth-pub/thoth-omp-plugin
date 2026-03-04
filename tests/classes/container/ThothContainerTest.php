@@ -3,19 +3,23 @@
 /**
  * @file plugins/generic/thoth/tests/classes/container/ThothContainerTest.php
  *
- * Copyright (c) 2024-2025 Lepidus Tecnologia
- * Copyright (c) 2024-2025 Thoth
+ * Copyright (c) 2024-2026 Lepidus Tecnologia
+ * Copyright (c) 2024-2026 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothContainerTest
+ *
  * @ingroup plugins_generic_thoth_tests
+ *
  * @see ThothContainer
  *
  * @brief Test class for the ThothContainer class
  */
 
-import('lib.pkp.tests.PKPTestCase');
-import('plugins.generic.thoth.classes.container.ThothContainer');
+namespace APP\plugins\generic\thoth\tests\classes\container;
+
+use APP\plugins\generic\thoth\classes\container\ThothContainer;
+use PKP\tests\PKPTestCase;
 
 class ThothContainerTest extends PKPTestCase
 {

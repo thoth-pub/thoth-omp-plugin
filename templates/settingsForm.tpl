@@ -3,8 +3,8 @@
  *
  * Copyright (c) 2014-2020 Simon Fraser University
  * Copyright (c) 2003-2020 John Willinsky
- * Copyright (c) 2024 Lepidus Tecnologia
- * Copyright (c) 2024 Thoth
+ * Copyright (c) 2024-2026 Lepidus Tecnologia
+ * Copyright (c) 2024-2026 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * Thoth plugin settings
@@ -25,21 +25,22 @@
 >
 	{csrf}
 
-	{include file="controllers/notification/inPlaceNotification.tpl" notificationId="thothSettingsFormNotification"}
+	{include file="common/formErrors.tpl"}
 
 	{fbvFormArea id="thothSettings"}
-		<h3>
-            {translate key="plugins.generic.thoth.settings.title" }
-        </h3>
-
-		{fbvFormSection}
-			{fbvElement type="email" id="email" label="plugins.generic.thoth.settings.email" value=$email required="true"}
-			</p>
-			{fbvElement type="text" password="true" id="password" label="plugins.generic.thoth.settings.password" value=$password required="true"}
+		{fbvFormSection title="plugins.generic.thoth.settings.email"}
+			{fbvElement type="email" id="email" label="plugins.generic.thoth.settings.email" value=$email required="true" size=$fbvStyles.size.SMALL}
+		{/fbvFormSection}	
+		{fbvFormSection title="plugins.generic.thoth.settings.password"}
+			{fbvElement type="text" password="true" id="password" label="plugins.generic.thoth.settings.password" value=$password required="true" size=$fbvStyles.size.SMALL}
 		{/fbvFormSection}
 
-		{fbvFormSection list="true" title="plugins.generic.thoth.settings.testEnvironment"}
-			{fbvElement type="checkbox" id="testEnvironment" label="plugins.generic.thoth.settings.testEnvironment.description" checked=$testEnvironment}
+		{fbvFormSection list="true" title="plugins.generic.thoth.settings.customThothApi"}
+			{fbvElement type="checkbox" id="customThothApi" label="plugins.generic.thoth.settings.customThothApi.description" checked=$customThothApi}
+		{/fbvFormSection}
+
+		{fbvFormSection title="plugins.generic.thoth.settings.customThothApiUrl"}
+			{fbvElement type="text" id="customThothApiUrl" label="plugins.generic.thoth.settings.customThothApiUrl" value=$customThothApiUrl size=$fbvStyles.size.SMALL}
 		{/fbvFormSection}
 	{/fbvFormArea}
 

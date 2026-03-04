@@ -3,8 +3,8 @@
 /**
  * @file plugins/generic/thoth/tests/classes/repositories/ThothWorkRepositoryTest.php
  *
- * Copyright (c) 2024-2025 Lepidus Tecnologia
- * Copyright (c) 2024-2025 Thoth
+ * Copyright (c) 2024-2026 Lepidus Tecnologia
+ * Copyright (c) 2024-2026 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothWorkRepositoryTest
@@ -16,11 +16,12 @@
  * @brief Test class for the ThothWorkRepository class
  */
 
+namespace APP\plugins\generic\thoth\tests\classes\repositories;
+
+use APP\plugins\generic\thoth\classes\repositories\ThothWorkRepository;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Models\Work as ThothWork;
-
-import('plugins.generic.thoth.classes.repositories.ThothWorkRepository');
 
 class ThothWorkRepositoryTest extends PKPTestCase
 {
@@ -55,11 +56,11 @@ class ThothWorkRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['work'])
+            ->onlyMethods(['work'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('work')
-            ->will($this->returnValue($expectedThothWork));
+            ->willReturn($expectedThothWork);
 
         $repository = new ThothWorkRepository($mockThothClient);
 
@@ -79,11 +80,11 @@ class ThothWorkRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['createWork'])
+            ->onlyMethods(['createWork'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('createWork')
-            ->will($this->returnValue('4c64863b-ce51-4cf5-bedf-0dd911147f6d'));
+            ->willReturn('4c64863b-ce51-4cf5-bedf-0dd911147f6d');
 
         $repository = new ThothWorkRepository($mockThothClient);
 
@@ -104,11 +105,11 @@ class ThothWorkRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['updateWork'])
+            ->onlyMethods(['updateWork'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('updateWork')
-            ->will($this->returnValue('8ea11ca6-a2e2-4da7-8f4e-7738e9dcaac9'));
+            ->willReturn('8ea11ca6-a2e2-4da7-8f4e-7738e9dcaac9');
 
         $repository = new ThothWorkRepository($mockThothClient);
 
@@ -120,11 +121,11 @@ class ThothWorkRepositoryTest extends PKPTestCase
     public function testDeleteWork()
     {
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['deleteWork'])
+            ->onlyMethods(['deleteWork'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('deleteWork')
-            ->will($this->returnValue('8de75f0d-36c3-4ab7-8c84-bc53dfc0c3a4'));
+            ->willReturn('8de75f0d-36c3-4ab7-8c84-bc53dfc0c3a4');
 
         $repository = new ThothWorkRepository($mockThothClient);
 

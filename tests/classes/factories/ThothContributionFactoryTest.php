@@ -3,8 +3,8 @@
 /**
  * @file plugins/generic/thoth/tests/classes/factories/ThothContributionFactoryTest.php
  *
- * Copyright (c) 2024-2025 Lepidus Tecnologia
- * Copyright (c) 2024-2025 Thoth
+ * Copyright (c) 2024-2026 Lepidus Tecnologia
+ * Copyright (c) 2024-2026 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothContributionFactoryTest
@@ -16,28 +16,25 @@
  * @brief Test class for the ThothContributionFactory class
  */
 
+namespace APP\plugins\generic\thoth\tests\classes\factories;
+
 require_once(__DIR__ . '/../../../vendor/autoload.php');
 
+use APP\plugins\generic\thoth\classes\factories\ThothContributionFactory;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Models\Contribution as ThothContribution;
 
-import('plugins.generic.thoth.classes.factories.ThothContributionFactory');
-
 class ThothContributionFactoryTest extends PKPTestCase
 {
+    protected array $mocks = [];
     private function setUpMockEnvironment()
     {
-        $mockUserGroup = $this->getMockBuilder(\PKP\userGroup\UserGroup::class)
-            ->setMethods(['getData'])
-            ->getMock();
-        $mockUserGroup->expects($this->any())
-            ->method('getData')
-            ->will($this->returnValueMap([
-                ['nameLocaleKey', null, 'default.groups.name.author'],
-            ]));
+        $mockUserGroup = new class () {
+            public $nameLocaleKey = 'default.groups.name.author';
+        };
 
         $mockAuthor = $this->getMockBuilder(\APP\author\Author::class)
-            ->setMethods([
+            ->onlyMethods([
                 'getFullName',
                 'getId',
                 'getLocalizedBiography',
@@ -49,25 +46,25 @@ class ThothContributionFactoryTest extends PKPTestCase
             ->getMock();
         $mockAuthor->expects($this->any())
             ->method('getFullName')
-            ->will($this->returnValue('John Doe'));
+            ->willReturn('John Doe');
         $mockAuthor->expects($this->any())
             ->method('getId')
-            ->will($this->returnValue(1));
+            ->willReturn(1);
         $mockAuthor->expects($this->any())
             ->method('getLocalizedBiography')
-            ->will($this->returnValue('This is my author biography'));
+            ->willReturn('This is my author biography');
         $mockAuthor->expects($this->any())
             ->method('getLocalizedFamilyName')
-            ->will($this->returnValue('Doe'));
+            ->willReturn('Doe');
         $mockAuthor->expects($this->any())
             ->method('getLocalizedGivenName')
-            ->will($this->returnValue('John'));
+            ->willReturn('John');
         $mockAuthor->expects($this->any())
             ->method('getSequence')
-            ->will($this->returnValue(0));
+            ->willReturn(0);
         $mockAuthor->expects($this->any())
             ->method('getUserGroup')
-            ->will($this->returnValue($mockUserGroup));
+            ->willReturn($mockUserGroup);
 
         $this->mocks = [];
         $this->mocks['author'] = $mockAuthor;
