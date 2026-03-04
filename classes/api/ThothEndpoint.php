@@ -128,6 +128,9 @@ class ThothEndpoint
             return response()->json($failure, Response::HTTP_BAD_REQUEST);
         }
 
+        $thothWork = ThothRepository::work()->get($thothBookId);
+        $thothWorkStatus = $thothWork->getWorkStatus();
+
         $submission = Repo::submission()->get($submission->getId());
 
         $userGroups = UserGroup::withContextIds($submission->getData('contextId'))->get();
@@ -138,13 +141,16 @@ class ThothEndpoint
         $routeController = PKPBaseController::getRouteController();
         $userRoles = (array) $routeController->getAuthorizedContextObject(Application::ASSOC_TYPE_USER_ROLES);
 
+        $submissionProps = Repo::submission()->getSchemaMap()->map(
+            $submission,
+            $userGroups,
+            $genres,
+            $userRoles
+        );
+        $submissionProps['thothWorkStatus'] = $thothWorkStatus;
+
         return response()->json(
-            Repo::submission()->getSchemaMap()->map(
-                $submission,
-                $userGroups,
-                $genres,
-                $userRoles
-            ),
+            $submissionProps,
             Response::HTTP_OK
         );
     }

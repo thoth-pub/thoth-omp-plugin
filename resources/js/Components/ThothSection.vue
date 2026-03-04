@@ -56,6 +56,7 @@ const props = defineProps({
 });
 
 const workStatus = ref(null);
+const fetchError = ref(false);
 const isLoading = ref(false);
 
 const isPublished = computed(
@@ -83,6 +84,9 @@ const statusLabel = computed(() => {
 	if (!props.submission.thothWorkId) {
 		return t('plugins.generic.thoth.status.unregistered');
 	}
+	if (fetchError.value) {
+		return t('common.error');
+	}
 	if (!workStatus.value) {
 		return '...';
 	}
@@ -91,7 +95,11 @@ const statusLabel = computed(() => {
 });
 
 const statusColor = computed(() => {
-	if (!props.submission.thothWorkId || !workStatus.value) {
+	if (!props.submission.thothWorkId) {
+		return 'bg-stage-declined';
+	}
+
+	if (fetchError.value) {
 		return 'bg-stage-declined';
 	}
 
@@ -117,6 +125,8 @@ function fetchWorkStatus() {
 		return;
 	}
 
+	fetchError.value = false;
+
 	$.ajax({
 		method: 'GET',
 		url: props.workStatusUrl,
@@ -125,6 +135,9 @@ function fetchWorkStatus() {
 		},
 		success(response) {
 			workStatus.value = response.workStatus;
+		},
+		error() {
+			fetchError.value = true;
 		},
 	});
 }

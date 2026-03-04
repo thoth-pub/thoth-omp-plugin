@@ -117,6 +117,7 @@ defineEmits(['select-item']);
 
 const expanded = ref(false);
 const workStatus = ref(null);
+const fetchError = ref(false);
 
 const workStatusLocaleMap = {
 	ACTIVE: 'plugins.generic.thoth.workStatus.active',
@@ -138,6 +139,9 @@ const currentPublication = computed(() =>
 
 const statusLabel = computed(() => {
 	if (props.item.thothWorkId) {
+		if (fetchError.value) {
+			return t('common.error');
+		}
 		if (!workStatus.value) {
 			return '...';
 		}
@@ -164,6 +168,8 @@ const badgeStyle = computed(() => {
 
 	if (!props.item.thothWorkId) {
 		color = hasErrors.value ? '#D00A0A' : '#777777';
+	} else if (fetchError.value) {
+		color = '#D00A0A';
 	} else {
 		color = workStatusColorMap[workStatus.value] || '#777777';
 	}
@@ -176,6 +182,8 @@ function fetchWorkStatus() {
 		return;
 	}
 
+	fetchError.value = false;
+
 	$.ajax({
 		method: 'GET',
 		url: `${props.apiUrl}/${props.item.id}/thothWorkStatus`,
@@ -185,6 +193,9 @@ function fetchWorkStatus() {
 		success(response) {
 			workStatus.value = response.workStatus;
 		},
+		error() {
+			fetchError.value = true;
+		},
 	});
 }
 
@@ -192,7 +203,11 @@ watch(
 	() => props.item.thothWorkId,
 	(newVal) => {
 		if (newVal) {
-			fetchWorkStatus();
+			if (props.item.thothWorkStatus) {
+				workStatus.value = props.item.thothWorkStatus;
+			} else {
+				fetchWorkStatus();
+			}
 		}
 	},
 	{immediate: true},
