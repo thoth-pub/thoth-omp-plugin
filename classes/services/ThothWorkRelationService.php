@@ -16,9 +16,9 @@
 
 namespace APP\plugins\generic\thoth\classes\services;
 
+use APP\plugins\generic\thoth\classes\facades\ThothService;
 use PKP\db\DAORegistry;
 use ThothApi\GraphQL\Models\WorkRelation as ThothWorkRelation;
-use APP\plugins\generic\thoth\classes\facades\ThothService;
 
 class ThothWorkRelationService
 {

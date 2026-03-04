@@ -8,6 +8,7 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothChapterService
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief Helper class that encapsulates business logic for Thoth Chapters
@@ -15,7 +16,6 @@
 
 namespace APP\plugins\generic\thoth\classes\services;
 
-use ThothApi\GraphQL\Models\WorkRelation as ThothWorkRelation;
 use APP\plugins\generic\thoth\classes\facades\ThothService;
 
 class ThothChapterService

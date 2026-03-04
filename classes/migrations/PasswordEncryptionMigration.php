@@ -60,7 +60,7 @@ class PasswordEncryptionMigration extends Migration
         if ($secret === '') {
             throw new Exception(
                 "A secret must be set in the config file ('api_key_secret')"
-                . " so that keys can be encrypted and decrypted"
+                . ' so that keys can be encrypted and decrypted'
             );
         }
 
@@ -136,7 +136,7 @@ class PasswordEncryptionMigration extends Migration
 
     public function decodeJWT($string): ?string
     {
-        list($header, $payload, $signature) = explode('.', $string);
+        [$header, $payload, $signature] = explode('.', $string);
         $decodedPayload = $this->base64URLDecode($payload);
         return $decodedPayload ? $decodedPayload : null;
     }

@@ -18,10 +18,10 @@
 
 namespace APP\plugins\generic\thoth\tests\classes\repositories;
 
+use APP\plugins\generic\thoth\classes\repositories\ThothInstitutionRepository;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Models\Institution as ThothInstitution;
-use APP\plugins\generic\thoth\classes\repositories\ThothInstitutionRepository;
 
 class ThothInstitutionRepositoryTest extends PKPTestCase
 {

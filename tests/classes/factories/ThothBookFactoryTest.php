@@ -20,6 +20,7 @@ namespace APP\plugins\generic\thoth\tests\classes\factories;
 
 require_once(__DIR__ . '/../../../vendor/autoload.php');
 
+use APP\plugins\generic\thoth\classes\factories\ThothBookFactory;
 use APP\press\Press;
 use APP\press\PressDAO;
 use APP\submission\Repository as SubmissionRepository;
@@ -29,7 +30,6 @@ use PKP\core\Registry;
 use PKP\db\DAORegistry;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Models\Work as ThothWork;
-use APP\plugins\generic\thoth\classes\factories\ThothBookFactory;
 
 class ThothBookFactoryTest extends PKPTestCase
 {

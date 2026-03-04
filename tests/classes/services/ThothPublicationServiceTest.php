@@ -18,14 +18,14 @@
 
 namespace APP\plugins\generic\thoth\tests\classes\services;
 
-use APP\publicationFormat\PublicationFormat;
-use PKP\tests\PKPTestCase;
-use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Publication as ThothPublication;
 use APP\plugins\generic\thoth\classes\container\ThothContainer;
 use APP\plugins\generic\thoth\classes\factories\ThothPublicationFactory;
 use APP\plugins\generic\thoth\classes\repositories\ThothPublicationRepository;
 use APP\plugins\generic\thoth\classes\services\ThothPublicationService;
+use APP\publicationFormat\PublicationFormat;
+use PKP\tests\PKPTestCase;
+use ThothApi\GraphQL\Client as ThothClient;
+use ThothApi\GraphQL\Models\Publication as ThothPublication;
 
 class ThothPublicationServiceTest extends PKPTestCase
 {

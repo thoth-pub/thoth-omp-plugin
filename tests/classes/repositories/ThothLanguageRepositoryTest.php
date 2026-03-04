@@ -18,10 +18,10 @@
 
 namespace APP\plugins\generic\thoth\tests\classes\repositories;
 
+use APP\plugins\generic\thoth\classes\repositories\ThothLanguageRepository;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Models\Language as ThothLanguage;
-use APP\plugins\generic\thoth\classes\repositories\ThothLanguageRepository;
 
 class ThothLanguageRepositoryTest extends PKPTestCase
 {

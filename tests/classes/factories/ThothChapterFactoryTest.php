@@ -21,6 +21,7 @@ namespace APP\plugins\generic\thoth\tests\classes\factories;
 require_once(__DIR__ . '/../../../vendor/autoload.php');
 
 use APP\monograph\Chapter;
+use APP\plugins\generic\thoth\classes\factories\ThothChapterFactory;
 use APP\publication\Repository as PublicationRepository;
 use APP\submission\Repository as SubmissionRepository;
 use Mockery;
@@ -28,7 +29,6 @@ use PKP\core\Registry;
 use PKP\db\DAORegistry;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Models\Work as ThothWork;
-use APP\plugins\generic\thoth\classes\factories\ThothChapterFactory;
 
 class ThothChapterFactoryTest extends PKPTestCase
 {

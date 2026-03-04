@@ -21,9 +21,9 @@ namespace APP\plugins\generic\thoth\tests\classes\factories;
 require_once(__DIR__ . '/../../../vendor/autoload.php');
 
 use APP\author\Author;
+use APP\plugins\generic\thoth\classes\factories\ThothContributorFactory;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Models\Contributor as ThothContributor;
-use APP\plugins\generic\thoth\classes\factories\ThothContributorFactory;
 
 class ThothContributorFactoryTest extends PKPTestCase
 {

@@ -19,12 +19,12 @@
 namespace APP\plugins\generic\thoth\tests\classes\services;
 
 use APP\author\Author;
+use APP\plugins\generic\thoth\classes\factories\ThothContributorFactory;
+use APP\plugins\generic\thoth\classes\repositories\ThothContributorRepository;
+use APP\plugins\generic\thoth\classes\services\ThothContributorService;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Models\Contributor as ThothContributor;
-use APP\plugins\generic\thoth\classes\factories\ThothContributorFactory;
-use APP\plugins\generic\thoth\classes\services\ThothContributorService;
-use APP\plugins\generic\thoth\classes\repositories\ThothContributorRepository;
 
 class ThothContributorServiceTest extends PKPTestCase
 {

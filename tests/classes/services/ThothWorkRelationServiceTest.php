@@ -18,14 +18,14 @@
 
 namespace APP\plugins\generic\thoth\tests\classes\services;
 
-use PKP\tests\PKPTestCase;
-use ThothApi\GraphQL\Client as ThothClient;
 use APP\plugins\generic\thoth\classes\container\ThothContainer;
 use APP\plugins\generic\thoth\classes\factories\ThothChapterFactory;
-use APP\plugins\generic\thoth\classes\repositories\ThothWorkRelationRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothChapterRepository;
+use APP\plugins\generic\thoth\classes\repositories\ThothWorkRelationRepository;
 use APP\plugins\generic\thoth\classes\services\ThothChapterService;
 use APP\plugins\generic\thoth\classes\services\ThothWorkRelationService;
+use PKP\tests\PKPTestCase;
+use ThothApi\GraphQL\Client as ThothClient;
 
 class ThothWorkRelationServiceTest extends PKPTestCase
 {

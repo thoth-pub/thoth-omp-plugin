@@ -8,7 +8,9 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ContainerTest
+ *
  * @ingroup plugins_generic_thoth_tests
+ *
  * @see Container
  *
  * @brief Test class for the Container class
@@ -16,10 +18,10 @@
 
 namespace APP\plugins\generic\thoth\tests\classes\container;
 
+use APP\plugins\generic\thoth\classes\container\Container;
+use APP\plugins\generic\thoth\classes\container\providers\ContainerProvider;
 use Exception;
 use PKP\tests\PKPTestCase;
-use APP\plugins\generic\thoth\classes\container\providers\ContainerProvider;
-use APP\plugins\generic\thoth\classes\container\Container;
 
 class ContainerTest extends PKPTestCase
 {

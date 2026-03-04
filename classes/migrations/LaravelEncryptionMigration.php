@@ -58,7 +58,7 @@ class LaravelEncryptionMigration extends Migration
         if ($secret === '') {
             throw new Exception(
                 "A secret must be set in the config file ('api_key_secret')"
-                . " so that keys can be encrypted and decrypted"
+                . ' so that keys can be encrypted and decrypted'
             );
         }
 

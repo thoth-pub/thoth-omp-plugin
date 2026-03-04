@@ -16,10 +16,9 @@
 
 namespace APP\plugins\generic\thoth\classes\services;
 
+use APP\plugins\generic\thoth\classes\facades\ThothService;
 use PKP\db\DAORegistry;
 use ThothApi\GraphQL\Models\Work as ThothWork;
-use APP\plugins\generic\thoth\classes\facades\ThothService;
-use PKP\services\PKPSchemaService;
 
 class ThothBookService
 {

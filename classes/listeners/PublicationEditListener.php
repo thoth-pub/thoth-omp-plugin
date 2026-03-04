@@ -17,9 +17,9 @@
 namespace APP\plugins\generic\thoth\classes\listeners;
 
 use APP\facades\Repo;
-use ThothApi\Exception\QueryException;
 use APP\plugins\generic\thoth\classes\facades\ThothService;
 use APP\plugins\generic\thoth\classes\notification\ThothNotification;
+use ThothApi\Exception\QueryException;
 
 class PublicationEditListener
 {

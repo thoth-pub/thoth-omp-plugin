@@ -18,10 +18,10 @@
 
 namespace APP\plugins\generic\thoth\tests\classes\repositories;
 
+use APP\plugins\generic\thoth\classes\repositories\ThothImprintRepository;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Models\Imprint as ThothImprint;
-use APP\plugins\generic\thoth\classes\repositories\ThothImprintRepository;
 
 class ThothImprintRepositoryTest extends PKPTestCase
 {

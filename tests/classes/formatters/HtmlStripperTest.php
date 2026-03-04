@@ -18,8 +18,8 @@
 
 namespace APP\plugins\generic\thoth\tests\classes\formatters;
 
-use PKP\tests\PKPTestCase;
 use APP\plugins\generic\thoth\classes\formatters\HtmlStripper;
+use PKP\tests\PKPTestCase;
 
 class HtmlStripperTest extends PKPTestCase
 {

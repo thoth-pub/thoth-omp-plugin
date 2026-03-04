@@ -17,7 +17,6 @@
 namespace APP\plugins\generic\thoth\classes\repositories;
 
 use ThothApi\Exception\QueryException;
-use APP\plugins\generic\thoth\classes\repositories\ThothWorkRepository;
 
 class ThothBookRepository extends ThothWorkRepository
 {

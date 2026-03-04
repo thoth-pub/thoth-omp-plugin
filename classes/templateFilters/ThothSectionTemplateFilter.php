@@ -8,6 +8,7 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothSectionTemplateFilter
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief Provide data for the Thoth section in the workflow page

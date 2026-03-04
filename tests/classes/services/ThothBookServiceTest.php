@@ -18,19 +18,19 @@
 
 namespace APP\plugins\generic\thoth\tests\classes\services;
 
-use PKP\tests\PKPTestCase;
-use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Work as ThothWork;
 use APP\plugins\generic\thoth\classes\container\ThothContainer;
 use APP\plugins\generic\thoth\classes\factories\ThothBookFactory;
 use APP\plugins\generic\thoth\classes\repositories\ThothBookRepository;
 use APP\plugins\generic\thoth\classes\services\ThothBookService;
 use APP\plugins\generic\thoth\classes\services\ThothContributionService;
-use APP\plugins\generic\thoth\classes\services\ThothPublicationService;
 use APP\plugins\generic\thoth\classes\services\ThothLanguageService;
-use APP\plugins\generic\thoth\classes\services\ThothSubjectService;
+use APP\plugins\generic\thoth\classes\services\ThothPublicationService;
 use APP\plugins\generic\thoth\classes\services\ThothReferenceService;
+use APP\plugins\generic\thoth\classes\services\ThothSubjectService;
 use APP\plugins\generic\thoth\classes\services\ThothWorkRelationService;
+use PKP\tests\PKPTestCase;
+use ThothApi\GraphQL\Client as ThothClient;
+use ThothApi\GraphQL\Models\Work as ThothWork;
 
 class ThothBookServiceTest extends PKPTestCase
 {
@@ -69,27 +69,27 @@ class ThothBookServiceTest extends PKPTestCase
 
         $mockContributionService = $this->createMock(ThothContributionService::class);
         $mockContributionService->method('registerByPublication');
-        $container->set('contributionService', fn() => $mockContributionService);
+        $container->set('contributionService', fn () => $mockContributionService);
 
         $mockPublicationService = $this->createMock(ThothPublicationService::class);
         $mockPublicationService->method('registerByPublication');
-        $container->set('publicationService', fn() => $mockPublicationService);
+        $container->set('publicationService', fn () => $mockPublicationService);
 
         $mockLanguageService = $this->createMock(ThothLanguageService::class);
         $mockLanguageService->method('registerByPublication');
-        $container->set('languageService', fn() => $mockLanguageService);
+        $container->set('languageService', fn () => $mockLanguageService);
 
         $mockSubjectService = $this->createMock(ThothSubjectService::class);
         $mockSubjectService->method('registerByPublication');
-        $container->set('subjectService', fn() => $mockSubjectService);
+        $container->set('subjectService', fn () => $mockSubjectService);
 
         $mockReferenceService = $this->createMock(ThothReferenceService::class);
         $mockReferenceService->method('registerByPublication');
-        $container->set('referenceService', fn() => $mockReferenceService);
+        $container->set('referenceService', fn () => $mockReferenceService);
 
         $mockWorkRelationService = $this->createMock(ThothWorkRelationService::class);
         $mockWorkRelationService->method('registerByPublication');
-        $container->set('workRelationService', fn() => $mockWorkRelationService);
+        $container->set('workRelationService', fn () => $mockWorkRelationService);
 
         $mockFactory = $this->getMockBuilder(ThothBookFactory::class)
             ->onlyMethods(['createFromPublication'])

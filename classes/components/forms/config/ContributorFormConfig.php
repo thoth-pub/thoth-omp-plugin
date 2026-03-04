@@ -8,14 +8,13 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ContributorFormConfig
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief Thoth configuration for contributor form
  */
 
 namespace APP\plugins\generic\thoth\classes\components\forms\config;
-
-use APP\facades\Repo;
 
 class ContributorFormConfig
 {

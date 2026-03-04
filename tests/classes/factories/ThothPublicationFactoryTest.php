@@ -20,9 +20,9 @@ namespace APP\plugins\generic\thoth\tests\classes\factories;
 
 require_once(__DIR__ . '/../../../vendor/autoload.php');
 
+use APP\plugins\generic\thoth\classes\factories\ThothPublicationFactory;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Models\Publication as ThothPublication;
-use APP\plugins\generic\thoth\classes\factories\ThothPublicationFactory;
 
 class ThothPublicationFactoryTest extends PKPTestCase
 {

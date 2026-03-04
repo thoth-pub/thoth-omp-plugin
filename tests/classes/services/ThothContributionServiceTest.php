@@ -18,15 +18,15 @@
 
 namespace APP\plugins\generic\thoth\tests\classes\services;
 
+use APP\plugins\generic\thoth\classes\container\ThothContainer;
+use APP\plugins\generic\thoth\classes\factories\ThothContributionFactory;
+use APP\plugins\generic\thoth\classes\repositories\ThothContributionRepository;
+use APP\plugins\generic\thoth\classes\repositories\ThothContributorRepository;
+use APP\plugins\generic\thoth\classes\services\ThothContributionService;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Models\Contribution as ThothContribution;
 use ThothApi\GraphQL\Models\Contributor as ThothContributor;
-use APP\plugins\generic\thoth\classes\container\ThothContainer;
-use APP\plugins\generic\thoth\classes\factories\ThothContributionFactory;
-use APP\plugins\generic\thoth\classes\services\ThothContributionService;
-use APP\plugins\generic\thoth\classes\repositories\ThothContributionRepository;
-use APP\plugins\generic\thoth\classes\repositories\ThothContributorRepository;
 
 class ThothContributionServiceTest extends PKPTestCase
 {

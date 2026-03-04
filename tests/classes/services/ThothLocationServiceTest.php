@@ -18,13 +18,13 @@
 
 namespace APP\plugins\generic\thoth\tests\classes\services;
 
+use APP\plugins\generic\thoth\classes\factories\ThothLocationFactory;
+use APP\plugins\generic\thoth\classes\repositories\ThothLocationRepository;
+use APP\plugins\generic\thoth\classes\services\ThothLocationService;
 use APP\publicationFormat\PublicationFormat;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Models\Location as ThothLocation;
-use APP\plugins\generic\thoth\classes\factories\ThothLocationFactory;
-use APP\plugins\generic\thoth\classes\repositories\ThothLocationRepository;
-use APP\plugins\generic\thoth\classes\services\ThothLocationService;
 
 class ThothLocationServiceTest extends PKPTestCase
 {

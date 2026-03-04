@@ -20,6 +20,7 @@ namespace APP\plugins\generic\thoth\tests\classes\factories;
 
 require_once(__DIR__ . '/../../../vendor/autoload.php');
 
+use APP\plugins\generic\thoth\classes\factories\ThothLocationFactory;
 use APP\publication\Repository as PublicationRepository;
 use APP\submission\Repository as SubmissionRepository;
 use Mockery;
@@ -27,7 +28,6 @@ use PKP\core\Registry;
 use PKP\db\DAORegistry;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Models\Location as ThothLocation;
-use APP\plugins\generic\thoth\classes\factories\ThothLocationFactory;
 
 class ThothLocationFactoryTest extends PKPTestCase
 {

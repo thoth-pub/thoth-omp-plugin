@@ -16,8 +16,6 @@
 
 namespace APP\plugins\generic\thoth\classes\services;
 
-use ThothApi\GraphQL\Models\Contributor as ThothContributor;
-
 class ThothContributorService
 {
     public $factory;

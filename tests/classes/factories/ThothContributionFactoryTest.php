@@ -20,17 +20,16 @@ namespace APP\plugins\generic\thoth\tests\classes\factories;
 
 require_once(__DIR__ . '/../../../vendor/autoload.php');
 
-use Mockery;
+use APP\plugins\generic\thoth\classes\factories\ThothContributionFactory;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Models\Contribution as ThothContribution;
-use APP\plugins\generic\thoth\classes\factories\ThothContributionFactory;
 
 class ThothContributionFactoryTest extends PKPTestCase
 {
     protected array $mocks = [];
     private function setUpMockEnvironment()
     {
-        $mockUserGroup = new class {
+        $mockUserGroup = new class () {
             public $nameLocaleKey = 'default.groups.name.author';
         };
 

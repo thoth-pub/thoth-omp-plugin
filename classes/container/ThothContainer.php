@@ -16,7 +16,6 @@
 
 namespace APP\plugins\generic\thoth\classes\container;
 
-use APP\plugins\generic\thoth\classes\container\Container;
 use APP\plugins\generic\thoth\classes\container\providers\ThothRepositoryProvider;
 use APP\plugins\generic\thoth\classes\container\providers\ThothServiceProvider;
 

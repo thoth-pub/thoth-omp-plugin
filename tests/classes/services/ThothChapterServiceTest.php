@@ -18,18 +18,18 @@
 
 namespace APP\plugins\generic\thoth\tests\classes\services;
 
-use Mockery;
-use Illuminate\Support\LazyCollection;
-use APP\publication\Repository as PublicationRepository;
-use PKP\tests\PKPTestCase;
-use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Work as ThothWork;
 use APP\plugins\generic\thoth\classes\container\ThothContainer;
 use APP\plugins\generic\thoth\classes\factories\ThothChapterFactory;
 use APP\plugins\generic\thoth\classes\repositories\ThothChapterRepository;
 use APP\plugins\generic\thoth\classes\services\ThothChapterService;
 use APP\plugins\generic\thoth\classes\services\ThothContributionService;
 use APP\plugins\generic\thoth\classes\services\ThothPublicationService;
+use APP\publication\Repository as PublicationRepository;
+use Illuminate\Support\LazyCollection;
+use Mockery;
+use PKP\tests\PKPTestCase;
+use ThothApi\GraphQL\Client as ThothClient;
+use ThothApi\GraphQL\Models\Work as ThothWork;
 
 class ThothChapterServiceTest extends PKPTestCase
 {
@@ -69,11 +69,11 @@ class ThothChapterServiceTest extends PKPTestCase
 
         $mockContributionService = $this->createMock(ThothContributionService::class);
         $mockContributionService->method('registerByChapter');
-        $container->set('contributionService', fn() => $mockContributionService);
+        $container->set('contributionService', fn () => $mockContributionService);
 
         $mockPublicationService = $this->createMock(ThothPublicationService::class);
         $mockPublicationService->method('registerByChapter');
-        $container->set('publicationService', fn() => $mockPublicationService);
+        $container->set('publicationService', fn () => $mockPublicationService);
 
         $publicationRepoMock = Mockery::mock(app(PublicationRepository::class))
             ->makePartial()

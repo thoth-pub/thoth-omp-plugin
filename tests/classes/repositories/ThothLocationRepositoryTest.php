@@ -18,10 +18,10 @@
 
 namespace APP\plugins\generic\thoth\tests\classes\repositories;
 
+use APP\plugins\generic\thoth\classes\repositories\ThothLocationRepository;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Models\Location as ThothLocation;
-use APP\plugins\generic\thoth\classes\repositories\ThothLocationRepository;
 
 class ThothLocationRepositoryTest extends PKPTestCase
 {

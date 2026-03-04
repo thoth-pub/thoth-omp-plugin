@@ -17,9 +17,9 @@
 namespace APP\plugins\generic\thoth\classes\services;
 
 use APP\facades\Repo;
-use PKP\db\DAORegistry;
-use APP\plugins\generic\thoth\classes\facades\ThothService;
 use APP\plugins\generic\thoth\classes\facades\ThothRepository;
+use APP\plugins\generic\thoth\classes\facades\ThothService;
+use PKP\db\DAORegistry;
 
 class ThothContributionService
 {

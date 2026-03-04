@@ -18,9 +18,9 @@
 
 namespace APP\plugins\generic\thoth\tests\classes\repositories;
 
+use APP\plugins\generic\thoth\classes\repositories\ThothAccountRepository;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-use APP\plugins\generic\thoth\classes\repositories\ThothAccountRepository;
 
 class ThothAccountRepositoryTest extends PKPTestCase
 {
