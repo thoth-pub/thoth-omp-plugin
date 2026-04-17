@@ -1,13 +1,14 @@
 <?php
 
 /**
- * @file plugins/generic/thoth/classes/services/ThothContributionService.php
+ * @file plugins/generic/thoth/classes/services/ThothContributionService.inc.php
  *
- * Copyright (c) 2024-2025 Lepidus Tecnologia
- * Copyright (c) 2024-2025 Thoth
+ * Copyright (c) 2024-2026 Lepidus Tecnologia
+ * Copyright (c) 2024-2026 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothContributionService
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief Helper class that encapsulates business logic for Thoth contributions
@@ -43,6 +44,7 @@ class ThothContributionService
         }
 
         $thothContributionId = $this->repository->add($thothContribution);
+        ThothService::biography()->registerByAuthor($author, $thothContributionId, $author->getData('locale'));
 
         if ($rorId = $author->getData('rorId')) {
             ThothService::affiliation()->register($rorId, $thothContributionId);

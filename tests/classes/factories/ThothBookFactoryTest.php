@@ -96,8 +96,6 @@ class ThothBookFactoryTest extends PKPTestCase
             ->setMethods([
                 'getData',
                 'getLocalizedData',
-                'getLocalizedFullTitle',
-                'getLocalizedTitle',
                 'getStoredPubId',
                 'getLocalizedCoverImageUrl'
             ])
@@ -114,17 +112,15 @@ class ThothBookFactoryTest extends PKPTestCase
             ]));
         $mockPublication->expects($this->any())
             ->method('getLocalizedData')
-            ->will($this->returnValueMap([
-                ['subtitle', null, null, 'My book subtitle'],
-                ['abstract', null, null, 'This is my book abstract'],
-                ['copyrightHolder', null, null, 'Public Knowledge Press']
-            ]));
-        $mockPublication->expects($this->once())
-            ->method('getLocalizedFullTitle')
-            ->will($this->returnValue('My book title: My book subtitle'));
-        $mockPublication->expects($this->once())
-            ->method('getLocalizedTitle')
-            ->will($this->returnValue('My book title'));
+            ->will($this->returnCallback(function ($key) {
+                $values = [
+                    'subtitle' => 'My book subtitle',
+                    'abstract' => 'This is my book abstract',
+                    'copyrightHolder' => 'Public Knowledge Press',
+                ];
+
+                return $values[$key] ?? null;
+            }));
         $mockPublication->expects($this->once())
             ->method('getLocalizedCoverImageUrl')
             ->will($this->returnValue('https://omp.publicknowledgeproject.org/templates/images/book-default.png'));
@@ -148,9 +144,6 @@ class ThothBookFactoryTest extends PKPTestCase
         $this->assertEquals(new ThothWork([
             'workType' => ThothWork::WORK_TYPE_MONOGRAPH,
             'workStatus' => ThothWork::WORK_STATUS_ACTIVE,
-            'fullTitle' => 'My book title: My book subtitle',
-            'title' => 'My book title',
-            'subtitle' => 'My book subtitle',
             'edition' => 1,
             'publicationDate' => '2020-01-01',
             'place' => 'Salvador, BR',
@@ -161,7 +154,6 @@ class ThothBookFactoryTest extends PKPTestCase
             'copyrightHolder' => 'Public Knowledge Press',
             'landingPage' => 'https://omp.publicknowledgeproject.org/index.php/press/catalog/book/3',
             'coverUrl' => 'https://omp.publicknowledgeproject.org/templates/images/book-default.png',
-            'longAbstract' => 'This is my book abstract',
         ]), $thothWork);
     }
 

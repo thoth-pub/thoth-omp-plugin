@@ -24,7 +24,11 @@ class ThothAccountRepository
 
     public function getLinkedPublishers()
     {
-        $details = $this->thothClient->accountDetails();
-        return $details['resourceAccess']['linkedPublishers'];
+        $publisherContexts = $this->thothClient->me()->getPublisherContexts() ?? [];
+
+        return array_values(array_map(
+            fn ($publisherContext) => $publisherContext['publisher'],
+            array_filter($publisherContexts, fn ($publisherContext) => !empty($publisherContext['publisher']))
+        ));
     }
 }

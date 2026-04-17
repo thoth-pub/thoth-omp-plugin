@@ -2,7 +2,11 @@
 
 # Plugin Thoth OMP
 
-Integração em progresso do OMP com o [Thoth](https://thoth.pub/) para comunicação e sincronização dos dados dos livros entre as duas plataformas.
+[![Versão Atual](https://img.shields.io/badge/versão-v0.3.0.0-blue)](https://github.com/thoth-pub/thoth-omp-plugin/releases)
+[![Licença: GPL v3](https://img.shields.io/badge/Licença-GPLv3-green.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Compatibilidade OMP](https://img.shields.io/badge/OMP-3.3-blue)](https://pkp.sfu.ca/software/omp/)
+
+Integra o [OMP (Open Monograph Press)](https://pkp.sfu.ca/software/omp/) com o [Thoth](https://thoth.pub/), uma plataforma aberta de gestão de metadados para livros. Este plugin permite o registro e a sincronização de metadados em nível de livro e capítulo diretamente do OMP para o Thoth, onde podem ser disseminados em múltiplos formatos padrão da indústria, incluindo ONIX, MARC, KBART e Crossref XML.
 
 ## Compatibilidade
 
@@ -18,7 +22,7 @@ Este plugin é compatível com as seguintes aplicações PKP:
 
 A instância do OMP deve ter o `api_key_secret` configurado. Você pode entrar em contato com o administrador do sistema para configurar isso (consulte [este post](https://forum.pkp.sfu.ca/t/how-to-generate-a-api-key-secret-code-in-ojs-3/72008)).
 
-Isso é necessário para usar as credenciais da API fornecidas, que são armazenadas criptografadas no banco de dados do OMP.
+Isso é necessário para armazenar o token de acesso pessoal do Thoth de forma criptografada no banco de dados do OMP.
 
 ## Instalação
 
@@ -30,52 +34,59 @@ Isso é necessário para usar as credenciais da API fornecidas, que são armazen
 
 ## Uso
 
-### Orientações
-
-- Apenas tags básicas de HTML são preservadas (`<strong>`, `<mark>`, `<em>`, `<i>`, `<u>`, `<sup>`, `<sub>`, `<ul>`, `<ol>` e `<li>`); todas as outras serão removidas
-- O ISBN deve estar devidamente formatado (por exemplo, 978-3-16-148410-0)
-- Para evitar a atribuição incorreta de afiliações no Thoth, é necessário o uso do [plugin ROR](https://github.com/withanage/ror) para preencher as afiliações no OMP.
-
 ### Configuração
 
-Para configurar o plugin:
+Após habilitar o plugin, vá nas configurações do plugin e preencha:
 
-- **E-mail** e **Senha**: Insira as credenciais de uma conta do Thoth para conectar com a API.
-- **Ambiente de Teste**: Marque esta opção se você estiver usando uma instância local da API do Thoth para fins de teste.
+- **Token de acesso pessoal**: Um token de acesso pessoal válido do Thoth para autenticar as requisições da API.
+- **API Thoth personalizada**: Marque esta opção para usar uma API Thoth personalizada em vez da oficial.
+- **URL da API Thoth**: A URL da API Thoth personalizada, necessária apenas quando a opção de API personalizada estiver habilitada.
 
-![settings](/images/settings.png)
+<img src="/docs/images/plugin_settings.png" alt="Formulário de configuração do plugin com token de acesso pessoal, API personalizada e URL" width="700">
 
-### Gerenciamento de Monografias
+### Registro de Monografias
 
-- **Monografias Não Publicadas**: Registre os metadados no Thoth durante o processo de publicação, selecionando a opção para registrar metadados no modal de publicação e escolhendo uma editora.
+#### Monografias Não Publicadas
 
-![publish](/images/publish.png)
+Registre os metadados no Thoth durante o processo de publicação, selecionando a opção para registrar metadados no modal de publicação e escolhendo um selo.
 
-- **Monografias Publicadas**: Registre os metadados para monografias publicadas usando o botão 'Registrar' ao lado do status de publicação.
+<img src="/docs/images/register_field.png" alt="Modal de publicação com opção de registro no Thoth" width="700">
 
-![button](/images/button.png)
-![register](/images/register.png)
+#### Monografias Publicadas
+
+Registre os metadados para monografias já publicadas usando o botão 'Registrar' ao lado do status de publicação.
+
+<img src="/docs/images/register_button.png" alt="Botão de registro no fluxo de trabalho de publicação" width="700">
+<img src="/docs/images/register_modal.png" alt="Modal de registro com seleção de selo" width="700">
 
 ### Atualização de Metadados
 
-Para atualizar os metadados no Thoth, despublique a monografia, edite os dados e as alterações serão atualizadas automaticamente no Thoth.
+Uma vez que uma monografia está registrada, as atualizações de metadados são **automáticas**. Despublique a monografia, edite os dados e as alterações serão sincronizadas com o Thoth ao republicar.
+
+Também é possível atualizar manualmente os metadados no Thoth clicando no botão 'Atualizar metadados' ao lado do status de publicação.
 
 ### Acessando Registros de Livros no Thoth
 
-Após a publicação dos metadados, um link para o livro no Thoth aparecerá no topo da publicação.
+Após o registro dos metadados, um link para o livro no Thoth aparecerá no topo do fluxo de trabalho de publicação.
 
-![link](/images/link.png)
+<img src="/docs/images/view_button.png" alt="Link para o registro do livro no Thoth" width="700">
 
-### Registro em massa
+### Registro em Massa
 
-Na página Thoth, você pode enviar em massa uma seleção de títulos do OMP para o Thoth.
+Na página de gestão do Thoth, você pode enviar em massa uma seleção de títulos do OMP para o Thoth.
 
-![page](/images/page.png)
+<img src="/docs/images/bulk_register_page.png" alt="Página de gestão do Thoth com registro em massa" width="700">
+
+### Orientações
+
+- Apenas tags HTML básicas são preservadas em campos de texto: `<strong>`, `<mark>`, `<em>`, `<i>`, `<u>`, `<sup>`, `<sub>`, `<ul>`, `<ol>` e `<li>`. Todas as outras tags serão removidas.
+- O ISBN deve estar devidamente formatado como ISBN-13, por exemplo `978-3-16-148410-0`.
+- Para evitar atribuição incorreta de afiliações no Thoth, use o [plugin ROR](https://github.com/withanage/ror) para preencher as afiliações no OMP.
 
 ## Mapeamento OMP-Thoth
 
 <details>
-    <summary>Clique aqui para ver a relação de dados entre Thoth e OMP</summary>
+<summary>Clique aqui para ver a relação de dados entre OMP e Thoth</summary>
 
 | OMP               |                    |   | Thoth                  |                     |             |
 | ----------------- | ------------------ | - | ---------------------- | ------------------- | ----------- |
@@ -132,6 +143,6 @@ Desenvolvido por [Lepidus Tecnologia](https://github.com/lepidus).
 
 Este plugin está licenciado sob a Licença Pública Geral GNU v3.0 - [Veja o arquivo de licença.](/LICENSE)
 
-Copyright (c) 2024-2025 Lepidus Tecnologia
+Copyright (c) 2024-2026 Lepidus Tecnologia
 
-Copyright (c) 2024-2025 Thoth
+Copyright (c) 2024-2026 Thoth Open Metadata

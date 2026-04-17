@@ -16,7 +16,6 @@
 use ThothApi\GraphQL\Models\Contribution as ThothContribution;
 
 import('classes.core.Services');
-import('plugins.generic.thoth.classes.formatters.HtmlStripper');
 
 class ThothContributionFactory
 {
@@ -31,7 +30,6 @@ class ThothContributionFactory
             'firstName' => $author->getLocalizedGivenName(),
             'lastName' => $author->getLocalizedData('familyName'),
             'fullName' => $author->getFullName(false),
-            'biography' => HtmlStripper::stripTags($author->getLocalizedBiography())
         ]);
     }
 

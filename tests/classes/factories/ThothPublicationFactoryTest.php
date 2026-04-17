@@ -24,7 +24,7 @@ import('plugins.generic.thoth.classes.factories.ThothPublicationFactory');
 
 class ThothPublicationFactoryTest extends PKPTestCase
 {
-    private function setUpMockEnvironment()
+    private function setUpMockEnvironment($entryKey = 'DA', $localizedName = 'PDF', $remoteUrl = null)
     {
         $mockIdentificationCode = $this->getMockBuilder(IdentificationCode::class)
             ->setMethods(['getCode', 'getValue'])
@@ -45,17 +45,20 @@ class ThothPublicationFactoryTest extends PKPTestCase
             ->will($this->returnValue([$mockIdentificationCode]));
 
         $mockPubFormat = $this->getMockBuilder(PublicationFormat::class)
-            ->setMethods(['getEntryKey', 'getLocalizedName', 'getIdentificationCodes'])
+            ->setMethods(['getEntryKey', 'getLocalizedName', 'getIdentificationCodes', 'getRemoteUrl'])
             ->getMock();
         $mockPubFormat->expects($this->any())
             ->method('getEntryKey')
-            ->will($this->returnValue('DA'));
+            ->will($this->returnValue($entryKey));
         $mockPubFormat->expects($this->any())
             ->method('getLocalizedName')
-            ->will($this->returnValue('PDF'));
+            ->will($this->returnValue($localizedName));
         $mockPubFormat->expects($this->any())
             ->method('getIdentificationCodes')
             ->will($this->returnValue($mockResult));
+        $mockPubFormat->expects($this->any())
+            ->method('getRemoteUrl')
+            ->will($this->returnValue($remoteUrl));
 
         $this->mocks = [];
         $this->mocks['publicationFormat'] = $mockPubFormat;
@@ -73,5 +76,49 @@ class ThothPublicationFactoryTest extends PKPTestCase
             'publicationType' => ThothPublication::PUBLICATION_TYPE_PDF,
             'isbn' => '978-3-16-148410-0',
         ]), $thothPublication);
+    }
+
+    public function testCreateThothPublicationFromSubmissionFileExtension()
+    {
+        $this->setUpMockEnvironment('DA', 'Digital');
+        $mockPubFormat = $this->mocks['publicationFormat'];
+
+        $mockSubmissionFile = new class () {
+            public function getOriginalFileName()
+            {
+                return 'book.docx';
+            }
+
+            public function getServerFileName()
+            {
+                return null;
+            }
+
+            public function getFileType()
+            {
+                return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+            }
+
+            public function getData($key)
+            {
+                return null;
+            }
+        };
+
+        $factory = new ThothPublicationFactory();
+        $thothPublication = $factory->createFromPublicationFormat($mockPubFormat, $mockSubmissionFile);
+
+        $this->assertSame(ThothPublication::PUBLICATION_TYPE_DOCX, $thothPublication->getPublicationType());
+    }
+
+    public function testCreateThothPublicationFromRemoteUrlExtension()
+    {
+        $this->setUpMockEnvironment('DA', 'Digital', 'https://example.com/catalog/book.epub');
+        $mockPubFormat = $this->mocks['publicationFormat'];
+
+        $factory = new ThothPublicationFactory();
+        $thothPublication = $factory->createFromPublicationFormat($mockPubFormat);
+
+        $this->assertSame(ThothPublication::PUBLICATION_TYPE_EPUB, $thothPublication->getPublicationType());
     }
 }

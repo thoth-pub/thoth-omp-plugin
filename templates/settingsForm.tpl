@@ -33,13 +33,15 @@
         </h3>
 
 		{fbvFormSection}
-			{fbvElement type="email" id="email" label="plugins.generic.thoth.settings.email" value=$email required="true"}
-			</p>
-			{fbvElement type="text" password="true" id="password" label="plugins.generic.thoth.settings.password" value=$password required="true"}
+			{fbvElement type="text" password="true" id="token" label="plugins.generic.thoth.settings.token" value=$token required="true"}
 		{/fbvFormSection}
 
-		{fbvFormSection list="true" title="plugins.generic.thoth.settings.testEnvironment"}
-			{fbvElement type="checkbox" id="testEnvironment" label="plugins.generic.thoth.settings.testEnvironment.description" checked=$testEnvironment}
+		{fbvFormSection list="true" title="plugins.generic.thoth.settings.customThothApi"}
+			{fbvElement type="checkbox" id="customThothApi" label="plugins.generic.thoth.settings.customThothApi.description" checked=$customThothApi}
+		{/fbvFormSection}
+
+		{fbvFormSection}
+			{fbvElement type="text" id="customThothApiUrl" label="plugins.generic.thoth.settings.customThothApiUrl" value=$customThothApiUrl}
 		{/fbvFormSection}
 	{/fbvFormArea}
 

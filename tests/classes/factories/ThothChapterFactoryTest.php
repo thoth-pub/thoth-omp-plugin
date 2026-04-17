@@ -156,10 +156,6 @@ class ThothChapterFactoryTest extends PKPTestCase
         $this->assertEquals(new ThothWork([
             'workType' => ThothWork::WORK_TYPE_BOOK_CHAPTER,
             'workStatus' => ThothWork::WORK_STATUS_ACTIVE,
-            'fullTitle' => 'My chapter title: My chapter subtitle',
-            'title' => 'My chapter title',
-            'subtitle' => 'My chapter subtitle',
-            'longAbstract' => 'This is my chapter abstract',
             'publicationDate' => '2024-01-01',
             'doi' => 'https://doi.org/10.12345/11112222',
             'pageInterval' => '31 - 50',

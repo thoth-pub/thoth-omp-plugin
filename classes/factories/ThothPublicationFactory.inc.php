@@ -17,54 +17,185 @@ use ThothApi\GraphQL\Models\Publication as ThothPublication;
 
 class ThothPublicationFactory
 {
-    public function createFromPublicationFormat($publicationFormat)
+    private const PHYSICAL_PUBLICATION_TYPE_MAPPING = [
+        'BC' => ThothPublication::PUBLICATION_TYPE_PAPERBACK,
+        'BB' => ThothPublication::PUBLICATION_TYPE_HARDBACK,
+    ];
+
+    private const DIGITAL_PUBLICATION_TYPE_MAPPING = [
+        'html' => ThothPublication::PUBLICATION_TYPE_HTML,
+        'htm' => ThothPublication::PUBLICATION_TYPE_HTML,
+        'xhtml' => ThothPublication::PUBLICATION_TYPE_HTML,
+        'pdf' => ThothPublication::PUBLICATION_TYPE_PDF,
+        'xml' => ThothPublication::PUBLICATION_TYPE_XML,
+        'jats' => ThothPublication::PUBLICATION_TYPE_XML,
+        'epub' => ThothPublication::PUBLICATION_TYPE_EPUB,
+        'mobi' => ThothPublication::PUBLICATION_TYPE_MOBI,
+        'azw3' => ThothPublication::PUBLICATION_TYPE_AZW3,
+        'doc' => ThothPublication::PUBLICATION_TYPE_DOCX,
+        'docx' => ThothPublication::PUBLICATION_TYPE_DOCX,
+        'fb2' => ThothPublication::PUBLICATION_TYPE_FICTION_BOOK,
+        'fictionbook' => ThothPublication::PUBLICATION_TYPE_FICTION_BOOK,
+        'wav' => ThothPublication::PUBLICATION_TYPE_WAV,
+        'mp3' => ThothPublication::PUBLICATION_TYPE_MP3,
+        'm4a' => ThothPublication::PUBLICATION_TYPE_MP3,
+        'aac' => ThothPublication::PUBLICATION_TYPE_MP3,
+        'flac' => ThothPublication::PUBLICATION_TYPE_MP3,
+        'ogg' => ThothPublication::PUBLICATION_TYPE_MP3,
+        'oga' => ThothPublication::PUBLICATION_TYPE_MP3,
+        'audio' => ThothPublication::PUBLICATION_TYPE_MP3,
+    ];
+
+    private const MIME_TYPE_MAPPING = [
+        'text/html' => ThothPublication::PUBLICATION_TYPE_HTML,
+        'application/xhtml+xml' => ThothPublication::PUBLICATION_TYPE_HTML,
+        'application/pdf' => ThothPublication::PUBLICATION_TYPE_PDF,
+        'application/xml' => ThothPublication::PUBLICATION_TYPE_XML,
+        'text/xml' => ThothPublication::PUBLICATION_TYPE_XML,
+        'application/jats+xml' => ThothPublication::PUBLICATION_TYPE_XML,
+        'application/epub+zip' => ThothPublication::PUBLICATION_TYPE_EPUB,
+        'application/x-mobipocket-ebook' => ThothPublication::PUBLICATION_TYPE_MOBI,
+        'application/vnd.amazon.ebook' => ThothPublication::PUBLICATION_TYPE_AZW3,
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => ThothPublication::PUBLICATION_TYPE_DOCX,
+        'application/msword' => ThothPublication::PUBLICATION_TYPE_DOCX,
+        'application/x-fictionbook+xml' => ThothPublication::PUBLICATION_TYPE_FICTION_BOOK,
+        'audio/wav' => ThothPublication::PUBLICATION_TYPE_WAV,
+        'audio/wave' => ThothPublication::PUBLICATION_TYPE_WAV,
+        'audio/x-wav' => ThothPublication::PUBLICATION_TYPE_WAV,
+        'audio/mpeg' => ThothPublication::PUBLICATION_TYPE_MP3,
+        'audio/mp3' => ThothPublication::PUBLICATION_TYPE_MP3,
+        'audio/mp4' => ThothPublication::PUBLICATION_TYPE_MP3,
+        'audio/x-m4a' => ThothPublication::PUBLICATION_TYPE_MP3,
+        'audio/aac' => ThothPublication::PUBLICATION_TYPE_MP3,
+        'audio/flac' => ThothPublication::PUBLICATION_TYPE_MP3,
+        'audio/ogg' => ThothPublication::PUBLICATION_TYPE_MP3,
+    ];
+
+    public function createFromPublicationFormat($publicationFormat, $submissionFile = null)
     {
         return new ThothPublication([
-            'publicationType' => $this->getPublicationTypeByPublicationFormat($publicationFormat),
+            'publicationType' => $this->getPublicationTypeByPublicationFormat($publicationFormat, $submissionFile),
             'isbn' => $this->getIsbnByPublicationFormat($publicationFormat)
         ]);
     }
 
-    private function getPublicationTypeByPublicationFormat($publicationFormat)
+    private function getPublicationTypeByPublicationFormat($publicationFormat, $submissionFile = null)
     {
-        $publicationTypeMapping = [
-            'BC' => ThothPublication::PUBLICATION_TYPE_PAPERBACK,
-            'BB' => ThothPublication::PUBLICATION_TYPE_HARDBACK,
-            'DA' => [
-                'html' => ThothPublication::PUBLICATION_TYPE_HTML,
-                'pdf' => ThothPublication::PUBLICATION_TYPE_PDF,
-                'xml' => ThothPublication::PUBLICATION_TYPE_XML,
-                'epub' => ThothPublication::PUBLICATION_TYPE_EPUB,
-                'mobi' => ThothPublication::PUBLICATION_TYPE_MOBI,
-                'azw3' => ThothPublication::PUBLICATION_TYPE_AZW3,
-                'docx' => ThothPublication::PUBLICATION_TYPE_DOCX,
-                'fictionbook' => ThothPublication::PUBLICATION_TYPE_FICTION_BOOK,
-                'wav' => ThothPublication::PUBLICATION_TYPE_WAV,
-                'mp3' => ThothPublication::PUBLICATION_TYPE_MP3,
-                'audio' => ThothPublication::PUBLICATION_TYPE_MP3,
-                'video' => ThothPublication::PUBLICATION_TYPE_MP3
-            ]
-        ];
-
         $entryKey = $publicationFormat->getEntryKey();
         if ($entryKey != 'DA') {
-            return $publicationTypeMapping[$entryKey];
+            return self::PHYSICAL_PUBLICATION_TYPE_MAPPING[$entryKey]
+                ?? ThothPublication::PUBLICATION_TYPE_PDF;
         }
 
-        $pubFormatName = $publicationFormat->getLocalizedName();
-        $pubFormatName = trim(
+        $submissionFilePublicationType = $this->getPublicationTypeBySubmissionFile($submissionFile);
+        if ($submissionFilePublicationType !== null) {
+            return $submissionFilePublicationType;
+        }
+
+        $remoteUrlPublicationType = $this->getPublicationTypeByUrl($publicationFormat->getRemoteUrl());
+        if ($remoteUrlPublicationType !== null) {
+            return $remoteUrlPublicationType;
+        }
+
+        $publicationFormatName = $this->normalizeFormatLabel($publicationFormat->getLocalizedName());
+
+        return self::DIGITAL_PUBLICATION_TYPE_MAPPING[$publicationFormatName]
+            ?? ThothPublication::PUBLICATION_TYPE_PDF;
+    }
+
+    private function getPublicationTypeBySubmissionFile($submissionFile)
+    {
+        if (!$submissionFile) {
+            return null;
+        }
+
+        $candidates = [];
+        $fileNames = [
+            $this->getSubmissionFileValue($submissionFile, 'getOriginalFileName', 'originalFileName'),
+            $this->getSubmissionFileValue($submissionFile, 'getServerFileName', 'serverFileName'),
+        ];
+
+        foreach ($fileNames as $fileName) {
+            $extension = pathinfo((string) $fileName, PATHINFO_EXTENSION);
+            if ($extension !== '') {
+                $candidates[] = $extension;
+            }
+        }
+
+        $mimeTypes = [
+            $this->getSubmissionFileValue($submissionFile, 'getFileType', 'filetype'),
+            $submissionFile->getData('mimetype'),
+            $submissionFile->getData('mimeType'),
+        ];
+
+        foreach ($mimeTypes as $mimeType) {
+            if (!empty($mimeType)) {
+                $candidates[] = $mimeType;
+            }
+        }
+
+        return $this->resolveDigitalPublicationType($candidates);
+    }
+
+    private function getSubmissionFileValue($submissionFile, $methodName, $dataKey)
+    {
+        if (method_exists($submissionFile, $methodName)) {
+            return $submissionFile->$methodName();
+        }
+
+        return $submissionFile->getData($dataKey);
+    }
+
+    private function getPublicationTypeByUrl($url)
+    {
+        if (empty($url)) {
+            return null;
+        }
+
+        $path = parse_url($url, PHP_URL_PATH);
+        if (empty($path)) {
+            return null;
+        }
+
+        return $this->resolveDigitalPublicationType([
+            pathinfo($path, PATHINFO_EXTENSION),
+        ]);
+    }
+
+    private function resolveDigitalPublicationType(array $candidates)
+    {
+        foreach ($candidates as $candidate) {
+            if (empty($candidate)) {
+                continue;
+            }
+
+            $normalizedCandidate = $this->normalizeFormatLabel($candidate);
+            if (isset(self::DIGITAL_PUBLICATION_TYPE_MAPPING[$normalizedCandidate])) {
+                return self::DIGITAL_PUBLICATION_TYPE_MAPPING[$normalizedCandidate];
+            }
+
+            $normalizedMimeType = strtolower(trim((string) $candidate));
+            if (isset(self::MIME_TYPE_MAPPING[$normalizedMimeType])) {
+                return self::MIME_TYPE_MAPPING[$normalizedMimeType];
+            }
+        }
+
+        return null;
+    }
+
+    private function normalizeFormatLabel($value)
+    {
+        return trim(
             preg_replace(
-                "/[^a-z0-9\.\-]+/",
+                "/[^a-z0-9\/\+\.\-]+/",
                 '',
                 str_replace(
                     [' ', '_', ':'],
                     '',
-                    strtolower($pubFormatName)
+                    strtolower((string) $value)
                 )
             )
         );
-
-        return $publicationTypeMapping[$entryKey][$pubFormatName] ?? ThothPublication::PUBLICATION_TYPE_PDF;
     }
 
     private function getIsbnByPublicationFormat($publicationFormat)

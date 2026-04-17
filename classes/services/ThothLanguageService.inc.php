@@ -28,7 +28,7 @@ class ThothLanguageService
     {
         $thothLanguage = $this->repository->new([
             'workId' => $thothWorkId,
-            'languageCode' => strtoupper(AppLocale::get3LetterIsoFromLocale($locale)),
+            'languageCode' => strtoupper(AppLocale::get3LetterIsoFromLocale($this->getLocale($locale))),
             'languageRelation' => ThothLanguage::LANGUAGE_RELATION_ORIGINAL,
             'mainLanguage' => true
         ]);
@@ -41,5 +41,14 @@ class ThothLanguageService
         $locale = $publication->getData('locale');
         $thothBookId = $publication->getData('thothBookId');
         $this->register($locale, $thothBookId);
+    }
+
+    public function getLocale($locale)
+    {
+        if (is_string($locale) && strlen($locale) >= 5) {
+            return $locale;
+        }
+
+        return AppLocale::getLocale();
     }
 }

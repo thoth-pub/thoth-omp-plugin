@@ -35,6 +35,7 @@ class ThothHandler extends Handler
         AppLocale::requireComponents(LOCALE_COMPONENT_APP_SUBMISSION);
         $context = $request->getContext();
         $connectionError = false;
+        $imprints = [];
 
         $plugin = PluginRegistry::getPlugin('generic', 'thothplugin');
         $templateMgr = TemplateManager::getManager($request);
@@ -45,7 +46,7 @@ class ThothHandler extends Handler
         try {
             $publishers = ThothRepo::account()->getLinkedPublishers();
             $imprints = ThothRepo::imprint()->getMany(array_column($publishers, 'publisherId'));
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             error_log($e->getMessage());
             $connectionError = true;
         }

@@ -89,7 +89,6 @@ class ThothContributionFactoryTest extends PKPTestCase
             'firstName' => 'John',
             'lastName' => 'Doe',
             'fullName' => 'John Doe',
-            'biography' => 'This is my author biography'
         ]), $thothContribution);
     }
 }

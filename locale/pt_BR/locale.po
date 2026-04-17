@@ -10,26 +10,35 @@ msgstr "Thoth"
 msgid "plugins.generic.thoth.settings.title"
 msgstr "Configurações da API Thoth"
 
-msgid "plugins.generic.thoth.settings.testEnvironment"
-msgstr "Ambiente de testes"
+msgid "plugins.generic.thoth.settings.customThothApi"
+msgstr "API personalizada do Thoth"
 
-msgid "plugins.generic.thoth.settings.testEnvironment.description"
-msgstr "Marque essa opção caso possua uma instância local da API do Thoth. (http://localhost:8000)"
+msgid "plugins.generic.thoth.settings.customThothApi.description"
+msgstr "Use uma API personalizada do Thoth em vez da API oficial do Thoth."
 
-msgid "plugins.generic.thoth.settings.email"
-msgstr "Email"
+msgid "plugins.generic.thoth.settings.customThothApiUrl"
+msgstr "URL da API do Thoth"
 
-msgid "plugins.generic.thoth.settings.password"
-msgstr "Senha"
+msgid "plugins.generic.thoth.settings.customThothApiUrl.required"
+msgstr "A URL da API personalizada do Thoth é obrigatória quando essa opção estiver habilitada."
+
+msgid "plugins.generic.thoth.settings.customThothApiUrl.invalid"
+msgstr "A URL da API personalizada do Thoth informada não é válida."
+
+msgid "plugins.generic.thoth.settings.customThothApiUrl.unreachable"
+msgstr "Não foi possível conectar à URL da API personalizada do Thoth. Verifique se a URL está correta e se o serviço está disponível."
+
+msgid "plugins.generic.thoth.settings.token"
+msgstr "Token de acesso pessoal"
 
 msgid "plugins.generic.thoth.settings.invalidCredentials"
-msgstr "Credenciais inválidas"
+msgstr "Token de acesso pessoal inválido"
 
 msgid "plugins.generic.thoth.settings.secretKeyEmpty"
 msgstr "O administrador do seu site deve definir um segredo no arquivo de configuração ('api_key_secret')."
 
 msgid "plugins.generic.thoth.credentialsMissing"
-msgstr "Credenciais do Thoth não configuradas."
+msgstr "Token de acesso pessoal do Thoth não configurado."
 
 msgid "plugins.generic.thoth.field.place.label"
 msgstr "Local de Publicação"

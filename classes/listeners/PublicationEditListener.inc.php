@@ -35,7 +35,7 @@ class PublicationEditListener
             ThothService::book()->update($publication, $thothBookId);
             $thothNotification->notifySuccess($request, $submission);
         } catch (QueryException $e) {
-            $thothNotification->notifyError($request, $submission, $e->getMessage());
+            $thothNotification->notifyError($request, $submission, $e);
         }
 
         return false;

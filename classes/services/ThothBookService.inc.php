@@ -1,13 +1,14 @@
 <?php
 
 /**
- * @file plugins/generic/thoth/classes/services/ThothBookService.php
+ * @file plugins/generic/thoth/classes/services/ThothBookService.inc.php
  *
- * Copyright (c) 2024-2025 Lepidus Tecnologia
- * Copyright (c) 2024-2025 Thoth
+ * Copyright (c) 2024-2026 Lepidus Tecnologia
+ * Copyright (c) 2024-2026 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothBookService
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief Helper class that encapsulates business logic for Thoth books
@@ -65,6 +66,7 @@ class ThothBookService
         $thothBookId = $this->repository->add($thothBook);
         $publication->setData('thothBookId', $thothBookId);
         $this->setRegisteredEntryId($thothBookId);
+        $this->registerMetadata($publication, $thothBookId);
 
         ThothService::contribution()->registerByPublication($publication);
         ThothService::publication()->registerByPublication($publication);
@@ -87,6 +89,7 @@ class ThothBookService
         ));
 
         $this->repository->edit($thothBook);
+        $this->updateMetadata($publication, $thothBookId, $oldThothBook);
     }
 
     public function validate($publication)
@@ -97,34 +100,24 @@ class ThothBookService
         if ($doi = $thothBook->getDoi()) {
             $retrievedThothBook = $this->repository->getByDoi($doi);
             if ($retrievedThothBook !== null) {
-                $errors[] = __(
-                    'plugins.generic.thoth.validation.doiExists',
-                    ['doi' => $doi]
-                );
+                $errors[] = __('plugins.generic.thoth.validation.doiExists', ['doi' => $doi]);
             }
         }
 
         if ($landingPage = $thothBook->getLandingPage()) {
             $retrievedThothBook = $this->repository->find($landingPage);
-            if (
-                $retrievedThothBook !== null
-                && $retrievedThothBook->getLandingPage() === $landingPage
-            ) {
-                $errors[] = __(
-                    'plugins.generic.thoth.validation.landingPageExists',
-                    ['landingPage' => $landingPage]
-                );
+            if ($retrievedThothBook !== null && $retrievedThothBook->getLandingPage() === $landingPage) {
+                $errors[] = __('plugins.generic.thoth.validation.landingPageExists', ['landingPage' => $landingPage]);
             }
         }
 
         $publicationFormats = DAORegistry::getDAO('PublicationFormatDAO')
-            ->getByPublicationId($publication->getId())
-            ->toArray();
+            ->getByPublicationId($publication->getId());
+        if (is_object($publicationFormats) && method_exists($publicationFormats, 'toArray')) {
+            $publicationFormats = $publicationFormats->toArray();
+        }
         foreach ($publicationFormats as $publicationFormat) {
-            $errors = array_merge(
-                $errors,
-                ThothService::publication()->validate($publicationFormat)
-            );
+            $errors = array_merge($errors, ThothService::publication()->validate($publicationFormat));
         }
 
         return $errors;
@@ -146,9 +139,39 @@ class ThothBookService
             return;
         }
 
-        $originalThothBook = $this->getOriginalThothBook();
-        $originalThothBook->setWorkId($this->getRegisteredEntryId());
-        $originalThothBook->setWorkStatus(ThothWork::WORK_STATUS_ACTIVE);
-        $this->repository->edit($originalThothBook);
+        $thothBook = $this->getOriginalThothBook();
+        $thothBook->setWorkId($this->getRegisteredEntryId());
+        $thothBook->setWorkStatus(ThothWork::WORK_STATUS_ACTIVE);
+        $this->repository->edit($thothBook);
+    }
+
+    private function registerMetadata($publication, $thothBookId)
+    {
+        ThothService::title()->registerByPublication(
+            $publication,
+            $thothBookId,
+            $publication->getData('locale')
+        );
+        ThothService::abstract()->registerByPublication(
+            $publication,
+            $thothBookId,
+            $publication->getData('locale')
+        );
+    }
+
+    private function updateMetadata($publication, $thothBookId, $oldThothBook)
+    {
+        ThothService::title()->updateByPublication(
+            $publication,
+            $thothBookId,
+            $oldThothBook->getData('titles') ?? [],
+            $publication->getData('locale')
+        );
+        ThothService::abstract()->updateByPublication(
+            $publication,
+            $thothBookId,
+            $oldThothBook->getData('abstracts') ?? [],
+            $publication->getData('locale')
+        );
     }
 }
