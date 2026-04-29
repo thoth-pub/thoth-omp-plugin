@@ -149,3 +149,72 @@ msgstr ""
 
 msgid "plugins.generic.thoth.api.403.alreadyRegistered"
 msgstr "El envío ya está registrado en Thoth."
+
+msgid "plugins.generic.thoth.publicationFormat.accessibility"
+msgstr "Metadatos de accesibilidad"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityHelp"
+msgstr "Mostrar orientacion sobre metadatos de accesibilidad"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityHelp.description"
+msgstr ""
+"<p>Los estandares de accesibilidad solo son validos para formatos de publicacion digital compatibles.</p>"
+"<p>Para publicaciones Paperback, Hardback, MP3 y WAV, deje vacios todos los campos de accesibilidad: estandar de accesibilidad, estandar adicional de accesibilidad y excepcion de accesibilidad.</p>"
+"<p>Para publicaciones en PDF, el estandar principal de accesibilidad debe ser un estandar WCAG, y el estandar adicional, cuando se proporcione, debe ser PDF/UA.</p>"
+"<p>Para publicaciones en EPUB, el estandar principal de accesibilidad debe ser un estandar WCAG, y el estandar adicional, cuando se proporcione, debe ser un estandar EPUB Accessibility.</p>"
+"<p>Para otros formatos digitales, solo se aceptan estandares WCAG, y no se debe proporcionar ningun estandar adicional de accesibilidad.</p>"
+"<p>Si la publicacion no declara un estandar de accesibilidad, deje vacios los campos de accesibilidad, o use una excepcion de accesibilidad solo cuando corresponda.</p>"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityStandard"
+msgstr "Estándar de accesibilidad"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityAdditionalStandard"
+msgstr "Estándar adicional de accesibilidad"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityException"
+msgstr "Excepción de accesibilidad"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityReportUrl"
+msgstr "URL del informe de accesibilidad"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityReportUrl.invalid"
+msgstr "La URL del informe de accesibilidad proporcionada no es una URL válida."
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityStandard.wcag21aa"
+msgstr "WCAG 2.1 AA"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityStandard.wcag21aaa"
+msgstr "WCAG 2.1 AAA"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityStandard.wcag22aa"
+msgstr "WCAG 2.2 AA"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityStandard.wcag22aaa"
+msgstr "WCAG 2.2 AAA"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityStandard.epubA11y10aa"
+msgstr "Especificación de Accesibilidad EPUB 1.0 AA"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityStandard.epubA11y10aaa"
+msgstr "Especificación de Accesibilidad EPUB 1.0 AAA"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityStandard.epubA11y11aa"
+msgstr "Especificación de Accesibilidad EPUB 1.1 AA"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityStandard.epubA11y11aaa"
+msgstr "Especificación de Accesibilidad EPUB 1.1 AAA"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityStandard.pdfUa1"
+msgstr "PDF/UA-1"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityStandard.pdfUa2"
+msgstr "PDF/UA-2"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityException.microEnterprises"
+msgstr "La editorial es una microempresa"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityException.disproportionateBurden"
+msgstr "Carga desproporcionada"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityException.fundamentalAlteration"
+msgstr "Alteración fundamental"

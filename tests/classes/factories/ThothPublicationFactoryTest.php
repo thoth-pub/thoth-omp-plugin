@@ -25,8 +25,12 @@ import('plugins.generic.thoth.classes.factories.ThothPublicationFactory');
 
 class ThothPublicationFactoryTest extends PKPTestCase
 {
-    private function setUpMockEnvironment($entryKey = 'DA', $localizedName = 'PDF', $remoteUrl = null)
-    {
+    private function setUpMockEnvironment(
+        $entryKey = 'DA',
+        $localizedName = 'PDF',
+        $remoteUrl = null,
+        $publicationFormatData = []
+    ) {
         $mockIdentificationCode = $this->getMockBuilder(\APP\publicationFormat\IdentificationCode::class)
             ->setMethods(['getCode', 'getValue'])
             ->getMock();
@@ -45,8 +49,10 @@ class ThothPublicationFactoryTest extends PKPTestCase
             ->method('toArray')
             ->will($this->returnValue([$mockIdentificationCode]));
 
+        $publicationFormatData['remoteUrl'] = $remoteUrl;
+
         $mockPubFormat = $this->getMockBuilder(\APP\publicationFormat\PublicationFormat::class)
-            ->setMethods(['getEntryKey', 'getLocalizedName', 'getIdentificationCodes', 'getRemoteUrl'])
+            ->setMethods(['getEntryKey', 'getLocalizedName', 'getIdentificationCodes', 'getRemoteUrl', 'getData'])
             ->getMock();
         $mockPubFormat->expects($this->any())
             ->method('getEntryKey')
@@ -60,6 +66,11 @@ class ThothPublicationFactoryTest extends PKPTestCase
         $mockPubFormat->expects($this->any())
             ->method('getRemoteUrl')
             ->will($this->returnValue($remoteUrl));
+        $mockPubFormat->expects($this->any())
+            ->method('getData')
+            ->will($this->returnCallback(function ($key) use ($publicationFormatData) {
+                return $publicationFormatData[$key] ?? null;
+            }));
 
         $this->mocks = [];
         $this->mocks['publicationFormat'] = $mockPubFormat;
@@ -121,5 +132,27 @@ class ThothPublicationFactoryTest extends PKPTestCase
         $thothPublication = $factory->createFromPublicationFormat($mockPubFormat);
 
         $this->assertSame(ThothPublication::PUBLICATION_TYPE_EPUB, $thothPublication->getPublicationType());
+    }
+
+    public function testCreateThothPublicationFromPublicationFormatAccessibilityMetadata()
+    {
+        $this->setUpMockEnvironment('DA', 'PDF', null, [
+            'accessibilityStandard' => 'WCAG21AA',
+            'accessibilityAdditionalStandard' => 'PDF_UA1',
+            'accessibilityException' => 'MICRO_ENTERPRISES',
+            'accessibilityReportUrl' => 'https://example.com/accessibility-report',
+        ]);
+        $mockPubFormat = $this->mocks['publicationFormat'];
+
+        $factory = new ThothPublicationFactory();
+        $thothPublication = $factory->createFromPublicationFormat($mockPubFormat);
+
+        $this->assertSame('WCAG21AA', $thothPublication->getData('accessibilityStandard'));
+        $this->assertSame('PDF_UA1', $thothPublication->getData('accessibilityAdditionalStandard'));
+        $this->assertSame('MICRO_ENTERPRISES', $thothPublication->getData('accessibilityException'));
+        $this->assertSame(
+            'https://example.com/accessibility-report',
+            $thothPublication->getData('accessibilityReportUrl')
+        );
     }
 }

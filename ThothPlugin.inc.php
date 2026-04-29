@@ -25,6 +25,8 @@ import('plugins.generic.thoth.classes.api.ThothEndpoint');
 import('plugins.generic.thoth.classes.components.forms.config.CatalogEntryFormConfig');
 import('plugins.generic.thoth.classes.components.forms.config.PublishFormConfig');
 import('plugins.generic.thoth.classes.components.forms.config.ContributorFormConfig');
+import('plugins.generic.thoth.classes.formModifiers.PublicationFormatFormModifier');
+import('plugins.generic.thoth.classes.templateFilters.PublicationFormatTemplateFilter');
 import('plugins.generic.thoth.classes.templateFilters.ThothSectionTemplateFilter');
 import('plugins.generic.thoth.classes.listeners.PublicationEditListener');
 import('plugins.generic.thoth.classes.listeners.PublicationPublishListener');
@@ -40,6 +42,7 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
         if ($success && $this->getEnabled()) {
             $this->addToSchema();
             $this->addFormConfig();
+            $this->addFormModifiers();
             $this->addListeners();
             $this->addEndpoints();
             HookRegistry::register('TemplateManager::display', [$this, 'addTemplateFilters']);
@@ -166,6 +169,19 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
 
         $contributorFormConfig = new ContributorFormConfig();
         HookRegistry::register('Form::config::before', [$contributorFormConfig, 'addConfig']);
+    }
+
+    public function addFormModifiers()
+    {
+        $publicationFormatFormModifier = new PublicationFormatFormModifier($this);
+        HookRegistry::register(
+            'publicationformatdao::getAdditionalFieldNames',
+            [$publicationFormatFormModifier, 'addAccessibilityFieldNames']
+        );
+        HookRegistry::register('publicationformatform::display', [$publicationFormatFormModifier, 'handleFormDisplay']);
+        HookRegistry::register('publicationformatform::readuservars', [$publicationFormatFormModifier, 'handleFormReadUserVars']);
+        HookRegistry::register('publicationformatform::validate', [$publicationFormatFormModifier, 'handleFormValidate']);
+        HookRegistry::register('publicationformatform::execute', [$publicationFormatFormModifier, 'handleFormExecute']);
     }
 
     public function addListeners()

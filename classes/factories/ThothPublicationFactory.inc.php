@@ -17,6 +17,13 @@ use ThothApi\GraphQL\Models\Publication as ThothPublication;
 
 class ThothPublicationFactory
 {
+    private const ACCESSIBILITY_FIELDS = [
+        'accessibilityStandard',
+        'accessibilityAdditionalStandard',
+        'accessibilityException',
+        'accessibilityReportUrl',
+    ];
+
     private const PHYSICAL_PUBLICATION_TYPE_MAPPING = [
         'BC' => ThothPublication::PUBLICATION_TYPE_PAPERBACK,
         'BB' => ThothPublication::PUBLICATION_TYPE_HARDBACK,
@@ -73,10 +80,19 @@ class ThothPublicationFactory
 
     public function createFromPublicationFormat($publicationFormat, $submissionFile = null)
     {
-        return new ThothPublication([
+        $publicationData = [
             'publicationType' => $this->getPublicationTypeByPublicationFormat($publicationFormat, $submissionFile),
-            'isbn' => $this->getIsbnByPublicationFormat($publicationFormat)
-        ]);
+            'isbn' => $this->getIsbnByPublicationFormat($publicationFormat),
+        ];
+
+        foreach (self::ACCESSIBILITY_FIELDS as $fieldName) {
+            $fieldValue = $publicationFormat->getData($fieldName);
+            if ($fieldValue !== null && $fieldValue !== '') {
+                $publicationData[$fieldName] = $fieldValue;
+            }
+        }
+
+        return new ThothPublication($publicationData);
     }
 
     private function getPublicationTypeByPublicationFormat($publicationFormat, $submissionFile = null)
