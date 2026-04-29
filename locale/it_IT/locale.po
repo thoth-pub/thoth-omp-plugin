@@ -1,0 +1,217 @@
+msgid "plugins.generic.thoth.name"
+msgstr "Thoth Plugin"
+
+msgid "plugins.generic.thoth.description"
+msgstr "Integra OMP con Thoth per la comunicazione e la sincronizzazione dei dati dei libri tra le due piattaforme."
+
+msgid "plugins.generic.thoth.navigation.thoth"
+msgstr "Thoth"
+
+msgid "plugins.generic.thoth.settings.title"
+msgstr "Impostazioni API Thoth"
+
+msgid "plugins.generic.thoth.settings.customThothApi"
+msgstr "API Thoth personalizzata"
+
+msgid "plugins.generic.thoth.settings.customThothApi.description"
+msgstr "Usa un'API Thoth personalizzata invece dell'API Thoth ufficiale."
+
+msgid "plugins.generic.thoth.settings.customThothApiUrl"
+msgstr "URL dell'API Thoth"
+
+msgid "plugins.generic.thoth.settings.customThothApiUrl.required"
+msgstr "L'URL dell'API Thoth personalizzata è obbligatorio quando l'opzione API personalizzata è abilitata."
+
+msgid "plugins.generic.thoth.settings.customThothApiUrl.invalid"
+msgstr "L'URL dell'API Thoth personalizzata fornito non è un URL valido."
+
+msgid "plugins.generic.thoth.settings.customThothApiUrl.unreachable"
+msgstr "Impossibile connettersi all'URL dell'API Thoth personalizzata. Verifica che l'URL sia corretto e che il servizio sia disponibile."
+
+msgid "plugins.generic.thoth.settings.token"
+msgstr "Token di accesso personale"
+
+msgid "plugins.generic.thoth.settings.invalidCredentials"
+msgstr "Token di accesso personale non valido"
+
+msgid "plugins.generic.thoth.settings.secretKeyEmpty"
+msgstr "L'amministratore del sito deve impostare una chiave segreta nel file di configurazione ('api_key_secret')."
+
+msgid "plugins.generic.thoth.credentialsMissing"
+msgstr "Token di accesso personale Thoth non configurato."
+
+msgid "plugins.generic.thoth.field.place.label"
+msgstr "Luogo di pubblicazione"
+
+msgid "plugins.generic.thoth.field.pageCount.label"
+msgstr "Numero di pagine"
+
+msgid "plugins.generic.thoth.field.imageCount.label"
+msgstr "Numero di immagini"
+
+msgid "plugins.generic.thoth.field.mainContribution.label"
+msgstr "Identifica questo collaboratore come contributo principale in Thoth."
+
+msgid "plugins.generic.thoth.workType"
+msgstr "Tipo di opera"
+
+msgid "plugins.generic.thoth.workType.monograph"
+msgstr "Monografia"
+
+msgid "plugins.generic.thoth.workType.textbook"
+msgstr "Manuale"
+
+msgid "plugins.generic.thoth.thothBook"
+msgstr "Libro Thoth: "
+
+msgid "plugins.generic.thoth.imprint"
+msgstr "Imprint"
+
+msgid "plugins.generic.thoth.imprint.required"
+msgstr "Seleziona un imprint."
+
+msgid "plugins.generic.thoth.connectionError"
+msgstr ""
+"Si è verificato un problema durante la connessione a Thoth. Riprova più tardi o "
+"contatta l'amministratore di sistema."
+
+msgid "plugins.generic.thoth.status.registered"
+msgstr "Registrato"
+
+msgid "plugins.generic.thoth.status.unregistered"
+msgstr "Non registrato"
+
+msgid "plugins.generic.thoth.register"
+msgstr "Registra"
+
+msgid "plugins.generic.thoth.register.label"
+msgstr "Registrazione in Thoth"
+
+msgid "plugins.generic.thoth.register.warning"
+msgstr "I metadati della proposta non possono essere inviati a Thoth a causa dei seguenti errori:"
+
+msgid "plugins.generic.thoth.validation.isbn"
+msgstr "\"{$isbn}\" del formato di pubblicazione \"{$formatName}\" non è un ISBN-13 valido."
+
+msgid "plugins.generic.thoth.validation.doiExists"
+msgstr "Esiste già un'opera con DOI \"{$doi}\"."
+
+msgid "plugins.generic.thoth.validation.landingPageExists"
+msgstr "Esiste già un'opera con la pagina di destinazione \"{$landingPage}\"."
+
+msgid "plugins.generic.thoth.validation.isbnExists"
+msgstr "Esiste già una pubblicazione con ISBN \"{$isbn}\"."
+
+msgid "plugins.generic.thoth.register.confirmation"
+msgstr "Vuoi registrare in Thoth i metadati relativi a questa proposta?"
+
+msgid "plugins.generic.thoth.register.success"
+msgstr "Metadati della proposta inviati con successo a Thoth."
+
+msgid "plugins.generic.thoth.register.success.log"
+msgstr "Metadati della proposta registrati in Thoth."
+
+msgid "plugins.generic.thoth.register.error"
+msgstr ""
+"Si è verificato un problema durante l'invio dei metadati della proposta a Thoth. Riprova più tardi o "
+"contatta l'amministratore di sistema."
+
+msgid "plugins.generic.thoth.register.error.log"
+msgstr "Errore durante la registrazione dei metadati in Thoth: {$reason}"
+
+msgid "plugins.generic.thoth.update"
+msgstr "Aggiorna metadati"
+
+msgid "plugins.generic.thoth.update.success"
+msgstr "Metadati aggiornati con successo in Thoth."
+
+msgid "plugins.generic.thoth.update.success.log"
+msgstr "Metadati della proposta aggiornati in Thoth."
+
+msgid "plugins.generic.thoth.update.error"
+msgstr ""
+"Si è verificato un problema durante l'aggiornamento dei metadati in Thoth. Riprova più tardi o "
+"contatta l'amministratore di sistema."
+
+msgid "plugins.generic.thoth.update.error.log"
+msgstr "Errore durante l'aggiornamento dei metadati in Thoth: {$reason}"
+
+msgid "plugins.generic.thoth.actions.register.label"
+msgstr "Registra proposte"
+
+msgid "plugins.generic.thoth.actions.register.prompt"
+msgstr ""
+"Stai per inviare i metadati della proposta per {$count} elementi a "
+"Thoth. Sei sicuro di voler registrare questi record?"
+
+msgid "plugins.generic.thoth.api.403.alreadyRegistered"
+msgstr "La proposta è già registrata in Thoth."
+
+msgid "plugins.generic.thoth.publicationFormat.accessibility"
+msgstr "Metadati di accessibilità"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityHelp"
+msgstr "Mostra indicazioni sui metadati di accessibilità"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityHelp.description"
+msgstr ""
+"<p>Gli standard di accessibilità sono validi solo per formati di pubblicazione digitale compatibili.</p>"
+"<p>Per pubblicazioni Paperback, Hardback, MP3 e WAV, lascia vuoti tutti i campi di accessibilità: standard di accessibilità, standard di accessibilità aggiuntivo ed eccezione di accessibilità.</p>"
+"<p>Per pubblicazioni PDF, lo standard principale di accessibilità deve essere uno standard WCAG e lo standard aggiuntivo, se fornito, deve essere PDF/UA.</p>"
+"<p>Per pubblicazioni EPUB, lo standard principale di accessibilità deve essere uno standard WCAG e lo standard aggiuntivo, se fornito, deve essere uno standard EPUB Accessibility.</p>"
+"<p>Per altri formati digitali, sono accettati solo standard WCAG e non deve essere fornito alcuno standard di accessibilità aggiuntivo.</p>"
+"<p>Se la pubblicazione non dichiara uno standard di accessibilità, lascia vuoti i campi di accessibilità, oppure usa un'eccezione di accessibilità solo quando applicabile.</p>"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityStandard"
+msgstr "Standard di accessibilità"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityAdditionalStandard"
+msgstr "Standard di accessibilità aggiuntivo"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityException"
+msgstr "Eccezione di accessibilità"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityReportUrl"
+msgstr "URL del rapporto di accessibilità"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityReportUrl.invalid"
+msgstr "L'URL del rapporto di accessibilità fornito non è un URL valido."
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityStandard.wcag21aa"
+msgstr "WCAG 2.1 AA"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityStandard.wcag21aaa"
+msgstr "WCAG 2.1 AAA"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityStandard.wcag22aa"
+msgstr "WCAG 2.2 AA"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityStandard.wcag22aaa"
+msgstr "WCAG 2.2 AAA"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityStandard.epubA11y10aa"
+msgstr "Specifica EPUB Accessibility 1.0 AA"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityStandard.epubA11y10aaa"
+msgstr "Specifica EPUB Accessibility 1.0 AAA"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityStandard.epubA11y11aa"
+msgstr "Specifica EPUB Accessibility 1.1 AA"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityStandard.epubA11y11aaa"
+msgstr "Specifica EPUB Accessibility 1.1 AAA"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityStandard.pdfUa1"
+msgstr "PDF/UA-1"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityStandard.pdfUa2"
+msgstr "PDF/UA-2"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityException.microEnterprises"
+msgstr "L'editore è una microimpresa"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityException.disproportionateBurden"
+msgstr "Onere sproporzionato"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityException.fundamentalAlteration"
+msgstr "Alterazione fondamentale"

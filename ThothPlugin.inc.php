@@ -22,10 +22,12 @@ import('plugins.generic.thoth.classes.api.ThothEndpoint');
 import('plugins.generic.thoth.classes.components.forms.config.CatalogEntryFormConfig');
 import('plugins.generic.thoth.classes.components.forms.config.PublishFormConfig');
 import('plugins.generic.thoth.classes.formModifiers.AuthorFormModifier');
+import('plugins.generic.thoth.classes.formModifiers.PublicationFormatFormModifier');
 import('plugins.generic.thoth.classes.listeners.PublicationEditListener');
 import('plugins.generic.thoth.classes.listeners.PublicationPublishListener');
 import('plugins.generic.thoth.classes.notification.ThothNotification');
 import('plugins.generic.thoth.classes.schema.ThothSchema');
+import('plugins.generic.thoth.classes.templateFilters.PublicationFormatTemplateFilter');
 import('plugins.generic.thoth.classes.templateFilters.ThothSectionTemplateFilter');
 
 class ThothPlugin extends GenericPlugin
@@ -154,6 +156,16 @@ class ThothPlugin extends GenericPlugin
         HookRegistry::register('authorform::Constructor', [$authorFormModifier, 'handleFormConstructor']);
         HookRegistry::register('authorform::display', [$authorFormModifier, 'handleFormDisplay']);
         HookRegistry::register('authorform::execute', [$authorFormModifier, 'handleFormExecute']);
+
+        $publicationFormatFormModifier = new PublicationFormatFormModifier($this);
+        HookRegistry::register(
+            'publicationformatdao::getAdditionalFieldNames',
+            [$publicationFormatFormModifier, 'addAccessibilityFieldNames']
+        );
+        HookRegistry::register('publicationformatform::display', [$publicationFormatFormModifier, 'handleFormDisplay']);
+        HookRegistry::register('publicationformatform::readuservars', [$publicationFormatFormModifier, 'handleFormReadUserVars']);
+        HookRegistry::register('publicationformatform::validate', [$publicationFormatFormModifier, 'handleFormValidate']);
+        HookRegistry::register('publicationformatform::execute', [$publicationFormatFormModifier, 'handleFormExecute']);
     }
 
     public function addEndpoints()

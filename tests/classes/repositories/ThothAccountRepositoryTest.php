@@ -55,4 +55,37 @@ class ThothAccountRepositoryTest extends PKPTestCase
 
         $this->assertEquals($expectedPublishers, $publishers);
     }
+
+    public function testGetLinkedPublishersUsesAuthenticatedQueryWhenTokenIsAvailable()
+    {
+        $mockThothClient = $this->getMockBuilder(ThothClient::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $repository = new class ($mockThothClient, [], 'token') extends ThothAccountRepository {
+            protected function getPublisherContextsWithPublishers()
+            {
+                return [
+                    [
+                        'publisher' => [
+                            'publisherId' => 'c1db6141-7af1-4f6a-97c4-2dc1065281ef',
+                            'publisherName' => 'Test Publisher',
+                        ],
+                        'permissions' => [
+                            'publisherAdmin' => true,
+                        ],
+                    ],
+                ];
+            }
+        };
+
+        $expectedPublishers = [
+            [
+                'publisherId' => 'c1db6141-7af1-4f6a-97c4-2dc1065281ef',
+                'publisherName' => 'Test Publisher',
+            ],
+        ];
+
+        $this->assertEquals($expectedPublishers, $repository->getLinkedPublishers());
+    }
 }
