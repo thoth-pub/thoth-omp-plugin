@@ -10,6 +10,7 @@
 
 import ThothSection from './Components/ThothSection.vue';
 import ThothListPanel from './Components/ThothListPanel.vue';
+import './thoth.css';
 
 pkp.registry.registerComponent('ThothSection', ThothSection);
 pkp.registry.registerComponent('ThothListPanel', ThothListPanel);

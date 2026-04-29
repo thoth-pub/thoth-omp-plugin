@@ -27,8 +27,12 @@ use ThothApi\GraphQL\Models\Publication as ThothPublication;
 class ThothPublicationFactoryTest extends PKPTestCase
 {
     protected array $mocks = [];
-    private function setUpMockEnvironment(string $entryKey = 'DA', string $localizedName = 'PDF', ?string $remoteUrl = null)
-    {
+    private function setUpMockEnvironment(
+        string $entryKey = 'DA',
+        string $localizedName = 'PDF',
+        ?string $remoteUrl = null,
+        array $publicationFormatData = []
+    ) {
         $mockIdentificationCode = $this->getMockBuilder(\APP\publicationFormat\IdentificationCode::class)
             ->onlyMethods(['getCode', 'getValue'])
             ->getMock();
@@ -59,10 +63,12 @@ class ThothPublicationFactoryTest extends PKPTestCase
         $mockPubFormat->expects($this->any())
             ->method('getIdentificationCodes')
             ->willReturn($mockResult);
+        $publicationFormatData['urlRemote'] = $remoteUrl;
+
         $mockPubFormat->expects($this->any())
             ->method('getData')
-            ->willReturnCallback(function ($key) use ($remoteUrl) {
-                return $key === 'urlRemote' ? $remoteUrl : null;
+            ->willReturnCallback(function ($key) use ($publicationFormatData) {
+                return $publicationFormatData[$key] ?? null;
             });
 
         $this->mocks = [];
@@ -125,5 +131,27 @@ class ThothPublicationFactoryTest extends PKPTestCase
         $thothPublication = $factory->createFromPublicationFormat($mockPubFormat);
 
         $this->assertSame(ThothPublication::PUBLICATION_TYPE_EPUB, $thothPublication->getPublicationType());
+    }
+
+    public function testCreateThothPublicationFromPublicationFormatAccessibilityMetadata()
+    {
+        $this->setUpMockEnvironment('DA', 'PDF', null, [
+            'accessibilityStandard' => 'WCAG21AA',
+            'accessibilityAdditionalStandard' => 'PDF_UA1',
+            'accessibilityException' => 'MICRO_ENTERPRISES',
+            'accessibilityReportUrl' => 'https://example.com/accessibility-report',
+        ]);
+        $mockPubFormat = $this->mocks['publicationFormat'];
+
+        $factory = new ThothPublicationFactory();
+        $thothPublication = $factory->createFromPublicationFormat($mockPubFormat);
+
+        $this->assertSame('WCAG21AA', $thothPublication->getData('accessibilityStandard'));
+        $this->assertSame('PDF_UA1', $thothPublication->getData('accessibilityAdditionalStandard'));
+        $this->assertSame('MICRO_ENTERPRISES', $thothPublication->getData('accessibilityException'));
+        $this->assertSame(
+            'https://example.com/accessibility-report',
+            $thothPublication->getData('accessibilityReportUrl')
+        );
     }
 }

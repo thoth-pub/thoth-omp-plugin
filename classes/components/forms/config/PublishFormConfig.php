@@ -21,6 +21,7 @@ use APP\plugins\generic\thoth\classes\facades\ThothRepository;
 use APP\plugins\generic\thoth\classes\facades\ThothService;
 use APP\plugins\generic\thoth\classes\notification\ThothNotification;
 use APP\submission\Submission;
+use Exception;
 use ThothApi\GraphQL\Models\Work as ThothWork;
 
 class PublishFormConfig
@@ -32,18 +33,17 @@ class PublishFormConfig
         }
 
         $publication = $form->publication;
-        $submission = Repo::submission()->get($publication->getData('submissionId'));
+        $submission = $this->getSubmission($publication);
 
         if ($submission->getData('thothWorkId')) {
             return;
         }
 
         try {
-            $errors = ThothService::book()->validate($publication);
+            $errors = $this->validatePublication($publication);
 
             if (empty($errors)) {
-                $publishers = ThothRepository::account()->getLinkedPublishers();
-                $imprints = ThothRepository::imprint()->getMany(array_column($publishers, 'publisherId'));
+                $imprints = $this->getImprints();
             }
         } catch (Exception $e) {
             error_log($e->getMessage());
@@ -58,6 +58,22 @@ class PublishFormConfig
         $this->addFields($form, $imprints, $submission->getData('workType'));
 
         return false;
+    }
+
+    protected function getSubmission($publication)
+    {
+        return Repo::submission()->get($publication->getData('submissionId'));
+    }
+
+    protected function validatePublication($publication): array
+    {
+        return ThothService::book()->validate($publication);
+    }
+
+    protected function getImprints(): array
+    {
+        $publishers = ThothRepository::account()->getLinkedPublishers();
+        return ThothRepository::imprint()->getMany(array_column($publishers, 'publisherId'));
     }
 
     private function addFields($form, $imprints, $workType)

@@ -83,7 +83,13 @@ class ThothRepositoryProvider implements ContainerProvider
         });
 
         $container->set('accountRepository', function ($container) {
-            return new ThothAccountRepository($container->get('client'));
+            $config = $container->get('config');
+            $httpConfig = [];
+            if ($config['customThothApi'] && $config['customThothApiUrl']) {
+                $httpConfig['base_uri'] = trim($config['customThothApiUrl']);
+            }
+
+            return new ThothAccountRepository($container->get('client'), $httpConfig, $config['token']);
         });
 
         $container->set('abstractRepository', function ($container) {

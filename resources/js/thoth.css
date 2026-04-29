@@ -1,0 +1,51 @@
+.thothAccessibilityHeader {
+	align-items: center;
+	display: flex;
+	gap: 0.35rem;
+	margin-bottom: 0.5rem;
+}
+
+.thothAccessibilityHeader__label {
+	font-weight: 700;
+}
+
+.thothAccessibilityHelp {
+	display: inline-block;
+	position: relative;
+}
+
+.thothAccessibilityHelp__button:hover,
+.thothAccessibilityHelp__button:focus {
+	color: #006798;
+	outline: 2px solid transparent;
+}
+
+.thothAccessibilityHelp__popover {
+	background: #fff;
+	border: 1px solid #bbb;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+	color: #333;
+	display: none;
+	font-size: 0.875rem;
+	font-weight: 400;
+	left: 0;
+	line-height: 1.4;
+	padding: 0.75rem;
+	position: absolute;
+	top: calc(100% + 0.25rem);
+	width: min(32rem, 80vw);
+	z-index: 1000;
+}
+
+.thothAccessibilityHelp:hover .thothAccessibilityHelp__popover,
+.thothAccessibilityHelp:focus-within .thothAccessibilityHelp__popover {
+	display: block;
+}
+
+.thothAccessibilityHelp__popover p {
+	margin: 0 0 0.5rem;
+}
+
+.thothAccessibilityHelp__popover p:last-child {
+	margin-bottom: 0;
+}

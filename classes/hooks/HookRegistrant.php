@@ -42,6 +42,7 @@ class HookRegistrant
     {
         $this->registerSchema();
         $this->registerFormConfigs();
+        $this->registerLegacyForms();
         $this->registerListeners();
         $this->registerEndpoints();
         $this->registerTemplateHooks();
@@ -62,6 +63,19 @@ class HookRegistrant
         Hook::add('Form::config::before', (new PublishFormConfig())->addConfig(...));
         Hook::add('Form::config::before', (new CatalogEntryFormConfig())->addConfig(...));
         Hook::add('Form::config::before', (new ContributorFormConfig())->addConfig(...));
+    }
+
+    private function registerLegacyForms(): void
+    {
+        $publicationFormatFormHandler = new PublicationFormatFormHandler($this->plugin);
+        Hook::add(
+            'publicationformatdao::getAdditionalFieldNames',
+            $publicationFormatFormHandler->addAccessibilityFieldNames(...)
+        );
+        Hook::add('publicationformatform::display', $publicationFormatFormHandler->addAccessibilityFields(...));
+        Hook::add('publicationformatform::readuservars', $publicationFormatFormHandler->addAccessibilityUserVars(...));
+        Hook::add('publicationformatform::validate', $publicationFormatFormHandler->validateAccessibilityFields(...));
+        Hook::add('publicationformatform::execute', $publicationFormatFormHandler->saveAccessibilityFields(...));
     }
 
     private function registerListeners(): void
