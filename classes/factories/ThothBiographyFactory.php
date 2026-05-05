@@ -16,6 +16,7 @@
 
 namespace APP\plugins\generic\thoth\classes\factories;
 
+use APP\plugins\generic\thoth\classes\formatters\ThothMarkupFormatter;
 use APP\plugins\generic\thoth\classes\i18n\ThothLocaleCode;
 use ThothApi\GraphQL\Models\Biography as ThothBiography;
 
@@ -25,6 +26,7 @@ class ThothBiographyFactory
     {
         $canonicalLocale = $this->getCanonicalLocale($author, $preferredLocale);
         $biographies = $this->getLocalizedValues($author, 'biography', $canonicalLocale);
+        $markupFormatter = new ThothMarkupFormatter();
         $thothBiographies = [];
 
         foreach ($biographies as $locale => $biography) {
@@ -37,7 +39,7 @@ class ThothBiographyFactory
             $thothBiographies[$this->getLocaleKey($localeCode)] = new ThothBiography([
                 'contributionId' => $contributionId,
                 'localeCode' => $localeCode,
-                'content' => $this->wrapInParagraph($biography),
+                'content' => $markupFormatter->format($biography),
                 'canonical' => $locale === $canonicalLocale,
             ]);
         }
@@ -97,15 +99,5 @@ class ThothBiographyFactory
             $locale ?? 'NULL',
             $normalizedLocaleCode
         ));
-    }
-
-    private function wrapInParagraph(string $content): string
-    {
-        $content = trim($content);
-        if (preg_match('/^<p\b[^>]*>.*<\/p>$/is', $content) === 1) {
-            return $content;
-        }
-
-        return sprintf('<p>%s</p>', $content);
     }
 }
