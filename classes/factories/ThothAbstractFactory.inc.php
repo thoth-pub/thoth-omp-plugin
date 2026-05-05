@@ -17,6 +17,7 @@
 use ThothApi\GraphQL\Models\AbstractText as ThothAbstract;
 
 import('plugins.generic.thoth.classes.i18n.ThothLocaleCode');
+import('plugins.generic.thoth.classes.formatters.ThothMarkupFormatter');
 
 class ThothAbstractFactory
 {
@@ -34,6 +35,7 @@ class ThothAbstractFactory
     {
         $canonicalLocale = $this->getCanonicalLocale($entity, $preferredLocale);
         $abstracts = $this->getLocalizedValues($entity, 'abstract', $canonicalLocale);
+        $markupFormatter = new ThothMarkupFormatter();
         $thothAbstracts = [];
 
         foreach ($abstracts as $locale => $abstract) {
@@ -46,7 +48,7 @@ class ThothAbstractFactory
             $thothAbstracts[$this->getLocaleKey($localeCode)] = new ThothAbstract([
                 'workId' => $workId,
                 'localeCode' => $localeCode,
-                'content' => $this->wrapInParagraph($abstract),
+                'content' => $markupFormatter->format($abstract),
                 'canonical' => $locale === $canonicalLocale,
                 'abstractType' => 'LONG',
             ]);
@@ -107,15 +109,5 @@ class ThothAbstractFactory
             $locale ?? 'NULL',
             $normalizedLocaleCode
         ));
-    }
-
-    private function wrapInParagraph($content)
-    {
-        $content = trim($content);
-        if (preg_match('/^<p\b[^>]*>.*<\/p>$/is', $content) === 1) {
-            return $content;
-        }
-
-        return sprintf('<p>%s</p>', $content);
     }
 }
