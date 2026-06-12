@@ -215,3 +215,6 @@ msgstr "Onere sproporzionato"
 
 msgid "plugins.generic.thoth.publicationFormat.accessibilityException.fundamentalAlteration"
 msgstr "Alterazione fondamentale"
+
+msgid "plugins.generic.thoth.grid.action.thothFileUpload"
+msgstr "Carica su Thoth"

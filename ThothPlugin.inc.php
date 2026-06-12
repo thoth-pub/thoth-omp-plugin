@@ -10,6 +10,7 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothPlugin
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief Plugin for integration with Thoth for communication and synchronization of book data between the two platforms
@@ -47,6 +48,9 @@ class ThothPlugin extends GenericPlugin
             $this->addFormModifiers();
             $this->addEndpoints();
             $this->addListeners();
+
+            import('plugins.generic.thoth.classes.gridModifier.PublicationFormatGridModifier');
+            $publicationFormatGridModifier = new PublicationFormatGridModifier($this);
         }
 
         return $success;
@@ -218,6 +222,15 @@ class ThothPlugin extends GenericPlugin
         if ($op === 'index') {
             $this->import('pages/thoth/ThothHandler');
             define('HANDLER_CLASS', 'ThothHandler');
+            return true;
+        }
+
+        if (in_array(
+            $op,
+            ['uploadThothPublicationFile', 'handleThothPublicationFile', 'saveUploadThothPublicationFile']
+        )) {
+            $this->import('controllers/fileUpload/UploadThothFileHandler');
+            define('HANDLER_CLASS', 'UploadThothFileHandler');
             return true;
         }
 
