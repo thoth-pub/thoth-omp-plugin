@@ -218,3 +218,6 @@ msgstr "Disproportionate burden"
 
 msgid "plugins.generic.thoth.publicationFormat.accessibilityException.fundamentalAlteration"
 msgstr "Fundamental alteration"
+
+msgid "plugins.generic.thoth.grid.action.thothFileUpload"
+msgstr "Upload to Thoth"

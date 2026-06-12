@@ -49,6 +49,9 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
             HookRegistry::register('TemplateManager::display', [$this, 'addScripts']);
             HookRegistry::register('TemplateManager::display', [$this, 'addMenu']);
             HookRegistry::register('LoadHandler', [$this, 'addHandlers']);
+
+            import('plugins.generic.thoth.classes.gridModifier.PublicationFormatGridModifier');
+            $publicationFormatGridModifier = new PublicationFormatGridModifier($this);
         }
 
         return $success;
@@ -249,6 +252,15 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
         if ($op === 'index') {
             $this->import('pages/thoth/ThothHandler');
             define('HANDLER_CLASS', 'ThothHandler');
+            return true;
+        }
+
+        if (in_array(
+            $op,
+            ['uploadThothPublicationFile', 'handleThothPublicationFile', 'saveUploadThothPublicationFile']
+        )) {
+            $this->import('controllers/fileUpload/UploadThothFileHandler');
+            define('HANDLER_CLASS', 'UploadThothFileHandler');
             return true;
         }
 
