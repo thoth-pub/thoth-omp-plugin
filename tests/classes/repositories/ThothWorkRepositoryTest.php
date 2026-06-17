@@ -60,6 +60,36 @@ class ThothWorkRepositoryTest extends PKPTestCase
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('work')
+            ->with('35a27dc3-8117-4381-9a8f-54ef5def6f0b', [
+                'workId',
+                'workType',
+                'workStatus',
+                'fullTitle',
+                'title',
+                'subtitle',
+                'edition',
+                'imprintId',
+                'doi',
+                'publicationDate',
+                'place',
+                'pageCount',
+                'imageCount',
+                'license',
+                'copyrightHolder',
+                'landingPage',
+                'coverUrl',
+                'titles' => [
+                    'titleId',
+                    'localeCode',
+                    'canonical',
+                ],
+                'abstracts' => [
+                    'abstractId',
+                    'localeCode',
+                    'abstractType',
+                    'canonical',
+                ],
+            ])
             ->will($this->returnValue($expectedThothWork));
 
         $repository = new ThothWorkRepository($mockThothClient);
