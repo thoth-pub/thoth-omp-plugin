@@ -25,6 +25,39 @@ class ThothBookService
     public $factory;
     public $repository;
 
+    private const PATCH_WORK_FIELDS = [
+        'workId' => true,
+        'workType' => true,
+        'workStatus' => true,
+        'reference' => true,
+        'edition' => true,
+        'imprintId' => true,
+        'doi' => true,
+        'publicationDate' => true,
+        'withdrawnDate' => true,
+        'place' => true,
+        'pageCount' => true,
+        'pageBreakdown' => true,
+        'imageCount' => true,
+        'tableCount' => true,
+        'audioCount' => true,
+        'videoCount' => true,
+        'license' => true,
+        'copyrightHolder' => true,
+        'landingPage' => true,
+        'lccn' => true,
+        'oclc' => true,
+        'generalNote' => true,
+        'bibliographyNote' => true,
+        'toc' => true,
+        'resourcesDescription' => true,
+        'coverUrl' => true,
+        'coverCaption' => true,
+        'firstPage' => true,
+        'lastPage' => true,
+        'pageInterval' => true,
+    ];
+
     private $originalThothBook;
     private $registeredEntryId;
 
@@ -85,12 +118,17 @@ class ThothBookService
         $newThothBook = $this->factory->createFromPublication($publication);
 
         $thothBook = $this->repository->new(array_merge(
-            $oldThothBook->toArray(),
+            $this->getPatchWorkData($oldThothBook),
             $newThothBook->getAllData()
         ));
 
         $this->repository->edit($thothBook);
         $this->updateMetadata($publication, $thothBookId, $oldThothBook);
+    }
+
+    private function getPatchWorkData($thothBook): array
+    {
+        return array_intersect_key($thothBook->toArray(), self::PATCH_WORK_FIELDS);
     }
 
     public function validate($publication)
