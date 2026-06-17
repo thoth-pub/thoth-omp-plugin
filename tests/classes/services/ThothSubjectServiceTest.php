@@ -1,5 +1,6 @@
 <?php
 
+require_once(__DIR__ . '/../../../vendor/autoload.php');
 /**
  * @file plugins/generic/thoth/tests/classes/services/ThothSubjectServiceTest.php
  *
@@ -15,7 +16,8 @@
  */
 
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Subject as ThothSubject;
+use ThothApi\GraphQL\Enums\SubjectType;
+use ThothApi\GraphQL\Inputs\PatchSubject as ThothSubject;
 
 import('lib.pkp.tests.PKPTestCase');
 import('plugins.generic.thoth.classes.repositories.ThothSubjectRepository');

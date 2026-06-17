@@ -1,5 +1,6 @@
 <?php
 
+require_once(__DIR__ . '/../../../vendor/autoload.php');
 /**
  * @file plugins/generic/thoth/tests/classes/factories/ThothChapterFactoryTest.php
  *
@@ -14,7 +15,9 @@
  * @brief Test class for the ThothChapterFactory class
  */
 
-use ThothApi\GraphQL\Models\Work as ThothWork;
+use ThothApi\GraphQL\Enums\WorkStatus;
+use ThothApi\GraphQL\Enums\WorkType;
+use ThothApi\GraphQL\Inputs\PatchWork as ThothWork;
 
 import('classes.monograph.Chapter');
 import('classes.press.Press');
@@ -154,8 +157,8 @@ class ThothChapterFactoryTest extends PKPTestCase
         $thothChapter = $factory->createFromChapter($mockChapter);
 
         $this->assertEquals(new ThothWork([
-            'workType' => ThothWork::WORK_TYPE_BOOK_CHAPTER,
-            'workStatus' => ThothWork::WORK_STATUS_ACTIVE,
+            'workType' => WorkType::BOOK_CHAPTER,
+            'workStatus' => WorkStatus::ACTIVE,
             'publicationDate' => '2024-01-01',
             'doi' => 'https://doi.org/10.12345/11112222',
             'pageInterval' => '31 - 50',
@@ -177,9 +180,9 @@ class ThothChapterFactoryTest extends PKPTestCase
 
         $factory = new ThothChapterFactory();
         $workStatus = $factory->getWorkStatusByDatePublished($mockChapter, null);
-        $this->assertEquals(ThothWork::WORK_STATUS_ACTIVE, $workStatus);
+        $this->assertEquals(WorkStatus::ACTIVE, $workStatus);
 
         $workStatus = $factory->getWorkStatusByDatePublished($mockChapter, null);
-        $this->assertEquals(ThothWork::WORK_STATUS_FORTHCOMING, $workStatus);
+        $this->assertEquals(WorkStatus::FORTHCOMING, $workStatus);
     }
 }

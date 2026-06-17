@@ -1,11 +1,10 @@
 <?php
 
-use ThothApi\GraphQL\Models\Title as ThothTitle;
+use ThothApi\GraphQL\Enums\MarkupFormat;
+use ThothApi\GraphQL\Inputs\PatchTitle as ThothTitle;
 
 class ThothTitleRepository
 {
-    private const MARKUP_FORMAT = 'PLAIN_TEXT';
-
     protected $thothClient;
 
     public function __construct($thothClient)
@@ -20,12 +19,12 @@ class ThothTitleRepository
 
     public function add($thothTitle)
     {
-        return $this->thothClient->createTitle($thothTitle, self::MARKUP_FORMAT);
+        return $this->thothClient->createTitle(MarkupFormat::PLAIN_TEXT, $thothTitle);
     }
 
     public function edit($thothPatchTitle)
     {
-        return $this->thothClient->updateTitle($thothPatchTitle, self::MARKUP_FORMAT);
+        return $this->thothClient->updateTitle(MarkupFormat::PLAIN_TEXT, $thothPatchTitle);
     }
 
     public function delete($thothTitleId)

@@ -13,7 +13,7 @@
  * @brief A repository to manage Thoth affiliations
  */
 
-use ThothApi\GraphQL\Models\Affiliation as ThothAffiliation;
+use ThothApi\GraphQL\Inputs\PatchAffiliation as ThothAffiliation;
 
 class ThothAffiliationRepository
 {

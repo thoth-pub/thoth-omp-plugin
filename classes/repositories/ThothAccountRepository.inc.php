@@ -14,28 +14,9 @@
  */
 
 use ThothApi\GraphQL\Client;
-use ThothApi\GraphQL\Request;
 
 class ThothAccountRepository
 {
-    private const ME_WITH_PUBLISHERS_QUERY = <<<GQL
-        query {
-            me {
-                publisherContexts {
-                    publisher {
-                        publisherId
-                        publisherName
-                    }
-                    permissions {
-                        publisherAdmin
-                        workLifecycle
-                        cdnWrite
-                    }
-                }
-            }
-        }
-    GQL;
-
     protected $thothClient;
     protected $httpConfig;
     protected $token;
@@ -51,7 +32,7 @@ class ThothAccountRepository
     {
         $publisherContexts = $this->token
             ? $this->getPublisherContextsWithPublishers()
-            : $this->thothClient->me()->getPublisherContexts() ?? [];
+            : $this->normalizePublisherContexts($this->thothClient->me()->getPublisherContexts() ?? []);
 
         return array_values(array_map(
             fn ($publisherContext) => $publisherContext['publisher'],
@@ -62,8 +43,28 @@ class ThothAccountRepository
     protected function getPublisherContextsWithPublishers()
     {
         $httpConfig = $this->httpConfig ?: ['base_uri' => Client::THOTH_BASE_URI];
-        $response = (new Request($httpConfig))->runQuery(self::ME_WITH_PUBLISHERS_QUERY, null, $this->token);
+        $me = (new Client($httpConfig))
+            ->setToken($this->token)
+            ->me([
+                'publisherContexts' => [
+                    'publisher' => ['publisherId', 'publisherName'],
+                    'permissions' => ['publisherAdmin', 'workLifecycle', 'cdnWrite'],
+                ],
+            ]);
 
-        return $response->getData()['me']['publisherContexts'] ?? [];
+        return array_map(
+            fn ($publisherContext) => $publisherContext->toArray(),
+            $me->getPublisherContexts() ?? []
+        );
+    }
+
+    private function normalizePublisherContexts(array $publisherContexts): array
+    {
+        return array_map(
+            fn ($publisherContext) => is_object($publisherContext) && method_exists($publisherContext, 'toArray')
+                ? $publisherContext->toArray()
+                : $publisherContext,
+            $publisherContexts
+        );
     }
 }

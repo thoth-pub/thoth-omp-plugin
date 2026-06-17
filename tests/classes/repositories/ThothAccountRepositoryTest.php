@@ -1,5 +1,6 @@
 <?php
 
+require_once(__DIR__ . '/../../../vendor/autoload.php');
 /**
  * @file plugins/generic/thoth/tests/classes/repositories/ThothAccountRepositoryTest.php
  *
@@ -15,7 +16,7 @@
  */
 
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Me;
+use ThothApi\GraphQL\Schemas\Me;
 
 import('lib.pkp.tests.PKPTestCase');
 import('plugins.generic.thoth.classes.repositories.ThothAccountRepository');

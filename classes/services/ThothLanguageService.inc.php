@@ -13,7 +13,7 @@
  * @brief Helper class that encapsulates business logic for Thoth languages
  */
 
-use ThothApi\GraphQL\Models\Language as ThothLanguage;
+use ThothApi\GraphQL\Enums\LanguageRelation;
 
 class ThothLanguageService
 {
@@ -29,7 +29,7 @@ class ThothLanguageService
         $thothLanguage = $this->repository->new([
             'workId' => $thothWorkId,
             'languageCode' => strtoupper(AppLocale::get3LetterIsoFromLocale($this->getLocale($locale))),
-            'languageRelation' => ThothLanguage::LANGUAGE_RELATION_ORIGINAL,
+            'languageRelation' => LanguageRelation::ORIGINAL,
             'mainLanguage' => true
         ]);
 

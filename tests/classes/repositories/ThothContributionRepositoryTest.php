@@ -1,5 +1,6 @@
 <?php
 
+require_once(__DIR__ . '/../../../vendor/autoload.php');
 /**
  * @file plugins/generic/thoth/tests/classes/repositories/ThothContributionRepositoryTest.php
  *
@@ -15,7 +16,8 @@
  */
 
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Contribution as ThothContribution;
+use ThothApi\GraphQL\Enums\ContributionType;
+use ThothApi\GraphQL\Inputs\PatchContribution as ThothContribution;
 
 import('lib.pkp.tests.PKPTestCase');
 import('plugins.generic.thoth.classes.repositories.ThothContributionRepository');
@@ -25,7 +27,7 @@ class ThothContributionRepositoryTest extends PKPTestCase
     public function testNewThothContribution()
     {
         $data = [
-            'contributionType' => ThothContribution::CONTRIBUTION_TYPE_AUTHOR,
+            'contributionType' => ContributionType::AUTHOR,
             'mainContribution' => true,
             'contributionOrdinal' => 1,
             'lastName' => 'John',
@@ -43,7 +45,7 @@ class ThothContributionRepositoryTest extends PKPTestCase
     {
         $expectedThothContribution = new ThothContribution([
             'contributionId' => '8d19d277-c42d-4bc4-b992-73174c7415e0',
-            'contributionType' => ThothContribution::CONTRIBUTION_TYPE_AUTHOR,
+            'contributionType' => ContributionType::AUTHOR,
             'mainContribution' => true,
             'contributionOrdinal' => 1,
             'lastName' => 'John',
@@ -68,7 +70,7 @@ class ThothContributionRepositoryTest extends PKPTestCase
         $thothContribution = new ThothContribution([
             'workId' => '66603c16-7f9f-440a-9584-09214491ec82',
             'contributorId' => '91350d60-b9e9-4083-a256-2d7acd6551e8',
-            'contributionType' => ThothContribution::CONTRIBUTION_TYPE_AUTHOR,
+            'contributionType' => ContributionType::AUTHOR,
             'mainContribution' => true,
             'contributionOrdinal' => 1,
             'lastName' => 'John',
@@ -94,7 +96,7 @@ class ThothContributionRepositoryTest extends PKPTestCase
             'contributionId' => 'ffc5404d-6365-434b-920b-da446cc3556e',
             'workId' => '66603c16-7f9f-440a-9584-09214491ec82',
             'contributorId' => '91350d60-b9e9-4083-a256-2d7acd6551e8',
-            'contributionType' => ThothContribution::CONTRIBUTION_TYPE_AUTHOR,
+            'contributionType' => ContributionType::AUTHOR,
             'mainContribution' => true,
             'contributionOrdinal' => 1,
             'lastName' => 'Johnathan',

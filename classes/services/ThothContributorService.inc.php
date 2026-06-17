@@ -13,7 +13,6 @@
  * @brief Helper class that encapsulates business logic for Thoth contributors
  */
 
-use ThothApi\GraphQL\Models\Contributor as ThothContributor;
 
 class ThothContributorService
 {

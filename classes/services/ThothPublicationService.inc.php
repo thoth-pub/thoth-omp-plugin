@@ -16,7 +16,6 @@
 use Biblys\Isbn\Isbn;
 use Biblys\Isbn\IsbnParsingException;
 use Biblys\Isbn\IsbnValidationException;
-use ThothApi\GraphQL\Models\Publication as ThothPublication;
 
 class ThothPublicationService
 {

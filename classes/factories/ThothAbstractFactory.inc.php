@@ -14,7 +14,7 @@
  * @brief A factory to create Thoth abstracts
  */
 
-use ThothApi\GraphQL\Models\AbstractText as ThothAbstract;
+use ThothApi\GraphQL\Inputs\PatchAbstract as ThothAbstract;
 
 import('plugins.generic.thoth.classes.i18n.ThothLocaleCode');
 import('plugins.generic.thoth.classes.formatters.ThothMarkupFormatter');

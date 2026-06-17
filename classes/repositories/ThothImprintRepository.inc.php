@@ -28,8 +28,6 @@ class ThothImprintRepository
             return [];
         }
 
-        $args['publishers'] = $thothPublisherIds;
-
-        return $this->thothClient->imprints($args, false);
+        return $this->thothClient->imprints(null, null, null, null, $thothPublisherIds);
     }
 }

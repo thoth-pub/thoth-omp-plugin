@@ -1,5 +1,6 @@
 <?php
 
+require_once(__DIR__ . '/../../../vendor/autoload.php');
 /**
  * @file plugins/generic/thoth/tests/classes/factories/ThothPublicationFactoryTest.php
  *
@@ -14,7 +15,8 @@
  * @brief Test class for the ThothPublicationFactory class
  */
 
-use ThothApi\GraphQL\Models\Publication as ThothPublication;
+use ThothApi\GraphQL\Enums\PublicationType;
+use ThothApi\GraphQL\Inputs\PatchPublication as ThothPublication;
 
 import('classes.publicationFormat.IdentificationCode');
 import('classes.publicationFormat.PublicationFormat');
@@ -84,7 +86,7 @@ class ThothPublicationFactoryTest extends PKPTestCase
         $thothPublication = $factory->createFromPublicationFormat($mockPubFormat);
 
         $this->assertEquals(new ThothPublication([
-            'publicationType' => ThothPublication::PUBLICATION_TYPE_PDF,
+            'publicationType' => PublicationType::PDF,
             'isbn' => '978-3-16-148410-0',
         ]), $thothPublication);
     }
@@ -119,7 +121,7 @@ class ThothPublicationFactoryTest extends PKPTestCase
         $factory = new ThothPublicationFactory();
         $thothPublication = $factory->createFromPublicationFormat($mockPubFormat, $mockSubmissionFile);
 
-        $this->assertSame(ThothPublication::PUBLICATION_TYPE_DOCX, $thothPublication->getPublicationType());
+        $this->assertSame(PublicationType::DOCX, $thothPublication->getPublicationType());
     }
 
     public function testCreateThothPublicationFromRemoteUrlExtension()
@@ -130,7 +132,7 @@ class ThothPublicationFactoryTest extends PKPTestCase
         $factory = new ThothPublicationFactory();
         $thothPublication = $factory->createFromPublicationFormat($mockPubFormat);
 
-        $this->assertSame(ThothPublication::PUBLICATION_TYPE_EPUB, $thothPublication->getPublicationType());
+        $this->assertSame(PublicationType::EPUB, $thothPublication->getPublicationType());
     }
 
     public function testCreateThothPublicationFromPublicationFormatAccessibilityMetadata()
@@ -146,12 +148,12 @@ class ThothPublicationFactoryTest extends PKPTestCase
         $factory = new ThothPublicationFactory();
         $thothPublication = $factory->createFromPublicationFormat($mockPubFormat);
 
-        $this->assertSame('WCAG21AA', $thothPublication->getData('accessibilityStandard'));
-        $this->assertSame('PDF_UA1', $thothPublication->getData('accessibilityAdditionalStandard'));
-        $this->assertSame('MICRO_ENTERPRISES', $thothPublication->getData('accessibilityException'));
+        $this->assertSame('WCAG21AA', $thothPublication->getAccessibilityStandard());
+        $this->assertSame('PDF_UA1', $thothPublication->getAccessibilityAdditionalStandard());
+        $this->assertSame('MICRO_ENTERPRISES', $thothPublication->getAccessibilityException());
         $this->assertSame(
             'https://example.com/accessibility-report',
-            $thothPublication->getData('accessibilityReportUrl')
+            $thothPublication->getAccessibilityReportUrl()
         );
     }
 }

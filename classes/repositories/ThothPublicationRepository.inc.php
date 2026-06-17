@@ -13,7 +13,7 @@
  * @brief A repository to manage Thoth publications
  */
 
-use ThothApi\GraphQL\Models\Publication as ThothPublication;
+use ThothApi\GraphQL\Inputs\PatchPublication as ThothPublication;
 
 class ThothPublicationRepository
 {
@@ -36,24 +36,17 @@ class ThothPublicationRepository
 
     public function getIdByType($thothWorkId, $thothPublicationType)
     {
-        $query = <<<GRAPHQL
-        query(\$workId: Uuid!, \$publicationType: PublicationType!) {
-            work(workId: \$workId) {
-                publications(publicationTypes: [\$publicationType]) {
-                    publicationId
-                }
+        $thothWork = $this->thothClient->work($thothWorkId, [
+            'publications' => ['publicationId', 'publicationType'],
+        ]);
+
+        foreach ($thothWork->getPublications() ?? [] as $thothPublication) {
+            if ($thothPublication->getPublicationType() === $thothPublicationType) {
+                return $thothPublication->getPublicationId();
             }
         }
-        GRAPHQL;
 
-        $variables = [
-            'workId' => $thothWorkId,
-            'publicationType' => $thothPublicationType
-        ];
-
-        $result = $this->thothClient->rawQuery($query, $variables);
-        $thothPublications = $result['work']['publications'];
-        return !empty($thothPublications) ? $thothPublications[0]['publicationId'] : null;
+        return null;
     }
 
     public function find($filter)
