@@ -1,5 +1,6 @@
 <?php
 
+require_once(__DIR__ . '/../../../vendor/autoload.php');
 /**
  * @file plugins/generic/thoth/tests/classes/repositories/ThothImprintRepositoryTest.php
  *
@@ -18,7 +19,7 @@
 
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Imprint as ThothImprint;
+use ThothApi\GraphQL\Schemas\Imprint as ThothImprint;
 
 import('plugins.generic.thoth.classes.repositories.ThothImprintRepository');
 
@@ -37,7 +38,7 @@ class ThothImprintRepositoryTest extends PKPTestCase
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('imprints')
-            ->with(['publishers' => ['fffa1c59-4823-48ea-9d1c-596006a119b5']], false)
+            ->with(null, null, null, null, ['fffa1c59-4823-48ea-9d1c-596006a119b5'])
             ->will($this->returnValue($expectedThothImprints));
 
         $thothPublisherIds = ['fffa1c59-4823-48ea-9d1c-596006a119b5'];

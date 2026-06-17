@@ -15,7 +15,7 @@
  */
 
 use PKP\db\DAORegistry;
-use ThothApi\GraphQL\Models\Work as ThothWork;
+use ThothApi\GraphQL\Enums\WorkStatus;
 
 import('plugins.generic.thoth.classes.facades.ThothService');
 import('lib.pkp.classes.services.PKPSchemaService');
@@ -59,9 +59,9 @@ class ThothBookService
         $thothBook = $this->factory->createFromPublication($publication);
         $thothBook->setImprintId($thothImprintId);
 
-        if ($thothBook->getWorkStatus() === ThothWork::WORK_STATUS_ACTIVE) {
+        if ($thothBook->getWorkStatus() === WorkStatus::ACTIVE) {
             $this->setOriginalThothBook($thothBook);
-            $thothBook->setWorkStatus(ThothWork::WORK_STATUS_FORTHCOMING);
+            $thothBook->setWorkStatus(WorkStatus::FORTHCOMING);
         }
 
         $thothBookId = $this->repository->add($thothBook);
@@ -85,7 +85,7 @@ class ThothBookService
         $newThothBook = $this->factory->createFromPublication($publication);
 
         $thothBook = $this->repository->new(array_merge(
-            $oldThothBook->getAllData(),
+            $oldThothBook->toArray(),
             $newThothBook->getAllData()
         ));
 
@@ -138,7 +138,7 @@ class ThothBookService
 
         $thothBook = $this->getOriginalThothBook();
         $thothBook->setWorkId($this->getRegisteredEntryId());
-        $thothBook->setWorkStatus(ThothWork::WORK_STATUS_ACTIVE);
+        $thothBook->setWorkStatus(WorkStatus::ACTIVE);
         $this->repository->edit($thothBook);
     }
 
@@ -161,13 +161,13 @@ class ThothBookService
         ThothService::title()->updateByPublication(
             $publication,
             $thothBookId,
-            $oldThothBook->getData('titles') ?? [],
+            $oldThothBook->toArray()['titles'] ?? [],
             $publication->getData('locale')
         );
         ThothService::abstract()->updateByPublication(
             $publication,
             $thothBookId,
-            $oldThothBook->getData('abstracts') ?? [],
+            $oldThothBook->toArray()['abstracts'] ?? [],
             $publication->getData('locale')
         );
     }

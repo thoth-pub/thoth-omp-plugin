@@ -1,5 +1,6 @@
 <?php
 
+require_once(__DIR__ . '/../../../vendor/autoload.php');
 /**
  * @file plugins/generic/thoth/tests/classes/services/ThothChapterServiceTest.php
  *
@@ -19,7 +20,9 @@
 use APP\publication\Repository as PublicationRepository;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Work as ThothWork;
+use ThothApi\GraphQL\Enums\WorkStatus;
+use ThothApi\GraphQL\Enums\WorkType;
+use ThothApi\GraphQL\Inputs\PatchWork as ThothWork;
 
 import('plugins.generic.thoth.classes.factories.ThothChapterFactory');
 import('plugins.generic.thoth.classes.repositories.ThothChapterRepository');

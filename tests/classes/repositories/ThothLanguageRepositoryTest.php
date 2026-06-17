@@ -1,5 +1,6 @@
 <?php
 
+require_once(__DIR__ . '/../../../vendor/autoload.php');
 /**
  * @file plugins/generic/thoth/tests/classes/repositories/ThothLanguageRepositoryTest.php
  *
@@ -18,7 +19,8 @@
 
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Language as ThothLanguage;
+use ThothApi\GraphQL\Enums\LanguageRelation;
+use ThothApi\GraphQL\Inputs\PatchLanguage as ThothLanguage;
 
 import('plugins.generic.thoth.classes.repositories.ThothLanguageRepository');
 
@@ -28,7 +30,7 @@ class ThothLanguageRepositoryTest extends PKPTestCase
     {
         $data = [
             'languageCode' => 'ENG',
-            'languageRelation' => ThothLanguage::LANGUAGE_RELATION_ORIGINAL,
+            'languageRelation' => LanguageRelation::ORIGINAL,
             'mainLanguage' => true
         ];
 
@@ -44,7 +46,7 @@ class ThothLanguageRepositoryTest extends PKPTestCase
         $expectedThothLanguage = new ThothLanguage([
             'languageId' => '01ff14a6-da2d-466b-a49f-ec1061fce8da',
             'languageCode' => 'ENG',
-            'languageRelation' => ThothLanguage::LANGUAGE_RELATION_ORIGINAL,
+            'languageRelation' => LanguageRelation::ORIGINAL,
             'mainLanguage' => true
         ]);
 
@@ -65,7 +67,7 @@ class ThothLanguageRepositoryTest extends PKPTestCase
     {
         $thothLanguage = new ThothLanguage([
             'languageCode' => 'ENG',
-            'languageRelation' => ThothLanguage::LANGUAGE_RELATION_ORIGINAL,
+            'languageRelation' => LanguageRelation::ORIGINAL,
             'mainLanguage' => true
         ]);
 
@@ -87,7 +89,7 @@ class ThothLanguageRepositoryTest extends PKPTestCase
         $thothPatchLanguage = new ThothLanguage([
             'languageId' => '39200d3a-397d-4d39-a6b2-86089520615a',
             'languageCode' => 'ESP',
-            'languageRelation' => ThothLanguage::LANGUAGE_RELATION_ORIGINAL,
+            'languageRelation' => LanguageRelation::ORIGINAL,
             'mainLanguage' => true
         ]);
 

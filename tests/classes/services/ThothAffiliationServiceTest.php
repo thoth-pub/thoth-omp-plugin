@@ -1,5 +1,6 @@
 <?php
 
+require_once(__DIR__ . '/../../../vendor/autoload.php');
 /**
  * @file plugins/generic/thoth/tests/classes/services/ThothAffiliationServiceTest.php
  *
@@ -18,7 +19,8 @@
 
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Institution as ThothInstitution;
+use ThothApi\GraphQL\Inputs\PatchAffiliation as ThothAffiliation;
+use ThothApi\GraphQL\Inputs\PatchInstitution as ThothInstitution;
 
 import('plugins.generic.thoth.classes.repositories.ThothAffiliationRepository');
 import('plugins.generic.thoth.classes.repositories.ThothInstitutionRepository');

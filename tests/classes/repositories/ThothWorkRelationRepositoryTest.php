@@ -1,5 +1,6 @@
 <?php
 
+require_once(__DIR__ . '/../../../vendor/autoload.php');
 /**
  * @file plugins/generic/thoth/tests/classes/repositories/ThothWorkRelationRepositoryTest.php
  *
@@ -18,7 +19,8 @@
 
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\WorkRelation as ThothWorkRelation;
+use ThothApi\GraphQL\Enums\RelationType;
+use ThothApi\GraphQL\Inputs\PatchWorkRelation as ThothWorkRelation;
 
 import('plugins.generic.thoth.classes.repositories.ThothWorkRelationRepository');
 
@@ -29,7 +31,7 @@ class ThothWorkRelationRepositoryTest extends PKPTestCase
         $data = [
             'relatorWorkId' => '074bef90-23f6-4e16-b188-175a1a428157',
             'relatedId' => '205d40f6-67d3-4af0-907b-ff53d02231cb',
-            'relationType' => ThothWorkRelation::RELATION_TYPE_HAS_CHILD,
+            'relationType' => RelationType::HAS_CHILD,
             'relationOrdinal' => 1
         ];
 
@@ -47,7 +49,7 @@ class ThothWorkRelationRepositoryTest extends PKPTestCase
         $thothWorkRelation = new ThothWorkRelation([
             'relatorWorkId' => 'b23ffa4e-b50b-48c7-bdad-f331cb8449f7',
             'relatedId' => '205d40f6-67d3-4af0-907b-ff53d02231cb',
-            'relationType' => ThothWorkRelation::RELATION_TYPE_HAS_CHILD,
+            'relationType' => RelationType::HAS_CHILD,
             'relationOrdinal' => 1
         ]);
 
@@ -71,7 +73,7 @@ class ThothWorkRelationRepositoryTest extends PKPTestCase
             'workRelationId' => '98d1efa2-475b-4cde-a180-d4fe8a470d25',
             'relatorWorkId' => 'b23ffa4e-b50b-48c7-bdad-f331cb8449f7',
             'relatedId' => '205d40f6-67d3-4af0-907b-ff53d02231cb',
-            'relationType' => ThothWorkRelation::RELATION_TYPE_HAS_TRANSLATION,
+            'relationType' => RelationType::HAS_TRANSLATION,
             'relationOrdinal' => 3
         ]);
 

@@ -14,7 +14,7 @@
  * @brief A repository to manage Thoth works
  */
 
-use ThothApi\GraphQL\Models\Work as ThothWork;
+use ThothApi\GraphQL\Inputs\PatchWork as ThothWork;
 
 class ThothWorkRepository
 {

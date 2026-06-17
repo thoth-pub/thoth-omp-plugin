@@ -1,5 +1,6 @@
 <?php
 
+require_once(__DIR__ . '/../../../vendor/autoload.php');
 /**
  * @file plugins/generic/thoth/tests/classes/repositories/ThothPublicationRepositoryTest.php
  *
@@ -18,7 +19,9 @@
 
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Publication as ThothPublication;
+use ThothApi\GraphQL\Enums\PublicationType;
+use ThothApi\GraphQL\Inputs\PatchPublication as ThothPublication;
+use ThothApi\GraphQL\Schemas\Work as ThothWork;
 
 import('plugins.generic.thoth.classes.repositories.ThothPublicationRepository');
 
@@ -28,7 +31,7 @@ class ThothPublicationRepositoryTest extends PKPTestCase
     {
         $data = [
             'workId' => 'a2c032c6-b09b-4911-a67b-17f97cb57cc1',
-            'publicationType' => ThothPublication::PUBLICATION_TYPE_PDF,
+            'publicationType' => PublicationType::PDF,
             'isbn' => '978-3-16-148410-0',
             'width' => '60',
             'height' => '120',
@@ -50,7 +53,7 @@ class ThothPublicationRepositoryTest extends PKPTestCase
         $expectedThothPublication = new ThothPublication([
             'publicationId' => '1bce4a08-270c-4515-b0d5-d72d001314d4',
             'workId' => 'a2c032c6-b09b-4911-a67b-17f97cb57cc1',
-            'publicationType' => ThothPublication::PUBLICATION_TYPE_PDF,
+            'publicationType' => PublicationType::PDF,
             'isbn' => '978-3-16-148410-0',
             'width' => '60',
             'height' => '120',
@@ -74,24 +77,31 @@ class ThothPublicationRepositoryTest extends PKPTestCase
 
     public function testGetPublicationIdByType()
     {
+        $expectedThothWork = new ThothWork([
+            'publications' => [
+                [
+                    'publicationId' => 'efac5d7a-2284-4432-ad50-02b70aadec49',
+                    'publicationType' => PublicationType::PDF,
+                ]
+            ]
+        ]);
+
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['rawQuery'])
+            ->setMethods(['work'])
             ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('rawQuery')
-            ->will($this->returnValue([
-                'work' => ['publications' => [
-                    [
-                        'publicationId' => 'efac5d7a-2284-4432-ad50-02b70aadec49',
-                    ]
-                ]]
-            ]));
+        $mockThothClient->expects($this->once())
+            ->method('work')
+            ->with(
+                'a2c032c6-b09b-4911-a67b-17f97cb57cc1',
+                ['publications' => ['publicationId', 'publicationType']]
+            )
+            ->will($this->returnValue($expectedThothWork));
 
         $repository = new ThothPublicationRepository($mockThothClient);
 
         $thothPublicationId = $repository->getIdByType(
             'a2c032c6-b09b-4911-a67b-17f97cb57cc1',
-            ThothPublication::PUBLICATION_TYPE_PDF
+            PublicationType::PDF
         );
 
         $this->assertEquals('efac5d7a-2284-4432-ad50-02b70aadec49', $thothPublicationId);
@@ -121,7 +131,7 @@ class ThothPublicationRepositoryTest extends PKPTestCase
     {
         $thothPublication = new ThothPublication([
             'workId' => 'a2c032c6-b09b-4911-a67b-17f97cb57cc1',
-            'publicationType' => ThothPublication::PUBLICATION_TYPE_PDF,
+            'publicationType' => PublicationType::PDF,
             'isbn' => '978-3-16-148410-0',
             'width' => '60',
             'height' => '120',
@@ -148,7 +158,7 @@ class ThothPublicationRepositoryTest extends PKPTestCase
         $thothPatchPublication = new ThothPublication([
             'publicationId' => 'fc6618f1-f4db-44f9-bbe3-75438f4bd536',
             'workId' => 'a2c032c6-b09b-4911-a67b-17f97cb57cc1',
-            'publicationType' => ThothPublication::PUBLICATION_TYPE_EPUB,
+            'publicationType' => PublicationType::EPUB,
             'isbn' => '978-3-16-148410-0'
         ]);
 

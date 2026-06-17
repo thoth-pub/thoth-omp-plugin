@@ -1,5 +1,7 @@
 <?php
 
+require_once(__DIR__ . '/../../../vendor/autoload.php');
+
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
 

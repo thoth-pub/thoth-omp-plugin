@@ -1,5 +1,6 @@
 <?php
 
+require_once(__DIR__ . '/../../../vendor/autoload.php');
 /**
  * @file plugins/generic/thoth/tests/classes/repositories/ThothBiographyRepositoryTest.php
  *
@@ -18,7 +19,7 @@
 
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Biography as ThothBiography;
+use ThothApi\GraphQL\Inputs\PatchBiography as ThothBiography;
 
 import('plugins.generic.thoth.classes.repositories.ThothBiographyRepository');
 
