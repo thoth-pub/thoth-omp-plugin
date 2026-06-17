@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "19d78865003741fcf73a54570509c41f",
+    "content-hash": "74e6202829712e800175ddda679f10a8",
     "packages": [
         {
             "name": "biblys/isbn",
@@ -664,16 +664,16 @@
         },
         {
             "name": "thoth-pub/thoth-client-php",
-            "version": "1.4.1",
+            "version": "2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thoth-pub/thoth-client-php.git",
-                "reference": "b19f8e808c1f734106362965b6e505acc2f2c60e"
+                "reference": "31f257d1c2eb1beb01e46378a305379a2c156e68"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thoth-pub/thoth-client-php/zipball/b19f8e808c1f734106362965b6e505acc2f2c60e",
-                "reference": "b19f8e808c1f734106362965b6e505acc2f2c60e",
+                "url": "https://api.github.com/repos/thoth-pub/thoth-client-php/zipball/31f257d1c2eb1beb01e46378a305379a2c156e68",
+                "reference": "31f257d1c2eb1beb01e46378a305379a2c156e68",
                 "shasum": ""
             },
             "require": {
@@ -682,6 +682,7 @@
             },
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "^3.64",
+                "phpstan/phpstan": "^2.2",
                 "phpunit/phpunit": "^9.6"
             },
             "type": "library",
@@ -697,9 +698,9 @@
             "description": "PHP client for Thoth's GraphQL and REST APIs.",
             "support": {
                 "issues": "https://github.com/thoth-pub/thoth-client-php/issues",
-                "source": "https://github.com/thoth-pub/thoth-client-php/tree/1.4.1"
+                "source": "https://github.com/thoth-pub/thoth-client-php/tree/2.0.0"
             },
-            "time": "2026-04-15T21:46:39+00:00"
+            "time": "2026-06-16T22:04:27+00:00"
         }
     ],
     "packages-dev": [],
