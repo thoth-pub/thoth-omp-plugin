@@ -37,7 +37,7 @@ class PublishFormConfig
             $errors = ThothService::book()->validate($publication);
 
             if (empty($errors)) {
-                $publishers = ThothRepo::account()->getLinkedPublishers();
+                $publishers = ThothRepo::me()->getLinkedPublishers();
                 $publisherIds = array_column($publishers, 'publisherId');
                 $imprints = ThothRepo::imprint()->getMany([
                     'publishers' => $publisherIds
