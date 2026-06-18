@@ -22,12 +22,8 @@ class ThothImprintRepository
         $this->thothClient = $thothClient;
     }
 
-    public function getMany($thothPublisherIds = [])
+    public function getMany(array $params = [], array $selection = [])
     {
-        if (empty($thothPublisherIds)) {
-            return [];
-        }
-
-        return $this->thothClient->imprints(null, null, null, null, $thothPublisherIds);
+        return $this->thothClient->imprints($params, $selection);
     }
 }

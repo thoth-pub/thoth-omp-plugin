@@ -38,7 +38,13 @@ class PublishFormConfig
 
             if (empty($errors)) {
                 $publishers = ThothRepo::account()->getLinkedPublishers();
-                $imprints = ThothRepo::imprint()->getMany(array_column($publishers, 'publisherId'));
+                $publisherIds = array_column($publishers, 'publisherId');
+                $imprints = ThothRepo::imprint()->getMany([
+                    'publishers' => $publisherIds
+                ], [
+                    'imprintId',
+                    'imprintName',
+                ]);
             }
         } catch (Exception $e) {
             error_log($e->getMessage());

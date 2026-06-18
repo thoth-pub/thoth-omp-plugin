@@ -29,8 +29,7 @@ class ThothLanguageService
         $thothLanguage = $this->repository->new([
             'workId' => $thothWorkId,
             'languageCode' => strtoupper(AppLocale::get3LetterIsoFromLocale($this->getLocale($locale))),
-            'languageRelation' => LanguageRelation::ORIGINAL,
-            'mainLanguage' => true
+            'languageRelation' => LanguageRelation::ORIGINAL
         ]);
 
         return $this->repository->add($thothLanguage);
