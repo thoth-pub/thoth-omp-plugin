@@ -28,7 +28,6 @@ import('plugins.generic.thoth.classes.factories.ThothContributionFactory');
 import('plugins.generic.thoth.classes.factories.ThothContributorFactory');
 import('plugins.generic.thoth.classes.factories.ThothLocationFactory');
 import('plugins.generic.thoth.classes.factories.ThothPublicationFactory');
-import('plugins.generic.thoth.classes.repositories.ThothAccountRepository');
 import('plugins.generic.thoth.classes.repositories.ThothAbstractRepository');
 import('plugins.generic.thoth.classes.repositories.ThothAffiliationRepository');
 import('plugins.generic.thoth.classes.repositories.ThothBiographyRepository');
@@ -40,6 +39,7 @@ import('plugins.generic.thoth.classes.repositories.ThothImprintRepository');
 import('plugins.generic.thoth.classes.repositories.ThothInstitutionRepository');
 import('plugins.generic.thoth.classes.repositories.ThothLanguageRepository');
 import('plugins.generic.thoth.classes.repositories.ThothLocationRepository');
+import('plugins.generic.thoth.classes.repositories.ThothMeRepository');
 import('plugins.generic.thoth.classes.repositories.ThothPublicationRepository');
 import('plugins.generic.thoth.classes.repositories.ThothReferenceRepository');
 import('plugins.generic.thoth.classes.repositories.ThothSubjectRepository');
@@ -88,14 +88,8 @@ class ThothRepositoryProvider implements ContainerProvider
             return $client->setToken($config['token']);
         });
 
-        $container->set('accountRepository', function ($container) {
-            $config = $container->get('config');
-            $httpConfig = [];
-            if ($config['customThothApi'] && $config['customThothApiUrl']) {
-                $httpConfig['base_uri'] = trim($config['customThothApiUrl']);
-            }
-
-            return new ThothAccountRepository($container->get('client'), $httpConfig, $config['token']);
+        $container->set('meRepository', function ($container) {
+            return new ThothMeRepository($container->get('client'));
         });
 
         $container->set('abstractRepository', function ($container) {
