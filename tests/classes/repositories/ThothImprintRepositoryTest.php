@@ -38,13 +38,17 @@ class ThothImprintRepositoryTest extends PKPTestCase
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('imprints')
-            ->with(null, null, null, null, ['fffa1c59-4823-48ea-9d1c-596006a119b5'])
+            ->with(
+                ['publishers' => ['fffa1c59-4823-48ea-9d1c-596006a119b5']],
+                ['imprintId']
+            )
             ->will($this->returnValue($expectedThothImprints));
 
-        $thothPublisherIds = ['fffa1c59-4823-48ea-9d1c-596006a119b5'];
+        $params = ['publishers' => ['fffa1c59-4823-48ea-9d1c-596006a119b5']];
+        $selection = ['imprintId'];
 
         $repository = new ThothImprintRepository($mockThothClient);
-        $thothImprints = $repository->getMany($thothPublisherIds);
+        $thothImprints = $repository->getMany($params, $selection);
 
         $this->assertEquals($expectedThothImprints, $thothImprints);
     }
@@ -54,8 +58,10 @@ class ThothImprintRepositoryTest extends PKPTestCase
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
             ->setMethods(['imprints'])
             ->getMock();
-        $mockThothClient->expects($this->never())
-            ->method('imprints');
+        $mockThothClient->expects($this->once())
+            ->method('imprints')
+            ->with([], [])
+            ->will($this->returnValue([]));
 
         $repository = new ThothImprintRepository($mockThothClient);
 
