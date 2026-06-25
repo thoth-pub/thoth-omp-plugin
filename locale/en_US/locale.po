@@ -96,6 +96,9 @@ msgstr "\"{$isbn}\" of \"{$formatName}\" publication format is not a valid ISBN-
 msgid "plugins.generic.thoth.validation.doiExists"
 msgstr "A work with DOI \"{$doi}\" already exists."
 
+msgid "plugins.generic.thoth.validation.doiNotFound"
+msgstr "Could not find a monograph or chapter in Thoth with DOI \"{$doi}\"."
+
 msgid "plugins.generic.thoth.validation.landingPageExists"
 msgstr "A work with the landing page \"{$landingPage}\" already exists."
 
@@ -218,3 +221,12 @@ msgstr "Fundamental alteration"
 
 msgid "plugins.generic.thoth.grid.action.thothFileUpload"
 msgstr "Upload to Thoth"
+
+msgid "plugins.generic.thoth.submissionComponent.title"
+msgstr "Submission component related to the file"
+
+msgid "plugins.generic.thoth.submissionComponent.description"
+msgstr "Select the monograph or chapter related to the file. Monographs and chapters must have a DOI to upload files to Thoth."
+
+msgid "plugins.generic.thoth.fileUpload.success"
+msgstr "File uploaded to Thoth successfully."

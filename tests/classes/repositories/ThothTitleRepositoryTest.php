@@ -1,6 +1,5 @@
 <?php
 
-require_once(__DIR__ . '/../../../vendor/autoload.php');
 /**
  * @file plugins/generic/thoth/tests/classes/repositories/ThothTitleRepositoryTest.php
  *
@@ -14,6 +13,8 @@ require_once(__DIR__ . '/../../../vendor/autoload.php');
  *
  * @brief Test class for the ThothTitleRepository class
  */
+
+require_once(__DIR__ . '/../../../vendor/autoload.php');
 
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Inputs\PatchTitle as ThothTitle;

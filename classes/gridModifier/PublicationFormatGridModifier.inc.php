@@ -44,19 +44,27 @@ class PublicationFormatGridModifier
             return;
         }
 
+        $submission = $handler->getSubmission();
+        $thothWorkId = $submission->getData('thothWorkId');
+
+        if (!$thothWorkId) {
+            return;
+        }
+
         $categoryRow = $templateMgr->getTemplateVars('categoryRow');
         $publicationFormat = $categoryRow->getData();
 
         $actionArgs = [
             'representationId' => $publicationFormat->getId(),
             'publicationId' => $publicationFormat->getData('publicationId'),
+            'thothWorkId' => $thothWorkId
         ];
 
         import('lib.pkp.classes.linkAction.request.AjaxModal');
         $linkAction = new LinkAction(
-            'settings',
+            'thothUpload',
             new AjaxModal(
-                $registerUrl = $request->getDispatcher()->url(
+                $request->getDispatcher()->url(
                     $request,
                     ROUTE_PAGE,
                     null,

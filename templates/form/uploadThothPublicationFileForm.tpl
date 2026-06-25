@@ -17,14 +17,17 @@
 				$uploader: $('#plupload'),
 				uploaderOptions: {ldelim}
 					uploadUrl: {url|json_encode router=$smarty.const.ROUTE_PAGE page="thoth" op="handleThothPublicationFile" escape=false},
-					baseUrl: {$baseUrl|json_encode}
+					baseUrl: {$baseUrl|json_encode},
+					filters: {ldelim}
+						max_file_size: '50mb'
+					{rdelim}
 				{rdelim}
 			{rdelim}
 		);
 	{rdelim});
 </script>
 
-<form class="pkp_form" id="uploadThothPublicationFileForm" action="{url router=$smarty.const.ROUTE_PAGE page="thoth" op="saveUploadThothPublicationFile"}" method="post">
+<form class="pkp_form" id="uploadThothPublicationFileForm" action="{url router=$smarty.const.ROUTE_PAGE page="thoth" op="saveUploadThothPublicationFile" publicationId=$publicationId representationId=$representationId thothWorkId=$thothWorkId}" method="post">
 	{csrf}
 	{include file="controllers/notification/inPlaceNotification.tpl" notificationId="uploadThothPublicationFileNotification"}
 
@@ -34,6 +37,17 @@
 			<input type="hidden" name="temporaryFileId" id="temporaryFileId" value="" />
 		{/fbvFormSection}
 	{/fbvFormArea}
+
+	{if $chapters}
+		{fbvFormArea id="file" title="plugins.generic.thoth.submissionComponent.title"}
+			{fbvFormSection description="plugins.generic.thoth.submissionComponent.description" for="submissionComponentId" list=true required=true}
+				{fbvElement type="radio" id=$publication->getId() name="submissionComponentId" value=$publication->getId() checked=false label=$publication->getLocalizedTitle() translate=false}
+				{foreach from=$chapters item=chapter}
+					{fbvElement type="radio" id=$chapter->getId() name="submissionComponentId" value=$chapter->getId() checked=false label=$chapter->getLocalizedTitle() translate=false}
+				{/foreach}
+			{/fbvFormSection}
+		{/fbvFormArea}
+	{/if}
 
 	{fbvFormButtons id="uploadThothPublicationFileFormSubmit" submitText="common.save"}
 </form>

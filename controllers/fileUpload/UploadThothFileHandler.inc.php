@@ -49,13 +49,14 @@ class UploadThothFileHandler extends Handler
 
     public function uploadThothPublicationFile($args, $request)
     {
-        $context = $request->getContext();
+        $contextId = $request->getContext()->getId();
         $publicationId = (int) $request->getUserVar('publicationId');
         $representationId = (int) $request->getUserVar('representationId');
+        $thothWorkId = $request->getUserVar('thothWorkId');
 
         import('plugins.generic.thoth.controllers.fileUpload.form.UploadThothPublicationFileForm');
         $template = $this->plugin->getTemplateResource('form/uploadThothPublicationFileForm.tpl');
-        $form = new UploadThothPublicationFileForm($template, $context->getId(), $publicationId, $representationId);
+        $form = new UploadThothPublicationFileForm($template, $contextId, $publicationId, $representationId, $thothWorkId);
         $form->initData();
 
         return new JSONMessage(true, $form->fetch($request));
@@ -80,6 +81,26 @@ class UploadThothFileHandler extends Handler
 
     public function saveUploadThothPublicationFile($args, $request)
     {
-        return new JSONMessage(true);
+        if (!$request->checkCSRF()) {
+            throw new Exception('CSRF mismatch!');
+        }
+
+        $contextId = $request->getContext()->getId();
+        $publicationId = (int) $request->getUserVar('publicationId');
+        $representationId = (int) $request->getUserVar('representationId');
+        $thothWorkId = $request->getUserVar('thothWorkId');
+
+        import('plugins.generic.thoth.controllers.fileUpload.form.UploadThothPublicationFileForm');
+        $template = $this->plugin->getTemplateResource('form/uploadThothPublicationFileForm.tpl');
+        $form = new UploadThothPublicationFileForm($template, $contextId, $publicationId, $representationId, $thothWorkId);
+        $form->readInputData();
+
+        if ($form->validate()) {
+            if ($form->execute()) {
+                return DAO::getDataChangedEvent();
+            }
+        }
+
+        return new JSONMessage(false);
     }
 }

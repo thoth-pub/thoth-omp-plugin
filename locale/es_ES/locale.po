@@ -96,6 +96,9 @@ msgstr "\"{$isbn}\" del formato de publicación \"{$formatName}\" no es un ISBN-
 msgid "plugins.generic.thoth.validation.doiExists"
 msgstr "Un trabajo con el DOI \"{$doi}\" ya existe."
 
+msgid "plugins.generic.thoth.validation.doiNotFound"
+msgstr "No se pudo encontrar una monografía o capítulo en Thoth con el DOI \"{$doi}\"."
+
 msgid "plugins.generic.thoth.validation.landingPageExists"
 msgstr "Un trabajo con la página de destino \"{$landingPage}\" ya existe."
 
@@ -218,3 +221,12 @@ msgstr "Alteración fundamental"
 
 msgid "plugins.generic.thoth.grid.action.thothFileUpload"
 msgstr "Enviar a Thoth"
+
+msgid "plugins.generic.thoth.submissionComponent.title"
+msgstr "Componente del envío relacionado con el archivo"
+
+msgid "plugins.generic.thoth.submissionComponent.description"
+msgstr "Seleccione la monografía o el capítulo relacionado con el archivo. Las monografías y los capítulos deben tener DOI para enviar archivos a Thoth."
+
+msgid "plugins.generic.thoth.fileUpload.success"
+msgstr "Archivo enviado a Thoth con éxito."
