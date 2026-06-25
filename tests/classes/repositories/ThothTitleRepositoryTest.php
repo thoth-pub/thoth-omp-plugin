@@ -1,6 +1,5 @@
 <?php
 
-require_once(__DIR__ . '/../../../vendor/autoload.php');
 /**
  * @file plugins/generic/thoth/tests/classes/repositories/ThothTitleRepositoryTest.php
  *
@@ -16,6 +15,8 @@ require_once(__DIR__ . '/../../../vendor/autoload.php');
  *
  * @brief Test class for the ThothTitleRepository class
  */
+
+require_once(__DIR__ . '/../../../vendor/autoload.php');
 
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;

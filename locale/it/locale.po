@@ -99,6 +99,9 @@ msgstr "\"{$isbn}\" del formato di pubblicazione \"{$formatName}\" non è un ISB
 msgid "plugins.generic.thoth.validation.doiExists"
 msgstr "Esiste già un'opera con DOI \"{$doi}\"."
 
+msgid "plugins.generic.thoth.validation.doiNotFound"
+msgstr "Non è stato possibile trovare una monografia o un capitolo in Thoth con DOI \"{$doi}\"."
+
 msgid "plugins.generic.thoth.validation.landingPageExists"
 msgstr "Esiste già un'opera con la pagina di destinazione \"{$landingPage}\"."
 
@@ -221,3 +224,12 @@ msgstr "Alterazione fondamentale"
 
 msgid "plugins.generic.thoth.grid.action.thothFileUpload"
 msgstr "Carica su Thoth"
+
+msgid "plugins.generic.thoth.submissionComponent.title"
+msgstr "Componente della proposta collegato al file"
+
+msgid "plugins.generic.thoth.submissionComponent.description"
+msgstr "Seleziona la monografia o il capitolo collegato al file. Le monografie e i capitoli devono avere un DOI per caricare file su Thoth."
+
+msgid "plugins.generic.thoth.fileUpload.success"
+msgstr "File caricato su Thoth con successo."
