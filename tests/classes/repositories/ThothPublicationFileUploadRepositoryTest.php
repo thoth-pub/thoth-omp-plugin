@@ -1,5 +1,7 @@
 <?php
 
+require_once(__DIR__ . '/../../../vendor/autoload.php');
+
 /**
  * @file plugins/generic/thoth/tests/classes/repositories/ThothPublicationFileUploadRepositoryTest.php
  *
@@ -113,7 +115,13 @@ class ThothPublicationFileUploadRepositoryTest extends PKPTestCase
         $repository = new ThothPublicationFileUploadRepository($mockThothClient);
         $mockThothClient->expects($this->once())
             ->method('completeFileUpload')
-            ->with($fileUploadId)
+            ->with(
+                $this->callback(function ($completeFileUpload) use ($fileUploadId) {
+                    return $completeFileUpload instanceof CompleteFileUpload
+                        && $completeFileUpload->getFileUploadId() === $fileUploadId;
+                }),
+                $this->isType('array')
+            )
             ->willReturn($expectedFile);
 
         $response = $repository->complete($fileUploadId);
