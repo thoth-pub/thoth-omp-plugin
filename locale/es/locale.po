@@ -233,3 +233,24 @@ msgstr "Seleccione la monografía o el capítulo relacionado con el archivo. Las
 
 msgid "plugins.generic.thoth.fileUpload.success"
 msgstr "Archivo enviado a Thoth con éxito."
+
+msgid "plugins.generic.thoth.fileUpload.error.invalidPublication"
+msgstr "No se encontró la publicación seleccionada para enviar el archivo a Thoth."
+
+msgid "plugins.generic.thoth.fileUpload.error.publicationContextMismatch"
+msgstr "La publicación seleccionada para enviar el archivo a Thoth no pertenece al contexto actual."
+
+msgid "plugins.generic.thoth.fileUpload.error.thothWorkMismatch"
+msgstr "La obra de Thoth asociada a este envío no coincide con la publicación seleccionada."
+
+msgid "plugins.generic.thoth.fileUpload.error.invalidPublicationFormat"
+msgstr "No se encontró el formato de publicación seleccionado para enviar el archivo a Thoth."
+
+msgid "plugins.generic.thoth.fileUpload.error.invalidSubmissionComponent"
+msgstr "No se encontró en esta publicación el componente del envío seleccionado para enviar el archivo a Thoth."
+
+msgid "plugins.generic.thoth.fileUpload.error.chapterNotFoundInThoth"
+msgstr "No se pudo encontrar un capítulo en Thoth con el DOI \"{$doi}\"."
+
+msgid "plugins.generic.thoth.fileUpload.error.chapterLookupFailed"
+msgstr "Se produjo un problema al verificar el capítulo seleccionado en Thoth antes de enviar el archivo."

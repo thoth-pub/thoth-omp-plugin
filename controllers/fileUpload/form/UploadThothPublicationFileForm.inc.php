@@ -15,6 +15,7 @@
 
 import('lib.pkp.classes.form.Form');
 import('lib.pkp.classes.plugins.PKPPubIdPluginDAO');
+import('plugins.generic.thoth.classes.services.ThothCatalogFilesCacheService');
 
 class UploadThothPublicationFileForm extends Form
 {
@@ -95,17 +96,30 @@ class UploadThothPublicationFileForm extends Form
 
         $submissionComponentId = (int) $this->getData('submissionComponentId');
         $thothWorkId = $this->thothWorkId;
+        $thothChapterId = null;
 
         try {
             if ($submissionComponentId && $submissionComponentId !== $this->publicationId) {
-                $chapter = DAORegistry::getDAO('ChapterDAO')->getChapter($submissionComponentId);
+                $chapter = DAORegistry::getDAO('ChapterDAO')->getChapter($submissionComponentId, $this->publicationId);
+                if (!$chapter) {
+                    throw new Exception(__('plugins.generic.thoth.fileUpload.error.invalidSubmissionComponent'));
+                }
+
                 $thothChapterId = ThothRepo::chapter()->getByDoi(
                     DoiFormatter::resolveUrl($chapter->getStoredPubId('doi'))
                 );
                 $thothWorkId = $thothChapterId;
             }
 
-            $publicationFormat = DAORegistry::getDAO('PublicationFormatDAO')->getById($this->representationId);
+            $publicationFormat = DAORegistry::getDAO('PublicationFormatDAO')->getById(
+                $this->representationId,
+                $this->publicationId,
+                $this->contextId
+            );
+            if (!$publicationFormat) {
+                throw new Exception(__('plugins.generic.thoth.fileUpload.error.invalidPublicationFormat'));
+            }
+
             $thothPublicationFactory = new ThothPublicationFactory();
             $newThothPublication = $thothPublicationFactory->createFromPublicationFormat($publicationFormat);
 
@@ -143,6 +157,7 @@ class UploadThothPublicationFileForm extends Form
             ]);
 
             $file = ThothRepo::publicationFileUpload()->complete($fileUploadResponse->getFileUploadId());
+            $this->flushCatalogFilesCache();
 
             $notificationMgr->createTrivialNotification(
                 $user->getId(),
@@ -162,22 +177,57 @@ class UploadThothPublicationFileForm extends Form
         return true;
     }
 
+    private function flushCatalogFilesCache()
+    {
+        $cacheService = new ThothCatalogFilesCacheService();
+        $cacheService->flush($this->publicationId);
+    }
+
     public function validate($callHooks = true)
     {
+        $publication = Services::get('publication')->get($this->publicationId);
+        if (!$publication) {
+            $this->addError('publicationId', __('plugins.generic.thoth.fileUpload.error.invalidPublication'));
+            return parent::validate($callHooks);
+        }
+
+        $submission = Services::get('submission')->get($publication->getData('submissionId'));
+        if (!$submission || (int) $submission->getData('contextId') !== (int) $this->contextId) {
+            $this->addError('publicationId', __('plugins.generic.thoth.fileUpload.error.publicationContextMismatch'));
+        }
+
+        if ($submission && $submission->getData('thothWorkId') !== $this->thothWorkId) {
+            $this->addError('thothWorkId', __('plugins.generic.thoth.fileUpload.error.thothWorkMismatch'));
+        }
+
+        $publicationFormat = DAORegistry::getDAO('PublicationFormatDAO')->getById(
+            $this->representationId,
+            $this->publicationId,
+            $this->contextId
+        );
+        if (!$publicationFormat) {
+            $this->addError('representationId', __('plugins.generic.thoth.fileUpload.error.invalidPublicationFormat'));
+        }
+
         $submissionComponentId = (int) $this->getData('submissionComponentId');
         if ($submissionComponentId && $submissionComponentId !== $this->publicationId) {
-            $chapter = DAORegistry::getDAO('ChapterDAO')->getChapter($submissionComponentId);
+            $chapter = DAORegistry::getDAO('ChapterDAO')->getChapter($submissionComponentId, $this->publicationId);
+            if (!$chapter) {
+                $this->addError('submissionComponentId', __('plugins.generic.thoth.fileUpload.error.invalidSubmissionComponent'));
+                return parent::validate($callHooks);
+            }
+
             $chapterDoi = DoiFormatter::resolveUrl($chapter->getStoredPubId('doi'));
             try {
                 $thothChapter = ThothRepo::chapter()->getByDoi($chapterDoi);
                 if (is_null($thothChapter)) {
                     $this->addError(
                         'submissionComponentId',
-                        __('plugins.generic.thoth.validation.doiNotFound', ['doi' => $chapterDoi])
+                        __('plugins.generic.thoth.fileUpload.error.chapterNotFoundInThoth', ['doi' => $chapterDoi])
                     );
                 }
             } catch (Exception $e) {
-                $this->addError('submissionComponentId', __('plugins.generic.thoth.connectionError'));
+                $this->addError('submissionComponentId', __('plugins.generic.thoth.fileUpload.error.chapterLookupFailed'));
             }
         }
 
