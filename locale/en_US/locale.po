@@ -230,3 +230,24 @@ msgstr "Select the monograph or chapter related to the file. Monographs and chap
 
 msgid "plugins.generic.thoth.fileUpload.success"
 msgstr "File uploaded to Thoth successfully."
+
+msgid "plugins.generic.thoth.fileUpload.error.invalidPublication"
+msgstr "The publication selected for the Thoth file upload could not be found."
+
+msgid "plugins.generic.thoth.fileUpload.error.publicationContextMismatch"
+msgstr "The publication selected for the Thoth file upload does not belong to the current context."
+
+msgid "plugins.generic.thoth.fileUpload.error.thothWorkMismatch"
+msgstr "The Thoth work associated with this upload does not match the selected publication."
+
+msgid "plugins.generic.thoth.fileUpload.error.invalidPublicationFormat"
+msgstr "The publication format selected for the Thoth file upload could not be found."
+
+msgid "plugins.generic.thoth.fileUpload.error.invalidSubmissionComponent"
+msgstr "The submission component selected for the Thoth file upload could not be found in this publication."
+
+msgid "plugins.generic.thoth.fileUpload.error.chapterNotFoundInThoth"
+msgstr "Could not find a chapter in Thoth with DOI \"{$doi}\"."
+
+msgid "plugins.generic.thoth.fileUpload.error.chapterLookupFailed"
+msgstr "There was a problem checking the selected chapter in Thoth before uploading the file."

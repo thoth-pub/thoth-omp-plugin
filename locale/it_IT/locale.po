@@ -230,3 +230,24 @@ msgstr "Seleziona la monografia o il capitolo collegato al file. Le monografie e
 
 msgid "plugins.generic.thoth.fileUpload.success"
 msgstr "File caricato su Thoth con successo."
+
+msgid "plugins.generic.thoth.fileUpload.error.invalidPublication"
+msgstr "La pubblicazione selezionata per il caricamento del file su Thoth non è stata trovata."
+
+msgid "plugins.generic.thoth.fileUpload.error.publicationContextMismatch"
+msgstr "La pubblicazione selezionata per il caricamento del file su Thoth non appartiene al contesto corrente."
+
+msgid "plugins.generic.thoth.fileUpload.error.thothWorkMismatch"
+msgstr "L'opera Thoth associata a questo caricamento non corrisponde alla pubblicazione selezionata."
+
+msgid "plugins.generic.thoth.fileUpload.error.invalidPublicationFormat"
+msgstr "Il formato di pubblicazione selezionato per il caricamento del file su Thoth non è stato trovato."
+
+msgid "plugins.generic.thoth.fileUpload.error.invalidSubmissionComponent"
+msgstr "Il componente della proposta selezionato per il caricamento del file su Thoth non è stato trovato in questa pubblicazione."
+
+msgid "plugins.generic.thoth.fileUpload.error.chapterNotFoundInThoth"
+msgstr "Non è stato possibile trovare un capitolo in Thoth con DOI \"{$doi}\"."
+
+msgid "plugins.generic.thoth.fileUpload.error.chapterLookupFailed"
+msgstr "Si è verificato un problema durante la verifica del capitolo selezionato in Thoth prima del caricamento del file."
