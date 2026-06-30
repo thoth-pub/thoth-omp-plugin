@@ -344,7 +344,12 @@ class ThothPlugin extends GenericPlugin
 
         if (in_array(
             $op,
-            ['uploadThothPublicationFile', 'handleThothPublicationFile', 'saveUploadThothPublicationFile']
+            [
+                'uploadThothPublicationFile',
+                'handleThothPublicationFile',
+                'saveUploadThothPublicationFile',
+                'viewThothPublicationFormatFiles',
+            ]
         )) {
             $this->import('controllers/fileUpload/UploadThothFileHandler');
             define('HANDLER_CLASS', 'UploadThothFileHandler');
