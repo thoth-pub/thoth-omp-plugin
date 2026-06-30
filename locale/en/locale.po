@@ -254,3 +254,27 @@ msgstr "Could not find a chapter in Thoth with DOI \"{$doi}\"."
 
 msgid "plugins.generic.thoth.fileUpload.error.chapterLookupFailed"
 msgstr "There was a problem checking the selected chapter in Thoth before uploading the file."
+
+msgid "plugins.generic.thoth.grid.column.thothFiles"
+msgstr "Thoth files"
+
+msgid "plugins.generic.thoth.grid.action.viewThothFiles"
+msgstr "Thoth files"
+
+msgid "plugins.generic.thoth.grid.action.viewThothFilesLabel"
+msgstr "View"
+
+msgid "plugins.generic.thoth.publicationFormat.thothFiles.empty"
+msgstr "No files were found in Thoth for this publication format."
+
+msgid "plugins.generic.thoth.publicationFormat.thothFiles.component"
+msgstr "Item"
+
+msgid "plugins.generic.thoth.publicationFormat.thothFiles.component.publication"
+msgstr "Publication: {$title}"
+
+msgid "plugins.generic.thoth.publicationFormat.thothFiles.component.chapter"
+msgstr "Chapter: {$title}"
+
+msgid "plugins.generic.thoth.publicationFormat.thothFiles.file"
+msgstr "File"

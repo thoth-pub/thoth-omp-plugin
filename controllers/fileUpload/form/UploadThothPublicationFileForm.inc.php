@@ -113,8 +113,7 @@ class UploadThothPublicationFileForm extends Form
 
             $publicationFormat = DAORegistry::getDAO('PublicationFormatDAO')->getById(
                 $this->representationId,
-                $this->publicationId,
-                $this->contextId
+                $this->publicationId
             );
             if (!$publicationFormat) {
                 throw new Exception(__('plugins.generic.thoth.fileUpload.error.invalidPublicationFormat'));
@@ -202,8 +201,7 @@ class UploadThothPublicationFileForm extends Form
 
         $publicationFormat = DAORegistry::getDAO('PublicationFormatDAO')->getById(
             $this->representationId,
-            $this->publicationId,
-            $this->contextId
+            $this->publicationId
         );
         if (!$publicationFormat) {
             $this->addError('representationId', __('plugins.generic.thoth.fileUpload.error.invalidPublicationFormat'));

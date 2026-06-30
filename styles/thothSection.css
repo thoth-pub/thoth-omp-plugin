@@ -6,6 +6,16 @@
     text-decoration: none;
 }
 
+.pkp_linkaction_viewThothFiles {
+    display: inline-block;
+    padding: 5px 1em;
+    border: 1px solid rgba(0, 103, 152, 0.6);
+    border-radius: 2px;
+    font-size: 12px;
+    line-height: 20px;
+    text-decoration: none;
+}
+
 .thothAccessibilityHeader {
     align-items: center;
     display: flex;

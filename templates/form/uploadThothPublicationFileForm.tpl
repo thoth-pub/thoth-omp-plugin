@@ -41,9 +41,11 @@
 	{if $chapters}
 		{fbvFormArea id="file" title="plugins.generic.thoth.submissionComponent.title"}
 			{fbvFormSection description="plugins.generic.thoth.submissionComponent.description" for="submissionComponentId" list=true required=true}
-				{fbvElement type="radio" id=$publication->getId() name="submissionComponentId" value=$publication->getId() checked=false label=$publication->getLocalizedTitle() translate=false}
+				{assign var="publicationLabel" value={translate key="plugins.generic.thoth.publicationFormat.thothFiles.component.publication" title=$publication->getLocalizedTitle()}}
+				{fbvElement type="radio" id=$publication->getId() name="submissionComponentId" value=$publication->getId() checked=false label=$publicationLabel translate=false}
 				{foreach from=$chapters item=chapter}
-					{fbvElement type="radio" id=$chapter->getId() name="submissionComponentId" value=$chapter->getId() checked=false label=$chapter->getLocalizedTitle() translate=false}
+					{assign var="chapterLabel" value={translate key="plugins.generic.thoth.publicationFormat.thothFiles.component.chapter" title=$chapter->getLocalizedTitle()}}
+					{fbvElement type="radio" id=$chapter->getId() name="submissionComponentId" value=$chapter->getId() checked=false label=$chapterLabel translate=false}
 				{/foreach}
 			{/fbvFormSection}
 		{/fbvFormArea}
