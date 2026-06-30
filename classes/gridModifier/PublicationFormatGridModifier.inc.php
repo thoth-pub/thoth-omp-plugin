@@ -47,6 +47,10 @@ class PublicationFormatGridModifier
             return;
         }
 
+        if (!$this->canManagePublicationFormats($handler)) {
+            return;
+        }
+
         $submission = $handler->getSubmission();
         $thothWorkId = $submission->getData('thothWorkId');
 
@@ -104,6 +108,10 @@ class PublicationFormatGridModifier
             return;
         }
 
+        if (!$this->canManagePublicationFormats($handler)) {
+            return;
+        }
+
         $submission = $handler->getSubmission();
         if (!$submission || !$submission->getData('thothWorkId')) {
             return;
@@ -126,6 +134,16 @@ class PublicationFormatGridModifier
         $output = $this->increaseColspans($output);
 
         return $output;
+    }
+
+    private function canManagePublicationFormats($handler)
+    {
+        $userRoles = $handler->getAuthorizedContextObject(ASSOC_TYPE_USER_ROLES);
+
+        return !empty(array_intersect(
+            $userRoles,
+            [ROLE_ID_MANAGER, ROLE_ID_SUB_EDITOR, ROLE_ID_ASSISTANT]
+        ));
     }
 
     private function injectThothFilesColumnGroups($output)

@@ -32,7 +32,7 @@ class UploadThothFileHandler extends Handler
         parent::__construct();
 
         $this->addRoleAssignment(
-            [ROLE_ID_SUB_EDITOR, ROLE_ID_MANAGER],
+            [ROLE_ID_MANAGER, ROLE_ID_SUB_EDITOR, ROLE_ID_ASSISTANT],
             [
                 'uploadThothPublicationFile',
                 'handleThothPublicationFile',
