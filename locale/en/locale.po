@@ -249,6 +249,9 @@ msgstr "The publication format selected for the Thoth file upload could not be f
 msgid "plugins.generic.thoth.fileUpload.error.invalidSubmissionComponent"
 msgstr "The submission component selected for the Thoth file upload could not be found in this publication."
 
+msgid "plugins.generic.thoth.fileUpload.error.missingDoi"
+msgstr "A DOI is required in the publication or in at least one chapter to upload files to Thoth."
+
 msgid "plugins.generic.thoth.fileUpload.error.chapterNotFoundInThoth"
 msgstr "Could not find a chapter in Thoth with DOI \"{$doi}\"."
 

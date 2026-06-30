@@ -31,26 +31,42 @@
 	{csrf}
 	{include file="controllers/notification/inPlaceNotification.tpl" notificationId="uploadThothPublicationFileNotification"}
 
-	{fbvFormArea id="file"}
-		{fbvFormSection title="common.file" required=true}
-			{include file="controllers/fileUploadContainer.tpl" id="plupload"}
-			<input type="hidden" name="temporaryFileId" id="temporaryFileId" value="" />
-		{/fbvFormSection}
-	{/fbvFormArea}
-
-	{if $chapters}
-		{fbvFormArea id="file" title="plugins.generic.thoth.submissionComponent.title"}
-			{fbvFormSection description="plugins.generic.thoth.submissionComponent.description" for="submissionComponentId" list=true required=true}
-				{assign var="publicationLabel" value={translate key="plugins.generic.thoth.publicationFormat.thothFiles.component.publication" title=$publication->getLocalizedTitle()}}
-				{fbvElement type="radio" id=$publication->getId() name="submissionComponentId" value=$publication->getId() checked=false label=$publicationLabel translate=false}
-				{foreach from=$chapters item=chapter}
-					{assign var="chapterLabel" value={translate key="plugins.generic.thoth.publicationFormat.thothFiles.component.chapter" title=$chapter->getLocalizedTitle()}}
-					{fbvElement type="radio" id=$chapter->getId() name="submissionComponentId" value=$chapter->getId() checked=false label=$chapterLabel translate=false}
-				{/foreach}
+	{if $missingDoiAlert}
+		<div class="pkpNotification pkpNotification--warning">
+			{translate key="plugins.generic.thoth.fileUpload.error.missingDoi"}
+		</div>
+	{else}
+		{fbvFormArea id="file"}
+			{fbvFormSection title="common.file" required=true}
+				{include file="controllers/fileUploadContainer.tpl" id="plupload"}
+				<input type="hidden" name="temporaryFileId" id="temporaryFileId" value="" />
 			{/fbvFormSection}
 		{/fbvFormArea}
-	{/if}
 
-	{fbvFormButtons id="uploadThothPublicationFileFormSubmit" submitText="common.save"}
+		{if $submissionComponents}
+			{fbvFormArea id="submissionComponent" title="plugins.generic.thoth.submissionComponent.title"}
+				{fbvFormSection
+					description="plugins.generic.thoth.submissionComponent.description"
+					for="submissionComponentId"
+					list=true
+					required=true
+				}
+					{foreach from=$submissionComponents item=submissionComponent}
+						{fbvElement
+							type="radio"
+							id=$submissionComponent.id
+							name="submissionComponentId"
+							value=$submissionComponent.id
+							checked=false
+							label=$submissionComponent.label
+							translate=false
+						}
+					{/foreach}
+				{/fbvFormSection}
+			{/fbvFormArea}
+		{/if}
+
+		{fbvFormButtons id="uploadThothPublicationFileFormSubmit" submitText="common.save"}
+		<p><span class="formRequired">{translate key="common.requiredField"}</span></p>
+	{/if}
 </form>
-<p><span class="formRequired">{translate key="common.requiredField"}</span></p>

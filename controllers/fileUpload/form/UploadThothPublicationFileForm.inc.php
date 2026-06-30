@@ -47,18 +47,65 @@ class UploadThothPublicationFileForm extends Form
             LOCALE_COMPONENT_APP_SUBMISSION
         );
 
+        $publication = Services::get('publication')->get($this->publicationId);
+        if (!$publication) {
+            return;
+        }
+
         $chapters = DAORegistry::getDAO('ChapterDAO')->getByPublicationId($this->publicationId)->toAssociativeArray();
-        $chapters = array_filter($chapters, function ($chapter) {
-            return !empty($chapter->getStoredPubId('doi'));
-        });
+        $chaptersWithDoi = $this->filterComponentsWithDoi($chapters);
 
         if (!empty($chapters)) {
-            $publication = Services::get('publication')->get($this->publicationId);
+            $componentOptions = array_map([$this, 'getChapterOption'], $chaptersWithDoi);
+            if ($this->hasDoi($publication)) {
+                array_unshift($componentOptions, $this->getPublicationOption($publication));
+            }
+
             $this->_data = [
-                'publication' => $publication,
-                'chapters' => $chapters
+                'submissionComponents' => $componentOptions,
+                'missingDoiAlert' => empty($componentOptions),
             ];
+
+            return;
         }
+
+        $this->_data = [
+            'missingDoiAlert' => !$this->hasDoi($publication),
+        ];
+    }
+
+    private function filterComponentsWithDoi($components)
+    {
+        return array_filter($components, [$this, 'hasDoi']);
+    }
+
+    private function hasDoi($submissionComponent)
+    {
+        return !empty($submissionComponent->getStoredPubId('doi'));
+    }
+
+    private function getPublicationOption($publication)
+    {
+        return $this->getSubmissionComponentOption(
+            $publication,
+            'plugins.generic.thoth.publicationFormat.thothFiles.component.publication'
+        );
+    }
+
+    private function getChapterOption($chapter)
+    {
+        return $this->getSubmissionComponentOption(
+            $chapter,
+            'plugins.generic.thoth.publicationFormat.thothFiles.component.chapter'
+        );
+    }
+
+    private function getSubmissionComponentOption($submissionComponent, $translationKey)
+    {
+        return [
+            'id' => $submissionComponent->getId(),
+            'label' => __($translationKey, ['title' => $submissionComponent->getLocalizedTitle()]),
+        ];
     }
 
     public function fetch($request, $template = null, $display = false)

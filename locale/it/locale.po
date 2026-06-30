@@ -249,6 +249,9 @@ msgstr "Il formato di pubblicazione selezionato per il caricamento del file su T
 msgid "plugins.generic.thoth.fileUpload.error.invalidSubmissionComponent"
 msgstr "Il componente della proposta selezionato per il caricamento del file su Thoth non è stato trovato in questa pubblicazione."
 
+msgid "plugins.generic.thoth.fileUpload.error.missingDoi"
+msgstr "È necessario un DOI nella pubblicazione o in almeno un capitolo per caricare file su Thoth."
+
 msgid "plugins.generic.thoth.fileUpload.error.chapterNotFoundInThoth"
 msgstr "Non è stato possibile trovare un capitolo in Thoth con DOI \"{$doi}\"."
 

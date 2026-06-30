@@ -249,6 +249,9 @@ msgstr "O formato de publicação selecionado para o envio do arquivo ao Thoth n
 msgid "plugins.generic.thoth.fileUpload.error.invalidSubmissionComponent"
 msgstr "O componente da submissão selecionado para o envio do arquivo ao Thoth não foi encontrado nesta publicação."
 
+msgid "plugins.generic.thoth.fileUpload.error.missingDoi"
+msgstr "É necessário ter DOI na publicação ou em pelo menos um capítulo para enviar arquivos para Thoth."
+
 msgid "plugins.generic.thoth.fileUpload.error.chapterNotFoundInThoth"
 msgstr "Não foi possível encontrar um capítulo no Thoth com o DOI \"{$doi}\"."
 
