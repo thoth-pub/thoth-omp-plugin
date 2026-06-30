@@ -18,7 +18,7 @@ use APP\facades\Repo;
 use PKP\db\DAORegistry;
 
 import('plugins.generic.thoth.classes.facades.ThothService');
-import('plugins.generic.thoth.classes.facades.ThothRepository');
+import('plugins.generic.thoth.classes.facades.ThothRepo');
 
 class ThothContributionService
 {
@@ -37,7 +37,7 @@ class ThothContributionService
         $thothContribution->setWorkId($thothWorkId);
 
         $filter = empty($author->getOrcid()) ? $author->getFullName(false) : $author->getOrcid();
-        $thothContributor = ThothRepository::contributor()->find($filter);
+        $thothContributor = ThothRepo::contributor()->find($filter);
 
         if ($thothContributor === null) {
             $thothContributorId = ThothService::contributor()->register($author);

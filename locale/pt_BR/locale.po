@@ -252,6 +252,9 @@ msgstr "O componente da submissão selecionado para o envio do arquivo ao Thoth 
 msgid "plugins.generic.thoth.fileUpload.error.missingDoi"
 msgstr "É necessário ter DOI na publicação ou em pelo menos um capítulo para enviar arquivos para Thoth."
 
+msgid "plugins.generic.thoth.fileUpload.error.missingCdnWritePermission"
+msgstr "O usuário da Thoth precisa da permissão cdnWrite para enviar arquivos."
+
 msgid "plugins.generic.thoth.fileUpload.error.chapterNotFoundInThoth"
 msgstr "Não foi possível encontrar um capítulo no Thoth com o DOI \"{$doi}\"."
 

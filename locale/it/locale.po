@@ -252,6 +252,9 @@ msgstr "Il componente della proposta selezionato per il caricamento del file su 
 msgid "plugins.generic.thoth.fileUpload.error.missingDoi"
 msgstr "È necessario un DOI nella pubblicazione o in almeno un capitolo per caricare file su Thoth."
 
+msgid "plugins.generic.thoth.fileUpload.error.missingCdnWritePermission"
+msgstr "L'utente Thoth deve disporre dell'autorizzazione cdnWrite per caricare file."
+
 msgid "plugins.generic.thoth.fileUpload.error.chapterNotFoundInThoth"
 msgstr "Non è stato possibile trovare un capitolo in Thoth con DOI \"{$doi}\"."
 

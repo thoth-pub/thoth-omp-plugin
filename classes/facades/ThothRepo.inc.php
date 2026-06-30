@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @file plugins/generic/thoth/classes/facades/ThothRepository.inc.php
+ * @file plugins/generic/thoth/classes/facades/ThothRepo.inc.php
  *
  * Copyright (c) 2014-2021 Simon Fraser University
  * Copyright (c) 2000-2021 John Willinsky
@@ -9,14 +9,14 @@
  * Copyright (c) 2024-2025 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
- * @class ThothRepository
+ * @class ThothRepo
  *
  * @brief This facade provides access to all repositories for Thoth.
  */
 
 import('plugins.generic.thoth.classes.container.ThothContainer');
 
-class ThothRepository
+class ThothRepo
 {
     public static function me()
     {

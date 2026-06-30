@@ -31,7 +31,11 @@
 	{csrf}
 	{include file="controllers/notification/inPlaceNotification.tpl" notificationId="uploadThothPublicationFileNotification"}
 
-	{if $missingDoiAlert}
+	{if $missingCdnWritePermissionAlert}
+		<div class="pkpNotification pkpNotification--warning">
+			{translate key="plugins.generic.thoth.fileUpload.error.missingCdnWritePermission"}
+		</div>
+	{elseif $missingDoiAlert}
 		<div class="pkpNotification pkpNotification--warning">
 			{translate key="plugins.generic.thoth.fileUpload.error.missingDoi"}
 		</div>
