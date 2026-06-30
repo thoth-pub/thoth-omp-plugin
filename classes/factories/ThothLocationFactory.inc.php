@@ -13,7 +13,8 @@
  * @brief A factory to create Thoth locations
  */
 
-use ThothApi\GraphQL\Models\Location as ThothLocation;
+use ThothApi\GraphQL\Enums\LocationPlatform;
+use ThothApi\GraphQL\Inputs\PatchLocation as ThothLocation;
 
 class ThothLocationFactory
 {
@@ -45,7 +46,7 @@ class ThothLocationFactory
         return new ThothLocation([
             'landingPage' => $landingPage,
             'fullTextUrl' => $fullTextUrl,
-            'locationPlatform' => ThothLocation::LOCATION_PLATFORM_OTHER
+            'locationPlatform' => LocationPlatform::OTHER
         ]);
     }
 }

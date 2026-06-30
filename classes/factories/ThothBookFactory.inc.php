@@ -13,7 +13,9 @@
  * @brief A factory to create Thoth books
  */
 
-use ThothApi\GraphQL\Models\Work as ThothWork;
+use ThothApi\GraphQL\Enums\WorkStatus;
+use ThothApi\GraphQL\Enums\WorkType;
+use ThothApi\GraphQL\Inputs\PatchWork as ThothWork;
 
 import('classes.submission.Submission');
 import('plugins.generic.thoth.classes.formatters.DoiFormatter');
@@ -62,20 +64,20 @@ class ThothBookFactory
     public function getWorkTypeBySubmissionWorkType($submissionWorkType)
     {
         $workTypeMapping = [
-            WORK_TYPE_EDITED_VOLUME => ThothWork::WORK_TYPE_EDITED_BOOK,
-            WORK_TYPE_AUTHORED_WORK => ThothWork::WORK_TYPE_MONOGRAPH
+            WORK_TYPE_EDITED_VOLUME => WorkType::EDITED_BOOK,
+            WORK_TYPE_AUTHORED_WORK => WorkType::MONOGRAPH
         ];
 
-        return $workTypeMapping[$submissionWorkType] ?? ThothWork::WORK_TYPE_MONOGRAPH;
+        return $workTypeMapping[$submissionWorkType] ?? WorkType::MONOGRAPH;
     }
 
     public function getWorkStatusByDatePublished($datePublished)
     {
         if ($datePublished && $datePublished <= \Core::getCurrentDate()) {
-            return ThothWork::WORK_STATUS_ACTIVE;
+            return WorkStatus::ACTIVE;
         }
 
-        return ThothWork::WORK_STATUS_FORTHCOMING;
+        return WorkStatus::FORTHCOMING;
     }
 
     public function getDoi($publication)

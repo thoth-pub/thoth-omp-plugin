@@ -1,5 +1,6 @@
 <?php
 
+require_once(__DIR__ . '/../../../vendor/autoload.php');
 /**
  * @file plugins/generic/thoth/tests/classes/services/ThothWorkRelationServiceTest.php
  *
@@ -15,8 +16,11 @@
  */
 
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Work as ThothWork;
-use ThothApi\GraphQL\Models\WorkRelation as ThothWorkRelation;
+use ThothApi\GraphQL\Enums\WorkStatus;
+use ThothApi\GraphQL\Enums\WorkType;
+use ThothApi\GraphQL\Inputs\PatchWork as ThothWork;
+use ThothApi\GraphQL\Enums\RelationType;
+use ThothApi\GraphQL\Inputs\PatchWorkRelation as ThothWorkRelation;
 
 import('classes.monograph.Chapter');
 import('lib.pkp.tests.PKPTestCase');

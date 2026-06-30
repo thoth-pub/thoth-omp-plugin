@@ -96,6 +96,9 @@ msgstr "\"{$isbn}\" del formato de publicación \"{$formatName}\" no es un ISBN-
 msgid "plugins.generic.thoth.validation.doiExists"
 msgstr "Un trabajo con el DOI \"{$doi}\" ya existe."
 
+msgid "plugins.generic.thoth.validation.doiNotFound"
+msgstr "No se pudo encontrar una monografía o capítulo en Thoth con el DOI \"{$doi}\"."
+
 msgid "plugins.generic.thoth.validation.landingPageExists"
 msgstr "Un trabajo con la página de destino \"{$landingPage}\" ya existe."
 
@@ -215,3 +218,66 @@ msgstr "Carga desproporcionada"
 
 msgid "plugins.generic.thoth.publicationFormat.accessibilityException.fundamentalAlteration"
 msgstr "Alteración fundamental"
+
+msgid "plugins.generic.thoth.grid.action.thothFileUpload"
+msgstr "Enviar a Thoth"
+
+msgid "plugins.generic.thoth.submissionComponent.title"
+msgstr "Componente del envío relacionado con el archivo"
+
+msgid "plugins.generic.thoth.submissionComponent.description"
+msgstr "Seleccione la monografía o el capítulo relacionado con el archivo. Las monografías y los capítulos deben tener DOI para enviar archivos a Thoth."
+
+msgid "plugins.generic.thoth.fileUpload.success"
+msgstr "Archivo enviado a Thoth con éxito."
+
+msgid "plugins.generic.thoth.fileUpload.error.invalidPublication"
+msgstr "No se encontró la publicación seleccionada para enviar el archivo a Thoth."
+
+msgid "plugins.generic.thoth.fileUpload.error.publicationContextMismatch"
+msgstr "La publicación seleccionada para enviar el archivo a Thoth no pertenece al contexto actual."
+
+msgid "plugins.generic.thoth.fileUpload.error.thothWorkMismatch"
+msgstr "La obra de Thoth asociada a este envío no coincide con la publicación seleccionada."
+
+msgid "plugins.generic.thoth.fileUpload.error.invalidPublicationFormat"
+msgstr "No se encontró el formato de publicación seleccionado para enviar el archivo a Thoth."
+
+msgid "plugins.generic.thoth.fileUpload.error.invalidSubmissionComponent"
+msgstr "No se encontró en esta publicación el componente del envío seleccionado para enviar el archivo a Thoth."
+
+msgid "plugins.generic.thoth.fileUpload.error.missingDoi"
+msgstr "Se requiere un DOI en la publicación o en al menos un capítulo para enviar archivos a Thoth."
+
+msgid "plugins.generic.thoth.fileUpload.error.missingCdnWritePermission"
+msgstr "El usuario de Thoth necesita el permiso cdnWrite para enviar archivos."
+
+msgid "plugins.generic.thoth.fileUpload.error.chapterNotFoundInThoth"
+msgstr "No se pudo encontrar un capítulo en Thoth con el DOI \"{$doi}\"."
+
+msgid "plugins.generic.thoth.fileUpload.error.chapterLookupFailed"
+msgstr "Se produjo un problema al verificar el capítulo seleccionado en Thoth antes de enviar el archivo."
+
+msgid "plugins.generic.thoth.grid.column.thothFiles"
+msgstr "Archivos en Thoth"
+
+msgid "plugins.generic.thoth.grid.action.viewThothFiles"
+msgstr "Archivos en Thoth"
+
+msgid "plugins.generic.thoth.grid.action.viewThothFilesLabel"
+msgstr "Ver"
+
+msgid "plugins.generic.thoth.publicationFormat.thothFiles.empty"
+msgstr "No se encontraron archivos en Thoth para este formato de publicación."
+
+msgid "plugins.generic.thoth.publicationFormat.thothFiles.component"
+msgstr "Elemento"
+
+msgid "plugins.generic.thoth.publicationFormat.thothFiles.component.publication"
+msgstr "Publicación: {$title}"
+
+msgid "plugins.generic.thoth.publicationFormat.thothFiles.component.chapter"
+msgstr "Capítulo: {$title}"
+
+msgid "plugins.generic.thoth.publicationFormat.thothFiles.file"
+msgstr "Archivo"

@@ -13,7 +13,6 @@
  * @brief Helper class that encapsulates business logic for Thoth locations
  */
 
-use ThothApi\GraphQL\Models\Location as ThothLocation;
 
 class ThothLocationService
 {

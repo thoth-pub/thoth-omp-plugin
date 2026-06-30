@@ -14,8 +14,10 @@
  * @brief Test class for the ThothTitleRepository class
  */
 
+require_once(__DIR__ . '/../../../vendor/autoload.php');
+
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Title as ThothTitle;
+use ThothApi\GraphQL\Inputs\PatchTitle as ThothTitle;
 
 import('lib.pkp.tests.PKPTestCase');
 import('plugins.generic.thoth.classes.repositories.ThothTitleRepository');

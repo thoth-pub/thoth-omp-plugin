@@ -13,7 +13,7 @@
  * @brief A factory to create Thoth contributors
  */
 
-use ThothApi\GraphQL\Models\Contributor as ThothContributor;
+use ThothApi\GraphQL\Inputs\PatchContributor as ThothContributor;
 
 class ThothContributorFactory
 {

@@ -20,6 +20,7 @@ use ThothApi\GraphQL\Client;
 
 import('lib.pkp.classes.form.Form');
 import('plugins.generic.thoth.classes.encryption.DataEncryption');
+import('plugins.generic.thoth.classes.services.ThothMeCacheService');
 
 class ThothSettingsForm extends Form
 {
@@ -148,6 +149,7 @@ class ThothSettingsForm extends Form
         foreach (self::SETTINGS as $setting) {
             $this->plugin->updateSetting($this->contextId, $setting, trim($this->getData($setting)), 'string');
         }
+        (new ThothMeCacheService())->flush($this->contextId);
         parent::execute(...$functionArgs);
     }
 

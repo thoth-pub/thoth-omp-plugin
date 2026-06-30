@@ -1,5 +1,6 @@
 <?php
 
+require_once(__DIR__ . '/../../../vendor/autoload.php');
 /**
  * @file plugins/generic/thoth/tests/classes/factories/ThothBookFactoryTest.php
  *
@@ -14,7 +15,9 @@
  * @brief Test class for the ThothBookFactory class
  */
 
-use ThothApi\GraphQL\Models\Work as ThothWork;
+use ThothApi\GraphQL\Enums\WorkStatus;
+use ThothApi\GraphQL\Enums\WorkType;
+use ThothApi\GraphQL\Inputs\PatchWork as ThothWork;
 
 import('classes.press.Press');
 import('classes.press.PressDAO');
@@ -142,8 +145,8 @@ class ThothBookFactoryTest extends PKPTestCase
         $thothWork = $factory->createFromPublication($mockPublication);
 
         $this->assertEquals(new ThothWork([
-            'workType' => ThothWork::WORK_TYPE_MONOGRAPH,
-            'workStatus' => ThothWork::WORK_STATUS_ACTIVE,
+            'workType' => WorkType::MONOGRAPH,
+            'workStatus' => WorkStatus::ACTIVE,
             'edition' => 1,
             'publicationDate' => '2020-01-01',
             'place' => 'Salvador, BR',
@@ -161,20 +164,20 @@ class ThothBookFactoryTest extends PKPTestCase
     {
         $factory = new ThothBookFactory();
         $workType = $factory->getWorkTypeBySubmissionWorkType(WORK_TYPE_AUTHORED_WORK);
-        $this->assertEquals(ThothWork::WORK_TYPE_MONOGRAPH, $workType);
+        $this->assertEquals(WorkType::MONOGRAPH, $workType);
 
         $workType = $factory->getWorkTypeBySubmissionWorkType(WORK_TYPE_EDITED_VOLUME);
-        $this->assertEquals(ThothWork::WORK_TYPE_EDITED_BOOK, $workType);
+        $this->assertEquals(WorkType::EDITED_BOOK, $workType);
     }
 
     public function testGetWorkStatusByDatePublished()
     {
         $factory = new ThothBookFactory();
         $workStatus = $factory->getWorkStatusByDatePublished('2020-01-01');
-        $this->assertEquals(ThothWork::WORK_STATUS_ACTIVE, $workStatus);
+        $this->assertEquals(WorkStatus::ACTIVE, $workStatus);
 
         $workStatus = $factory->getWorkStatusByDatePublished('2050-12-12');
-        $this->assertEquals(ThothWork::WORK_STATUS_FORTHCOMING, $workStatus);
+        $this->assertEquals(WorkStatus::FORTHCOMING, $workStatus);
     }
 
     public function testGetDoiFromPublication()

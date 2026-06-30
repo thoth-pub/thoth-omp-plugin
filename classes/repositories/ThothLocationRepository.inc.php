@@ -13,7 +13,7 @@
  * @brief A repository to manage Thoth locations
  */
 
-use ThothApi\GraphQL\Models\Location as ThothLocation;
+use ThothApi\GraphQL\Inputs\PatchLocation as ThothLocation;
 
 class ThothLocationRepository
 {
@@ -36,21 +36,17 @@ class ThothLocationRepository
 
     public function hasCanonical($thothPublicationId)
     {
-        $query = <<<GQL
-        query(\$publicationId: Uuid!) {
-            publication(publicationId: \$publicationId) {
-                locations {
-                    canonical
-                }
+        $publication = $this->thothClient->publication($thothPublicationId, [
+            'locations' => ['canonical'],
+        ]);
+
+        foreach ($publication->getLocations() ?? [] as $location) {
+            if ($location->getCanonical()) {
+                return true;
             }
         }
-        GQL;
 
-        $result = $this->thothClient->rawQuery($query, ['publicationId' => $thothPublicationId]);
-        $locations = $result['publication']['locations'];
-        $hasCanonical = array_search(true, $locations);
-
-        return $hasCanonical !== false;
+        return false;
     }
 
     public function add($thothLocation)

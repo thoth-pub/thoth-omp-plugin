@@ -13,10 +13,11 @@
  * @brief Thoth config for publish form
  */
 
-use ThothApi\GraphQL\Models\Work as ThothWork;
+use ThothApi\GraphQL\Enums\WorkType;
 
 import('plugins.generic.thoth.classes.facades.ThothService');
 import('plugins.generic.thoth.classes.facades.ThothRepo');
+import('plugins.generic.thoth.classes.services.ThothMeCacheService');
 
 class PublishFormConfig
 {
@@ -37,8 +38,14 @@ class PublishFormConfig
             $errors = ThothService::book()->validate($publication);
 
             if (empty($errors)) {
-                $publishers = ThothRepo::account()->getLinkedPublishers();
-                $imprints = ThothRepo::imprint()->getMany(array_column($publishers, 'publisherId'));
+                $publishers = (new ThothMeCacheService())->getLinkedPublishers($submission->getData('contextId'));
+                $publisherIds = array_column($publishers, 'publisherId');
+                $imprints = ThothRepo::imprint()->getMany([
+                    'publishers' => $publisherIds
+                ], [
+                    'imprintId',
+                    'imprintName',
+                ]);
             }
         } catch (Exception $e) {
             error_log($e->getMessage());
@@ -88,11 +95,11 @@ class PublishFormConfig
 
         $workTypeOptions = [
             [
-                'value' => ThothWork::WORK_TYPE_MONOGRAPH,
+                'value' => WorkType::MONOGRAPH,
                 'label' => __('plugins.generic.thoth.workType.monograph')
             ],
             [
-                'value' => ThothWork::WORK_TYPE_TEXTBOOK,
+                'value' => WorkType::TEXTBOOK,
                 'label' => __('plugins.generic.thoth.workType.textbook')
             ],
         ];

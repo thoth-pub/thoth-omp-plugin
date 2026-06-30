@@ -1,5 +1,6 @@
 <?php
 
+require_once(__DIR__ . '/../../../vendor/autoload.php');
 /**
  * @file plugins/generic/thoth/tests/classes/services/ThothContributorServiceTest.php
  *
@@ -15,7 +16,7 @@
  */
 
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Contributor as ThothContributor;
+use ThothApi\GraphQL\Inputs\PatchContributor as ThothContributor;
 
 import('classes.monograph.Author');
 import('lib.pkp.tests.PKPTestCase');

@@ -13,7 +13,7 @@
  * @brief A repository to manage Thoth languages
  */
 
-use ThothApi\GraphQL\Models\Language as ThothLanguage;
+use ThothApi\GraphQL\Inputs\PatchLanguage as ThothLanguage;
 
 class ThothLanguageRepository
 {

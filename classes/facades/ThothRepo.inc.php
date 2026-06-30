@@ -18,9 +18,9 @@ import('plugins.generic.thoth.classes.container.ThothContainer');
 
 class ThothRepo
 {
-    public static function account()
+    public static function me()
     {
-        return ThothContainer::getInstance()->get('accountRepository');
+        return ThothContainer::getInstance()->get('meRepository');
     }
 
     public static function abstract()
@@ -36,6 +36,11 @@ class ThothRepo
     public static function affiliation()
     {
         return ThothContainer::getInstance()->get('affiliationRepository');
+    }
+
+    public static function chapter()
+    {
+        return ThothContainer::getInstance()->get('chapterRepository');
     }
 
     public static function contribution()
@@ -71,6 +76,11 @@ class ThothRepo
     public static function publication()
     {
         return ThothContainer::getInstance()->get('publicationRepository');
+    }
+
+    public static function publicationFileUpload()
+    {
+        return ThothContainer::getInstance()->get('publicationFileUploadRepository');
     }
 
     public static function reference()

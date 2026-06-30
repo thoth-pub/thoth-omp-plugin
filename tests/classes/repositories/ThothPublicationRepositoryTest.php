@@ -1,5 +1,6 @@
 <?php
 
+require_once(__DIR__ . '/../../../vendor/autoload.php');
 /**
  * @file plugins/generic/thoth/tests/classes/repositories/ThothPublicationRepositoryTest.php
  *
@@ -15,7 +16,11 @@
  */
 
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Publication as ThothPublication;
+use ThothApi\GraphQL\Enums\PublicationType;
+use ThothApi\GraphQL\Inputs\PatchPublication as ThothPublication;
+use ThothApi\GraphQL\Schemas\File as ThothFile;
+use ThothApi\GraphQL\Schemas\Publication as ThothPublicationSchema;
+use ThothApi\GraphQL\Schemas\Work as ThothWork;
 
 import('lib.pkp.tests.PKPTestCase');
 import('plugins.generic.thoth.classes.repositories.ThothPublicationRepository');
@@ -26,7 +31,7 @@ class ThothPublicationRepositoryTest extends PKPTestCase
     {
         $data = [
             'workId' => 'a2c032c6-b09b-4911-a67b-17f97cb57cc1',
-            'publicationType' => ThothPublication::PUBLICATION_TYPE_PDF,
+            'publicationType' => PublicationType::PDF,
             'isbn' => '978-3-16-148410-0',
             'width' => '60',
             'height' => '120',
@@ -48,7 +53,7 @@ class ThothPublicationRepositoryTest extends PKPTestCase
         $expectedThothPublication = new ThothPublication([
             'publicationId' => '1bce4a08-270c-4515-b0d5-d72d001314d4',
             'workId' => 'a2c032c6-b09b-4911-a67b-17f97cb57cc1',
-            'publicationType' => ThothPublication::PUBLICATION_TYPE_PDF,
+            'publicationType' => PublicationType::PDF,
             'isbn' => '978-3-16-148410-0',
             'width' => '60',
             'height' => '120',
@@ -72,27 +77,92 @@ class ThothPublicationRepositoryTest extends PKPTestCase
 
     public function testGetPublicationByType()
     {
+        $expectedThothWork = new ThothWork([
+            'publications' => [
+                [
+                    'publicationId' => 'efac5d7a-2284-4432-ad50-02b70aadec49',
+                    'publicationType' => PublicationType::PDF,
+                ]
+            ]
+        ]);
+
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['rawQuery'])
+            ->setMethods(['work'])
             ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('rawQuery')
-            ->will($this->returnValue([
-                'work' => ['publications' => [
-                    [
-                        'publicationId' => 'efac5d7a-2284-4432-ad50-02b70aadec49',
-                    ]
-                ]]
-            ]));
+        $mockThothClient->expects($this->once())
+            ->method('work')
+            ->with(
+                'a2c032c6-b09b-4911-a67b-17f97cb57cc1',
+                ['publications' => ['publicationId', 'publicationType']]
+            )
+            ->will($this->returnValue($expectedThothWork));
 
         $repository = new ThothPublicationRepository($mockThothClient);
 
         $thothPublicationId = $repository->getIdByType(
             'a2c032c6-b09b-4911-a67b-17f97cb57cc1',
-            ThothPublication::PUBLICATION_TYPE_PDF
+            PublicationType::PDF
         );
 
         $this->assertEquals('efac5d7a-2284-4432-ad50-02b70aadec49', $thothPublicationId);
+    }
+
+    public function testGetFilesByWorkId()
+    {
+        $expectedThothFile = new ThothFile([
+            'fileId' => '0c333e20-09f9-4f32-9f8f-20e801437dba',
+            'cdnUrl' => 'https://example.thoth.pub/10.12345/book.pdf',
+            'mimeType' => 'application/pdf',
+            'objectKey' => '10.12345/book.pdf',
+        ]);
+        $expectedThothWork = new ThothWork([
+            'publications' => [
+                new ThothPublicationSchema([
+                    'publicationId' => 'efac5d7a-2284-4432-ad50-02b70aadec49',
+                    'publicationType' => PublicationType::PDF,
+                    'file' => $expectedThothFile,
+                ]),
+                new ThothPublicationSchema([
+                    'publicationId' => '7dbd7f38-64f8-4df2-a3dd-5ac4d6e7c1cb',
+                    'publicationType' => PublicationType::EPUB,
+                    'file' => null,
+                ]),
+            ]
+        ]);
+
+        $mockThothClient = $this->getMockBuilder(ThothClient::class)
+            ->setMethods(['work'])
+            ->getMock();
+        $mockThothClient->expects($this->once())
+            ->method('work')
+            ->with(
+                'a2c032c6-b09b-4911-a67b-17f97cb57cc1',
+                [
+                    'workId',
+                    'publications' => [
+                        'publicationId',
+                        'publicationType',
+                        'file' => [
+                            'fileId',
+                            'cdnUrl',
+                            'mimeType',
+                            'objectKey',
+                        ],
+                    ],
+                ]
+            )
+            ->will($this->returnValue($expectedThothWork));
+
+        $repository = new ThothPublicationRepository($mockThothClient);
+
+        $thothFiles = $repository->getFilesByWorkId('a2c032c6-b09b-4911-a67b-17f97cb57cc1');
+
+        $this->assertSame([
+            [
+                'publicationType' => PublicationType::PDF,
+                'file' => $expectedThothFile,
+            ]
+        ], $thothFiles);
     }
 
     public function testFindPublication()
@@ -119,7 +189,7 @@ class ThothPublicationRepositoryTest extends PKPTestCase
     {
         $thothPublication = new ThothPublication([
             'workId' => 'a2c032c6-b09b-4911-a67b-17f97cb57cc1',
-            'publicationType' => ThothPublication::PUBLICATION_TYPE_PDF,
+            'publicationType' => PublicationType::PDF,
             'isbn' => '978-3-16-148410-0',
             'width' => '60',
             'height' => '120',
@@ -146,7 +216,7 @@ class ThothPublicationRepositoryTest extends PKPTestCase
         $thothPatchPublication = new ThothPublication([
             'publicationId' => 'fc6618f1-f4db-44f9-bbe3-75438f4bd536',
             'workId' => 'a2c032c6-b09b-4911-a67b-17f97cb57cc1',
-            'publicationType' => ThothPublication::PUBLICATION_TYPE_EPUB,
+            'publicationType' => PublicationType::EPUB,
             'isbn' => '978-3-16-148410-0'
         ]);
 

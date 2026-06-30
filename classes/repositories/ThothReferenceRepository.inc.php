@@ -13,7 +13,7 @@
  * @brief A repository to manage Thoth references
  */
 
-use ThothApi\GraphQL\Models\Reference as ThothReference;
+use ThothApi\GraphQL\Inputs\PatchReference as ThothReference;
 
 class ThothReferenceRepository
 {

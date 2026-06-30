@@ -1,5 +1,6 @@
 <?php
 
+require_once(__DIR__ . '/../../../vendor/autoload.php');
 /**
  * @file plugins/generic/thoth/tests/classes/repositories/ThothImprintRepositoryTest.php
  *
@@ -15,7 +16,7 @@
  */
 
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Imprint as ThothImprint;
+use ThothApi\GraphQL\Schemas\Imprint as ThothImprint;
 
 import('lib.pkp.tests.PKPTestCase');
 import('plugins.generic.thoth.classes.repositories.ThothImprintRepository');
@@ -35,13 +36,17 @@ class ThothImprintRepositoryTest extends PKPTestCase
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('imprints')
-            ->with(['publishers' => ['fffa1c59-4823-48ea-9d1c-596006a119b5']], false)
+            ->with(
+                ['publishers' => ['fffa1c59-4823-48ea-9d1c-596006a119b5']],
+                ['imprintId']
+            )
             ->will($this->returnValue($expectedThothImprints));
 
-        $thothPublisherIds = ['fffa1c59-4823-48ea-9d1c-596006a119b5'];
+        $params = ['publishers' => ['fffa1c59-4823-48ea-9d1c-596006a119b5']];
+        $selection = ['imprintId'];
 
         $repository = new ThothImprintRepository($mockThothClient);
-        $thothImprints = $repository->getMany($thothPublisherIds);
+        $thothImprints = $repository->getMany($params, $selection);
 
         $this->assertEquals($expectedThothImprints, $thothImprints);
     }
@@ -51,8 +56,10 @@ class ThothImprintRepositoryTest extends PKPTestCase
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
             ->setMethods(['imprints'])
             ->getMock();
-        $mockThothClient->expects($this->never())
-            ->method('imprints');
+        $mockThothClient->expects($this->once())
+            ->method('imprints')
+            ->with([], [])
+            ->will($this->returnValue([]));
 
         $repository = new ThothImprintRepository($mockThothClient);
 

@@ -14,7 +14,7 @@
  * @brief A factory to create Thoth titles
  */
 
-use ThothApi\GraphQL\Models\Title as ThothTitle;
+use ThothApi\GraphQL\Inputs\PatchTitle as ThothTitle;
 
 import('plugins.generic.thoth.classes.i18n.ThothLocaleCode');
 
