@@ -23,6 +23,109 @@ import('plugins.generic.thoth.classes.repositories.ThothMeRepository');
 
 class ThothMeRepositoryTest extends PKPTestCase
 {
+    public function testGetProfileReturnsNormalizedMeSchema()
+    {
+        $mockThothClient = $this->getMockBuilder(ThothClient::class)
+            ->setMethods(['me'])
+            ->getMock();
+        $mockThothClient->expects($this->once())
+            ->method('me')
+            ->with([
+                'userId',
+                'email',
+                'firstName',
+                'lastName',
+                'isSuperuser',
+                'publisherContexts' => [
+                    'publisher' => ['publisherId', 'publisherName'],
+                    'permissions' => ['publisherAdmin', 'workLifecycle', 'cdnWrite'],
+                ],
+            ])
+            ->will($this->returnValue(
+                new Me([
+                    'userId' => 'user-id',
+                    'email' => 'user@example.com',
+                    'publisherContexts' => [
+                        [
+                            'publisher' => [
+                                'publisherId' => 'c1db6141-7af1-4f6a-97c4-2dc1065281ef',
+                                'publisherName' => 'Test Publisher',
+                            ],
+                            'permissions' => [
+                                'publisherAdmin' => false,
+                                'workLifecycle' => true,
+                                'cdnWrite' => true,
+                            ],
+                        ],
+                    ],
+                ])
+            ));
+
+        $repository = new ThothMeRepository($mockThothClient);
+
+        $this->assertEquals(
+            [
+                'userId' => 'user-id',
+                'email' => 'user@example.com',
+                'publisherContexts' => [
+                    [
+                        'publisher' => [
+                            'publisherId' => 'c1db6141-7af1-4f6a-97c4-2dc1065281ef',
+                            'publisherName' => 'Test Publisher',
+                        ],
+                        'permissions' => [
+                            'publisherAdmin' => false,
+                            'workLifecycle' => true,
+                            'cdnWrite' => true,
+                        ],
+                    ],
+                ],
+                'linkedPublishers' => [
+                    [
+                        'publisherId' => 'c1db6141-7af1-4f6a-97c4-2dc1065281ef',
+                        'publisherName' => 'Test Publisher',
+                    ],
+                ],
+            ],
+            $repository->getProfile()
+        );
+    }
+
+    public function testHasCdnWritePermission()
+    {
+        $repository = new ThothMeRepository(null);
+
+        $this->assertTrue($repository->hasCdnWritePermission([
+            'publisherContexts' => [
+                [
+                    'permissions' => [
+                        'cdnWrite' => false,
+                    ],
+                ],
+                [
+                    'permissions' => [
+                        'cdnWrite' => true,
+                    ],
+                ],
+            ],
+        ]));
+    }
+
+    public function testHasCdnWritePermissionReturnsFalseWithoutCdnWrite()
+    {
+        $repository = new ThothMeRepository(null);
+
+        $this->assertFalse($repository->hasCdnWritePermission([
+            'publisherContexts' => [
+                [
+                    'permissions' => [
+                        'cdnWrite' => false,
+                    ],
+                ],
+            ],
+        ]));
+    }
+
     public function testGetLinkedPublishers()
     {
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
@@ -31,6 +134,11 @@ class ThothMeRepositoryTest extends PKPTestCase
         $mockThothClient->expects($this->once())
             ->method('me')
             ->with([
+                'userId',
+                'email',
+                'firstName',
+                'lastName',
+                'isSuperuser',
                 'publisherContexts' => [
                     'publisher' => ['publisherId', 'publisherName'],
                     'permissions' => ['publisherAdmin', 'workLifecycle', 'cdnWrite'],
@@ -72,6 +180,11 @@ class ThothMeRepositoryTest extends PKPTestCase
         $mockThothClient->expects($this->once())
             ->method('me')
             ->with([
+                'userId',
+                'email',
+                'firstName',
+                'lastName',
+                'isSuperuser',
                 'publisherContexts' => [
                     'publisher' => ['publisherId', 'publisherName'],
                     'permissions' => ['publisherAdmin', 'workLifecycle', 'cdnWrite'],

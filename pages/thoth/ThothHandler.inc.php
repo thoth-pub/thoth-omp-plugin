@@ -2,6 +2,7 @@
 
 import('classes.handler.Handler');
 import('plugins.generic.thoth.classes.components.listPanels.ThothListPanel');
+import('plugins.generic.thoth.classes.services.ThothMeCacheService');
 
 class ThothHandler extends Handler
 {
@@ -44,7 +45,7 @@ class ThothHandler extends Handler
         $this->addStyles($request, $templateMgr, $plugin);
 
         try {
-            $publishers = ThothRepo::me()->getLinkedPublishers();
+            $publishers = (new ThothMeCacheService())->getLinkedPublishers($context->getId());
             $publisherIds = array_column($publishers, 'publisherId');
             $imprints = ThothRepo::imprint()->getMany([
                 'publishers' => $publisherIds

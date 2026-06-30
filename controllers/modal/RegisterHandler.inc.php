@@ -21,6 +21,7 @@ use ThothApi\Exception\QueryException;
 import('classes.handler.Handler');
 import('plugins.generic.thoth.classes.facades.ThothService');
 import('plugins.generic.thoth.classes.facades.ThothRepo');
+import('plugins.generic.thoth.classes.services.ThothMeCacheService');
 
 class RegisterHandler extends Handler
 {
@@ -88,7 +89,7 @@ class RegisterHandler extends Handler
             $errors = ThothService::book()->validate($this->publication);
 
             if (empty($errors)) {
-                $publishers = ThothRepo::me()->getLinkedPublishers();
+                $publishers = (new ThothMeCacheService())->getLinkedPublishers($submissionContext->getId());
                 $publisherIds = array_column($publishers, 'publisherId');
                 $imprints = ThothRepo::imprint()->getMany([
                     'publishers' => $publisherIds

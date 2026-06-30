@@ -15,7 +15,12 @@
 
 class ThothMeRepository
 {
-    private const PUBLISHER_CONTEXTS_SELECTION = [
+    private const PROFILE_SELECTION = [
+        'userId',
+        'email',
+        'firstName',
+        'lastName',
+        'isSuperuser',
         'publisherContexts' => [
             'publisher' => ['publisherId', 'publisherName'],
             'permissions' => ['publisherAdmin', 'workLifecycle', 'cdnWrite'],
@@ -34,11 +39,44 @@ class ThothMeRepository
         return $this->thothClient->me($selection);
     }
 
+    public function getProfile()
+    {
+        $profile = $this->normalizeMe($this->get(self::PROFILE_SELECTION));
+        $profile['linkedPublishers'] = $this->getLinkedPublishersFromProfile($profile);
+
+        return $profile;
+    }
+
     public function getLinkedPublishers()
     {
-        $publisherContexts = $this->normalizePublisherContexts(
-            $this->get(self::PUBLISHER_CONTEXTS_SELECTION)->getPublisherContexts() ?? []
-        );
+        return $this->getProfile()['linkedPublishers'] ?? [];
+    }
+
+    public function hasCdnWritePermission($me)
+    {
+        $publisherContexts = $this->normalizePublisherContexts($me['publisherContexts'] ?? []);
+
+        foreach ($publisherContexts as $publisherContext) {
+            if (!empty($publisherContext['permissions']['cdnWrite'])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function normalizeMe($me)
+    {
+        if (is_object($me) && method_exists($me, 'toArray')) {
+            return $me->toArray();
+        }
+
+        return $me ?: [];
+    }
+
+    private function getLinkedPublishersFromProfile($profile)
+    {
+        $publisherContexts = $this->normalizePublisherContexts($profile['publisherContexts'] ?? []);
 
         return array_values(array_map(
             fn ($publisherContext) => $publisherContext['publisher'],

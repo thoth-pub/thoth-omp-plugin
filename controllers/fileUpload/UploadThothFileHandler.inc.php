@@ -19,6 +19,7 @@ import('plugins.generic.thoth.classes.facades.ThothRepo');
 import('plugins.generic.thoth.classes.factories.ThothPublicationFactory');
 import('plugins.generic.thoth.classes.formatters.DoiFormatter');
 import('plugins.generic.thoth.classes.services.ThothCatalogFileService');
+import('plugins.generic.thoth.classes.services.ThothMeCacheService');
 
 class UploadThothFileHandler extends Handler
 {
@@ -73,12 +74,17 @@ class UploadThothFileHandler extends Handler
             $thothWorkId
         );
         $form->initData();
+        $form->setData('missingCdnWritePermissionAlert', !$this->canUploadFiles($request));
 
         return new JSONMessage(true, $form->fetch($request));
     }
 
     public function handleThothPublicationFile($args, $request)
     {
+        if (!$this->canUploadFiles($request)) {
+            return new JSONMessage(false, __('plugins.generic.thoth.fileUpload.error.missingCdnWritePermission'));
+        }
+
         import('lib.pkp.classes.file.TemporaryFileManager');
         $temporaryFileManager = new TemporaryFileManager();
         $user = $request->getUser();
@@ -98,6 +104,10 @@ class UploadThothFileHandler extends Handler
     {
         if (!$request->checkCSRF()) {
             throw new Exception('CSRF mismatch!');
+        }
+
+        if (!$this->canUploadFiles($request)) {
+            return new JSONMessage(false, __('plugins.generic.thoth.fileUpload.error.missingCdnWritePermission'));
         }
 
         $contextId = $request->getContext()->getId();
@@ -260,6 +270,18 @@ class UploadThothFileHandler extends Handler
         }
 
         return null;
+    }
+
+    private function canUploadFiles($request)
+    {
+        try {
+            $cacheService = new ThothMeCacheService();
+            $contextId = $request->getContext()->getId();
+            return $cacheService->hasCdnWritePermission($contextId);
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            return false;
+        }
     }
 
     private function getThothWorkId($thothWork)

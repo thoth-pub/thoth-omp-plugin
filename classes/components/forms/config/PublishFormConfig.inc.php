@@ -17,6 +17,7 @@ use ThothApi\GraphQL\Enums\WorkType;
 
 import('plugins.generic.thoth.classes.facades.ThothService');
 import('plugins.generic.thoth.classes.facades.ThothRepo');
+import('plugins.generic.thoth.classes.services.ThothMeCacheService');
 
 class PublishFormConfig
 {
@@ -37,7 +38,7 @@ class PublishFormConfig
             $errors = ThothService::book()->validate($publication);
 
             if (empty($errors)) {
-                $publishers = ThothRepo::me()->getLinkedPublishers();
+                $publishers = (new ThothMeCacheService())->getLinkedPublishers($submission->getData('contextId'));
                 $publisherIds = array_column($publishers, 'publisherId');
                 $imprints = ThothRepo::imprint()->getMany([
                     'publishers' => $publisherIds

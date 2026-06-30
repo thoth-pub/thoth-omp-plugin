@@ -63,6 +63,8 @@ class PublicationFormatGridModifier
             'thothWorkId' => $thothWorkId
         ];
 
+        $title = __('plugins.generic.thoth.grid.action.thothFileUpload');
+
         import('lib.pkp.classes.linkAction.request.AjaxModal');
         $linkAction = new LinkAction(
             'thothUpload',
@@ -76,9 +78,9 @@ class PublicationFormatGridModifier
                     null,
                     $actionArgs
                 ),
-                __('plugins.generic.thoth.grid.action.thothFileUpload')
+                $title
             ),
-            __('plugins.generic.thoth.grid.action.thothFileUpload'),
+            $title,
             null
         );
 
