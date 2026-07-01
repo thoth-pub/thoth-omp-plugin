@@ -8,6 +8,7 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothCatalogFilesHandler
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief Public handler to load Thoth catalog files asynchronously.

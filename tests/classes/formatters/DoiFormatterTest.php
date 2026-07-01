@@ -8,7 +8,9 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class DoiFormatterTest
+ *
  * @ingroup plugins_generic_thoth_tests
+ *
  * @see DoiFormatter
  *
  * @brief Test class for the DoiFormatter class

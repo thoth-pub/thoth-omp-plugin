@@ -19,7 +19,6 @@ require_once(__DIR__ . '/../../../vendor/autoload.php');
 
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Enums\LocationPlatform;
 use ThothApi\GraphQL\Inputs\PatchLocation as ThothLocation;
 
 import('plugins.generic.thoth.classes.repositories.ThothLocationRepository');

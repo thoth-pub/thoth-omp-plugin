@@ -19,7 +19,6 @@ require_once(__DIR__ . '/../../../vendor/autoload.php');
 
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Enums\ContributionType;
 use ThothApi\GraphQL\Inputs\PatchContribution as ThothContribution;
 use ThothApi\GraphQL\Inputs\PatchContributor as ThothContributor;
 

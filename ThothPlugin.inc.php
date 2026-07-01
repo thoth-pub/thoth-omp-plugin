@@ -329,7 +329,7 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
         }
 
         if (in_array(ROLE_ID_MANAGER, $userRoles)) {
-            $offset = array_search("settings", array_keys($menu));
+            $offset = array_search('settings', array_keys($menu));
 
             $menu = array_slice($menu, 0, $offset, true) +
             [

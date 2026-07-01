@@ -10,14 +10,16 @@ require_once(__DIR__ . '/../../../vendor/autoload.php');
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothCatalogFilesHandlerTest
+ *
  * @ingroup plugins_generic_thoth_tests
+ *
  * @see ThothCatalogFilesHandler
  *
  * @brief Test class for the ThothCatalogFilesHandler class
  */
 
-use ThothApi\GraphQL\Schemas\Work as ThothWork;
 use ThothApi\GraphQL\Enums\PublicationType;
+use ThothApi\GraphQL\Schemas\Work as ThothWork;
 
 import('classes.publicationFormat.PublicationFormat');
 import('lib.pkp.classes.db.DAOResultFactory');

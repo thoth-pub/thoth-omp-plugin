@@ -15,8 +15,6 @@
  */
 
 use APP\facades\Repo;
-use APP\submission\Submission;
-use PKP\core\Core;
 use PKP\doi\Doi;
 use PKP\submission\PKPSubmission;
 use ThothApi\GraphQL\Enums\WorkStatus;

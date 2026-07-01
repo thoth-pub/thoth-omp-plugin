@@ -19,8 +19,6 @@ require_once(__DIR__ . '/../../../vendor/autoload.php');
 
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Enums\LanguageRelation;
-use ThothApi\GraphQL\Inputs\PatchLanguage as ThothLanguage;
 
 import('plugins.generic.thoth.classes.repositories.ThothLanguageRepository');
 import('plugins.generic.thoth.classes.services.ThothLanguageService');

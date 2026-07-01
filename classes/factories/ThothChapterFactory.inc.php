@@ -75,7 +75,7 @@ class ThothChapterFactory
             ];
         }
 
-        list($firstPage, $lastPage) = explode('-', $pages);
+        [$firstPage, $lastPage] = explode('-', $pages);
         return [
             'pageInterval' => trim($pages),
             'firstPage' => trim($firstPage),

@@ -8,6 +8,7 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothCatalogFileService
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief Service to format Thoth files for the public catalog page.

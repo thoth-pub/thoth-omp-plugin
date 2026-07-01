@@ -10,7 +10,9 @@ require_once(__DIR__ . '/../../../vendor/autoload.php');
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothCatalogFileServiceTest
+ *
  * @ingroup plugins_generic_thoth_tests
+ *
  * @see ThothCatalogFileService
  *
  * @brief Test class for the ThothCatalogFileService class

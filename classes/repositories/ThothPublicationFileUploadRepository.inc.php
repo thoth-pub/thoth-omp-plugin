@@ -8,6 +8,7 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothPublicationFileUploadRepository
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief A repository to manage Thoth publication file uploads

@@ -2,9 +2,9 @@
 
 namespace APP\plugins\generic\thoth\classes\migrations;
 
+use APP\plugins\generic\thoth\classes\encryption\DataEncryption;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
-use APP\plugins\generic\thoth\classes\encryption\DataEncryption;
 
 class PasswordEncryptionMigration extends Migration
 {
@@ -74,7 +74,7 @@ class PasswordEncryptionMigration extends Migration
 
     public function decodeJWT($string): ?string
     {
-        list($header, $payload, $signature) = explode('.', $string);
+        [$header, $payload, $signature] = explode('.', $string);
         $decodedPayload = $this->base64URLDecode($payload);
         return $decodedPayload ? $decodedPayload : null;
     }

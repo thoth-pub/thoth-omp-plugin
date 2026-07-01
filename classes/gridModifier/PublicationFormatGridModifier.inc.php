@@ -8,6 +8,7 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class PublicationFormatGridModifier
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief A class to modify the publication format grid by adding Thoth features.

@@ -8,6 +8,7 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothMeCacheService
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief Cache service for authenticated Thoth user data.

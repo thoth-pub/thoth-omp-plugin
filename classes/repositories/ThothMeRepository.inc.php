@@ -8,6 +8,7 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothMeRepository
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief A repository to manage the authenticated Thoth user

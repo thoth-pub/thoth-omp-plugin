@@ -8,6 +8,7 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class UploadThothPublicationFileForm
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief Form for uploading publication files to Thoth.
@@ -208,7 +209,7 @@ class UploadThothPublicationFileForm extends Form
             $notificationMgr->createTrivialNotification(
                 $user->getId(),
                 NOTIFICATION_TYPE_SUCCESS,
-                array('contents' => __('plugins.generic.thoth.fileUpload.success'))
+                ['contents' => __('plugins.generic.thoth.fileUpload.success')]
             );
         } catch (Exception $e) {
             $notificationMgr->createTrivialNotification(

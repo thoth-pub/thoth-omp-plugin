@@ -19,7 +19,6 @@ require_once(__DIR__ . '/../../../vendor/autoload.php');
 
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Inputs\PatchReference as ThothReference;
 
 import('plugins.generic.thoth.classes.repositories.ThothReferenceRepository');
 import('plugins.generic.thoth.classes.services.ThothReferenceService');

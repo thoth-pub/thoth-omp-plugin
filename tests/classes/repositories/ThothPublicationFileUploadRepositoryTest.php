@@ -10,7 +10,9 @@ require_once(__DIR__ . '/../../../vendor/autoload.php');
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothPublicationFileUploadRepositoryTest
+ *
  * @ingroup plugins_generic_thoth_tests
+ *
  * @see ThothPublicationFileUploadRepository
  *
  * @brief Test class for the ThothPublicationFileUploadRepository class
@@ -96,18 +98,18 @@ class ThothPublicationFileUploadRepositoryTest extends PKPTestCase
         $fileUploadId = '123e4567-e89b-12d3-a456-426614174000';
 
         $expectedFile = new File([
-                'fileId' => '0c333e20-09f9-4f32-9f8f-20e801437dba',
-                'fileType' => 'PUBLICATION',
-                'workId' => null,
-                'publicationId' => 'f214b70e-9c0d-4a1f-a254-c8f426783dfd',
-                'additionalResourceId' => null,
-                'workFeaturedVideoId' => null,
-                'objectKey' => '10.12345/123.pdf',
-                'cdnUrl' => 'https://example.thoth.pub/10.12345/123.pdf',
-                'mimeType' => 'application/pdf',
-                'bytes' => 2358735,
-                'sha256' => 'b5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c',
-            ]);
+            'fileId' => '0c333e20-09f9-4f32-9f8f-20e801437dba',
+            'fileType' => 'PUBLICATION',
+            'workId' => null,
+            'publicationId' => 'f214b70e-9c0d-4a1f-a254-c8f426783dfd',
+            'additionalResourceId' => null,
+            'workFeaturedVideoId' => null,
+            'objectKey' => '10.12345/123.pdf',
+            'cdnUrl' => 'https://example.thoth.pub/10.12345/123.pdf',
+            'mimeType' => 'application/pdf',
+            'bytes' => 2358735,
+            'sha256' => 'b5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c',
+        ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
             ->setMethods(['completeFileUpload'])

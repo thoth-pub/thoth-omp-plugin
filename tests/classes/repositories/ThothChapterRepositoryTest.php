@@ -19,8 +19,6 @@ require_once(__DIR__ . '/../../../vendor/autoload.php');
 
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Enums\WorkStatus;
-use ThothApi\GraphQL\Enums\WorkType;
 use ThothApi\GraphQL\Inputs\PatchWork as ThothWork;
 
 import('plugins.generic.thoth.classes.repositories.ThothChapterRepository');

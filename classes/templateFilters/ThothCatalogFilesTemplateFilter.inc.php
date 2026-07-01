@@ -8,6 +8,7 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothCatalogFilesTemplateFilter
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief Template filter to add async Thoth file targets to the catalog page.
