@@ -14,6 +14,10 @@
  * @brief Handler for uploading Thoth files.
  */
 
+use APP\facades\Repo;
+use PKP\core\JSONMessage;
+use PKP\security\Role;
+
 import('classes.handler.Handler');
 import('plugins.generic.thoth.classes.facades.ThothRepo');
 import('plugins.generic.thoth.classes.factories.ThothPublicationFactory');
@@ -32,7 +36,7 @@ class UploadThothFileHandler extends Handler
         parent::__construct();
 
         $this->addRoleAssignment(
-            [ROLE_ID_MANAGER, ROLE_ID_SUB_EDITOR, ROLE_ID_ASSISTANT],
+            [Role::ROLE_ID_MANAGER, Role::ROLE_ID_SUB_EDITOR, Role::ROLE_ID_ASSISTANT],
             [
                 'uploadThothPublicationFile',
                 'handleThothPublicationFile',
@@ -141,12 +145,12 @@ class UploadThothFileHandler extends Handler
         $publicationId = (int) $request->getUserVar('publicationId');
         $representationId = (int) $request->getUserVar('representationId');
 
-        $publication = Services::get('publication')->get($publicationId);
+        $publication = Repo::publication()->get($publicationId);
         if (!$publication) {
             return new JSONMessage(false, __('plugins.generic.thoth.fileUpload.error.invalidPublication'));
         }
 
-        $submission = Services::get('submission')->get($publication->getData('submissionId'));
+        $submission = Repo::submission()->get($publication->getData('submissionId'));
         if (!$submission || (int) $submission->getData('contextId') !== (int) $contextId) {
             return new JSONMessage(false, __('plugins.generic.thoth.fileUpload.error.publicationContextMismatch'));
         }

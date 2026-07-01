@@ -14,6 +14,9 @@
  * @brief Public handler to load Thoth catalog files asynchronously.
  */
 
+use APP\facades\Repo;
+use PKP\core\JSONMessage;
+
 import('classes.handler.Handler');
 import('plugins.generic.thoth.classes.facades.ThothRepo');
 import('plugins.generic.thoth.classes.factories.ThothPublicationFactory');
@@ -33,8 +36,8 @@ class ThothCatalogFilesHandler extends Handler
         $submissionId = (int) $request->getUserVar('submissionId');
         $publicationId = (int) $request->getUserVar('publicationId');
 
-        $submission = Services::get('submission')->get($submissionId);
-        $publication = Services::get('publication')->get($publicationId);
+        $submission = Repo::submission()->get($submissionId);
+        $publication = Repo::publication()->get($publicationId);
 
         if (!$submission || !$publication || !$this->isPublicCatalogPublication($submission, $publication, $request)) {
             return new JSONMessage(false);

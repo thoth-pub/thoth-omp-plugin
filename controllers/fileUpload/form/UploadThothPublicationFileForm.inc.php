@@ -14,6 +14,12 @@
  * @brief Form for uploading publication files to Thoth.
  */
 
+use APP\facades\Repo;
+use APP\i18n\AppLocale;
+use APP\notification\Notification;
+use APP\notification\NotificationManager;
+use PKP\form\validation\FormValidator;
+
 import('lib.pkp.classes.form.Form');
 import('lib.pkp.classes.plugins.PKPPubIdPluginDAO');
 import('plugins.generic.thoth.classes.services.ThothCatalogFilesCacheService');
@@ -48,7 +54,7 @@ class UploadThothPublicationFileForm extends Form
             LOCALE_COMPONENT_APP_SUBMISSION
         );
 
-        $publication = Services::get('publication')->get($this->publicationId);
+        $publication = Repo::publication()->get($this->publicationId);
         if (!$publication) {
             return;
         }
@@ -208,13 +214,13 @@ class UploadThothPublicationFileForm extends Form
 
             $notificationMgr->createTrivialNotification(
                 $user->getId(),
-                NOTIFICATION_TYPE_SUCCESS,
+                Notification::NOTIFICATION_TYPE_SUCCESS,
                 ['contents' => __('plugins.generic.thoth.fileUpload.success')]
             );
         } catch (Exception $e) {
             $notificationMgr->createTrivialNotification(
                 $user->getId(),
-                NOTIFICATION_TYPE_ERROR,
+                Notification::NOTIFICATION_TYPE_ERROR,
                 ['contents' => $e->getMessage()]
             );
         } finally {
@@ -232,13 +238,13 @@ class UploadThothPublicationFileForm extends Form
 
     public function validate($callHooks = true)
     {
-        $publication = Services::get('publication')->get($this->publicationId);
+        $publication = Repo::publication()->get($this->publicationId);
         if (!$publication) {
             $this->addError('publicationId', __('plugins.generic.thoth.fileUpload.error.invalidPublication'));
             return parent::validate($callHooks);
         }
 
-        $submission = Services::get('submission')->get($publication->getData('submissionId'));
+        $submission = Repo::submission()->get($publication->getData('submissionId'));
         if (!$submission || (int) $submission->getData('contextId') !== (int) $this->contextId) {
             $this->addError('publicationId', __('plugins.generic.thoth.fileUpload.error.publicationContextMismatch'));
         }

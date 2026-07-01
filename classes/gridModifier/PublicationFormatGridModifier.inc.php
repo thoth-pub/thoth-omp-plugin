@@ -14,6 +14,9 @@
  * @brief A class to modify the publication format grid by adding Thoth features.
  */
 
+use APP\controllers\grid\catalogEntry\PublicationFormatGridHandler;
+use PKP\security\Role;
+
 class PublicationFormatGridModifier
 {
     private $plugin;
@@ -143,7 +146,7 @@ class PublicationFormatGridModifier
 
         return !empty(array_intersect(
             $userRoles,
-            [ROLE_ID_MANAGER, ROLE_ID_SUB_EDITOR, ROLE_ID_ASSISTANT]
+            [Role::ROLE_ID_MANAGER, Role::ROLE_ID_SUB_EDITOR, Role::ROLE_ID_ASSISTANT]
         ));
     }
 
