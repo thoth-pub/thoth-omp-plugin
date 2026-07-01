@@ -8,7 +8,9 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothContainerTest
+ *
  * @ingroup plugins_generic_thoth_tests
+ *
  * @see ThothContainer
  *
  * @brief Test class for the ThothContainer class

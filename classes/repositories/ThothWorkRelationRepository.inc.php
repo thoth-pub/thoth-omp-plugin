@@ -14,7 +14,7 @@
  * @brief A repository to manage Thoth work relations
  */
 
-use ThothApi\GraphQL\Models\WorkRelation as ThothWorkRelation;
+use ThothApi\GraphQL\Inputs\PatchWorkRelation as ThothWorkRelation;
 
 class ThothWorkRelationRepository
 {

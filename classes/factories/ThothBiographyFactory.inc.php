@@ -14,7 +14,7 @@
  * @brief A factory to create Thoth biographies
  */
 
-use ThothApi\GraphQL\Models\Biography as ThothBiography;
+use ThothApi\GraphQL\Inputs\PatchBiography as ThothBiography;
 
 import('plugins.generic.thoth.classes.i18n.ThothLocaleCode');
 import('plugins.generic.thoth.classes.formatters.ThothMarkupFormatter');

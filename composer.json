@@ -2,6 +2,6 @@
     "require": {
         "biblys/isbn": "~3.0",
         "psr/http-message": "^1.0",
-        "thoth-pub/thoth-client-php": "^1.4"
+        "thoth-pub/thoth-client-php": "^2.0"
     }
 }

@@ -14,7 +14,7 @@
  * @brief A repository to manage Thoth institutions
  */
 
-use ThothApi\GraphQL\Models\Institution as ThothInstitution;
+use ThothApi\GraphQL\Inputs\PatchInstitution as ThothInstitution;
 
 class ThothInstitutionRepository
 {

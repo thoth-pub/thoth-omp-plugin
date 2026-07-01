@@ -14,7 +14,7 @@
  * @brief Helper class that encapsulates business logic for Thoth affiliations
  */
 
-import('plugins.generic.thoth.classes.facades.ThothRepository');
+import('plugins.generic.thoth.classes.facades.ThothRepo');
 
 class ThothAffiliationService
 {
@@ -27,7 +27,7 @@ class ThothAffiliationService
 
     public function register($rorId, $thothContributionId)
     {
-        $thothInstitution = ThothRepository::institution()->find($rorId);
+        $thothInstitution = ThothRepo::institution()->find($rorId);
 
         if ($thothInstitution === null) {
             return null;

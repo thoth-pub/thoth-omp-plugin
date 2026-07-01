@@ -1,5 +1,7 @@
 <?php
 
+require_once(__DIR__ . '/../../../vendor/autoload.php');
+
 use PKP\tests\PKPTestCase;
 
 import('plugins.generic.thoth.classes.i18n.ThothLocaleCode');

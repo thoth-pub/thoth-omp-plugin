@@ -15,7 +15,7 @@
  */
 
 use PKP\db\DAORegistry;
-use ThothApi\GraphQL\Models\WorkRelation as ThothWorkRelation;
+use ThothApi\GraphQL\Enums\RelationType;
 
 import('plugins.generic.thoth.classes.facades.ThothService');
 
@@ -35,7 +35,7 @@ class ThothWorkRelationService
         $thothWorkRelation = $this->repository->new([
             'relatorWorkId' => $thothChapterId,
             'relatedWorkId' => $thothRelatedWorkId,
-            'relationType' => ThothWorkRelation::RELATION_TYPE_IS_CHILD_OF,
+            'relationType' => RelationType::IS_CHILD_OF,
             'relationOrdinal' => ($chapter->getSequence() + 1)
         ]);
 

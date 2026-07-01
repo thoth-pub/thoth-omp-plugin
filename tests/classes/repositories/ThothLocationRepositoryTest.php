@@ -1,5 +1,6 @@
 <?php
 
+require_once(__DIR__ . '/../../../vendor/autoload.php');
 /**
  * @file plugins/generic/thoth/tests/classes/repositories/ThothLocationRepositoryTest.php
  *
@@ -18,7 +19,9 @@
 
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Location as ThothLocation;
+use ThothApi\GraphQL\Enums\LocationPlatform;
+use ThothApi\GraphQL\Inputs\PatchLocation as ThothLocation;
+use ThothApi\GraphQL\Schemas\Publication as ThothPublication;
 
 import('plugins.generic.thoth.classes.repositories.ThothLocationRepository');
 
@@ -29,7 +32,7 @@ class ThothLocationRepositoryTest extends PKPTestCase
         $data = [
             'landingPage' => 'https://omp.publicknowledgeproject.org/press/catalog/book/12',
             'fullTextUrl' => 'https://omp.publicknowledgeproject.org/press/catalog/book/12/view',
-            'locationPlatform' => ThothLocation::LOCATION_PLATFORM_OTHER,
+            'locationPlatform' => LocationPlatform::OTHER,
         ];
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)->getMock();
@@ -47,7 +50,7 @@ class ThothLocationRepositoryTest extends PKPTestCase
             'locationId' => 'e2c57d05-b0e4-460e-a4c5-72c91b383b75',
             'landingPage' => 'https://omp.publicknowledgeproject.org/press/catalog/book/12',
             'fullTextUrl' => 'https://omp.publicknowledgeproject.org/press/catalog/book/12/view',
-            'locationPlatform' => ThothLocation::LOCATION_PLATFORM_OTHER,
+            'locationPlatform' => LocationPlatform::OTHER,
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
@@ -66,23 +69,27 @@ class ThothLocationRepositoryTest extends PKPTestCase
 
     public function testHasCanonicalLocation()
     {
+        $expectedThothPublication = new ThothPublication([
+            'locations' => [
+                [
+                    'canonical' => false
+                ],
+                [
+                    'canonical' => true
+                ],
+            ]
+        ]);
+
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->setMethods(['rawQuery'])
+            ->setMethods(['publication'])
             ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('rawQuery')
-            ->will($this->returnValue([
-                'publication' => [
-                    'locations' => [
-                        [
-                            'canonical' => false
-                        ],
-                        [
-                            'canonical' => true
-                        ],
-                    ]
-                ]
-            ]));
+        $mockThothClient->expects($this->once())
+            ->method('publication')
+            ->with(
+                'dd239ee6-90d6-4487-ac7f-43ec18391c48',
+                ['locations' => ['canonical']]
+            )
+            ->will($this->returnValue($expectedThothPublication));
 
         $repository = new ThothLocationRepository($mockThothClient);
 
@@ -97,7 +104,7 @@ class ThothLocationRepositoryTest extends PKPTestCase
         $thothLocation = new ThothLocation([
             'landingPage' => 'https://omp.publicknowledgeproject.org/press/catalog/book/12',
             'fullTextUrl' => 'https://omp.publicknowledgeproject.org/press/catalog/book/12/view',
-            'locationPlatform' => ThothLocation::LOCATION_PLATFORM_OTHER,
+            'locationPlatform' => LocationPlatform::OTHER,
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
@@ -120,7 +127,7 @@ class ThothLocationRepositoryTest extends PKPTestCase
             'locationId' => 'a8a397a0-ee70-466b-948a-41d7b1e3069b',
             'landingPage' => 'https://omp.publicknowledgeproject.org/my_press/catalog/book/12',
             'fullTextUrl' => 'https://omp.publicknowledgeproject.org/my_press/catalog/book/12/view',
-            'locationPlatform' => ThothLocation::LOCATION_PLATFORM_OTHER,
+            'locationPlatform' => LocationPlatform::OTHER,
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)

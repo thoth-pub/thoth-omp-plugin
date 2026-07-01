@@ -27,7 +27,8 @@ use PKP\security\Role;
 
 import('plugins.generic.thoth.classes.components.listPanels.ThothListPanel');
 import('plugins.generic.thoth.classes.facades.ThothService');
-import('plugins.generic.thoth.classes.facades.ThothRepository');
+import('plugins.generic.thoth.classes.facades.ThothRepo');
+import('plugins.generic.thoth.classes.services.ThothMeCacheService');
 
 class ThothHandler extends Handler
 {
@@ -70,8 +71,14 @@ class ThothHandler extends Handler
         $this->addStyles($request, $templateMgr, $plugin);
 
         try {
-            $publishers = ThothRepository::account()->getLinkedPublishers();
-            $imprints = ThothRepository::imprint()->getMany(array_column($publishers, 'publisherId'));
+            $publishers = (new ThothMeCacheService())->getLinkedPublishers($context->getId());
+            $publisherIds = array_column($publishers, 'publisherId');
+            $imprints = ThothRepo::imprint()->getMany([
+                'publishers' => $publisherIds
+            ], [
+                'imprintId',
+                'imprintName',
+            ]);
         } catch (\Exception $e) {
             error_log($e->getMessage());
             $connectionError = true;

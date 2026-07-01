@@ -1,5 +1,6 @@
 <?php
 
+require_once(__DIR__ . '/../../../vendor/autoload.php');
 /**
  * @file plugins/generic/thoth/tests/classes/services/ThothLocationServiceTest.php
  *
@@ -18,7 +19,7 @@
 
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Location as ThothLocation;
+use ThothApi\GraphQL\Inputs\PatchLocation as ThothLocation;
 
 import('plugins.generic.thoth.classes.repositories.ThothLocationRepository');
 import('plugins.generic.thoth.classes.services.ThothLocationService');

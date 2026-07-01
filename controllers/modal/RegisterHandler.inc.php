@@ -24,7 +24,8 @@ use PKP\plugins\PluginRegistry;
 use PKP\security\Role;
 
 import('plugins.generic.thoth.classes.facades.ThothService');
-import('plugins.generic.thoth.classes.facades.ThothRepository');
+import('plugins.generic.thoth.classes.facades.ThothRepo');
+import('plugins.generic.thoth.classes.services.ThothMeCacheService');
 
 class RegisterHandler extends Handler
 {
@@ -92,8 +93,14 @@ class RegisterHandler extends Handler
             $errors = ThothService::book()->validate($this->publication);
 
             if (empty($errors)) {
-                $publishers = ThothRepository::account()->getLinkedPublishers();
-                $imprints = ThothRepository::imprint()->getMany(array_column($publishers, 'publisherId'));
+                $publishers = (new ThothMeCacheService())->getLinkedPublishers($submissionContext->getId());
+                $publisherIds = array_column($publishers, 'publisherId');
+                $imprints = ThothRepo::imprint()->getMany([
+                    'publishers' => $publisherIds
+                ], [
+                    'imprintId',
+                    'imprintName',
+                ]);
             }
         } catch (Exception $e) {
             error_log($e->getMessage());

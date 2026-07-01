@@ -14,7 +14,7 @@
  * @brief A repository to manage Thoth contributions
  */
 
-use ThothApi\GraphQL\Models\Contribution as ThothContribution;
+use ThothApi\GraphQL\Inputs\PatchContribution as ThothContribution;
 
 class ThothContributionRepository
 {

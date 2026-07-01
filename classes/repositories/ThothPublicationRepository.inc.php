@@ -14,7 +14,7 @@
  * @brief A repository to manage Thoth publications
  */
 
-use ThothApi\GraphQL\Models\Publication as ThothPublication;
+use ThothApi\GraphQL\Inputs\PatchPublication as ThothPublication;
 
 class ThothPublicationRepository
 {
@@ -37,24 +37,47 @@ class ThothPublicationRepository
 
     public function getIdByType($thothWorkId, $thothPublicationType)
     {
-        $query = <<<GRAPHQL
-        query(\$workId: Uuid!, \$publicationType: PublicationType!) {
-            work(workId: \$workId) {
-                publications(publicationTypes: [\$publicationType]) {
-                    publicationId
-                }
+        $thothWork = $this->thothClient->work($thothWorkId, [
+            'publications' => ['publicationId', 'publicationType'],
+        ]);
+
+        foreach ($thothWork->getPublications() ?? [] as $thothPublication) {
+            if ($thothPublication->getPublicationType() === $thothPublicationType) {
+                return $thothPublication->getPublicationId();
             }
         }
-        GRAPHQL;
 
-        $variables = [
-            'workId' => $thothWorkId,
-            'publicationType' => $thothPublicationType
-        ];
+        return null;
+    }
 
-        $result = $this->thothClient->rawQuery($query, $variables);
-        $thothPublications = $result['work']['publications'];
-        return !empty($thothPublications) ? $thothPublications[0]['publicationId'] : null;
+    public function getFilesByWorkId($thothWorkId)
+    {
+        $thothWork = $this->thothClient->work($thothWorkId, [
+            'workId',
+            'publications' => [
+                'publicationId',
+                'publicationType',
+                'file' => [
+                    'fileId',
+                    'cdnUrl',
+                    'mimeType',
+                    'objectKey',
+                ],
+            ],
+        ]);
+
+        $files = [];
+        foreach ($thothWork->getPublications() ?? [] as $thothPublication) {
+            $file = $thothPublication->getFile();
+            if ($file) {
+                $files[] = [
+                    'publicationType' => $thothPublication->getPublicationType(),
+                    'file' => $file,
+                ];
+            }
+        }
+
+        return $files;
     }
 
     public function find($filter)

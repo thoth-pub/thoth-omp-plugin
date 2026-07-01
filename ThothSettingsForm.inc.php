@@ -24,6 +24,8 @@ use PKP\form\validation\FormValidatorPost;
 use ThothApi\Exception\QueryException;
 use ThothApi\GraphQL\Client;
 
+import('plugins.generic.thoth.classes.services.ThothMeCacheService');
+
 class ThothSettingsForm extends Form
 {
     private $contextId;
@@ -151,6 +153,7 @@ class ThothSettingsForm extends Form
         foreach (self::SETTINGS as $setting) {
             $this->plugin->updateSetting($this->contextId, $setting, trim($this->getData($setting)), 'string');
         }
+        (new ThothMeCacheService())->flush($this->contextId);
         parent::execute(...$functionArgs);
     }
 
