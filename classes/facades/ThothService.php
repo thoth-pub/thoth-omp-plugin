@@ -70,6 +70,11 @@ class ThothService
         return ThothContainer::getInstance()->get('locationService');
     }
 
+    public static function me()
+    {
+        return ThothContainer::getInstance()->get('meService');
+    }
+
     public static function publication()
     {
         return ThothContainer::getInstance()->get('publicationService');

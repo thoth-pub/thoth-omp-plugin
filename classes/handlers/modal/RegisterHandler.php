@@ -21,7 +21,6 @@ namespace APP\plugins\generic\thoth\classes\handlers\modal;
 use APP\core\Application;
 use APP\handler\Handler;
 use APP\plugins\generic\thoth\classes\components\forms\RegisterForm;
-use APP\plugins\generic\thoth\classes\facades\ThothRepository;
 use APP\plugins\generic\thoth\classes\facades\ThothService;
 use APP\template\TemplateManager;
 use Exception;
@@ -106,8 +105,7 @@ class RegisterHandler extends Handler
             $errors = ThothService::book()->validate($this->publication);
 
             if (empty($errors)) {
-                $publishers = ThothRepository::me()->getLinkedPublishers();
-                $imprints = ThothRepository::imprint()->getMany(array_column($publishers, 'publisherId'));
+                $imprints = ThothService::me()->getImprints();
             }
         } catch (Exception $e) {
             error_log($e->getMessage());

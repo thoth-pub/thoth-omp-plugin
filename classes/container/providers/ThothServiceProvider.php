@@ -17,17 +17,17 @@
 
 namespace APP\plugins\generic\thoth\classes\container\providers;
 
-use APP\plugins\generic\thoth\classes\factories\ThothBookFactory;
-use APP\plugins\generic\thoth\classes\factories\ThothChapterFactory;
 use APP\plugins\generic\thoth\classes\factories\ThothAbstractFactory;
 use APP\plugins\generic\thoth\classes\factories\ThothBiographyFactory;
+use APP\plugins\generic\thoth\classes\factories\ThothBookFactory;
+use APP\plugins\generic\thoth\classes\factories\ThothChapterFactory;
 use APP\plugins\generic\thoth\classes\factories\ThothContributionFactory;
 use APP\plugins\generic\thoth\classes\factories\ThothContributorFactory;
 use APP\plugins\generic\thoth\classes\factories\ThothLocationFactory;
 use APP\plugins\generic\thoth\classes\factories\ThothPublicationFactory;
 use APP\plugins\generic\thoth\classes\factories\ThothTitleFactory;
-use APP\plugins\generic\thoth\classes\services\ThothAffiliationService;
 use APP\plugins\generic\thoth\classes\services\ThothAbstractService;
+use APP\plugins\generic\thoth\classes\services\ThothAffiliationService;
 use APP\plugins\generic\thoth\classes\services\ThothBiographyService;
 use APP\plugins\generic\thoth\classes\services\ThothBookService;
 use APP\plugins\generic\thoth\classes\services\ThothChapterService;
@@ -35,6 +35,7 @@ use APP\plugins\generic\thoth\classes\services\ThothContributionService;
 use APP\plugins\generic\thoth\classes\services\ThothContributorService;
 use APP\plugins\generic\thoth\classes\services\ThothLanguageService;
 use APP\plugins\generic\thoth\classes\services\ThothLocationService;
+use APP\plugins\generic\thoth\classes\services\ThothMeService;
 use APP\plugins\generic\thoth\classes\services\ThothPublicationService;
 use APP\plugins\generic\thoth\classes\services\ThothReferenceService;
 use APP\plugins\generic\thoth\classes\services\ThothSubjectService;
@@ -100,6 +101,10 @@ class ThothServiceProvider implements ContainerProvider
                 new ThothLocationFactory(),
                 $container->get('locationRepository')
             );
+        });
+
+        $container->set('meService', function ($container) {
+            return new ThothMeService($container->get('meRepository'));
         });
 
         $container->set('publicationService', function ($container) {

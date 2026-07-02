@@ -20,11 +20,6 @@ use APP\plugins\generic\thoth\classes\container\ThothContainer;
 
 class ThothRepository
 {
-    public static function me()
-    {
-        return ThothContainer::getInstance()->get('meRepository');
-    }
-
     public static function abstract()
     {
         return ThothContainer::getInstance()->get('abstractRepository');
@@ -68,6 +63,11 @@ class ThothRepository
     public static function location()
     {
         return ThothContainer::getInstance()->get('locationRepository');
+    }
+
+    public static function me()
+    {
+        return ThothContainer::getInstance()->get('meRepository');
     }
 
     public static function publication()

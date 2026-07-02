@@ -17,7 +17,6 @@
 namespace APP\plugins\generic\thoth\classes\components\forms\config;
 
 use APP\facades\Repo;
-use APP\plugins\generic\thoth\classes\facades\ThothRepository;
 use APP\plugins\generic\thoth\classes\facades\ThothService;
 use APP\submission\Submission;
 use Exception;
@@ -71,8 +70,7 @@ class PublishFormConfig
 
     protected function getImprints(): array
     {
-        $publishers = ThothRepository::me()->getLinkedPublishers();
-        return ThothRepository::imprint()->getMany(array_column($publishers, 'publisherId'));
+        return ThothService::me()->getImprints();
     }
 
     private function addFields($form, $imprints, $workType)

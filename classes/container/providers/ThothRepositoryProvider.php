@@ -20,7 +20,6 @@ require_once(__DIR__ . '/../../../vendor/autoload.php');
 
 use APP\core\Application;
 use APP\plugins\generic\thoth\classes\repositories\ThothAbstractRepository;
-use APP\plugins\generic\thoth\classes\repositories\ThothAccountRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothAffiliationRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothBiographyRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothBookRepository;
@@ -31,6 +30,7 @@ use APP\plugins\generic\thoth\classes\repositories\ThothImprintRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothInstitutionRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothLanguageRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothLocationRepository;
+use APP\plugins\generic\thoth\classes\repositories\ThothMeRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothPublicationRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothReferenceRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothSubjectRepository;
@@ -82,10 +82,6 @@ class ThothRepositoryProvider implements ContainerProvider
             return $client->setToken($config['token']);
         });
 
-        $container->set('meRepository', function ($container) {
-            return new ThothAccountRepository($container->get('client'));
-        });
-
         $container->set('abstractRepository', function ($container) {
             return new ThothAbstractRepository($container->get('client'));
         });
@@ -128,6 +124,11 @@ class ThothRepositoryProvider implements ContainerProvider
 
         $container->set('locationRepository', function ($container) {
             return new ThothLocationRepository($container->get('client'));
+        });
+
+        $container->set('meRepository', function ($container) {
+            $contextId = Application::get()->getRequest()->getContext()->getId();
+            return new ThothMeRepository($container->get('client'), $contextId);
         });
 
         $container->set('publicationRepository', function ($container) {
