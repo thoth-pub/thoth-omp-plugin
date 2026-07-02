@@ -21,7 +21,7 @@ namespace APP\plugins\generic\thoth\tests\classes\repositories;
 use APP\plugins\generic\thoth\classes\repositories\ThothContributorRepository;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Contributor as ThothContributor;
+use ThothApi\GraphQL\Inputs\PatchContributor as ThothContributor;
 
 class ThothContributorRepositoryTest extends PKPTestCase
 {
@@ -54,7 +54,7 @@ class ThothContributorRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['contributor'])
+            ->addMethods(['contributor'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('contributor')
@@ -78,7 +78,7 @@ class ThothContributorRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['contributors'])
+            ->addMethods(['contributors'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('contributors')
@@ -101,7 +101,7 @@ class ThothContributorRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['createContributor'])
+            ->addMethods(['createContributor'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('createContributor')
@@ -125,7 +125,7 @@ class ThothContributorRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['updateContributor'])
+            ->addMethods(['updateContributor'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('updateContributor')
@@ -140,7 +140,7 @@ class ThothContributorRepositoryTest extends PKPTestCase
     public function testDeleteContributor()
     {
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['deleteContributor'])
+            ->addMethods(['deleteContributor'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('deleteContributor')

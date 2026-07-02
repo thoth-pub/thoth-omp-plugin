@@ -21,7 +21,7 @@ namespace APP\plugins\generic\thoth\tests\classes\repositories;
 use APP\plugins\generic\thoth\classes\repositories\ThothInstitutionRepository;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Institution as ThothInstitution;
+use ThothApi\GraphQL\Inputs\PatchInstitution as ThothInstitution;
 
 class ThothInstitutionRepositoryTest extends PKPTestCase
 {
@@ -52,7 +52,7 @@ class ThothInstitutionRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['institution'])
+            ->addMethods(['institution'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('institution')
@@ -75,7 +75,7 @@ class ThothInstitutionRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['institutions'])
+            ->addMethods(['institutions'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('institutions')
@@ -97,7 +97,7 @@ class ThothInstitutionRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['createInstitution'])
+            ->addMethods(['createInstitution'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('createInstitution')
@@ -120,7 +120,7 @@ class ThothInstitutionRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['updateInstitution'])
+            ->addMethods(['updateInstitution'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('updateInstitution')
@@ -135,7 +135,7 @@ class ThothInstitutionRepositoryTest extends PKPTestCase
     public function testDeleteInstitution()
     {
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['deleteInstitution'])
+            ->addMethods(['deleteInstitution'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('deleteInstitution')

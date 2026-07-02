@@ -16,12 +16,11 @@
 
 namespace APP\plugins\generic\thoth\classes\repositories;
 
-use ThothApi\GraphQL\Models\Biography as ThothBiography;
+use ThothApi\GraphQL\Enums\MarkupFormat;
+use ThothApi\GraphQL\Inputs\PatchBiography as ThothBiography;
 
 class ThothBiographyRepository
 {
-    private const MARKUP_FORMAT = 'HTML';
-
     protected $thothClient;
 
     public function __construct($thothClient)
@@ -36,12 +35,12 @@ class ThothBiographyRepository
 
     public function add($thothBiography)
     {
-        return $this->thothClient->createBiography($thothBiography, self::MARKUP_FORMAT);
+        return $this->thothClient->createBiography(MarkupFormat::HTML, $thothBiography);
     }
 
     public function edit($thothPatchBiography)
     {
-        return $this->thothClient->updateBiography($thothPatchBiography, self::MARKUP_FORMAT);
+        return $this->thothClient->updateBiography(MarkupFormat::HTML, $thothPatchBiography);
     }
 
     public function delete($thothBiographyId)

@@ -16,7 +16,7 @@
 
 namespace APP\plugins\generic\thoth\classes\repositories;
 
-use ThothApi\GraphQL\Models\Affiliation as ThothAffiliation;
+use ThothApi\GraphQL\Inputs\PatchAffiliation as ThothAffiliation;
 
 class ThothAffiliationRepository
 {

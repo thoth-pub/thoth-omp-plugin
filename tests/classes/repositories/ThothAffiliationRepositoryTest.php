@@ -21,7 +21,7 @@ namespace APP\plugins\generic\thoth\tests\classes\repositories;
 use APP\plugins\generic\thoth\classes\repositories\ThothAffiliationRepository;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Affiliation as ThothAffiliation;
+use ThothApi\GraphQL\Inputs\PatchAffiliation as ThothAffiliation;
 
 class ThothAffiliationRepositoryTest extends PKPTestCase
 {
@@ -55,7 +55,7 @@ class ThothAffiliationRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['affiliation'])
+            ->addMethods(['affiliation'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('affiliation')
@@ -78,7 +78,7 @@ class ThothAffiliationRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['createAffiliation'])
+            ->addMethods(['createAffiliation'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('createAffiliation')
@@ -102,7 +102,7 @@ class ThothAffiliationRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['updateAffiliation'])
+            ->addMethods(['updateAffiliation'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('updateAffiliation')
@@ -118,7 +118,7 @@ class ThothAffiliationRepositoryTest extends PKPTestCase
     public function testDeleteAffiliation()
     {
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['deleteAffiliation'])
+            ->addMethods(['deleteAffiliation'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('deleteAffiliation')

@@ -17,7 +17,7 @@
 namespace APP\plugins\generic\thoth\classes\factories;
 
 use APP\plugins\generic\thoth\classes\i18n\ThothLocaleCode;
-use ThothApi\GraphQL\Models\Title as ThothTitle;
+use ThothApi\GraphQL\Inputs\PatchTitle as ThothTitle;
 
 class ThothTitleFactory
 {

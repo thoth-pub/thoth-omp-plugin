@@ -20,9 +20,9 @@ use APP\plugins\generic\thoth\classes\container\ThothContainer;
 
 class ThothRepository
 {
-    public static function account()
+    public static function me()
     {
-        return ThothContainer::getInstance()->get('accountRepository');
+        return ThothContainer::getInstance()->get('meRepository');
     }
 
     public static function abstract()

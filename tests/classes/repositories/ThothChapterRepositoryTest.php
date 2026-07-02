@@ -21,7 +21,7 @@ namespace APP\plugins\generic\thoth\tests\classes\repositories;
 use APP\plugins\generic\thoth\classes\repositories\ThothChapterRepository;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Work as ThothWork;
+use ThothApi\GraphQL\Inputs\PatchWork as ThothWork;
 
 class ThothChapterRepositoryTest extends PKPTestCase
 {
@@ -32,7 +32,7 @@ class ThothChapterRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['chapterByDoi'])
+            ->addMethods(['chapterByDoi'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('chapterByDoi')
@@ -52,7 +52,7 @@ class ThothChapterRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['chapters'])
+            ->addMethods(['chapters'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('chapters')

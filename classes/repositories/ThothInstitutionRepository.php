@@ -16,7 +16,7 @@
 
 namespace APP\plugins\generic\thoth\classes\repositories;
 
-use ThothApi\GraphQL\Models\Institution as ThothInstitution;
+use ThothApi\GraphQL\Inputs\PatchInstitution as ThothInstitution;
 
 class ThothInstitutionRepository
 {

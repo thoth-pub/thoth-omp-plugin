@@ -21,7 +21,7 @@ namespace APP\plugins\generic\thoth\tests\classes\repositories;
 use APP\plugins\generic\thoth\classes\repositories\ThothReferenceRepository;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Reference as ThothReference;
+use ThothApi\GraphQL\Inputs\PatchReference as ThothReference;
 
 class ThothReferenceRepositoryTest extends PKPTestCase
 {
@@ -52,7 +52,7 @@ class ThothReferenceRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['reference'])
+            ->addMethods(['reference'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('reference')
@@ -74,7 +74,7 @@ class ThothReferenceRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['createReference'])
+            ->addMethods(['createReference'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('createReference')
@@ -97,7 +97,7 @@ class ThothReferenceRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['updateReference'])
+            ->addMethods(['updateReference'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('updateReference')
@@ -113,7 +113,7 @@ class ThothReferenceRepositoryTest extends PKPTestCase
     public function testDeleteReference()
     {
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['deleteReference'])
+            ->addMethods(['deleteReference'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('deleteReference')

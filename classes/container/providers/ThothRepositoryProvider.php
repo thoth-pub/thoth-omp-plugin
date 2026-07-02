@@ -19,8 +19,8 @@ namespace APP\plugins\generic\thoth\classes\container\providers;
 require_once(__DIR__ . '/../../../vendor/autoload.php');
 
 use APP\core\Application;
-use APP\plugins\generic\thoth\classes\repositories\ThothAccountRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothAbstractRepository;
+use APP\plugins\generic\thoth\classes\repositories\ThothAccountRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothAffiliationRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothBiographyRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothBookRepository;
@@ -82,14 +82,8 @@ class ThothRepositoryProvider implements ContainerProvider
             return $client->setToken($config['token']);
         });
 
-        $container->set('accountRepository', function ($container) {
-            $config = $container->get('config');
-            $httpConfig = [];
-            if ($config['customThothApi'] && $config['customThothApiUrl']) {
-                $httpConfig['base_uri'] = trim($config['customThothApiUrl']);
-            }
-
-            return new ThothAccountRepository($container->get('client'), $httpConfig, $config['token']);
+        $container->set('meRepository', function ($container) {
+            return new ThothAccountRepository($container->get('client'));
         });
 
         $container->set('abstractRepository', function ($container) {

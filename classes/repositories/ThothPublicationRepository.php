@@ -16,7 +16,7 @@
 
 namespace APP\plugins\generic\thoth\classes\repositories;
 
-use ThothApi\GraphQL\Models\Publication as ThothPublication;
+use ThothApi\GraphQL\Inputs\PatchPublication as ThothPublication;
 
 class ThothPublicationRepository
 {

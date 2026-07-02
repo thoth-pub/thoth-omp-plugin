@@ -21,7 +21,7 @@ namespace APP\plugins\generic\thoth\tests\classes\repositories;
 use APP\plugins\generic\thoth\classes\repositories\ThothBiographyRepository;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Biography as ThothBiography;
+use ThothApi\GraphQL\Inputs\PatchBiography as ThothBiography;
 
 class ThothBiographyRepositoryTest extends PKPTestCase
 {
@@ -53,7 +53,7 @@ class ThothBiographyRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['createBiography'])
+            ->addMethods(['createBiography'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('createBiography')
@@ -77,7 +77,7 @@ class ThothBiographyRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['updateBiography'])
+            ->addMethods(['updateBiography'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('updateBiography')
@@ -93,7 +93,7 @@ class ThothBiographyRepositoryTest extends PKPTestCase
     public function testDeleteBiography()
     {
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['deleteBiography'])
+            ->addMethods(['deleteBiography'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('deleteBiography')

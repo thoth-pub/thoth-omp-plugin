@@ -19,7 +19,9 @@ namespace APP\plugins\generic\thoth\classes\factories;
 use APP\core\Application;
 use APP\facades\Repo;
 use PKP\core\Core;
-use ThothApi\GraphQL\Models\Work as ThothWork;
+use ThothApi\GraphQL\Enums\WorkStatus;
+use ThothApi\GraphQL\Enums\WorkType;
+use ThothApi\GraphQL\Inputs\PatchWork as ThothWork;
 
 class ThothChapterFactory
 {
@@ -33,7 +35,7 @@ class ThothChapterFactory
         $pages = $this->extractPages($chapter);
 
         return new ThothWork([
-            'workType' => ThothWork::WORK_TYPE_BOOK_CHAPTER,
+            'workType' => WorkType::BOOK_CHAPTER,
             'workStatus' => $this->getWorkStatusByDatePublished($chapter, $publication),
             'doi' => $chapter->getData('doiObject')?->getResolvingUrl(),
             'pageInterval' => $pages['pageInterval'] ?? null,
@@ -56,10 +58,10 @@ class ThothChapterFactory
         $dataPublished = $chapter->getDatePublished() ?? $publication->getData('datePublished');
 
         if ($dataPublished && $dataPublished <= Core::getCurrentDate()) {
-            return ThothWork::WORK_STATUS_ACTIVE;
+            return WorkStatus::ACTIVE;
         }
 
-        return ThothWork::WORK_STATUS_FORTHCOMING;
+        return WorkStatus::FORTHCOMING;
     }
 
     private function extractPages($chapter): array

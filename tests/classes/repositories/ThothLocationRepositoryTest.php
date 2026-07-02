@@ -21,7 +21,8 @@ namespace APP\plugins\generic\thoth\tests\classes\repositories;
 use APP\plugins\generic\thoth\classes\repositories\ThothLocationRepository;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Location as ThothLocation;
+use ThothApi\GraphQL\Enums\LocationPlatform;
+use ThothApi\GraphQL\Inputs\PatchLocation as ThothLocation;
 
 class ThothLocationRepositoryTest extends PKPTestCase
 {
@@ -30,7 +31,7 @@ class ThothLocationRepositoryTest extends PKPTestCase
         $data = [
             'landingPage' => 'https://omp.publicknowledgeproject.org/press/catalog/book/12',
             'fullTextUrl' => 'https://omp.publicknowledgeproject.org/press/catalog/book/12/view',
-            'locationPlatform' => ThothLocation::LOCATION_PLATFORM_OTHER,
+            'locationPlatform' => LocationPlatform::OTHER,
         ];
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)->getMock();
@@ -48,11 +49,11 @@ class ThothLocationRepositoryTest extends PKPTestCase
             'locationId' => 'e2c57d05-b0e4-460e-a4c5-72c91b383b75',
             'landingPage' => 'https://omp.publicknowledgeproject.org/press/catalog/book/12',
             'fullTextUrl' => 'https://omp.publicknowledgeproject.org/press/catalog/book/12/view',
-            'locationPlatform' => ThothLocation::LOCATION_PLATFORM_OTHER,
+            'locationPlatform' => LocationPlatform::OTHER,
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['location'])
+            ->addMethods(['location'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('location')
@@ -98,11 +99,11 @@ class ThothLocationRepositoryTest extends PKPTestCase
         $thothLocation = new ThothLocation([
             'landingPage' => 'https://omp.publicknowledgeproject.org/press/catalog/book/12',
             'fullTextUrl' => 'https://omp.publicknowledgeproject.org/press/catalog/book/12/view',
-            'locationPlatform' => ThothLocation::LOCATION_PLATFORM_OTHER,
+            'locationPlatform' => LocationPlatform::OTHER,
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['createLocation'])
+            ->addMethods(['createLocation'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('createLocation')
@@ -121,11 +122,11 @@ class ThothLocationRepositoryTest extends PKPTestCase
             'locationId' => 'a8a397a0-ee70-466b-948a-41d7b1e3069b',
             'landingPage' => 'https://omp.publicknowledgeproject.org/my_press/catalog/book/12',
             'fullTextUrl' => 'https://omp.publicknowledgeproject.org/my_press/catalog/book/12/view',
-            'locationPlatform' => ThothLocation::LOCATION_PLATFORM_OTHER,
+            'locationPlatform' => LocationPlatform::OTHER,
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['updateLocation'])
+            ->addMethods(['updateLocation'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('updateLocation')
@@ -141,7 +142,7 @@ class ThothLocationRepositoryTest extends PKPTestCase
     public function testDeleteLocation()
     {
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['deleteLocation'])
+            ->addMethods(['deleteLocation'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('deleteLocation')

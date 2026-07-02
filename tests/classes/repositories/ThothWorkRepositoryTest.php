@@ -21,7 +21,8 @@ namespace APP\plugins\generic\thoth\tests\classes\repositories;
 use APP\plugins\generic\thoth\classes\repositories\ThothWorkRepository;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Work as ThothWork;
+use ThothApi\GraphQL\Enums\WorkType;
+use ThothApi\GraphQL\Inputs\PatchWork as ThothWork;
 
 class ThothWorkRepositoryTest extends PKPTestCase
 {
@@ -29,8 +30,8 @@ class ThothWorkRepositoryTest extends PKPTestCase
     {
         $data = [
             'imprintId' => '5eaef26f-adf6-4d68-b938-d61bdc389ebd',
-            'workType' => ThothWork::WORK_TYPE_EDITED_BOOK,
-            'workStatus' => ThothWork::WORK_TYPE_EDITED_BOOK,
+            'workType' => WorkType::EDITED_BOOK,
+            'workStatus' => WorkType::EDITED_BOOK,
             'fullTitle' => 'My book title',
             'title' => 'My book title',
         ];
@@ -49,14 +50,14 @@ class ThothWorkRepositoryTest extends PKPTestCase
         $expectedThothWork = new ThothWork([
             'workId' => '35a27dc3-8117-4381-9a8f-54ef5def6f0b',
             'imprintId' => '5eaef26f-adf6-4d68-b938-d61bdc389ebd',
-            'workType' => ThothWork::WORK_TYPE_EDITED_BOOK,
-            'workStatus' => ThothWork::WORK_TYPE_EDITED_BOOK,
+            'workType' => WorkType::EDITED_BOOK,
+            'workStatus' => WorkType::EDITED_BOOK,
             'fullTitle' => 'My book title',
             'title' => 'My book title',
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['work'])
+            ->addMethods(['work'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('work')
@@ -73,14 +74,14 @@ class ThothWorkRepositoryTest extends PKPTestCase
     {
         $thothWork = new ThothWork([
             'imprintId' => '5eaef26f-adf6-4d68-b938-d61bdc389ebd',
-            'workType' => ThothWork::WORK_TYPE_EDITED_BOOK,
-            'workStatus' => ThothWork::WORK_TYPE_EDITED_BOOK,
+            'workType' => WorkType::EDITED_BOOK,
+            'workStatus' => WorkType::EDITED_BOOK,
             'fullTitle' => 'My book title',
             'title' => 'My book title',
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['createWork'])
+            ->addMethods(['createWork'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('createWork')
@@ -98,14 +99,14 @@ class ThothWorkRepositoryTest extends PKPTestCase
         $thothPatchWork = new ThothWork([
             'workId' => '8ea11ca6-a2e2-4da7-8f4e-7738e9dcaac9',
             'imprintId' => '5eaef26f-adf6-4d68-b938-d61bdc389ebd',
-            'workType' => ThothWork::WORK_TYPE_EDITED_BOOK,
-            'workStatus' => ThothWork::WORK_TYPE_EDITED_BOOK,
+            'workType' => WorkType::EDITED_BOOK,
+            'workStatus' => WorkType::EDITED_BOOK,
             'fullTitle' => 'My edited book title',
             'title' => 'My edited book title',
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['updateWork'])
+            ->addMethods(['updateWork'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('updateWork')
@@ -121,7 +122,7 @@ class ThothWorkRepositoryTest extends PKPTestCase
     public function testDeleteWork()
     {
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['deleteWork'])
+            ->addMethods(['deleteWork'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('deleteWork')

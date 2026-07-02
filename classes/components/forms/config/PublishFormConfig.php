@@ -19,10 +19,9 @@ namespace APP\plugins\generic\thoth\classes\components\forms\config;
 use APP\facades\Repo;
 use APP\plugins\generic\thoth\classes\facades\ThothRepository;
 use APP\plugins\generic\thoth\classes\facades\ThothService;
-use APP\plugins\generic\thoth\classes\notification\ThothNotification;
 use APP\submission\Submission;
 use Exception;
-use ThothApi\GraphQL\Models\Work as ThothWork;
+use ThothApi\GraphQL\Enums\WorkType;
 
 class PublishFormConfig
 {
@@ -72,7 +71,7 @@ class PublishFormConfig
 
     protected function getImprints(): array
     {
-        $publishers = ThothRepository::account()->getLinkedPublishers();
+        $publishers = ThothRepository::me()->getLinkedPublishers();
         return ThothRepository::imprint()->getMany(array_column($publishers, 'publisherId'));
     }
 
@@ -109,11 +108,11 @@ class PublishFormConfig
 
         $workTypeOptions = [
             [
-                'value' => ThothWork::WORK_TYPE_MONOGRAPH,
+                'value' => WorkType::MONOGRAPH,
                 'label' => __('plugins.generic.thoth.workType.monograph')
             ],
             [
-                'value' => ThothWork::WORK_TYPE_TEXTBOOK,
+                'value' => WorkType::TEXTBOOK,
                 'label' => __('plugins.generic.thoth.workType.textbook')
             ],
         ];

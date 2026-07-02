@@ -18,12 +18,45 @@ namespace APP\plugins\generic\thoth\classes\services;
 
 use APP\plugins\generic\thoth\classes\facades\ThothService;
 use PKP\db\DAORegistry;
-use ThothApi\GraphQL\Models\Work as ThothWork;
+use ThothApi\GraphQL\Enums\WorkStatus;
 
 class ThothBookService
 {
     public $factory;
     public $repository;
+
+    private const PATCH_WORK_FIELDS = [
+        'workId' => true,
+        'workType' => true,
+        'workStatus' => true,
+        'reference' => true,
+        'edition' => true,
+        'imprintId' => true,
+        'doi' => true,
+        'publicationDate' => true,
+        'withdrawnDate' => true,
+        'place' => true,
+        'pageCount' => true,
+        'pageBreakdown' => true,
+        'imageCount' => true,
+        'tableCount' => true,
+        'audioCount' => true,
+        'videoCount' => true,
+        'license' => true,
+        'copyrightHolder' => true,
+        'landingPage' => true,
+        'lccn' => true,
+        'oclc' => true,
+        'generalNote' => true,
+        'bibliographyNote' => true,
+        'toc' => true,
+        'resourcesDescription' => true,
+        'coverUrl' => true,
+        'coverCaption' => true,
+        'firstPage' => true,
+        'lastPage' => true,
+        'pageInterval' => true,
+    ];
 
     private $originalThothBook;
     private $registeredEntryId;
@@ -59,9 +92,9 @@ class ThothBookService
         $thothBook = $this->factory->createFromPublication($publication);
         $thothBook->setImprintId($thothImprintId);
 
-        if ($thothBook->getWorkStatus() === ThothWork::WORK_STATUS_ACTIVE) {
+        if ($thothBook->getWorkStatus() === WorkStatus::ACTIVE) {
             $this->setOriginalThothBook($thothBook);
-            $thothBook->setWorkStatus(ThothWork::WORK_STATUS_FORTHCOMING);
+            $thothBook->setWorkStatus(WorkStatus::FORTHCOMING);
         }
 
         $thothBookId = $this->repository->add($thothBook);
@@ -85,12 +118,17 @@ class ThothBookService
         $newThothBook = $this->factory->createFromPublication($publication);
 
         $thothBook = $this->repository->new(array_merge(
-            $oldThothBook->getAllData(),
+            $this->getPatchWorkData($oldThothBook),
             $newThothBook->getAllData()
         ));
 
         $this->repository->edit($thothBook);
         $this->updateMetadata($publication, $thothBookId, $oldThothBook);
+    }
+
+    private function getPatchWorkData($thothBook): array
+    {
+        return array_intersect_key($thothBook->toArray(), self::PATCH_WORK_FIELDS);
     }
 
     public function validate($publication)
@@ -151,7 +189,7 @@ class ThothBookService
 
         $thothBook = $this->getOriginalThothBook();
         $thothBook->setWorkId($this->getRegisteredEntryId());
-        $thothBook->setWorkStatus(ThothWork::WORK_STATUS_ACTIVE);
+        $thothBook->setWorkStatus(WorkStatus::ACTIVE);
         $this->repository->edit($thothBook);
     }
 
@@ -174,13 +212,13 @@ class ThothBookService
         ThothService::title()->updateByPublication(
             $publication,
             $thothBookId,
-            $oldThothBook->getData('titles') ?? [],
+            $oldThothBook->toArray()['titles'] ?? [],
             $publication->getData('locale')
         );
         ThothService::abstract()->updateByPublication(
             $publication,
             $thothBookId,
-            $oldThothBook->getData('abstracts') ?? [],
+            $oldThothBook->toArray()['abstracts'] ?? [],
             $publication->getData('locale')
         );
     }

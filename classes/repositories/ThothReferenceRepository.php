@@ -16,7 +16,7 @@
 
 namespace APP\plugins\generic\thoth\classes\repositories;
 
-use ThothApi\GraphQL\Models\Reference as ThothReference;
+use ThothApi\GraphQL\Inputs\PatchReference as ThothReference;
 
 class ThothReferenceRepository
 {

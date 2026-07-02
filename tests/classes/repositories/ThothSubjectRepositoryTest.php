@@ -21,7 +21,8 @@ namespace APP\plugins\generic\thoth\tests\classes\repositories;
 use APP\plugins\generic\thoth\classes\repositories\ThothSubjectRepository;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Subject as ThothSubject;
+use ThothApi\GraphQL\Enums\SubjectType;
+use ThothApi\GraphQL\Inputs\PatchSubject as ThothSubject;
 
 class ThothSubjectRepositoryTest extends PKPTestCase
 {
@@ -29,7 +30,7 @@ class ThothSubjectRepositoryTest extends PKPTestCase
     {
         $data = [
             'workId' => '2e38b2af-90fc-4610-8e57-d365fd8e00e2',
-            'subjectType' => ThothSubject::SUBJECT_TYPE_KEYWORD,
+            'subjectType' => SubjectType::KEYWORD,
             'subjectCode' => 'Psychology',
             'subjectOrdinal' => 1
         ];
@@ -48,13 +49,13 @@ class ThothSubjectRepositoryTest extends PKPTestCase
         $expectedThothSubject = new ThothSubject([
             'subjectId' => '7250f980-3a2b-4922-b2a9-559c946ffc29',
             'workId' => '2e38b2af-90fc-4610-8e57-d365fd8e00e2',
-            'subjectType' => ThothSubject::SUBJECT_TYPE_KEYWORD,
+            'subjectType' => SubjectType::KEYWORD,
             'subjectCode' => 'Psychology',
             'subjectOrdinal' => 1
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['subject'])
+            ->addMethods(['subject'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('subject')
@@ -71,13 +72,13 @@ class ThothSubjectRepositoryTest extends PKPTestCase
     {
         $thothSubject = new ThothSubject([
             'workId' => '2e38b2af-90fc-4610-8e57-d365fd8e00e2',
-            'subjectType' => ThothSubject::SUBJECT_TYPE_KEYWORD,
+            'subjectType' => SubjectType::KEYWORD,
             'subjectCode' => 'Psychology',
             'subjectOrdinal' => 1
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['createSubject'])
+            ->addMethods(['createSubject'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('createSubject')
@@ -95,13 +96,13 @@ class ThothSubjectRepositoryTest extends PKPTestCase
         $thothPatchSubject = new ThothSubject([
             'subjectId' => '8f9e7255-010c-4c6f-a6df-035a501513a9',
             'workId' => '2e38b2af-90fc-4610-8e57-d365fd8e00e2',
-            'subjectType' => ThothSubject::SUBJECT_TYPE_BISAC,
+            'subjectType' => SubjectType::BISAC,
             'subjectCode' => '1D',
             'subjectOrdinal' => 1
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['updateSubject'])
+            ->addMethods(['updateSubject'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('updateSubject')
@@ -117,7 +118,7 @@ class ThothSubjectRepositoryTest extends PKPTestCase
     public function testDeleteSubject()
     {
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['deleteSubject'])
+            ->addMethods(['deleteSubject'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('deleteSubject')

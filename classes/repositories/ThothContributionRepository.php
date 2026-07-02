@@ -16,7 +16,7 @@
 
 namespace APP\plugins\generic\thoth\classes\repositories;
 
-use ThothApi\GraphQL\Models\Contribution as ThothContribution;
+use ThothApi\GraphQL\Inputs\PatchContribution as ThothContribution;
 
 class ThothContributionRepository
 {

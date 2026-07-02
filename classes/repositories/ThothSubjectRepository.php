@@ -16,7 +16,7 @@
 
 namespace APP\plugins\generic\thoth\classes\repositories;
 
-use ThothApi\GraphQL\Models\Subject as ThothSubject;
+use ThothApi\GraphQL\Inputs\PatchSubject as ThothSubject;
 
 class ThothSubjectRepository
 {

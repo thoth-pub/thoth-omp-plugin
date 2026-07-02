@@ -21,7 +21,7 @@ namespace APP\plugins\generic\thoth\tests\classes\repositories;
 use APP\plugins\generic\thoth\classes\repositories\ThothTitleRepository;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Title as ThothTitle;
+use ThothApi\GraphQL\Inputs\PatchTitle as ThothTitle;
 
 class ThothTitleRepositoryTest extends PKPTestCase
 {
@@ -57,7 +57,7 @@ class ThothTitleRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['createTitle'])
+            ->addMethods(['createTitle'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('createTitle')
@@ -83,7 +83,7 @@ class ThothTitleRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['updateTitle'])
+            ->addMethods(['updateTitle'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('updateTitle')
@@ -99,7 +99,7 @@ class ThothTitleRepositoryTest extends PKPTestCase
     public function testDeleteTitle()
     {
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['deleteTitle'])
+            ->addMethods(['deleteTitle'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('deleteTitle')

@@ -24,7 +24,7 @@ use APP\plugins\generic\thoth\classes\repositories\ThothContributorRepository;
 use APP\plugins\generic\thoth\classes\services\ThothContributorService;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Contributor as ThothContributor;
+use ThothApi\GraphQL\Inputs\PatchContributor as ThothContributor;
 
 class ThothContributorServiceTest extends PKPTestCase
 {

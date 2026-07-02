@@ -16,7 +16,8 @@
 
 namespace APP\plugins\generic\thoth\classes\factories;
 
-use ThothApi\GraphQL\Models\Contribution as ThothContribution;
+use ThothApi\GraphQL\Enums\ContributionType;
+use ThothApi\GraphQL\Inputs\PatchContribution as ThothContribution;
 
 class ThothContributionFactory
 {
@@ -46,10 +47,10 @@ class ThothContributionFactory
     private function getContributionTypeByUserGroupLocaleKey($userGroupLocaleKey)
     {
         $contributionTypeMapping = [
-            'default.groups.name.author' => ThothContribution::CONTRIBUTION_TYPE_AUTHOR,
-            'default.groups.name.chapterAuthor' => ThothContribution::CONTRIBUTION_TYPE_AUTHOR,
-            'default.groups.name.volumeEditor' => ThothContribution::CONTRIBUTION_TYPE_EDITOR,
-            'default.groups.name.translator' => ThothContribution::CONTRIBUTION_TYPE_TRANSLATOR,
+            'default.groups.name.author' => ContributionType::AUTHOR,
+            'default.groups.name.chapterAuthor' => ContributionType::AUTHOR,
+            'default.groups.name.volumeEditor' => ContributionType::EDITOR,
+            'default.groups.name.translator' => ContributionType::TRANSLATOR,
         ];
         return $contributionTypeMapping[$userGroupLocaleKey];
     }

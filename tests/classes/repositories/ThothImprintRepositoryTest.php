@@ -21,7 +21,7 @@ namespace APP\plugins\generic\thoth\tests\classes\repositories;
 use APP\plugins\generic\thoth\classes\repositories\ThothImprintRepository;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Imprint as ThothImprint;
+use ThothApi\GraphQL\Schemas\Imprint as ThothImprint;
 
 class ThothImprintRepositoryTest extends PKPTestCase
 {
@@ -34,7 +34,7 @@ class ThothImprintRepositoryTest extends PKPTestCase
         ];
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['imprints'])
+            ->addMethods(['imprints'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('imprints')
@@ -52,7 +52,7 @@ class ThothImprintRepositoryTest extends PKPTestCase
     public function testGetImprintsReturnsEmptyArrayWithoutLinkedPublishers()
     {
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['imprints'])
+            ->addMethods(['imprints'])
             ->getMock();
         $mockThothClient->expects($this->never())
             ->method('imprints');

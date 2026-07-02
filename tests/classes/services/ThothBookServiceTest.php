@@ -20,9 +20,7 @@ namespace APP\plugins\generic\thoth\tests\classes\services;
 
 use APP\plugins\generic\thoth\classes\container\ThothContainer;
 use APP\plugins\generic\thoth\classes\factories\ThothBookFactory;
-use APP\plugins\generic\thoth\classes\repositories\ThothAbstractRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothBookRepository;
-use APP\plugins\generic\thoth\classes\repositories\ThothTitleRepository;
 use APP\plugins\generic\thoth\classes\services\ThothAbstractService;
 use APP\plugins\generic\thoth\classes\services\ThothBookService;
 use APP\plugins\generic\thoth\classes\services\ThothContributionService;
@@ -34,7 +32,7 @@ use APP\plugins\generic\thoth\classes\services\ThothTitleService;
 use APP\plugins\generic\thoth\classes\services\ThothWorkRelationService;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Work as ThothWork;
+use ThothApi\GraphQL\Inputs\PatchWork as ThothWork;
 
 class ThothBookServiceTest extends PKPTestCase
 {

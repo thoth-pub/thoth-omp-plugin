@@ -18,7 +18,7 @@ namespace APP\plugins\generic\thoth\classes\factories;
 
 use APP\plugins\generic\thoth\classes\formatters\ThothMarkupFormatter;
 use APP\plugins\generic\thoth\classes\i18n\ThothLocaleCode;
-use ThothApi\GraphQL\Models\AbstractText as ThothAbstract;
+use ThothApi\GraphQL\Inputs\PatchAbstract as ThothAbstract;
 
 class ThothAbstractFactory
 {

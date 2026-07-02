@@ -21,7 +21,7 @@ namespace APP\plugins\generic\thoth\tests\classes\repositories;
 use APP\plugins\generic\thoth\classes\repositories\ThothAbstractRepository;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\AbstractText as ThothAbstract;
+use ThothApi\GraphQL\Inputs\PatchAbstract as ThothAbstract;
 
 class ThothAbstractRepositoryTest extends PKPTestCase
 {
@@ -55,7 +55,7 @@ class ThothAbstractRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['createAbstract'])
+            ->addMethods(['createAbstract'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('createAbstract')
@@ -80,7 +80,7 @@ class ThothAbstractRepositoryTest extends PKPTestCase
         ]);
 
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['updateAbstract'])
+            ->addMethods(['updateAbstract'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('updateAbstract')
@@ -96,7 +96,7 @@ class ThothAbstractRepositoryTest extends PKPTestCase
     public function testDeleteAbstract()
     {
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['deleteAbstract'])
+            ->addMethods(['deleteAbstract'])
             ->getMock();
         $mockThothClient->expects($this->any())
             ->method('deleteAbstract')

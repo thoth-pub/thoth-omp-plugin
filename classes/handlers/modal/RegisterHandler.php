@@ -23,7 +23,6 @@ use APP\handler\Handler;
 use APP\plugins\generic\thoth\classes\components\forms\RegisterForm;
 use APP\plugins\generic\thoth\classes\facades\ThothRepository;
 use APP\plugins\generic\thoth\classes\facades\ThothService;
-use APP\plugins\generic\thoth\classes\notification\ThothNotification;
 use APP\template\TemplateManager;
 use Exception;
 use PKP\core\JSONMessage;
@@ -107,7 +106,7 @@ class RegisterHandler extends Handler
             $errors = ThothService::book()->validate($this->publication);
 
             if (empty($errors)) {
-                $publishers = ThothRepository::account()->getLinkedPublishers();
+                $publishers = ThothRepository::me()->getLinkedPublishers();
                 $imprints = ThothRepository::imprint()->getMany(array_column($publishers, 'publisherId'));
             }
         } catch (Exception $e) {

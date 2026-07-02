@@ -31,7 +31,7 @@ use Illuminate\Support\LazyCollection;
 use Mockery;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Work as ThothWork;
+use ThothApi\GraphQL\Inputs\PatchWork as ThothWork;
 
 class ThothChapterServiceTest extends PKPTestCase
 {

@@ -16,7 +16,7 @@
 
 namespace APP\plugins\generic\thoth\classes\repositories;
 
-use ThothApi\GraphQL\Models\Language as ThothLanguage;
+use ThothApi\GraphQL\Inputs\PatchLanguage as ThothLanguage;
 
 class ThothLanguageRepository
 {

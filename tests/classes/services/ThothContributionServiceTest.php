@@ -26,8 +26,8 @@ use APP\plugins\generic\thoth\classes\services\ThothBiographyService;
 use APP\plugins\generic\thoth\classes\services\ThothContributionService;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Contribution as ThothContribution;
-use ThothApi\GraphQL\Models\Contributor as ThothContributor;
+use ThothApi\GraphQL\Inputs\PatchContribution as ThothContribution;
+use ThothApi\GraphQL\Inputs\PatchContributor as ThothContributor;
 
 class ThothContributionServiceTest extends PKPTestCase
 {
