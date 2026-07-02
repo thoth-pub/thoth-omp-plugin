@@ -18,25 +18,35 @@
 
 namespace APP\plugins\generic\thoth\tests\classes\services;
 
+require_once(__DIR__ . '/../../../vendor/autoload.php');
+
 use APP\plugins\generic\thoth\classes\repositories\ThothLanguageRepository;
 use APP\plugins\generic\thoth\classes\services\ThothLanguageService;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
+use ThothApi\GraphQL\Enums\LanguageRelation;
 
 class ThothLanguageServiceTest extends PKPTestCase
 {
     public function testRegisterLanguage()
     {
+        $locale = 'en_US';
+        $thothWorkId = 'fdd9321f-84e3-4d19-a914-24289e8aec09';
+
         $mockRepository = $this->getMockBuilder(ThothLanguageRepository::class)
             ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
             ->onlyMethods(['add'])
             ->getMock();
         $mockRepository->expects($this->once())
             ->method('add')
+            ->with($this->callback(function ($thothLanguage) use ($thothWorkId) {
+                return $thothLanguage->getAllData() === [
+                    'workId' => $thothWorkId,
+                    'languageCode' => 'ENG',
+                    'languageRelation' => LanguageRelation::ORIGINAL,
+                ];
+            }))
             ->willReturn('d3ddc7b3-d5f3-4394-9c34-320cd222a497');
-
-        $locale = 'en_US';
-        $thothWorkId = 'fdd9321f-84e3-4d19-a914-24289e8aec09';
 
         $service = new ThothLanguageService($mockRepository);
         $thothLanguageId = $service->register($locale, $thothWorkId);
