@@ -17,7 +17,7 @@
 namespace APP\plugins\generic\thoth\classes\services;
 
 use PKP\i18n\LocaleConversion;
-use ThothApi\GraphQL\Models\Language as ThothLanguage;
+use ThothApi\GraphQL\Enums\LanguageRelation;
 
 class ThothLanguageService
 {
@@ -33,8 +33,7 @@ class ThothLanguageService
         $thothLanguage = $this->repository->new([
             'workId' => $thothWorkId,
             'languageCode' => strtoupper(LocaleConversion::get3LetterIsoFromLocale($locale)),
-            'languageRelation' => ThothLanguage::LANGUAGE_RELATION_ORIGINAL,
-            'mainLanguage' => true
+            'languageRelation' => LanguageRelation::ORIGINAL
         ]);
 
         return $this->repository->add($thothLanguage);

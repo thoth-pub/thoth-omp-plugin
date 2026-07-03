@@ -25,7 +25,7 @@ use APP\plugins\generic\thoth\classes\services\ThothPublicationService;
 use APP\publicationFormat\PublicationFormat;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Publication as ThothPublication;
+use ThothApi\GraphQL\Inputs\PatchPublication as ThothPublication;
 
 class ThothPublicationServiceTest extends PKPTestCase
 {

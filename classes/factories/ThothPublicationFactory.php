@@ -16,7 +16,8 @@
 
 namespace APP\plugins\generic\thoth\classes\factories;
 
-use ThothApi\GraphQL\Models\Publication as ThothPublication;
+use ThothApi\GraphQL\Inputs\PatchPublication as ThothPublication;
+use ThothApi\GraphQL\Enums\PublicationType;
 
 class ThothPublicationFactory
 {
@@ -28,57 +29,57 @@ class ThothPublicationFactory
     ];
 
     private const PHYSICAL_PUBLICATION_TYPE_MAPPING = [
-        'BC' => ThothPublication::PUBLICATION_TYPE_PAPERBACK,
-        'BB' => ThothPublication::PUBLICATION_TYPE_HARDBACK,
+        'BC' => PublicationType::PAPERBACK,
+        'BB' => PublicationType::HARDBACK,
     ];
 
     private const DIGITAL_PUBLICATION_TYPE_MAPPING = [
-        'html' => ThothPublication::PUBLICATION_TYPE_HTML,
-        'htm' => ThothPublication::PUBLICATION_TYPE_HTML,
-        'xhtml' => ThothPublication::PUBLICATION_TYPE_HTML,
-        'pdf' => ThothPublication::PUBLICATION_TYPE_PDF,
-        'xml' => ThothPublication::PUBLICATION_TYPE_XML,
-        'jats' => ThothPublication::PUBLICATION_TYPE_XML,
-        'epub' => ThothPublication::PUBLICATION_TYPE_EPUB,
-        'mobi' => ThothPublication::PUBLICATION_TYPE_MOBI,
-        'azw3' => ThothPublication::PUBLICATION_TYPE_AZW3,
-        'doc' => ThothPublication::PUBLICATION_TYPE_DOCX,
-        'docx' => ThothPublication::PUBLICATION_TYPE_DOCX,
-        'fb2' => ThothPublication::PUBLICATION_TYPE_FICTION_BOOK,
-        'fictionbook' => ThothPublication::PUBLICATION_TYPE_FICTION_BOOK,
-        'wav' => ThothPublication::PUBLICATION_TYPE_WAV,
-        'mp3' => ThothPublication::PUBLICATION_TYPE_MP3,
-        'm4a' => ThothPublication::PUBLICATION_TYPE_MP3,
-        'aac' => ThothPublication::PUBLICATION_TYPE_MP3,
-        'flac' => ThothPublication::PUBLICATION_TYPE_MP3,
-        'ogg' => ThothPublication::PUBLICATION_TYPE_MP3,
-        'oga' => ThothPublication::PUBLICATION_TYPE_MP3,
-        'audio' => ThothPublication::PUBLICATION_TYPE_MP3,
+        'html' => PublicationType::HTML,
+        'htm' => PublicationType::HTML,
+        'xhtml' => PublicationType::HTML,
+        'pdf' => PublicationType::PDF,
+        'xml' => PublicationType::XML,
+        'jats' => PublicationType::XML,
+        'epub' => PublicationType::EPUB,
+        'mobi' => PublicationType::MOBI,
+        'azw3' => PublicationType::AZW3,
+        'doc' => PublicationType::DOCX,
+        'docx' => PublicationType::DOCX,
+        'fb2' => PublicationType::FICTION_BOOK,
+        'fictionbook' => PublicationType::FICTION_BOOK,
+        'wav' => PublicationType::WAV,
+        'mp3' => PublicationType::MP3,
+        'm4a' => PublicationType::MP3,
+        'aac' => PublicationType::MP3,
+        'flac' => PublicationType::MP3,
+        'ogg' => PublicationType::MP3,
+        'oga' => PublicationType::MP3,
+        'audio' => PublicationType::MP3,
     ];
 
     private const MIME_TYPE_MAPPING = [
-        'text/html' => ThothPublication::PUBLICATION_TYPE_HTML,
-        'application/xhtml+xml' => ThothPublication::PUBLICATION_TYPE_HTML,
-        'application/pdf' => ThothPublication::PUBLICATION_TYPE_PDF,
-        'application/xml' => ThothPublication::PUBLICATION_TYPE_XML,
-        'text/xml' => ThothPublication::PUBLICATION_TYPE_XML,
-        'application/jats+xml' => ThothPublication::PUBLICATION_TYPE_XML,
-        'application/epub+zip' => ThothPublication::PUBLICATION_TYPE_EPUB,
-        'application/x-mobipocket-ebook' => ThothPublication::PUBLICATION_TYPE_MOBI,
-        'application/vnd.amazon.ebook' => ThothPublication::PUBLICATION_TYPE_AZW3,
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => ThothPublication::PUBLICATION_TYPE_DOCX,
-        'application/msword' => ThothPublication::PUBLICATION_TYPE_DOCX,
-        'application/x-fictionbook+xml' => ThothPublication::PUBLICATION_TYPE_FICTION_BOOK,
-        'audio/wav' => ThothPublication::PUBLICATION_TYPE_WAV,
-        'audio/wave' => ThothPublication::PUBLICATION_TYPE_WAV,
-        'audio/x-wav' => ThothPublication::PUBLICATION_TYPE_WAV,
-        'audio/mpeg' => ThothPublication::PUBLICATION_TYPE_MP3,
-        'audio/mp3' => ThothPublication::PUBLICATION_TYPE_MP3,
-        'audio/mp4' => ThothPublication::PUBLICATION_TYPE_MP3,
-        'audio/x-m4a' => ThothPublication::PUBLICATION_TYPE_MP3,
-        'audio/aac' => ThothPublication::PUBLICATION_TYPE_MP3,
-        'audio/flac' => ThothPublication::PUBLICATION_TYPE_MP3,
-        'audio/ogg' => ThothPublication::PUBLICATION_TYPE_MP3,
+        'text/html' => PublicationType::HTML,
+        'application/xhtml+xml' => PublicationType::HTML,
+        'application/pdf' => PublicationType::PDF,
+        'application/xml' => PublicationType::XML,
+        'text/xml' => PublicationType::XML,
+        'application/jats+xml' => PublicationType::XML,
+        'application/epub+zip' => PublicationType::EPUB,
+        'application/x-mobipocket-ebook' => PublicationType::MOBI,
+        'application/vnd.amazon.ebook' => PublicationType::AZW3,
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => PublicationType::DOCX,
+        'application/msword' => PublicationType::DOCX,
+        'application/x-fictionbook+xml' => PublicationType::FICTION_BOOK,
+        'audio/wav' => PublicationType::WAV,
+        'audio/wave' => PublicationType::WAV,
+        'audio/x-wav' => PublicationType::WAV,
+        'audio/mpeg' => PublicationType::MP3,
+        'audio/mp3' => PublicationType::MP3,
+        'audio/mp4' => PublicationType::MP3,
+        'audio/x-m4a' => PublicationType::MP3,
+        'audio/aac' => PublicationType::MP3,
+        'audio/flac' => PublicationType::MP3,
+        'audio/ogg' => PublicationType::MP3,
     ];
 
     public function createFromPublicationFormat($publicationFormat, $submissionFile = null)
@@ -103,7 +104,7 @@ class ThothPublicationFactory
         $entryKey = $publicationFormat->getEntryKey();
         if ($entryKey !== 'DA') {
             return self::PHYSICAL_PUBLICATION_TYPE_MAPPING[$entryKey]
-                ?? ThothPublication::PUBLICATION_TYPE_PDF;
+                ?? PublicationType::PDF;
         }
 
         $submissionFilePublicationType = $this->getPublicationTypeBySubmissionFile($submissionFile);
@@ -119,7 +120,7 @@ class ThothPublicationFactory
         $publicationFormatName = $this->normalizeFormatLabel($publicationFormat->getLocalizedName());
 
         return self::DIGITAL_PUBLICATION_TYPE_MAPPING[$publicationFormatName]
-            ?? ThothPublication::PUBLICATION_TYPE_PDF;
+            ?? PublicationType::PDF;
     }
 
     private function getPublicationTypeBySubmissionFile($submissionFile)

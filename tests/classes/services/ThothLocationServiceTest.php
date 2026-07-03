@@ -24,7 +24,7 @@ use APP\plugins\generic\thoth\classes\services\ThothLocationService;
 use APP\publicationFormat\PublicationFormat;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Location as ThothLocation;
+use ThothApi\GraphQL\Inputs\PatchLocation as ThothLocation;
 
 class ThothLocationServiceTest extends PKPTestCase
 {

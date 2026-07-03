@@ -19,9 +19,10 @@
 namespace APP\plugins\generic\thoth\tests\classes\repositories;
 
 use APP\plugins\generic\thoth\classes\repositories\ThothInstitutionRepository;
+use Mockery;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Institution as ThothInstitution;
+use ThothApi\GraphQL\Inputs\PatchInstitution as ThothInstitution;
 
 class ThothInstitutionRepositoryTest extends PKPTestCase
 {
@@ -51,13 +52,10 @@ class ThothInstitutionRepositoryTest extends PKPTestCase
             'ror' => 'https://ror.org/123abcd45'
         ]);
 
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['institution'])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('institution')
-            ->willReturn($expectedThothInstitution);
-
+        $mockThothClient = Mockery::mock(ThothClient::class);
+        $mockThothClient->shouldReceive('institution')
+            ->zeroOrMoreTimes()
+            ->andReturn($expectedThothInstitution);
         $repository = new ThothInstitutionRepository($mockThothClient);
         $thothInstitution = $repository->get('8a3a7422-e5fb-4d2d-810d-513987735b4e');
 
@@ -74,13 +72,10 @@ class ThothInstitutionRepositoryTest extends PKPTestCase
             'ror' => 'https://ror.org/123abcd45'
         ]);
 
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['institutions'])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('institutions')
-            ->willReturn([$expectedThothInstitution]);
-
+        $mockThothClient = Mockery::mock(ThothClient::class);
+        $mockThothClient->shouldReceive('institutions')
+            ->zeroOrMoreTimes()
+            ->andReturn([$expectedThothInstitution]);
         $repository = new ThothInstitutionRepository($mockThothClient);
         $thothInstitution = $repository->find('https://ror.org/123abcd45');
 
@@ -96,13 +91,10 @@ class ThothInstitutionRepositoryTest extends PKPTestCase
             'ror' => 'https://ror.org/123abcd45'
         ]);
 
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['createInstitution'])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('createInstitution')
-            ->willReturn('4da12af5-7a1d-400a-a6d4-263e7ec05c2d');
-
+        $mockThothClient = Mockery::mock(ThothClient::class);
+        $mockThothClient->shouldReceive('createInstitution')
+            ->zeroOrMoreTimes()
+            ->andReturn('4da12af5-7a1d-400a-a6d4-263e7ec05c2d');
         $repository = new ThothInstitutionRepository($mockThothClient);
         $thothInstitutionId = $repository->add($thothInstitution);
 
@@ -119,13 +111,10 @@ class ThothInstitutionRepositoryTest extends PKPTestCase
             'ror' => 'https://ror.org/123abcd45'
         ]);
 
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['updateInstitution'])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('updateInstitution')
-            ->willReturn('9083a2c0-c86d-4406-806b-b589067b5e27');
-
+        $mockThothClient = Mockery::mock(ThothClient::class);
+        $mockThothClient->shouldReceive('updateInstitution')
+            ->zeroOrMoreTimes()
+            ->andReturn('9083a2c0-c86d-4406-806b-b589067b5e27');
         $repository = new ThothInstitutionRepository($mockThothClient);
         $thothInstitutionId = $repository->edit($thothPatchInstitution);
 
@@ -134,13 +123,11 @@ class ThothInstitutionRepositoryTest extends PKPTestCase
 
     public function testDeleteInstitution()
     {
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['deleteInstitution'])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('deleteInstitution')
-            ->willReturn('bde559b6-ce66-4064-b7b6-8f164bbaa1eb');
+        $mockThothClient = Mockery::mock(ThothClient::class);
 
+        $mockThothClient->shouldReceive('deleteInstitution')
+            ->zeroOrMoreTimes()
+            ->andReturn('bde559b6-ce66-4064-b7b6-8f164bbaa1eb');
         $repository = new ThothInstitutionRepository($mockThothClient);
         $thothInstitutionId = $repository->delete('bde559b6-ce66-4064-b7b6-8f164bbaa1eb');
 

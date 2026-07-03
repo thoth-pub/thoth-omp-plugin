@@ -27,7 +27,8 @@ use Mockery;
 use PKP\core\Registry;
 use PKP\db\DAORegistry;
 use PKP\tests\PKPTestCase;
-use ThothApi\GraphQL\Models\Location as ThothLocation;
+use ThothApi\GraphQL\Enums\LocationPlatform;
+use ThothApi\GraphQL\Inputs\PatchLocation as ThothLocation;
 
 class ThothLocationFactoryTest extends PKPTestCase
 {
@@ -173,7 +174,7 @@ class ThothLocationFactoryTest extends PKPTestCase
         $this->assertEquals(new ThothLocation([
             'landingPage' => 'https://omp.publicknowledgeproject.org/press/catalog/book/12',
             'fullTextUrl' => 'https://omp.publicknowledgeproject.org/press/catalog/view/12/1/1',
-            'locationPlatform' => ThothLocation::LOCATION_PLATFORM_OTHER
+            'locationPlatform' => LocationPlatform::OTHER
         ]), $thothLocation);
     }
 }

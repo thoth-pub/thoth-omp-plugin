@@ -21,10 +21,13 @@ use APP\plugins\generic\thoth\classes\api\ThothEndpoint;
 use APP\plugins\generic\thoth\classes\components\forms\config\CatalogEntryFormConfig;
 use APP\plugins\generic\thoth\classes\components\forms\config\ContributorFormConfig;
 use APP\plugins\generic\thoth\classes\components\forms\config\PublishFormConfig;
+use APP\plugins\generic\thoth\classes\gridModifier\PublicationFormatGridModifier;
 use APP\plugins\generic\thoth\classes\listeners\PublicationEditListener;
 use APP\plugins\generic\thoth\classes\listeners\PublicationPublishListener;
 use APP\plugins\generic\thoth\classes\notification\ThothNotification;
 use APP\plugins\generic\thoth\classes\schema\ThothSchema;
+use APP\plugins\generic\thoth\classes\services\ThothCatalogFilesCacheService;
+use APP\plugins\generic\thoth\classes\templateFilters\ThothCatalogFilesTemplateFilter;
 use APP\plugins\generic\thoth\classes\templateFilters\ThothSectionTemplateFilter;
 use PKP\plugins\GenericPlugin;
 use PKP\plugins\Hook;
@@ -97,10 +100,24 @@ class HookRegistrant
     {
         $thothMenuHandler = new ThothMenuHandler();
         $thothPageHandler = new ThothPageHandler($this->plugin);
+        $publicationFormatGridModifier = new PublicationFormatGridModifier($this->plugin);
+        $publicationFormatGridModifier->register();
 
+        Hook::add('TemplateManager::display', $this->addTemplateFilters(...));
         Hook::add('TemplateManager::display', $this->addScripts(...));
         Hook::add('TemplateManager::display', $thothMenuHandler->addMenu(...));
         Hook::add('LoadHandler', $thothPageHandler->addHandlers(...));
+    }
+
+    private function addTemplateFilters($hookName, $args): bool
+    {
+        $templateMgr = $args[0];
+        $template = $args[1];
+
+        $thothCatalogFilesFilter = new ThothCatalogFilesTemplateFilter();
+        $thothCatalogFilesFilter->registerFilter($templateMgr, $template);
+
+        return false;
     }
 
     private function addScripts($hookName, $args): void
@@ -117,5 +134,134 @@ class HookRegistrant
         $thothNotification = new ThothNotification();
         $thothNotification->addJavaScriptData($request, $templateMgr);
         $thothNotification->addJavaScript($request, $templateMgr, $this->plugin);
+
+        $this->addCatalogFilesAssets($request, $templateMgr, $template);
+    }
+
+    private function addCatalogFilesAssets($request, $templateMgr, $template): bool
+    {
+        if ($template !== 'frontend/pages/book.tpl') {
+            return false;
+        }
+
+        $monograph = $templateMgr->getTemplateVars('publishedSubmission')
+            ?: $templateMgr->getTemplateVars('monograph');
+        $publication = $templateMgr->getTemplateVars('publication');
+        $chapters = (array) $templateMgr->getTemplateVars('chapters');
+        $availableFiles = (array) $templateMgr->getTemplateVars('availableFiles');
+
+        if (!$monograph || !$publication || !$monograph->getData('thothWorkId')) {
+            return false;
+        }
+
+        $catalogFilesUrl = $request->getDispatcher()->url(
+            $request,
+            Application::ROUTE_PAGE,
+            null,
+            'thoth',
+            'catalogFiles',
+            null,
+            [
+                'submissionId' => $monograph->getId(),
+                'publicationId' => $publication->getId(),
+            ]
+        );
+        $catalogFilesCacheService = new ThothCatalogFilesCacheService();
+
+        $templateMgr->addJavaScript(
+            'thoth-catalog-files-data',
+            'window.thothCatalogFiles = ' . json_encode([
+                'url' => $catalogFilesUrl,
+                'downloadsLabel' => __('submission.downloads'),
+                'loadingLabel' => __('common.loading'),
+                'chapters' => $this->getCatalogFilesChapterData($chapters),
+                'publicationFormatFiles' => $this->getCatalogFilesPublicationFormatFileData($availableFiles),
+                'cacheTtl' => ThothCatalogFilesCacheService::TTL,
+                'cacheKeySuffix' => $catalogFilesCacheService->getClientCacheKeySuffix($publication->getId()),
+            ]) . ';',
+            [
+                'inline' => true,
+                'contexts' => 'frontend',
+            ]
+        );
+        $templateMgr->addJavaScript(
+            'thoth-catalog-files-js',
+            $request->getBaseUrl() . '/' . $this->plugin->getPluginPath() . '/js/ThothCatalogFiles.js',
+            [
+                'contexts' => 'frontend',
+                'priority' => STYLE_SEQUENCE_LATE,
+            ]
+        );
+
+        return false;
+    }
+
+    private function getCatalogFilesChapterData($chapters): array
+    {
+        return array_map(function ($chapter) {
+            return [
+                'id' => (int) $chapter->getId(),
+            ];
+        }, array_values($chapters));
+    }
+
+    private function getCatalogFilesPublicationFormatFileData($availableFiles): array
+    {
+        $publicationFormatFiles = [];
+
+        foreach ($availableFiles as $file) {
+            if (!$this->isCatalogFilesMonographFile($file)) {
+                continue;
+            }
+
+            $publicationFormatId = $file->getData('assocId');
+            if (!$publicationFormatId) {
+                continue;
+            }
+
+            $fileName = $this->getCatalogFileName($file);
+            if ($fileName) {
+                $publicationFormatFiles[$publicationFormatId][] = $fileName;
+            }
+        }
+
+        return $publicationFormatFiles;
+    }
+
+    private function getCatalogFileName($file): ?string
+    {
+        if (method_exists($file, 'getLocalizedName')) {
+            return $this->normalizeCatalogFileName($file->getLocalizedName());
+        }
+
+        if (method_exists($file, 'getOriginalFileName')) {
+            return $this->normalizeCatalogFileName($file->getOriginalFileName());
+        }
+
+        return $this->normalizeCatalogFileName(
+            $file->getData('name')
+                ?: $file->getData('originalFileName')
+                ?: $file->getData('serverFileName')
+        );
+    }
+
+    private function normalizeCatalogFileName($fileName): ?string
+    {
+        if (is_array($fileName)) {
+            $fileName = reset($fileName);
+        }
+
+        $fileName = trim((string) $fileName);
+
+        return $fileName !== '' ? $fileName : null;
+    }
+
+    private function isCatalogFilesMonographFile($file): bool
+    {
+        if (method_exists($file, 'getChapterId')) {
+            return !$file->getChapterId();
+        }
+
+        return $file->getData('chapterId') == null;
     }
 }

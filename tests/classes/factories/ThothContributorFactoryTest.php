@@ -23,7 +23,7 @@ require_once(__DIR__ . '/../../../vendor/autoload.php');
 use APP\author\Author;
 use APP\plugins\generic\thoth\classes\factories\ThothContributorFactory;
 use PKP\tests\PKPTestCase;
-use ThothApi\GraphQL\Models\Contributor as ThothContributor;
+use ThothApi\GraphQL\Inputs\PatchContributor as ThothContributor;
 
 class ThothContributorFactoryTest extends PKPTestCase
 {

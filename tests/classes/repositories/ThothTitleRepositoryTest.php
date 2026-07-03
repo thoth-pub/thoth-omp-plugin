@@ -19,9 +19,10 @@
 namespace APP\plugins\generic\thoth\tests\classes\repositories;
 
 use APP\plugins\generic\thoth\classes\repositories\ThothTitleRepository;
+use Mockery;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Title as ThothTitle;
+use ThothApi\GraphQL\Inputs\PatchTitle as ThothTitle;
 
 class ThothTitleRepositoryTest extends PKPTestCase
 {
@@ -56,13 +57,10 @@ class ThothTitleRepositoryTest extends PKPTestCase
             'canonical' => true,
         ]);
 
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['createTitle'])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('createTitle')
-            ->willReturn('0ee25017-980c-44ab-a18b-164b1bd31b8d');
-
+        $mockThothClient = Mockery::mock(ThothClient::class);
+        $mockThothClient->shouldReceive('createTitle')
+            ->zeroOrMoreTimes()
+            ->andReturn('0ee25017-980c-44ab-a18b-164b1bd31b8d');
         $repository = new ThothTitleRepository($mockThothClient);
 
         $thothTitleId = $repository->add($thothTitle);
@@ -82,13 +80,10 @@ class ThothTitleRepositoryTest extends PKPTestCase
             'canonical' => true,
         ]);
 
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['updateTitle'])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('updateTitle')
-            ->willReturn('0ee25017-980c-44ab-a18b-164b1bd31b8d');
-
+        $mockThothClient = Mockery::mock(ThothClient::class);
+        $mockThothClient->shouldReceive('updateTitle')
+            ->zeroOrMoreTimes()
+            ->andReturn('0ee25017-980c-44ab-a18b-164b1bd31b8d');
         $repository = new ThothTitleRepository($mockThothClient);
 
         $thothTitleId = $repository->edit($thothPatchTitle);
@@ -98,13 +93,11 @@ class ThothTitleRepositoryTest extends PKPTestCase
 
     public function testDeleteTitle()
     {
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['deleteTitle'])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('deleteTitle')
-            ->willReturn('0ee25017-980c-44ab-a18b-164b1bd31b8d');
+        $mockThothClient = Mockery::mock(ThothClient::class);
 
+        $mockThothClient->shouldReceive('deleteTitle')
+            ->zeroOrMoreTimes()
+            ->andReturn('0ee25017-980c-44ab-a18b-164b1bd31b8d');
         $repository = new ThothTitleRepository($mockThothClient);
 
         $thothTitleId = $repository->delete('0ee25017-980c-44ab-a18b-164b1bd31b8d');

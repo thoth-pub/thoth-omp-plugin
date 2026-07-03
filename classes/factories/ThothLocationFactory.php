@@ -18,7 +18,8 @@ namespace APP\plugins\generic\thoth\classes\factories;
 
 use APP\core\Application;
 use APP\facades\Repo;
-use ThothApi\GraphQL\Models\Location as ThothLocation;
+use ThothApi\GraphQL\Enums\LocationPlatform;
+use ThothApi\GraphQL\Inputs\PatchLocation as ThothLocation;
 
 class ThothLocationFactory
 {
@@ -50,7 +51,7 @@ class ThothLocationFactory
         return new ThothLocation([
             'landingPage' => $landingPage,
             'fullTextUrl' => $fullTextUrl,
-            'locationPlatform' => ThothLocation::LOCATION_PLATFORM_OTHER
+            'locationPlatform' => LocationPlatform::OTHER
         ]);
     }
 }

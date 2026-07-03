@@ -25,7 +25,7 @@ use APP\plugins\generic\thoth\classes\services\ThothAffiliationService;
 use PKP\affiliation\Affiliation;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Institution as ThothInstitution;
+use ThothApi\GraphQL\Inputs\PatchInstitution as ThothInstitution;
 
 class ThothAffiliationServiceTest extends PKPTestCase
 {

@@ -19,9 +19,10 @@
 namespace APP\plugins\generic\thoth\tests\classes\repositories;
 
 use APP\plugins\generic\thoth\classes\repositories\ThothAbstractRepository;
+use Mockery;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\AbstractText as ThothAbstract;
+use ThothApi\GraphQL\Inputs\PatchAbstract as ThothAbstract;
 
 class ThothAbstractRepositoryTest extends PKPTestCase
 {
@@ -54,13 +55,10 @@ class ThothAbstractRepositoryTest extends PKPTestCase
             'canonical' => true,
         ]);
 
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['createAbstract'])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('createAbstract')
-            ->willReturn('6975a02d-4c2f-49cb-b988-c8cf32db3e0e');
-
+        $mockThothClient = Mockery::mock(ThothClient::class);
+        $mockThothClient->shouldReceive('createAbstract')
+            ->zeroOrMoreTimes()
+            ->andReturn('6975a02d-4c2f-49cb-b988-c8cf32db3e0e');
         $repository = new ThothAbstractRepository($mockThothClient);
 
         $thothAbstractId = $repository->add($thothAbstract);
@@ -79,13 +77,10 @@ class ThothAbstractRepositoryTest extends PKPTestCase
             'canonical' => true,
         ]);
 
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['updateAbstract'])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('updateAbstract')
-            ->willReturn('6975a02d-4c2f-49cb-b988-c8cf32db3e0e');
-
+        $mockThothClient = Mockery::mock(ThothClient::class);
+        $mockThothClient->shouldReceive('updateAbstract')
+            ->zeroOrMoreTimes()
+            ->andReturn('6975a02d-4c2f-49cb-b988-c8cf32db3e0e');
         $repository = new ThothAbstractRepository($mockThothClient);
 
         $thothAbstractId = $repository->edit($thothPatchAbstract);
@@ -95,13 +90,11 @@ class ThothAbstractRepositoryTest extends PKPTestCase
 
     public function testDeleteAbstract()
     {
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['deleteAbstract'])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('deleteAbstract')
-            ->willReturn('6975a02d-4c2f-49cb-b988-c8cf32db3e0e');
+        $mockThothClient = Mockery::mock(ThothClient::class);
 
+        $mockThothClient->shouldReceive('deleteAbstract')
+            ->zeroOrMoreTimes()
+            ->andReturn('6975a02d-4c2f-49cb-b988-c8cf32db3e0e');
         $repository = new ThothAbstractRepository($mockThothClient);
 
         $thothAbstractId = $repository->delete('6975a02d-4c2f-49cb-b988-c8cf32db3e0e');

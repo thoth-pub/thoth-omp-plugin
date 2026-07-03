@@ -19,7 +19,6 @@ namespace APP\plugins\generic\thoth\classes\container\providers;
 require_once(__DIR__ . '/../../../vendor/autoload.php');
 
 use APP\core\Application;
-use APP\plugins\generic\thoth\classes\repositories\ThothAccountRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothAbstractRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothAffiliationRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothBiographyRepository;
@@ -31,6 +30,8 @@ use APP\plugins\generic\thoth\classes\repositories\ThothImprintRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothInstitutionRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothLanguageRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothLocationRepository;
+use APP\plugins\generic\thoth\classes\repositories\ThothMeRepository;
+use APP\plugins\generic\thoth\classes\repositories\ThothPublicationFileUploadRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothPublicationRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothReferenceRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothSubjectRepository;
@@ -82,16 +83,6 @@ class ThothRepositoryProvider implements ContainerProvider
             return $client->setToken($config['token']);
         });
 
-        $container->set('accountRepository', function ($container) {
-            $config = $container->get('config');
-            $httpConfig = [];
-            if ($config['customThothApi'] && $config['customThothApiUrl']) {
-                $httpConfig['base_uri'] = trim($config['customThothApiUrl']);
-            }
-
-            return new ThothAccountRepository($container->get('client'), $httpConfig, $config['token']);
-        });
-
         $container->set('abstractRepository', function ($container) {
             return new ThothAbstractRepository($container->get('client'));
         });
@@ -136,8 +127,17 @@ class ThothRepositoryProvider implements ContainerProvider
             return new ThothLocationRepository($container->get('client'));
         });
 
+        $container->set('meRepository', function ($container) {
+            $contextId = Application::get()->getRequest()->getContext()->getId();
+            return new ThothMeRepository($container->get('client'), $contextId);
+        });
+
         $container->set('publicationRepository', function ($container) {
             return new ThothPublicationRepository($container->get('client'));
+        });
+
+        $container->set('publicationFileUploadRepository', function ($container) {
+            return new ThothPublicationFileUploadRepository($container->get('client'));
         });
 
         $container->set('referenceRepository', function ($container) {

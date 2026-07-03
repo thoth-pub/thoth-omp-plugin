@@ -16,7 +16,7 @@
 
 namespace APP\plugins\generic\thoth\classes\repositories;
 
-use ThothApi\GraphQL\Models\WorkRelation as ThothWorkRelation;
+use ThothApi\GraphQL\Inputs\PatchWorkRelation as ThothWorkRelation;
 
 class ThothWorkRelationRepository
 {

@@ -24,7 +24,7 @@ use APP\submission\Submission;
 use PKP\components\forms\FieldHTML;
 use PKP\components\forms\FieldSelect;
 use PKP\components\forms\FormComponent;
-use ThothApi\GraphQL\Models\Work as ThothWork;
+use ThothApi\GraphQL\Enums\WorkType;
 
 class RegisterForm extends FormComponent
 {
@@ -99,11 +99,11 @@ class RegisterForm extends FormComponent
 
         $workTypeOptions = [
             [
-                'value' => ThothWork::WORK_TYPE_MONOGRAPH,
+                'value' => WorkType::MONOGRAPH,
                 'label' => __('plugins.generic.thoth.workType.monograph')
             ],
             [
-                'value' => ThothWork::WORK_TYPE_TEXTBOOK,
+                'value' => WorkType::TEXTBOOK,
                 'label' => __('plugins.generic.thoth.workType.textbook')
             ],
         ];
