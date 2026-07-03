@@ -18,11 +18,14 @@
 
 namespace APP\plugins\generic\thoth\tests\classes\repositories;
 
+require_once(__DIR__ . '/../../../vendor/autoload.php');
+
 use APP\plugins\generic\thoth\classes\repositories\ThothWorkRepository;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Enums\WorkType;
 use ThothApi\GraphQL\Inputs\PatchWork as ThothWork;
+use ThothApi\GraphQL\SchemaSelection;
 
 class ThothWorkRepositoryTest extends PKPTestCase
 {
@@ -59,8 +62,12 @@ class ThothWorkRepositoryTest extends PKPTestCase
         $mockThothClient = $this->getMockBuilder(ThothClient::class)
             ->addMethods(['work'])
             ->getMock();
-        $mockThothClient->expects($this->any())
+        $mockThothClient->expects($this->once())
             ->method('work')
+            ->with(
+                '35a27dc3-8117-4381-9a8f-54ef5def6f0b',
+                SchemaSelection::for('Work')
+            )
             ->willReturn($expectedThothWork);
 
         $repository = new ThothWorkRepository($mockThothClient);

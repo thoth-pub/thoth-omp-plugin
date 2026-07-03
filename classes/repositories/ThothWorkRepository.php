@@ -17,6 +17,7 @@
 namespace APP\plugins\generic\thoth\classes\repositories;
 
 use ThothApi\GraphQL\Inputs\PatchWork as ThothWork;
+use ThothApi\GraphQL\SchemaSelection;
 
 class ThothWorkRepository
 {
@@ -34,7 +35,7 @@ class ThothWorkRepository
 
     public function get($thothWorkId)
     {
-        return $this->thothClient->work($thothWorkId);
+        return $this->thothClient->work($thothWorkId, SchemaSelection::for('Work'));
     }
 
     public function add($thothWork)
