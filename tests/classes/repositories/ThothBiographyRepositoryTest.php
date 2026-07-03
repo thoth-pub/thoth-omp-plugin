@@ -19,6 +19,7 @@
 namespace APP\plugins\generic\thoth\tests\classes\repositories;
 
 use APP\plugins\generic\thoth\classes\repositories\ThothBiographyRepository;
+use Mockery;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Inputs\PatchBiography as ThothBiography;
@@ -52,13 +53,10 @@ class ThothBiographyRepositoryTest extends PKPTestCase
             'canonical' => true,
         ]);
 
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->addMethods(['createBiography'])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('createBiography')
-            ->willReturn('0ee25017-980c-44ab-a18b-164b1bd31b8d');
-
+        $mockThothClient = Mockery::mock(ThothClient::class);
+        $mockThothClient->shouldReceive('createBiography')
+            ->zeroOrMoreTimes()
+            ->andReturn('0ee25017-980c-44ab-a18b-164b1bd31b8d');
         $repository = new ThothBiographyRepository($mockThothClient);
 
         $thothBiographyId = $repository->add($thothBiography);
@@ -76,13 +74,10 @@ class ThothBiographyRepositoryTest extends PKPTestCase
             'canonical' => true,
         ]);
 
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->addMethods(['updateBiography'])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('updateBiography')
-            ->willReturn('0ee25017-980c-44ab-a18b-164b1bd31b8d');
-
+        $mockThothClient = Mockery::mock(ThothClient::class);
+        $mockThothClient->shouldReceive('updateBiography')
+            ->zeroOrMoreTimes()
+            ->andReturn('0ee25017-980c-44ab-a18b-164b1bd31b8d');
         $repository = new ThothBiographyRepository($mockThothClient);
 
         $thothBiographyId = $repository->edit($thothPatchBiography);
@@ -92,13 +87,11 @@ class ThothBiographyRepositoryTest extends PKPTestCase
 
     public function testDeleteBiography()
     {
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->addMethods(['deleteBiography'])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('deleteBiography')
-            ->willReturn('0ee25017-980c-44ab-a18b-164b1bd31b8d');
+        $mockThothClient = Mockery::mock(ThothClient::class);
 
+        $mockThothClient->shouldReceive('deleteBiography')
+            ->zeroOrMoreTimes()
+            ->andReturn('0ee25017-980c-44ab-a18b-164b1bd31b8d');
         $repository = new ThothBiographyRepository($mockThothClient);
 
         $thothBiographyId = $repository->delete('0ee25017-980c-44ab-a18b-164b1bd31b8d');

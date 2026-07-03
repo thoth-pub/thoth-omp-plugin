@@ -19,6 +19,7 @@
 namespace APP\plugins\generic\thoth\tests\classes\repositories;
 
 use APP\plugins\generic\thoth\classes\repositories\ThothAffiliationRepository;
+use Mockery;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Inputs\PatchAffiliation as ThothAffiliation;
@@ -54,13 +55,10 @@ class ThothAffiliationRepositoryTest extends PKPTestCase
             'position' => 'Professor'
         ]);
 
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->addMethods(['affiliation'])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('affiliation')
-            ->willReturn($expectedThothAffiliation);
-
+        $mockThothClient = Mockery::mock(ThothClient::class);
+        $mockThothClient->shouldReceive('affiliation')
+            ->zeroOrMoreTimes()
+            ->andReturn($expectedThothAffiliation);
         $repository = new ThothAffiliationRepository($mockThothClient);
 
         $thothAffiliation = $repository->get('8b308be4-34e0-4053-b818-0508430c1918');
@@ -77,13 +75,10 @@ class ThothAffiliationRepositoryTest extends PKPTestCase
             'position' => 'Professor'
         ]);
 
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->addMethods(['createAffiliation'])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('createAffiliation')
-            ->willReturn('f68d406c-c50d-49ec-b803-1cfbb5e9d0b1');
-
+        $mockThothClient = Mockery::mock(ThothClient::class);
+        $mockThothClient->shouldReceive('createAffiliation')
+            ->zeroOrMoreTimes()
+            ->andReturn('f68d406c-c50d-49ec-b803-1cfbb5e9d0b1');
         $repository = new ThothAffiliationRepository($mockThothClient);
 
         $thothAffiliationId = $repository->add($thothAffiliation);
@@ -101,13 +96,10 @@ class ThothAffiliationRepositoryTest extends PKPTestCase
             'position' => 'Research'
         ]);
 
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->addMethods(['updateAffiliation'])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('updateAffiliation')
-            ->willReturn('f68d406c-c50d-49ec-b803-1cfbb5e9d0b1');
-
+        $mockThothClient = Mockery::mock(ThothClient::class);
+        $mockThothClient->shouldReceive('updateAffiliation')
+            ->zeroOrMoreTimes()
+            ->andReturn('f68d406c-c50d-49ec-b803-1cfbb5e9d0b1');
         $repository = new ThothAffiliationRepository($mockThothClient);
 
         $thothAffiliationId = $repository->edit($thothPatchAffiliation);
@@ -117,13 +109,11 @@ class ThothAffiliationRepositoryTest extends PKPTestCase
 
     public function testDeleteAffiliation()
     {
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->addMethods(['deleteAffiliation'])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('deleteAffiliation')
-            ->willReturn('f68d406c-c50d-49ec-b803-1cfbb5e9d0b1');
+        $mockThothClient = Mockery::mock(ThothClient::class);
 
+        $mockThothClient->shouldReceive('deleteAffiliation')
+            ->zeroOrMoreTimes()
+            ->andReturn('f68d406c-c50d-49ec-b803-1cfbb5e9d0b1');
         $repository = new ThothAffiliationRepository($mockThothClient);
 
         $thothAffiliationId = $repository->delete('f68d406c-c50d-49ec-b803-1cfbb5e9d0b1');

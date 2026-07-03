@@ -19,6 +19,7 @@
 namespace APP\plugins\generic\thoth\tests\classes\repositories;
 
 use APP\plugins\generic\thoth\classes\repositories\ThothPublicationRepository;
+use Mockery;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Enums\PublicationType;
@@ -60,13 +61,10 @@ class ThothPublicationRepositoryTest extends PKPTestCase
             'weight' => '80'
         ]);
 
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->addMethods(['publication'])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('publication')
-            ->willReturn($expectedThothPublication);
-
+        $mockThothClient = Mockery::mock(ThothClient::class);
+        $mockThothClient->shouldReceive('publication')
+            ->zeroOrMoreTimes()
+            ->andReturn($expectedThothPublication);
         $repository = new ThothPublicationRepository($mockThothClient);
 
         $thothPublication = $repository->get('1bce4a08-270c-4515-b0d5-d72d001314d4');
@@ -105,13 +103,10 @@ class ThothPublicationRepositoryTest extends PKPTestCase
             'isbn' => '978-3-16-148410-0'
         ]);
 
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->addMethods(['publications'])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('publications')
-            ->willReturn([$expectedThothPublication]);
-
+        $mockThothClient = Mockery::mock(ThothClient::class);
+        $mockThothClient->shouldReceive('publications')
+            ->zeroOrMoreTimes()
+            ->andReturn([$expectedThothPublication]);
         $repository = new ThothPublicationRepository($mockThothClient);
 
         $thothPublication = $repository->find('978-3-16-148410-0');
@@ -131,13 +126,10 @@ class ThothPublicationRepositoryTest extends PKPTestCase
             'weight' => '80'
         ]);
 
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->addMethods(['createPublication'])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('createPublication')
-            ->willReturn('36fcfd7a-2284-4432-ad50-02b70aadec49');
-
+        $mockThothClient = Mockery::mock(ThothClient::class);
+        $mockThothClient->shouldReceive('createPublication')
+            ->zeroOrMoreTimes()
+            ->andReturn('36fcfd7a-2284-4432-ad50-02b70aadec49');
         $repository = new ThothPublicationRepository($mockThothClient);
 
         $thothPublicationId = $repository->add($thothPublication);
@@ -154,13 +146,10 @@ class ThothPublicationRepositoryTest extends PKPTestCase
             'isbn' => '978-3-16-148410-0'
         ]);
 
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->addMethods(['updatePublication'])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('updatePublication')
-            ->willReturn('fc6618f1-f4db-44f9-bbe3-75438f4bd536');
-
+        $mockThothClient = Mockery::mock(ThothClient::class);
+        $mockThothClient->shouldReceive('updatePublication')
+            ->zeroOrMoreTimes()
+            ->andReturn('fc6618f1-f4db-44f9-bbe3-75438f4bd536');
         $repository = new ThothPublicationRepository($mockThothClient);
 
         $thothPublicationId = $repository->edit($thothPatchPublication);
@@ -170,13 +159,11 @@ class ThothPublicationRepositoryTest extends PKPTestCase
 
     public function testDeletePublication()
     {
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->addMethods(['deletePublication'])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('deletePublication')
-            ->willReturn('5f708d25-249a-4e67-aaf6-ce80b85ed2ee');
+        $mockThothClient = Mockery::mock(ThothClient::class);
 
+        $mockThothClient->shouldReceive('deletePublication')
+            ->zeroOrMoreTimes()
+            ->andReturn('5f708d25-249a-4e67-aaf6-ce80b85ed2ee');
         $repository = new ThothPublicationRepository($mockThothClient);
 
         $thothPublicationId = $repository->delete('5f708d25-249a-4e67-aaf6-ce80b85ed2ee');

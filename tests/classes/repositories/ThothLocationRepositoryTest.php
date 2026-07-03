@@ -19,6 +19,7 @@
 namespace APP\plugins\generic\thoth\tests\classes\repositories;
 
 use APP\plugins\generic\thoth\classes\repositories\ThothLocationRepository;
+use Mockery;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Enums\LocationPlatform;
@@ -52,13 +53,10 @@ class ThothLocationRepositoryTest extends PKPTestCase
             'locationPlatform' => LocationPlatform::OTHER,
         ]);
 
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->addMethods(['location'])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('location')
-            ->willReturn($expectedThothLocation);
-
+        $mockThothClient = Mockery::mock(ThothClient::class);
+        $mockThothClient->shouldReceive('location')
+            ->zeroOrMoreTimes()
+            ->andReturn($expectedThothLocation);
         $repository = new ThothLocationRepository($mockThothClient);
 
         $thothLocation = $repository->get('e2c57d05-b0e4-460e-a4c5-72c91b383b75');
@@ -102,13 +100,10 @@ class ThothLocationRepositoryTest extends PKPTestCase
             'locationPlatform' => LocationPlatform::OTHER,
         ]);
 
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->addMethods(['createLocation'])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('createLocation')
-            ->willReturn('2a3771b7-df83-4346-b43e-c2a3ca03aadf');
-
+        $mockThothClient = Mockery::mock(ThothClient::class);
+        $mockThothClient->shouldReceive('createLocation')
+            ->zeroOrMoreTimes()
+            ->andReturn('2a3771b7-df83-4346-b43e-c2a3ca03aadf');
         $repository = new ThothLocationRepository($mockThothClient);
 
         $thothLocationId = $repository->add($thothLocation);
@@ -125,13 +120,10 @@ class ThothLocationRepositoryTest extends PKPTestCase
             'locationPlatform' => LocationPlatform::OTHER,
         ]);
 
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->addMethods(['updateLocation'])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('updateLocation')
-            ->willReturn('a8a397a0-ee70-466b-948a-41d7b1e3069b');
-
+        $mockThothClient = Mockery::mock(ThothClient::class);
+        $mockThothClient->shouldReceive('updateLocation')
+            ->zeroOrMoreTimes()
+            ->andReturn('a8a397a0-ee70-466b-948a-41d7b1e3069b');
         $repository = new ThothLocationRepository($mockThothClient);
 
         $thothLocationId = $repository->edit($thothPatchLocation);
@@ -141,13 +133,11 @@ class ThothLocationRepositoryTest extends PKPTestCase
 
     public function testDeleteLocation()
     {
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->addMethods(['deleteLocation'])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('deleteLocation')
-            ->willReturn('5a636395-2540-456b-9cfa-f2e0fa20e032');
+        $mockThothClient = Mockery::mock(ThothClient::class);
 
+        $mockThothClient->shouldReceive('deleteLocation')
+            ->zeroOrMoreTimes()
+            ->andReturn('5a636395-2540-456b-9cfa-f2e0fa20e032');
         $repository = new ThothLocationRepository($mockThothClient);
 
         $thothLocationId = $repository->delete('5a636395-2540-456b-9cfa-f2e0fa20e032');

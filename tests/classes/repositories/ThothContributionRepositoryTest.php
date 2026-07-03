@@ -19,6 +19,7 @@
 namespace APP\plugins\generic\thoth\tests\classes\repositories;
 
 use APP\plugins\generic\thoth\classes\repositories\ThothContributionRepository;
+use Mockery;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Enums\ContributionType;
@@ -54,13 +55,10 @@ class ThothContributionRepositoryTest extends PKPTestCase
             'fullName' => 'John Doe'
         ]);
 
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->addMethods(['contribution'])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('contribution')
-            ->willReturn($expectedThothContribution);
-
+        $mockThothClient = Mockery::mock(ThothClient::class);
+        $mockThothClient->shouldReceive('contribution')
+            ->zeroOrMoreTimes()
+            ->andReturn($expectedThothContribution);
         $repository = new ThothContributionRepository($mockThothClient);
         $thothContribution = $repository->get('8d19d277-c42d-4bc4-b992-73174c7415e0');
 
@@ -79,13 +77,10 @@ class ThothContributionRepositoryTest extends PKPTestCase
             'fullName' => 'John Doe'
         ]);
 
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->addMethods(['createContribution'])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('createContribution')
-            ->willReturn('d2cea6e7-32d4-421c-9983-d4553a991efd');
-
+        $mockThothClient = Mockery::mock(ThothClient::class);
+        $mockThothClient->shouldReceive('createContribution')
+            ->zeroOrMoreTimes()
+            ->andReturn('d2cea6e7-32d4-421c-9983-d4553a991efd');
         $repository = new ThothContributionRepository($mockThothClient);
         $thothContributionId = $repository->add($thothContribution);
 
@@ -105,13 +100,10 @@ class ThothContributionRepositoryTest extends PKPTestCase
             'fullName' => 'Johnathan Doe'
         ]);
 
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->addMethods(['updateContribution'])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('updateContribution')
-            ->willReturn('ffc5404d-6365-434b-920b-da446cc3556e');
-
+        $mockThothClient = Mockery::mock(ThothClient::class);
+        $mockThothClient->shouldReceive('updateContribution')
+            ->zeroOrMoreTimes()
+            ->andReturn('ffc5404d-6365-434b-920b-da446cc3556e');
         $repository = new ThothContributionRepository($mockThothClient);
         $thothContributionId = $repository->edit($thothPatchContribution);
 
@@ -120,13 +112,11 @@ class ThothContributionRepositoryTest extends PKPTestCase
 
     public function testDeleteContribution()
     {
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->addMethods(['deleteContribution'])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('deleteContribution')
-            ->willReturn('ffc5404d-6365-434b-920b-da446cc3556e');
+        $mockThothClient = Mockery::mock(ThothClient::class);
 
+        $mockThothClient->shouldReceive('deleteContribution')
+            ->zeroOrMoreTimes()
+            ->andReturn('ffc5404d-6365-434b-920b-da446cc3556e');
         $repository = new ThothContributionRepository($mockThothClient);
         $thothContributionId = $repository->delete('ffc5404d-6365-434b-920b-da446cc3556e');
 

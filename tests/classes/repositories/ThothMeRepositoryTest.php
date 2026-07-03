@@ -21,6 +21,7 @@ namespace APP\plugins\generic\thoth\tests\classes\repositories;
 require_once(__DIR__ . '/../../../vendor/autoload.php');
 
 use APP\plugins\generic\thoth\classes\repositories\ThothMeRepository;
+use Mockery;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Schemas\Me;
@@ -65,14 +66,11 @@ class ThothMeRepositoryTest extends PKPTestCase
             ],
         ]);
 
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->addMethods(['me'])
-            ->getMock();
-        $mockThothClient->expects($this->once())
-            ->method('me')
+        $mockThothClient = Mockery::mock(ThothClient::class);
+        $mockThothClient->shouldReceive('me')
+            ->once()
             ->with(self::ME_SELECTION)
-            ->willReturn($expectedMe);
-
+            ->andReturn($expectedMe);
         $repository = new ThothMeRepository($mockThothClient, $this->getContextId());
 
         $this->assertEquals($expectedMe, $repository->get());
@@ -85,14 +83,11 @@ class ThothMeRepositoryTest extends PKPTestCase
             'email' => 'user@example.com',
         ]);
 
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->addMethods(['me'])
-            ->getMock();
-        $mockThothClient->expects($this->once())
-            ->method('me')
+        $mockThothClient = Mockery::mock(ThothClient::class);
+        $mockThothClient->shouldReceive('me')
+            ->once()
             ->with(self::ME_SELECTION)
-            ->willReturn($expectedMe);
-
+            ->andReturn($expectedMe);
         $repository = new ThothMeRepository($mockThothClient, $this->getContextId());
 
         $this->assertEquals($expectedMe, $repository->get());
@@ -110,22 +105,17 @@ class ThothMeRepositoryTest extends PKPTestCase
             'email' => 'second-user@example.com',
         ]);
 
-        $firstThothClient = $this->getMockBuilder(ThothClient::class)
-            ->addMethods(['me'])
-            ->getMock();
-        $firstThothClient->expects($this->once())
-            ->method('me')
+        $firstThothClient = Mockery::mock(ThothClient::class);
+        $firstThothClient->shouldReceive('me')
+            ->once()
             ->with(self::ME_SELECTION)
-            ->willReturn($firstMe);
+            ->andReturn($firstMe);
+        $secondThothClient = Mockery::mock(ThothClient::class);
 
-        $secondThothClient = $this->getMockBuilder(ThothClient::class)
-            ->addMethods(['me'])
-            ->getMock();
-        $secondThothClient->expects($this->once())
-            ->method('me')
+        $secondThothClient->shouldReceive('me')
+            ->once()
             ->with(self::ME_SELECTION)
-            ->willReturn($secondMe);
-
+            ->andReturn($secondMe);
         $firstRepository = new ThothMeRepository($firstThothClient, $this->getContextId());
         $secondRepository = new ThothMeRepository($secondThothClient, $this->getContextId());
 

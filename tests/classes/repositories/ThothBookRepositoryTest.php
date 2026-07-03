@@ -19,6 +19,7 @@
 namespace APP\plugins\generic\thoth\tests\classes\repositories;
 
 use APP\plugins\generic\thoth\classes\repositories\ThothBookRepository;
+use Mockery;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Inputs\PatchWork as ThothWork;
@@ -31,13 +32,10 @@ class ThothBookRepositoryTest extends PKPTestCase
             'doi' => 'https://doi.org/10.12345/10101010'
         ]);
 
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->addMethods(['bookByDoi'])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('bookByDoi')
-            ->willReturn($expectedThothBook);
-
+        $mockThothClient = Mockery::mock(ThothClient::class);
+        $mockThothClient->shouldReceive('bookByDoi')
+            ->zeroOrMoreTimes()
+            ->andReturn($expectedThothBook);
         $repository = new ThothBookRepository($mockThothClient);
 
         $thothBook = $repository->getByDoi('https://doi.org/10.12345/10101010');
@@ -51,13 +49,10 @@ class ThothBookRepositoryTest extends PKPTestCase
             'landingPage' => 'https://publisher.org/books/my_book'
         ]);
 
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->addMethods(['books'])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('books')
-            ->willReturn([$expectedThothBook]);
-
+        $mockThothClient = Mockery::mock(ThothClient::class);
+        $mockThothClient->shouldReceive('books')
+            ->zeroOrMoreTimes()
+            ->andReturn([$expectedThothBook]);
         $repository = new ThothBookRepository($mockThothClient);
 
         $thothBook = $repository->find('https://publisher.org/books/my_book');

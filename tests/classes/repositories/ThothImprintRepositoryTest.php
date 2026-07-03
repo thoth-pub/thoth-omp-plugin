@@ -19,6 +19,7 @@
 namespace APP\plugins\generic\thoth\tests\classes\repositories;
 
 use APP\plugins\generic\thoth\classes\repositories\ThothImprintRepository;
+use Mockery;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Schemas\Imprint as ThothImprint;
@@ -33,14 +34,11 @@ class ThothImprintRepositoryTest extends PKPTestCase
             ])
         ];
 
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->addMethods(['imprints'])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('imprints')
+        $mockThothClient = Mockery::mock(ThothClient::class);
+        $mockThothClient->shouldReceive('imprints')
+            ->zeroOrMoreTimes()
             ->with(['publishers' => ['fffa1c59-4823-48ea-9d1c-596006a119b5']], false)
-            ->willReturn($expectedThothImprints);
-
+            ->andReturn($expectedThothImprints);
         $thothPublisherIds = ['fffa1c59-4823-48ea-9d1c-596006a119b5'];
 
         $repository = new ThothImprintRepository($mockThothClient);
@@ -51,12 +49,10 @@ class ThothImprintRepositoryTest extends PKPTestCase
 
     public function testGetImprintsReturnsEmptyArrayWithoutLinkedPublishers()
     {
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->addMethods(['imprints'])
-            ->getMock();
-        $mockThothClient->expects($this->never())
-            ->method('imprints');
+        $mockThothClient = Mockery::mock(ThothClient::class);
 
+        $mockThothClient->shouldReceive('imprints')
+            ->never();
         $repository = new ThothImprintRepository($mockThothClient);
 
         $this->assertSame([], $repository->getMany([]));
