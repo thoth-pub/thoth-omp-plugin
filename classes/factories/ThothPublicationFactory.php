@@ -16,8 +16,8 @@
 
 namespace APP\plugins\generic\thoth\classes\factories;
 
-use ThothApi\GraphQL\Enums\PublicationType;
 use ThothApi\GraphQL\Inputs\PatchPublication as ThothPublication;
+use ThothApi\GraphQL\Enums\PublicationType;
 
 class ThothPublicationFactory
 {

@@ -16,7 +16,9 @@
 
 namespace APP\plugins\generic\thoth\classes\hooks;
 
+use APP\plugins\generic\thoth\classes\handlers\fileUpload\UploadThothFileHandler;
 use APP\plugins\generic\thoth\classes\handlers\modal\RegisterHandler;
+use APP\plugins\generic\thoth\classes\handlers\pages\ThothCatalogFilesHandler;
 use APP\plugins\generic\thoth\classes\handlers\pages\ThothHandler;
 use PKP\plugins\GenericPlugin;
 
@@ -42,6 +44,21 @@ class ThothPageHandler
 
         if ($op === 'register') {
             $handler = new RegisterHandler($this);
+            return true;
+        }
+
+        if ($op === 'catalogFiles') {
+            $handler = new ThothCatalogFilesHandler();
+            return true;
+        }
+
+        if (in_array($op, [
+            'uploadThothPublicationFile',
+            'handleThothPublicationFile',
+            'saveUploadThothPublicationFile',
+            'viewThothPublicationFormatFiles',
+        ])) {
+            $handler = new UploadThothFileHandler();
             return true;
         }
 

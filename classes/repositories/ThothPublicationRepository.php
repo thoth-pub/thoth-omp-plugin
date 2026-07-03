@@ -59,6 +59,36 @@ class ThothPublicationRepository
         return !empty($thothPublications) ? $thothPublications[0]['publicationId'] : null;
     }
 
+    public function getFilesByWorkId($thothWorkId)
+    {
+        $thothWork = $this->thothClient->work($thothWorkId, [
+            'workId',
+            'publications' => [
+                'publicationId',
+                'publicationType',
+                'file' => [
+                    'fileId',
+                    'cdnUrl',
+                    'mimeType',
+                    'objectKey',
+                ],
+            ],
+        ]);
+
+        $files = [];
+        foreach ($thothWork->getPublications() ?? [] as $thothPublication) {
+            $file = $thothPublication->getFile();
+            if ($file) {
+                $files[] = [
+                    'publicationType' => $thothPublication->getPublicationType(),
+                    'file' => $file,
+                ];
+            }
+        }
+
+        return $files;
+    }
+
     public function find($filter)
     {
         $thothPublications = $this->thothClient->publications([

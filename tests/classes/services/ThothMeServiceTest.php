@@ -72,4 +72,59 @@ class ThothMeServiceTest extends PKPTestCase
         $this->assertSame('imprint-id', $imprints[0]->getImprintId());
         $this->assertSame('Test Imprint', $imprints[0]->getImprintName());
     }
+
+    public function testHasCdnWritePermission()
+    {
+        $contextId = 322;
+
+        $mockRepository = $this->getMockBuilder(ThothMeRepository::class)
+            ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock(), $contextId])
+            ->onlyMethods(['get'])
+            ->getMock();
+        $mockRepository->expects($this->once())
+            ->method('get')
+            ->willReturn(new Me([
+                'publisherContexts' => [
+                    [
+                        'permissions' => [
+                            'cdnWrite' => false,
+                        ],
+                    ],
+                    [
+                        'permissions' => [
+                            'cdnWrite' => true,
+                        ],
+                    ],
+                ],
+            ]));
+
+        $service = new ThothMeService($mockRepository);
+
+        $this->assertTrue($service->hasCdnWritePermission());
+    }
+
+    public function testHasCdnWritePermissionReturnsFalseWithoutCdnWrite()
+    {
+        $contextId = 322;
+
+        $mockRepository = $this->getMockBuilder(ThothMeRepository::class)
+            ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock(), $contextId])
+            ->onlyMethods(['get'])
+            ->getMock();
+        $mockRepository->expects($this->once())
+            ->method('get')
+            ->willReturn(new Me([
+                'publisherContexts' => [
+                    [
+                        'permissions' => [
+                            'cdnWrite' => false,
+                        ],
+                    ],
+                ],
+            ]));
+
+        $service = new ThothMeService($mockRepository);
+
+        $this->assertFalse($service->hasCdnWritePermission());
+    }
 }

@@ -31,6 +31,7 @@ use APP\plugins\generic\thoth\classes\repositories\ThothInstitutionRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothLanguageRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothLocationRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothMeRepository;
+use APP\plugins\generic\thoth\classes\repositories\ThothPublicationFileUploadRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothPublicationRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothReferenceRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothSubjectRepository;
@@ -133,6 +134,10 @@ class ThothRepositoryProvider implements ContainerProvider
 
         $container->set('publicationRepository', function ($container) {
             return new ThothPublicationRepository($container->get('client'));
+        });
+
+        $container->set('publicationFileUploadRepository', function ($container) {
+            return new ThothPublicationFileUploadRepository($container->get('client'));
         });
 
         $container->set('referenceRepository', function ($container) {

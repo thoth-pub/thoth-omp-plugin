@@ -39,4 +39,18 @@ class ThothMeService
 
         return $imprints;
     }
+
+    public function hasCdnWritePermission(): bool
+    {
+        $me = $this->repository->get();
+
+        foreach ($me->getPublisherContexts() as $publisherContext) {
+            $permissions = $publisherContext->getPermissions();
+            if ($permissions && $permissions->getCdnWrite()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

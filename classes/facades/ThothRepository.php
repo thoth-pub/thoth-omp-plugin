@@ -30,6 +30,11 @@ class ThothRepository
         return ThothContainer::getInstance()->get('biographyRepository');
     }
 
+    public static function chapter()
+    {
+        return ThothContainer::getInstance()->get('chapterRepository');
+    }
+
     public static function affiliation()
     {
         return ThothContainer::getInstance()->get('affiliationRepository');
@@ -73,6 +78,11 @@ class ThothRepository
     public static function publication()
     {
         return ThothContainer::getInstance()->get('publicationRepository');
+    }
+
+    public static function publicationFileUpload()
+    {
+        return ThothContainer::getInstance()->get('publicationFileUploadRepository');
     }
 
     public static function reference()
