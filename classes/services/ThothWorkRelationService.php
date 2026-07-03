@@ -37,7 +37,7 @@ class ThothWorkRelationService
             'relatorWorkId' => $thothChapterId,
             'relatedWorkId' => $thothRelatedWorkId,
             'relationType' => RelationType::IS_CHILD_OF,
-            'relationOrdinal' => ($chapter->getSequence() + 1)
+            'relationOrdinal' => ((int) $chapter->getSequence() + 1)
         ]);
 
         return $this->repository->add($thothWorkRelation);
