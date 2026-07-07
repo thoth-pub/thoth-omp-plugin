@@ -15,13 +15,18 @@
  */
 
 import('lib.pkp.classes.cache.CacheManager');
-import('plugins.generic.thoth.classes.facades.ThothRepo');
-
 class ThothMeCacheService
 {
     public const TTL = 86400;
 
     private const CONTEXT = 'thothMe';
+
+    private $meRepository;
+
+    public function __construct($meRepository = null)
+    {
+        $this->meRepository = $meRepository;
+    }
 
     public function get($contextId)
     {
@@ -64,13 +69,13 @@ class ThothMeCacheService
     public function getProfile($contextId)
     {
         return $this->remember($contextId, function () {
-            return ThothRepo::me()->getProfile();
+            return $this->meRepository->getProfile();
         });
     }
 
     public function hasCdnWritePermission($contextId)
     {
-        return ThothRepo::me()->hasCdnWritePermission($this->getProfile($contextId));
+        return $this->meRepository->hasCdnWritePermission($this->getProfile($contextId));
     }
 
     public function getLinkedPublishers($contextId)

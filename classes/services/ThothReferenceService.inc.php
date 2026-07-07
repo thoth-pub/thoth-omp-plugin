@@ -43,7 +43,7 @@ class ThothReferenceService
             ->getByPublicationId($publication->getId())
             ->toArray();
         foreach ($citations as $citation) {
-            ThothService::reference()->register($citation, $thothBookId);
+            $this->register($citation, $thothBookId);
         }
     }
 }

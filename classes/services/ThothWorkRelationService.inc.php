@@ -17,20 +17,20 @@
 use PKP\db\DAORegistry;
 use ThothApi\GraphQL\Enums\RelationType;
 
-import('plugins.generic.thoth.classes.facades.ThothService');
-
 class ThothWorkRelationService
 {
     public $repository;
+    public $chapterService;
 
-    public function __construct($repository)
+    public function __construct($repository, $chapterService)
     {
         $this->repository = $repository;
+        $this->chapterService = $chapterService;
     }
 
     public function register($chapter, $thothRelatedWorkId, $thothImprintId)
     {
-        $thothChapterId = ThothService::chapter()->register($chapter, $thothImprintId);
+        $thothChapterId = $this->chapterService->register($chapter, $thothImprintId);
 
         $thothWorkRelation = $this->repository->new([
             'relatorWorkId' => $thothChapterId,
@@ -49,7 +49,7 @@ class ThothWorkRelationService
             ->getByPublicationId($publication->getId())
             ->toArray();
         foreach ($chapters as $chapter) {
-            ThothService::workRelation()->register($chapter, $thothBookId, $thothImprintId);
+            $this->register($chapter, $thothBookId, $thothImprintId);
         }
     }
 }

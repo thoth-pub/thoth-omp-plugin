@@ -23,6 +23,7 @@ use ThothApi\GraphQL\Enums\WorkStatus;
 use ThothApi\GraphQL\Enums\WorkType;
 use ThothApi\GraphQL\Inputs\PatchWork as ThothWork;
 
+import('plugins.generic.thoth.classes.container.ThothContainer');
 import('plugins.generic.thoth.classes.factories.ThothBookFactory');
 import('plugins.generic.thoth.classes.repositories.ThothBookRepository');
 import('plugins.generic.thoth.classes.services.ThothAbstractService');
@@ -63,6 +64,22 @@ class ThothBookServiceTest extends PKPTestCase
             $container->set($key, $factory);
         }
         parent::tearDown();
+    }
+
+    private function createBookService(
+        $factory,
+        $repository,
+        $publicationService = null,
+        $titleService = null,
+        $abstractService = null
+    ) {
+        return new ThothBookService(
+            $factory,
+            $repository,
+            $publicationService ?? $this->createMock(ThothPublicationService::class),
+            $titleService ?? $this->createMock(ThothTitleService::class),
+            $abstractService ?? $this->createMock(ThothAbstractService::class)
+        );
     }
 
     public function testRegisterBook()
@@ -145,7 +162,7 @@ class ThothBookServiceTest extends PKPTestCase
 
         $thothImprintId = 'f740cf4e-16d1-487c-9a92-615882a591e9';
 
-        $service = new ThothBookService($mockFactory, $mockRepository);
+        $service = $this->createBookService($mockFactory, $mockRepository);
         $thothBookId = $service->register($mockPublication, $thothImprintId);
 
         $this->assertSame('d8fa2e63-5513-45e5-84c1-e9c2d89f99d3', $thothBookId);
@@ -162,8 +179,6 @@ class ThothBookServiceTest extends PKPTestCase
                 [['titleId' => 'title-id']],
                 'en_US'
             );
-        ThothContainer::getInstance()->set('titleService', fn () => $mockTitleService);
-
         $mockAbstractService = $this->createMock(ThothAbstractService::class);
         $mockAbstractService->expects($this->once())
             ->method('updateByPublication')
@@ -173,8 +188,6 @@ class ThothBookServiceTest extends PKPTestCase
                 [['abstractId' => 'abstract-id']],
                 'en_US'
             );
-        ThothContainer::getInstance()->set('abstractService', fn () => $mockAbstractService);
-
         $oldThothBook = new class () {
             public function toArray()
             {
@@ -229,7 +242,13 @@ class ThothBookServiceTest extends PKPTestCase
             ['locale', null, 'en_US'],
         ]));
 
-        $service = new ThothBookService($mockFactory, $mockRepository);
+        $service = $this->createBookService(
+            $mockFactory,
+            $mockRepository,
+            null,
+            $mockTitleService,
+            $mockAbstractService
+        );
         $service->update($mockPublication, '9f65f147-1d9d-4dd1-9f78-89b58d088a2c');
     }
 
@@ -254,7 +273,7 @@ class ThothBookServiceTest extends PKPTestCase
 
         $mockPublication = $this->getMockBuilder(\APP\publication\Publication::class)->getMock();
 
-        $service = new ThothBookService($mockFactory, $mockRepository);
+        $service = $this->createBookService($mockFactory, $mockRepository);
         $errors = $service->validate($mockPublication);
 
         $this->assertEquals([
@@ -285,7 +304,7 @@ class ThothBookServiceTest extends PKPTestCase
 
         $mockPublication = $this->getMockBuilder(\APP\publication\Publication::class)->getMock();
 
-        $service = new ThothBookService($mockFactory, $mockRepository);
+        $service = $this->createBookService($mockFactory, $mockRepository);
         $errors = $service->validate($mockPublication);
 
         $this->assertEquals([
