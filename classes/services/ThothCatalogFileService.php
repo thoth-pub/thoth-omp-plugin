@@ -16,10 +16,15 @@
 
 namespace APP\plugins\generic\thoth\classes\services;
 
-use APP\plugins\generic\thoth\classes\facades\ThothRepository;
-
 class ThothCatalogFileService
 {
+    private $publicationRepository;
+
+    public function __construct($publicationRepository)
+    {
+        $this->publicationRepository = $publicationRepository;
+    }
+
     public function getFilesByWorkId($thothWorkId): array
     {
         if (!$thothWorkId) {
@@ -28,7 +33,7 @@ class ThothCatalogFileService
 
         return array_values(array_filter(array_map(
             [$this, 'formatFile'],
-            ThothRepository::publication()->getFilesByWorkId($thothWorkId)
+            $this->publicationRepository->getFilesByWorkId($thothWorkId)
         )));
     }
 

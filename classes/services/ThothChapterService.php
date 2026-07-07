@@ -17,17 +17,30 @@
 namespace APP\plugins\generic\thoth\classes\services;
 
 use APP\facades\Repo;
-use APP\plugins\generic\thoth\classes\facades\ThothService;
 
 class ThothChapterService
 {
     public $factory;
     public $repository;
+    public $contributionService;
+    public $publicationService;
+    public $titleService;
+    public $abstractService;
 
-    public function __construct($factory, $repository)
-    {
+    public function __construct(
+        $factory,
+        $repository,
+        $contributionService,
+        $publicationService,
+        $titleService,
+        $abstractService
+    ) {
         $this->factory = $factory;
         $this->repository = $repository;
+        $this->contributionService = $contributionService;
+        $this->publicationService = $publicationService;
+        $this->titleService = $titleService;
+        $this->abstractService = $abstractService;
     }
 
     public function register($chapter, $thothImprintId)
@@ -39,8 +52,8 @@ class ThothChapterService
         $chapter->setData('thothChapterId', $thothChapterId);
         $this->registerMetadata($chapter, $thothChapterId);
 
-        ThothService::contribution()->registerByChapter($chapter);
-        ThothService::publication()->registerByChapter($chapter);
+        $this->contributionService->registerByChapter($chapter);
+        $this->publicationService->registerByChapter($chapter);
 
         return $thothChapterId;
     }
@@ -49,7 +62,7 @@ class ThothChapterService
     {
         $publication = Repo::publication()->get($chapter->getData('publicationId'));
 
-        ThothService::title()->registerByChapter($chapter, $thothChapterId, $publication->getData('locale'));
-        ThothService::abstract()->registerByChapter($chapter, $thothChapterId, $publication->getData('locale'));
+        $this->titleService->registerByChapter($chapter, $thothChapterId, $publication->getData('locale'));
+        $this->abstractService->registerByChapter($chapter, $thothChapterId, $publication->getData('locale'));
     }
 }

@@ -18,9 +18,6 @@
 
 namespace APP\plugins\generic\thoth\tests\classes\services;
 
-use APP\plugins\generic\thoth\classes\container\ThothContainer;
-use APP\plugins\generic\thoth\classes\factories\ThothChapterFactory;
-use APP\plugins\generic\thoth\classes\repositories\ThothChapterRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothWorkRelationRepository;
 use APP\plugins\generic\thoth\classes\services\ThothChapterService;
 use APP\plugins\generic\thoth\classes\services\ThothWorkRelationService;
@@ -32,24 +29,10 @@ class ThothWorkRelationServiceTest extends PKPTestCase
 {
     public function testRegisterWorkRelation()
     {
-        ThothContainer::getInstance()->set('chapterService', function () {
-            $mockService = $this->getMockBuilder(ThothChapterService::class)
-                ->setConstructorArgs([
-                    $this->getMockBuilder(ThothChapterFactory::class)->getMock(),
-                    $this->getMockBuilder(ThothChapterRepository::class)
-                        ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)
-                            ->getMock()
-                        ])
-                        ->getMock(),
-                ])
-                ->onlyMethods(['register'])
-                ->getMock();
-            $mockService->expects($this->any())
-                ->method('register')
-                ->willReturn('dccd9dfd-fee2-4e85-b1f8-0440f9b43ce8');
-
-            return $mockService;
-        });
+        $mockChapterService = $this->createMock(ThothChapterService::class);
+        $mockChapterService->expects($this->once())
+            ->method('register')
+            ->willReturn('dccd9dfd-fee2-4e85-b1f8-0440f9b43ce8');
 
         $thothRelatedWorkId = '813e0519-05ca-455b-b330-af623456dace';
         $thothImprintId = '41b6a2a4-c3e1-4045-882c-c0f31386dee5';
@@ -77,7 +60,7 @@ class ThothWorkRelationServiceTest extends PKPTestCase
             ->method('getSequence')
             ->willReturn(1.0);
 
-        $service = new ThothWorkRelationService($mockRepository);
+        $service = new ThothWorkRelationService($mockRepository, $mockChapterService);
         $thothWorkRelationId = $service->register($mockChapter, $thothRelatedWorkId, $thothImprintId);
 
         $this->assertSame('91966e15-0203-4eb8-b7e7-02b72c57cedc', $thothWorkRelationId);

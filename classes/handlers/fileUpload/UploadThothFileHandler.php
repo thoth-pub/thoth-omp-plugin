@@ -176,7 +176,7 @@ class UploadThothFileHandler extends Handler
             return [];
         }
 
-        $catalogFileService = new ThothCatalogFileService();
+        $catalogFileService = new ThothCatalogFileService(ThothRepository::publication());
         $thothFiles = [];
 
         $monographFile = $this->getFileByPublicationType(
