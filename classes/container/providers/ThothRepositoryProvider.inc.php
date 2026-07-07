@@ -16,12 +16,10 @@
 
 require_once(__DIR__ . '/../../../vendor/autoload.php');
 
-use APP\core\Application;
-use APP\plugins\generic\thoth\classes\encryption\DataEncryption;
-use PKP\db\DAORegistry;
 use ThothApi\GraphQL\Client;
 
 import('plugins.generic.thoth.classes.container.providers.ContainerProvider');
+import('plugins.generic.thoth.classes.config.ThothSettings');
 import('plugins.generic.thoth.classes.factories.ThothBookFactory');
 import('plugins.generic.thoth.classes.factories.ThothChapterFactory');
 import('plugins.generic.thoth.classes.factories.ThothContributionFactory');
@@ -53,28 +51,7 @@ class ThothRepositoryProvider implements ContainerProvider
     public function register($container)
     {
         $container->set('config', function ($container) {
-            $encryption = new DataEncryption();
-            $pluginSettingsDao = & DAORegistry::getDAO('PluginSettingsDAO');
-            $contextId = Application::get()->getRequest()->getContext()->getId();
-
-            $customThothApi = $pluginSettingsDao->getSetting($contextId, 'ThothPlugin', 'customThothApi');
-            $customThothApiUrl = $pluginSettingsDao->getSetting($contextId, 'ThothPlugin', 'customThothApiUrl');
-            $token = $pluginSettingsDao->getSetting($contextId, 'ThothPlugin', 'token') ?? '';
-            $decryptedToken = '';
-
-            if ($token) {
-                try {
-                    $decryptedToken = $encryption->decryptString($token);
-                } catch (Exception $e) {
-                    $decryptedToken = '';
-                }
-            }
-
-            return [
-                'customThothApi' => $customThothApi,
-                'customThothApiUrl' => $customThothApiUrl,
-                'token' => $decryptedToken
-            ];
+            return (new ThothSettings())->toArray();
         });
 
         $container->set('client', function ($container) {
