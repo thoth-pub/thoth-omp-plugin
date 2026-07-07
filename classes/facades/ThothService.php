@@ -55,11 +55,6 @@ class ThothService
         return ThothContainer::getInstance()->get('contributorService');
     }
 
-    public static function institution()
-    {
-        return ThothContainer::getInstance()->get('institutionService');
-    }
-
     public static function language()
     {
         return ThothContainer::getInstance()->get('languageService');
