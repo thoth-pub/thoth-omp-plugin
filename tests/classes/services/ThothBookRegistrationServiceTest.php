@@ -34,33 +34,6 @@ import('plugins.generic.thoth.classes.services.ThothWorkRelationService');
 
 class ThothBookRegistrationServiceTest extends PKPTestCase
 {
-    protected $backups = [];
-
-    public function setUp(): void
-    {
-        parent::setUp();
-        $container = ThothContainer::getInstance();
-        $this->backups = [
-            'abstractService' => $container->backup('abstractService'),
-            'contributionService' => $container->backup('contributionService'),
-            'languageService' => $container->backup('languageService'),
-            'publicationService' => $container->backup('publicationService'),
-            'referenceService' => $container->backup('referenceService'),
-            'subjectService' => $container->backup('subjectService'),
-            'titleService' => $container->backup('titleService'),
-            'workRelationService' => $container->backup('workRelationService'),
-        ];
-    }
-
-    protected function tearDown(): void
-    {
-        $container = ThothContainer::getInstance();
-        foreach ($this->backups as $key => $factory) {
-            $container->set($key, $factory);
-        }
-        parent::tearDown();
-    }
-
     public function testRegisterBookMetadataAndRelations()
     {
         $mockPublication = $this->getMockBuilder(Publication::class)
@@ -90,37 +63,40 @@ class ThothBookRegistrationServiceTest extends PKPTestCase
 
         $mockAbstractService = $this->createMock(ThothAbstractService::class);
         $mockAbstractService->expects($this->once())->method('registerByPublication');
-        ThothContainer::getInstance()->set('abstractService', fn () => $mockAbstractService);
 
         $mockContributionService = $this->createMock(ThothContributionService::class);
         $mockContributionService->expects($this->once())->method('registerByPublication');
-        ThothContainer::getInstance()->set('contributionService', fn () => $mockContributionService);
 
         $mockPublicationService = $this->createMock(ThothPublicationService::class);
         $mockPublicationService->expects($this->once())->method('registerByPublication');
-        ThothContainer::getInstance()->set('publicationService', fn () => $mockPublicationService);
 
         $mockLanguageService = $this->createMock(ThothLanguageService::class);
         $mockLanguageService->expects($this->once())->method('registerByPublication');
-        ThothContainer::getInstance()->set('languageService', fn () => $mockLanguageService);
 
         $mockSubjectService = $this->createMock(ThothSubjectService::class);
         $mockSubjectService->expects($this->once())->method('registerByPublication');
-        ThothContainer::getInstance()->set('subjectService', fn () => $mockSubjectService);
 
         $mockReferenceService = $this->createMock(ThothReferenceService::class);
         $mockReferenceService->expects($this->once())->method('registerByPublication');
-        ThothContainer::getInstance()->set('referenceService', fn () => $mockReferenceService);
 
         $mockTitleService = $this->createMock(ThothTitleService::class);
         $mockTitleService->expects($this->once())->method('registerByPublication');
-        ThothContainer::getInstance()->set('titleService', fn () => $mockTitleService);
 
         $mockWorkRelationService = $this->createMock(ThothWorkRelationService::class);
         $mockWorkRelationService->expects($this->once())->method('registerByPublication');
-        ThothContainer::getInstance()->set('workRelationService', fn () => $mockWorkRelationService);
 
-        $service = new ThothBookRegistrationService($mockFactory, $mockRepository);
+        $service = new ThothBookRegistrationService(
+            $mockFactory,
+            $mockRepository,
+            $mockAbstractService,
+            $mockContributionService,
+            $mockLanguageService,
+            $mockPublicationService,
+            $mockReferenceService,
+            $mockSubjectService,
+            $mockTitleService,
+            $mockWorkRelationService
+        );
 
         $thothBookId = $service->register($mockPublication, 'f740cf4e-16d1-487c-9a92-615882a591e9');
 
