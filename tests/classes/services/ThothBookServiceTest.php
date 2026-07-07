@@ -37,6 +37,8 @@ import('plugins.generic.thoth.classes.services.ThothWorkRelationService');
 
 class ThothBookServiceTest extends PKPTestCase
 {
+    protected $backups = [];
+
     public function setUp(): void
     {
         parent::setUp();
@@ -70,7 +72,7 @@ class ThothBookServiceTest extends PKPTestCase
         });
 
         $mockAbstractService = $this->createMock(ThothAbstractService::class);
-        $mockAbstractService->expects($this->once())->method('registerByPublication');
+        $mockAbstractService->expects($this->never())->method('registerByPublication');
         ThothContainer::getInstance()->set('abstractService', fn () => $mockAbstractService);
 
         $mockContributionService = $this->createMock(ThothContributionService::class);
@@ -109,7 +111,7 @@ class ThothBookServiceTest extends PKPTestCase
             ->will($this->returnValue('d8fa2e63-5513-45e5-84c1-e9c2d89f99d3'));
 
         $mockTitleService = $this->createMock(ThothTitleService::class);
-        $mockTitleService->expects($this->once())->method('registerByPublication');
+        $mockTitleService->expects($this->never())->method('registerByPublication');
         ThothContainer::getInstance()->set('titleService', fn () => $mockTitleService);
 
         $mockWorkRelationService = $this->createMock(ThothWorkRelationService::class);
