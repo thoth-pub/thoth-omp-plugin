@@ -75,7 +75,15 @@ class ThothServiceProvider implements ContainerProvider
         $container->set('bookRegistrationService', function ($container) {
             return new ThothBookRegistrationService(
                 new ThothBookFactory(),
-                $container->get('bookRepository')
+                $container->get('bookRepository'),
+                $container->get('abstractService'),
+                $container->get('contributionService'),
+                $container->get('languageService'),
+                $container->get('publicationService'),
+                $container->get('referenceService'),
+                $container->get('subjectService'),
+                $container->get('titleService'),
+                $container->get('workRelationService')
             );
         });
 
