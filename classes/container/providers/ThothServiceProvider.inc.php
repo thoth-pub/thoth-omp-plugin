@@ -35,7 +35,10 @@ class ThothServiceProvider implements ContainerProvider
         });
 
         $container->singleton('affiliationService', function ($container) {
-            return new ThothAffiliationService($container->get('affiliationRepository'));
+            return new ThothAffiliationService(
+                $container->get('affiliationRepository'),
+                $container->get('institutionRepository')
+            );
         });
 
         $container->singleton('biographyService', function ($container) {
@@ -43,7 +46,13 @@ class ThothServiceProvider implements ContainerProvider
         });
 
         $container->singleton('bookService', function ($container) {
-            return new ThothBookService(new ThothBookFactory(), $container->get('bookRepository'));
+            return new ThothBookService(
+                new ThothBookFactory(),
+                $container->get('bookRepository'),
+                $container->get('publicationService'),
+                $container->get('titleService'),
+                $container->get('abstractService')
+            );
         });
 
         $container->singleton('bookRegistrationService', function ($container) {
@@ -62,11 +71,25 @@ class ThothServiceProvider implements ContainerProvider
         });
 
         $container->singleton('chapterService', function ($container) {
-            return new ThothChapterService(new ThothChapterFactory(), $container->get('chapterRepository'));
+            return new ThothChapterService(
+                new ThothChapterFactory(),
+                $container->get('chapterRepository'),
+                $container->get('contributionService'),
+                $container->get('publicationService'),
+                $container->get('titleService'),
+                $container->get('abstractService')
+            );
         });
 
         $container->singleton('contributionService', function ($container) {
-            return new ThothContributionService(new ThothContributionFactory(), $container->get('contributionRepository'));
+            return new ThothContributionService(
+                new ThothContributionFactory(),
+                $container->get('contributionRepository'),
+                $container->get('contributorRepository'),
+                $container->get('contributorService'),
+                $container->get('biographyService'),
+                $container->get('affiliationService')
+            );
         });
 
         $container->singleton('contributorService', function ($container) {
@@ -82,7 +105,11 @@ class ThothServiceProvider implements ContainerProvider
         });
 
         $container->singleton('publicationService', function ($container) {
-            return new ThothPublicationService(new ThothPublicationFactory(), $container->get('publicationRepository'));
+            return new ThothPublicationService(
+                new ThothPublicationFactory(),
+                $container->get('publicationRepository'),
+                $container->get('locationService')
+            );
         });
 
         $container->singleton('referenceService', function ($container) {
@@ -98,7 +125,10 @@ class ThothServiceProvider implements ContainerProvider
         });
 
         $container->singleton('workRelationService', function ($container) {
-            return new ThothWorkRelationService($container->get('workRelationRepository'));
+            return new ThothWorkRelationService(
+                $container->get('workRelationRepository'),
+                $container->get('chapterService')
+            );
         });
     }
 }

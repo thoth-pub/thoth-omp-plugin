@@ -14,13 +14,15 @@
  * @brief Helper class that encapsulates business logic for Thoth books
  */
 
-import('plugins.generic.thoth.classes.facades.ThothService');
 import('lib.pkp.classes.services.PKPSchemaService');
 
 class ThothBookService
 {
     public $factory;
     public $repository;
+    public $publicationService;
+    public $titleService;
+    public $abstractService;
 
     private const PATCH_WORK_FIELDS = [
         'workId' => true,
@@ -55,10 +57,13 @@ class ThothBookService
         'pageInterval' => true,
     ];
 
-    public function __construct($factory, $repository)
+    public function __construct($factory, $repository, $publicationService, $titleService, $abstractService)
     {
         $this->factory = $factory;
         $this->repository = $repository;
+        $this->publicationService = $publicationService;
+        $this->titleService = $titleService;
+        $this->abstractService = $abstractService;
     }
 
     public function register($publication, $thothImprintId)
@@ -116,7 +121,7 @@ class ThothBookService
             $publicationFormats = $publicationFormats->toArray();
         }
         foreach ($publicationFormats as $publicationFormat) {
-            $errors = array_merge($errors, ThothService::publication()->validate($publicationFormat));
+            $errors = array_merge($errors, $this->publicationService->validate($publicationFormat));
         }
 
         return $errors;
@@ -124,13 +129,13 @@ class ThothBookService
 
     private function updateMetadata($publication, $thothBookId, $oldThothBook)
     {
-        ThothService::title()->updateByPublication(
+        $this->titleService->updateByPublication(
             $publication,
             $thothBookId,
             $oldThothBook->toArray()['titles'] ?? [],
             $publication->getData('locale')
         );
-        ThothService::abstract()->updateByPublication(
+        $this->abstractService->updateByPublication(
             $publication,
             $thothBookId,
             $oldThothBook->toArray()['abstracts'] ?? [],

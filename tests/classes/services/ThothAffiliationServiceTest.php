@@ -20,6 +20,7 @@ use ThothApi\GraphQL\Inputs\PatchAffiliation as ThothAffiliation;
 use ThothApi\GraphQL\Inputs\PatchInstitution as ThothInstitution;
 
 import('lib.pkp.tests.PKPTestCase');
+import('plugins.generic.thoth.classes.container.ThothContainer');
 import('plugins.generic.thoth.classes.repositories.ThothAffiliationRepository');
 import('plugins.generic.thoth.classes.repositories.ThothInstitutionRepository');
 import('plugins.generic.thoth.classes.services.ThothAffiliationService');
@@ -40,17 +41,13 @@ class ThothAffiliationServiceTest extends PKPTestCase
 
     public function testRegisterAffiliation()
     {
-        ThothContainer::getInstance()->set('institutionRepository', function () {
-            $mockRepository = $this->getMockBuilder(ThothInstitutionRepository::class)
-                ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
-                ->setMethods(['find'])
-                ->getMock();
-            $mockRepository->expects($this->once())
-                ->method('find')
-                ->will($this->returnValue(new ThothInstitution()));
-
-            return $mockRepository;
-        });
+        $mockInstitutionRepository = $this->getMockBuilder(ThothInstitutionRepository::class)
+            ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
+            ->setMethods(['find'])
+            ->getMock();
+        $mockInstitutionRepository->expects($this->once())
+            ->method('find')
+            ->will($this->returnValue(new ThothInstitution()));
 
         $mockRepository = $this->getMockBuilder(ThothAffiliationRepository::class)
             ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
@@ -63,7 +60,7 @@ class ThothAffiliationServiceTest extends PKPTestCase
         $rorId = 'https://ror.org/00101234';
         $thothContributionId = '7315563c-e5c3-40b2-8558-8d1f9cede901';
 
-        $service = new ThothAffiliationService($mockRepository);
+        $service = new ThothAffiliationService($mockRepository, $mockInstitutionRepository);
         $thothAffiliationId = $service->register($rorId, $thothContributionId);
 
         $this->assertSame('43f98edb-ac8c-45b4-9faa-2941a05c133c', $thothAffiliationId);

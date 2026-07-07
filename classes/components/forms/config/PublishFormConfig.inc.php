@@ -38,7 +38,9 @@ class PublishFormConfig
             $errors = ThothService::book()->validate($publication);
 
             if (empty($errors)) {
-                $publishers = (new ThothMeCacheService())->getLinkedPublishers($submission->getData('contextId'));
+                $publishers = (new ThothMeCacheService(ThothRepo::me()))->getLinkedPublishers(
+                    $submission->getData('contextId')
+                );
                 $publisherIds = array_column($publishers, 'publisherId');
                 $imprints = ThothRepo::imprint()->getMany([
                     'publishers' => $publisherIds
