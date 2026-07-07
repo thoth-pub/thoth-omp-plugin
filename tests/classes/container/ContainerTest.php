@@ -57,6 +57,37 @@ class ContainerTest extends PKPTestCase
         $this->assertSame($callable, $fooBackup);
     }
 
+    public function testSingletonReturnsSameInstance()
+    {
+        $container = new Container();
+
+        $container->singleton('class', function ($container) {
+            return new class () {
+            };
+        });
+
+        $firstClass = $container->get('class');
+        $secondClass = $container->get('class');
+
+        $this->assertSame($firstClass, $secondClass);
+    }
+
+    public function testSetReplacesSingletonBinding()
+    {
+        $container = new Container();
+
+        $container->singleton('foo', function () {
+            return 'foo';
+        });
+        $container->get('foo');
+
+        $container->set('foo', function () {
+            return 'bar';
+        });
+
+        $this->assertSame('bar', $container->get('foo'));
+    }
+
     public function testInvalidBindingThrownException()
     {
         $this->expectException(Exception::class);
