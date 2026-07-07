@@ -30,23 +30,23 @@ class ThothServiceProvider implements ContainerProvider
 {
     public function register($container)
     {
-        $container->set('abstractService', function ($container) {
+        $container->singleton('abstractService', function ($container) {
             return new ThothAbstractService(new ThothAbstractFactory(), $container->get('abstractRepository'));
         });
 
-        $container->set('affiliationService', function ($container) {
+        $container->singleton('affiliationService', function ($container) {
             return new ThothAffiliationService($container->get('affiliationRepository'));
         });
 
-        $container->set('biographyService', function ($container) {
+        $container->singleton('biographyService', function ($container) {
             return new ThothBiographyService(new ThothBiographyFactory(), $container->get('biographyRepository'));
         });
 
-        $container->set('bookService', function ($container) {
+        $container->singleton('bookService', function ($container) {
             return new ThothBookService(new ThothBookFactory(), $container->get('bookRepository'));
         });
 
-        $container->set('bookRegistrationService', function ($container) {
+        $container->singleton('bookRegistrationService', function ($container) {
             return new ThothBookRegistrationService(
                 new ThothBookFactory(),
                 $container->get('bookRepository'),
@@ -61,43 +61,43 @@ class ThothServiceProvider implements ContainerProvider
             );
         });
 
-        $container->set('chapterService', function ($container) {
+        $container->singleton('chapterService', function ($container) {
             return new ThothChapterService(new ThothChapterFactory(), $container->get('chapterRepository'));
         });
 
-        $container->set('contributionService', function ($container) {
+        $container->singleton('contributionService', function ($container) {
             return new ThothContributionService(new ThothContributionFactory(), $container->get('contributionRepository'));
         });
 
-        $container->set('contributorService', function ($container) {
+        $container->singleton('contributorService', function ($container) {
             return new ThothContributorService(new ThothContributorFactory(), $container->get('contributorRepository'));
         });
 
-        $container->set('languageService', function ($container) {
+        $container->singleton('languageService', function ($container) {
             return new ThothLanguageService($container->get('languageRepository'));
         });
 
-        $container->set('locationService', function ($container) {
+        $container->singleton('locationService', function ($container) {
             return new ThothLocationService(new ThothLocationFactory(), $container->get('locationRepository'));
         });
 
-        $container->set('publicationService', function ($container) {
+        $container->singleton('publicationService', function ($container) {
             return new ThothPublicationService(new ThothPublicationFactory(), $container->get('publicationRepository'));
         });
 
-        $container->set('referenceService', function ($container) {
+        $container->singleton('referenceService', function ($container) {
             return new ThothReferenceService($container->get('referenceRepository'));
         });
 
-        $container->set('subjectService', function ($container) {
+        $container->singleton('subjectService', function ($container) {
             return new ThothSubjectService($container->get('subjectRepository'));
         });
 
-        $container->set('titleService', function ($container) {
+        $container->singleton('titleService', function ($container) {
             return new ThothTitleService(new ThothTitleFactory(), $container->get('titleRepository'));
         });
 
-        $container->set('workRelationService', function ($container) {
+        $container->singleton('workRelationService', function ($container) {
             return new ThothWorkRelationService($container->get('workRelationRepository'));
         });
     }

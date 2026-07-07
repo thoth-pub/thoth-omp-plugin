@@ -16,10 +16,20 @@
 class Container
 {
     private $bindings = [];
+    private $singletons = [];
+    private $instances = [];
 
     public function set($id, $factory)
     {
         $this->bindings[$id] = $factory;
+        unset($this->singletons[$id], $this->instances[$id]);
+    }
+
+    public function singleton($id, $factory)
+    {
+        $this->bindings[$id] = $factory;
+        $this->singletons[$id] = true;
+        unset($this->instances[$id]);
     }
 
     public function get($id)
@@ -30,7 +40,15 @@ class Container
 
         $factory = $this->bindings[$id];
 
-        return $factory($this);
+        if (!isset($this->singletons[$id])) {
+            return $factory($this);
+        }
+
+        if (!array_key_exists($id, $this->instances)) {
+            $this->instances[$id] = $factory($this);
+        }
+
+        return $this->instances[$id];
     }
 
     public function backup($id)
