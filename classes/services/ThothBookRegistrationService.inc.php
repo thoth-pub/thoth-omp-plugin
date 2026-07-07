@@ -16,19 +16,43 @@
 
 use ThothApi\GraphQL\Enums\WorkStatus;
 
-import('plugins.generic.thoth.classes.facades.ThothService');
-
 class ThothBookRegistrationService
 {
     private $factory;
     private $repository;
+    private $abstractService;
+    private $contributionService;
+    private $languageService;
+    private $publicationService;
+    private $referenceService;
+    private $subjectService;
+    private $titleService;
+    private $workRelationService;
     private $originalThothBook;
     private $registeredEntryId;
 
-    public function __construct($factory, $repository)
-    {
+    public function __construct(
+        $factory,
+        $repository,
+        $abstractService,
+        $contributionService,
+        $languageService,
+        $publicationService,
+        $referenceService,
+        $subjectService,
+        $titleService,
+        $workRelationService
+    ) {
         $this->factory = $factory;
         $this->repository = $repository;
+        $this->abstractService = $abstractService;
+        $this->contributionService = $contributionService;
+        $this->languageService = $languageService;
+        $this->publicationService = $publicationService;
+        $this->referenceService = $referenceService;
+        $this->subjectService = $subjectService;
+        $this->titleService = $titleService;
+        $this->workRelationService = $workRelationService;
     }
 
     public function register($publication, $thothImprintId)
@@ -46,12 +70,12 @@ class ThothBookRegistrationService
         $this->registeredEntryId = $thothBookId;
         $this->registerMetadata($publication, $thothBookId);
 
-        ThothService::contribution()->registerByPublication($publication);
-        ThothService::publication()->registerByPublication($publication);
-        ThothService::language()->registerByPublication($publication);
-        ThothService::subject()->registerByPublication($publication);
-        ThothService::reference()->registerByPublication($publication);
-        ThothService::workRelation()->registerByPublication($publication, $thothImprintId);
+        $this->contributionService->registerByPublication($publication);
+        $this->publicationService->registerByPublication($publication);
+        $this->languageService->registerByPublication($publication);
+        $this->subjectService->registerByPublication($publication);
+        $this->referenceService->registerByPublication($publication);
+        $this->workRelationService->registerByPublication($publication, $thothImprintId);
 
         return $thothBookId;
     }
@@ -79,12 +103,12 @@ class ThothBookRegistrationService
 
     private function registerMetadata($publication, $thothBookId)
     {
-        ThothService::title()->registerByPublication(
+        $this->titleService->registerByPublication(
             $publication,
             $thothBookId,
             $publication->getData('locale')
         );
-        ThothService::abstract()->registerByPublication(
+        $this->abstractService->registerByPublication(
             $publication,
             $thothBookId,
             $publication->getData('locale')
