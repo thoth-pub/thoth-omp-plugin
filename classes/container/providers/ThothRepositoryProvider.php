@@ -18,7 +18,7 @@ namespace APP\plugins\generic\thoth\classes\container\providers;
 
 require_once(__DIR__ . '/../../../vendor/autoload.php');
 
-use APP\core\Application;
+use APP\plugins\generic\thoth\classes\config\ThothSettings;
 use APP\plugins\generic\thoth\classes\repositories\ThothAbstractRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothAffiliationRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothBiographyRepository;
@@ -38,9 +38,6 @@ use APP\plugins\generic\thoth\classes\repositories\ThothSubjectRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothTitleRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothWorkRelationRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothWorkRepository;
-use Illuminate\Contracts\Encryption\DecryptException;
-use Illuminate\Support\Facades\Crypt;
-use PKP\db\DAORegistry;
 use ThothApi\GraphQL\Client;
 
 class ThothRepositoryProvider implements ContainerProvider
@@ -48,27 +45,7 @@ class ThothRepositoryProvider implements ContainerProvider
     public function register($container)
     {
         $container->set('config', function ($container) {
-            $pluginSettingsDao = & DAORegistry::getDAO('PluginSettingsDAO');
-            $contextId = Application::get()->getRequest()->getContext()->getId();
-
-            $customThothApi = $pluginSettingsDao->getSetting($contextId, 'ThothPlugin', 'customThothApi');
-            $customThothApiUrl = $pluginSettingsDao->getSetting($contextId, 'ThothPlugin', 'customThothApiUrl');
-            $token = $pluginSettingsDao->getSetting($contextId, 'ThothPlugin', 'token') ?? '';
-            $decryptedToken = '';
-
-            if ($token) {
-                try {
-                    $decryptedToken = Crypt::decrypt($token);
-                } catch (DecryptException $exception) {
-                    $decryptedToken = '';
-                }
-            }
-
-            return [
-                'customThothApi' => $customThothApi,
-                'customThothApiUrl' => $customThothApiUrl,
-                'token' => $decryptedToken
-            ];
+            return (new ThothSettings())->toArray();
         });
 
         $container->set('client', function ($container) {
