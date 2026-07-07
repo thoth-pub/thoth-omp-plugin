@@ -13,6 +13,7 @@ import('plugins.generic.thoth.classes.factories.ThothTitleFactory');
 import('plugins.generic.thoth.classes.services.ThothAbstractService');
 import('plugins.generic.thoth.classes.services.ThothAffiliationService');
 import('plugins.generic.thoth.classes.services.ThothBiographyService');
+import('plugins.generic.thoth.classes.services.ThothBookRegistrationService');
 import('plugins.generic.thoth.classes.services.ThothBookService');
 import('plugins.generic.thoth.classes.services.ThothChapterService');
 import('plugins.generic.thoth.classes.services.ThothContributionService');
@@ -43,6 +44,10 @@ class ThothServiceProvider implements ContainerProvider
 
         $container->set('bookService', function ($container) {
             return new ThothBookService(new ThothBookFactory(), $container->get('bookRepository'));
+        });
+
+        $container->set('bookRegistrationService', function ($container) {
+            return new ThothBookRegistrationService(new ThothBookFactory(), $container->get('bookRepository'));
         });
 
         $container->set('chapterService', function ($container) {

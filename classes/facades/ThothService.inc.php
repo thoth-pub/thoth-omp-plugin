@@ -24,6 +24,11 @@ class ThothService
         return ThothContainer::getInstance()->get('bookService');
     }
 
+    public static function bookRegistration()
+    {
+        return ThothContainer::getInstance()->get('bookRegistrationService');
+    }
+
     public static function chapter()
     {
         return ThothContainer::getInstance()->get('chapterService');
