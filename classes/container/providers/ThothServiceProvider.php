@@ -29,6 +29,7 @@ use APP\plugins\generic\thoth\classes\factories\ThothTitleFactory;
 use APP\plugins\generic\thoth\classes\services\ThothAbstractService;
 use APP\plugins\generic\thoth\classes\services\ThothAffiliationService;
 use APP\plugins\generic\thoth\classes\services\ThothBiographyService;
+use APP\plugins\generic\thoth\classes\services\ThothBookRegistrationService;
 use APP\plugins\generic\thoth\classes\services\ThothBookService;
 use APP\plugins\generic\thoth\classes\services\ThothChapterService;
 use APP\plugins\generic\thoth\classes\services\ThothContributionService;
@@ -66,6 +67,13 @@ class ThothServiceProvider implements ContainerProvider
 
         $container->set('bookService', function ($container) {
             return new ThothBookService(
+                new ThothBookFactory(),
+                $container->get('bookRepository')
+            );
+        });
+
+        $container->set('bookRegistrationService', function ($container) {
+            return new ThothBookRegistrationService(
                 new ThothBookFactory(),
                 $container->get('bookRepository')
             );
