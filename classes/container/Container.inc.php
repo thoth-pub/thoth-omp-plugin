@@ -32,6 +32,34 @@ class Container
         unset($this->instances[$id]);
     }
 
+    public function singletonClass($id, $className, array $dependencies = [])
+    {
+        $this->singleton($id, function ($container) use ($className, $dependencies) {
+            return $container->make($className, $dependencies);
+        });
+    }
+
+    public function make($className, array $dependencies = [])
+    {
+        $resolvedDependencies = [];
+
+        foreach ($dependencies as $dependency) {
+            if (is_string($dependency) && isset($this->bindings[$dependency])) {
+                $resolvedDependencies[] = $this->get($dependency);
+                continue;
+            }
+
+            if ($dependency instanceof Closure) {
+                $resolvedDependencies[] = $dependency($this);
+                continue;
+            }
+
+            $resolvedDependencies[] = $dependency;
+        }
+
+        return new $className(...$resolvedDependencies);
+    }
+
     public function get($id)
     {
         if (!isset($this->bindings[$id])) {
