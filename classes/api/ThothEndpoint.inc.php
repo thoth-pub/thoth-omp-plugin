@@ -96,14 +96,18 @@ class ThothEndpoint
         AppLocale::requireComponents(LOCALE_COMPONENT_PKP_SUBMISSION, LOCALE_COMPONENT_APP_SUBMISSION);
 
         $disableNotification = $params['disableNotification'] ?? false;
+        $registrationResult = null;
         try {
             $thothBookRegistrationService = ThothService::bookRegistration();
-            $thothBookId = $thothBookRegistrationService->register($publication, $thothImprintId);
-            $thothBookRegistrationService->setActive();
+            $registrationResult = $thothBookRegistrationService->register($publication, $thothImprintId);
+            $thothBookRegistrationService->setActive($registrationResult);
+            $thothBookId = $registrationResult->getWorkId();
             Repo::submission()->edit($submission, ['thothWorkId' => $thothBookId]);
             $this->handleNotification($request, $submission, true, $disableNotification);
         } catch (QueryException $e) {
-            $thothBookRegistrationService->deleteRegisteredEntry();
+            if ($registrationResult !== null) {
+                $thothBookRegistrationService->deleteRegisteredEntry($registrationResult);
+            }
             $this->handleNotification($request, $submission, false, $disableNotification, $e);
             $failure['errors'][] = __('plugins.generic.thoth.register.error.log', ['reason' => $e->getMessage()]);
             return $response->withStatus(403)->withJson($failure);
