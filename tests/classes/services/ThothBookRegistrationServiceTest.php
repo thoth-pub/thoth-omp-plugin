@@ -16,6 +16,7 @@ require_once(__DIR__ . '/../../../vendor/autoload.php');
  */
 
 use ThothApi\GraphQL\Client as ThothClient;
+use ThothApi\GraphQL\Enums\WorkStatus;
 use ThothApi\GraphQL\Inputs\PatchWork as ThothWork;
 
 import('classes.publication.Publication');
@@ -23,6 +24,7 @@ import('lib.pkp.tests.PKPTestCase');
 import('plugins.generic.thoth.classes.factories.ThothBookFactory');
 import('plugins.generic.thoth.classes.repositories.ThothBookRepository');
 import('plugins.generic.thoth.classes.services.ThothAbstractService');
+import('plugins.generic.thoth.classes.services.ThothBookRegistrationResult');
 import('plugins.generic.thoth.classes.services.ThothBookRegistrationService');
 import('plugins.generic.thoth.classes.services.ThothContributionService');
 import('plugins.generic.thoth.classes.services.ThothLanguageService');
@@ -98,8 +100,64 @@ class ThothBookRegistrationServiceTest extends PKPTestCase
             $mockWorkRelationService
         );
 
-        $thothBookId = $service->register($mockPublication, 'f740cf4e-16d1-487c-9a92-615882a591e9');
+        $registrationResult = $service->register($mockPublication, 'f740cf4e-16d1-487c-9a92-615882a591e9');
 
-        $this->assertSame('d8fa2e63-5513-45e5-84c1-e9c2d89f99d3', $thothBookId);
+        $this->assertInstanceOf(ThothBookRegistrationResult::class, $registrationResult);
+        $this->assertSame('d8fa2e63-5513-45e5-84c1-e9c2d89f99d3', $registrationResult->getWorkId());
+    }
+
+    public function testSetActiveUsesOnlyTheGivenRegistrationResult()
+    {
+        $firstBook = new ThothWork();
+        $firstBook->setWorkStatus(WorkStatus::ACTIVE);
+
+        $secondBook = new ThothWork();
+
+        $mockPublication = $this->getMockBuilder(Publication::class)
+            ->setMethods(['getData'])
+            ->getMock();
+        $mockPublication->method('getData')
+            ->with('locale')
+            ->willReturn('en_US');
+
+        $mockFactory = $this->getMockBuilder(ThothBookFactory::class)
+            ->setMethods(['createFromPublication'])
+            ->getMock();
+        $mockFactory->expects($this->exactly(2))
+            ->method('createFromPublication')
+            ->with($mockPublication)
+            ->willReturnOnConsecutiveCalls($firstBook, $secondBook);
+
+        $mockRepository = $this->getMockBuilder(ThothBookRepository::class)
+            ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
+            ->setMethods(['add', 'edit'])
+            ->getMock();
+        $mockRepository->expects($this->exactly(2))
+            ->method('add')
+            ->with($this->isInstanceOf(ThothWork::class))
+            ->willReturnOnConsecutiveCalls(
+                'first-work-id',
+                'second-work-id'
+            );
+        $mockRepository->expects($this->never())
+            ->method('edit');
+
+        $service = new ThothBookRegistrationService(
+            $mockFactory,
+            $mockRepository,
+            $this->createMock(ThothAbstractService::class),
+            $this->createMock(ThothContributionService::class),
+            $this->createMock(ThothLanguageService::class),
+            $this->createMock(ThothPublicationService::class),
+            $this->createMock(ThothReferenceService::class),
+            $this->createMock(ThothSubjectService::class),
+            $this->createMock(ThothTitleService::class),
+            $this->createMock(ThothWorkRelationService::class)
+        );
+
+        $service->register($mockPublication, 'f740cf4e-16d1-487c-9a92-615882a591e9');
+        $secondRegistrationResult = $service->register($mockPublication, 'f740cf4e-16d1-487c-9a92-615882a591e9');
+
+        $service->setActive($secondRegistrationResult);
     }
 }
