@@ -16,7 +16,7 @@
 
 namespace APP\plugins\generic\thoth\classes\repositories;
 
-use ThothApi\GraphQL\Enums\MarkupFormat;
+use APP\plugins\generic\thoth\classes\formatters\ThothMarkupFormat;
 use ThothApi\GraphQL\Inputs\PatchTitle as ThothTitle;
 
 class ThothTitleRepository
@@ -35,12 +35,18 @@ class ThothTitleRepository
 
     public function add($thothTitle)
     {
-        return $this->thothClient->createTitle(MarkupFormat::PLAIN_TEXT, $thothTitle);
+        return $this->thothClient->createTitle(
+            ThothMarkupFormat::fromContent($thothTitle->getFullTitle()),
+            $thothTitle
+        );
     }
 
     public function edit($thothPatchTitle)
     {
-        return $this->thothClient->updateTitle(MarkupFormat::PLAIN_TEXT, $thothPatchTitle);
+        return $this->thothClient->updateTitle(
+            ThothMarkupFormat::fromContent($thothPatchTitle->getFullTitle()),
+            $thothPatchTitle
+        );
     }
 
     public function delete($thothTitleId)
