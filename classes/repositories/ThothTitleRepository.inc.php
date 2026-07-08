@@ -1,7 +1,8 @@
 <?php
 
-use ThothApi\GraphQL\Enums\MarkupFormat;
 use ThothApi\GraphQL\Inputs\PatchTitle as ThothTitle;
+
+import('plugins.generic.thoth.classes.formatters.ThothMarkupFormat');
 
 class ThothTitleRepository
 {
@@ -19,12 +20,18 @@ class ThothTitleRepository
 
     public function add($thothTitle)
     {
-        return $this->thothClient->createTitle(MarkupFormat::PLAIN_TEXT, $thothTitle);
+        return $this->thothClient->createTitle(
+            ThothMarkupFormat::fromContent($thothTitle->getFullTitle()),
+            $thothTitle
+        );
     }
 
     public function edit($thothPatchTitle)
     {
-        return $this->thothClient->updateTitle(MarkupFormat::PLAIN_TEXT, $thothPatchTitle);
+        return $this->thothClient->updateTitle(
+            ThothMarkupFormat::fromContent($thothPatchTitle->getFullTitle()),
+            $thothPatchTitle
+        );
     }
 
     public function delete($thothTitleId)

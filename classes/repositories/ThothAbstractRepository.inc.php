@@ -1,7 +1,8 @@
 <?php
 
-use ThothApi\GraphQL\Enums\MarkupFormat;
 use ThothApi\GraphQL\Inputs\PatchAbstract as ThothAbstract;
+
+import('plugins.generic.thoth.classes.formatters.ThothMarkupFormat');
 
 class ThothAbstractRepository
 {
@@ -19,12 +20,18 @@ class ThothAbstractRepository
 
     public function add($thothAbstract)
     {
-        return $this->thothClient->createAbstract(MarkupFormat::HTML, $thothAbstract);
+        return $this->thothClient->createAbstract(
+            ThothMarkupFormat::fromContent($thothAbstract->getContent()),
+            $thothAbstract
+        );
     }
 
     public function edit($thothPatchAbstract)
     {
-        return $this->thothClient->updateAbstract(MarkupFormat::HTML, $thothPatchAbstract);
+        return $this->thothClient->updateAbstract(
+            ThothMarkupFormat::fromContent($thothPatchAbstract->getContent()),
+            $thothPatchAbstract
+        );
     }
 
     public function delete($thothAbstractId)
