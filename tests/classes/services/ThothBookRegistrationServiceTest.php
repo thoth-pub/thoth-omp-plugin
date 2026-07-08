@@ -21,6 +21,7 @@ namespace APP\plugins\generic\thoth\tests\classes\services;
 use APP\plugins\generic\thoth\classes\factories\ThothBookFactory;
 use APP\plugins\generic\thoth\classes\repositories\ThothBookRepository;
 use APP\plugins\generic\thoth\classes\services\ThothAbstractService;
+use APP\plugins\generic\thoth\classes\services\ThothBookRegistrationResult;
 use APP\plugins\generic\thoth\classes\services\ThothBookRegistrationService;
 use APP\plugins\generic\thoth\classes\services\ThothContributionService;
 use APP\plugins\generic\thoth\classes\services\ThothLanguageService;
@@ -32,6 +33,7 @@ use APP\plugins\generic\thoth\classes\services\ThothWorkRelationService;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Inputs\PatchWork as ThothWork;
+use ThothApi\GraphQL\Enums\WorkStatus;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
@@ -116,8 +118,90 @@ class ThothBookRegistrationServiceTest extends PKPTestCase
             $mockWorkRelationService
         );
 
-        $thothBookId = $service->register($mockPublication, 'f740cf4e-16d1-487c-9a92-615882a591e9');
+        $registrationResult = $service->register($mockPublication, 'f740cf4e-16d1-487c-9a92-615882a591e9');
 
-        $this->assertSame('d8fa2e63-5513-45e5-84c1-e9c2d89f99d3', $thothBookId);
+        $this->assertInstanceOf(ThothBookRegistrationResult::class, $registrationResult);
+        $this->assertSame('d8fa2e63-5513-45e5-84c1-e9c2d89f99d3', $registrationResult->getWorkId());
+    }
+
+    public function testSetActiveUsesOnlyTheGivenRegistrationResult(): void
+    {
+        $firstBook = new ThothWork();
+        $firstBook->setWorkStatus(WorkStatus::ACTIVE);
+
+        $secondBook = new ThothWork();
+
+        $mockPublication = $this->getMockBuilder(\APP\publication\Publication::class)
+            ->onlyMethods(['getData'])
+            ->getMock();
+        $mockPublication->method('getData')
+            ->with('locale')
+            ->willReturn('en_US');
+
+        $mockFactory = $this->getMockBuilder(ThothBookFactory::class)
+            ->onlyMethods(['createFromPublication'])
+            ->getMock();
+        $mockFactory->expects($this->exactly(2))
+            ->method('createFromPublication')
+            ->with($mockPublication)
+            ->willReturnOnConsecutiveCalls($firstBook, $secondBook);
+
+        $mockRepository = $this->getMockBuilder(ThothBookRepository::class)
+            ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
+            ->onlyMethods(['add', 'edit'])
+            ->getMock();
+        $mockRepository->expects($this->exactly(2))
+            ->method('add')
+            ->with($this->isInstanceOf(ThothWork::class))
+            ->willReturnOnConsecutiveCalls(
+                'first-work-id',
+                'second-work-id'
+            );
+        $mockRepository->expects($this->never())
+            ->method('edit');
+
+        $service = $this->createService(
+            $mockFactory,
+            $mockRepository,
+            $this->createMock(ThothAbstractService::class),
+            $this->createMock(ThothContributionService::class),
+            $this->createMock(ThothLanguageService::class),
+            $this->createMock(ThothPublicationService::class),
+            $this->createMock(ThothReferenceService::class),
+            $this->createMock(ThothSubjectService::class),
+            $this->createMock(ThothTitleService::class),
+            $this->createMock(ThothWorkRelationService::class)
+        );
+
+        $service->register($mockPublication, 'f740cf4e-16d1-487c-9a92-615882a591e9');
+        $secondRegistrationResult = $service->register($mockPublication, 'f740cf4e-16d1-487c-9a92-615882a591e9');
+
+        $service->setActive($secondRegistrationResult);
+    }
+
+    private function createService(
+        $mockFactory,
+        $mockRepository,
+        $mockAbstractService,
+        $mockContributionService,
+        $mockLanguageService,
+        $mockPublicationService,
+        $mockReferenceService,
+        $mockSubjectService,
+        $mockTitleService,
+        $mockWorkRelationService
+    ): ThothBookRegistrationService {
+        return new ThothBookRegistrationService(
+            $mockFactory,
+            $mockRepository,
+            $mockAbstractService,
+            $mockContributionService,
+            $mockLanguageService,
+            $mockPublicationService,
+            $mockReferenceService,
+            $mockSubjectService,
+            $mockTitleService,
+            $mockWorkRelationService
+        );
     }
 }

@@ -17,6 +17,7 @@
 namespace APP\plugins\generic\thoth\classes\services;
 
 use ThothApi\GraphQL\Enums\WorkStatus;
+use ThothApi\Exception\QueryException;
 
 class ThothBookRegistrationService
 {
@@ -30,8 +31,6 @@ class ThothBookRegistrationService
     private ThothSubjectService $subjectService;
     private ThothTitleService $titleService;
     private ThothWorkRelationService $workRelationService;
-    private $originalThothBook;
-    private $registeredEntryId;
 
     public function __construct(
         $factory,
@@ -57,50 +56,53 @@ class ThothBookRegistrationService
         $this->workRelationService = $workRelationService;
     }
 
-    public function register($publication, $thothImprintId)
+    public function register($publication, $thothImprintId): ThothBookRegistrationResult
     {
         $thothBook = $this->factory->createFromPublication($publication);
         $thothBook->setImprintId($thothImprintId);
 
+        $bookToActivate = null;
         if ($thothBook->getWorkStatus() === WorkStatus::ACTIVE) {
-            $this->originalThothBook = clone $thothBook;
+            $bookToActivate = clone $thothBook;
             $thothBook->setWorkStatus(WorkStatus::FORTHCOMING);
         }
 
         $thothBookId = $this->repository->add($thothBook);
         $publication->setData('thothBookId', $thothBookId);
-        $this->registeredEntryId = $thothBookId;
-        $this->registerMetadata($publication, $thothBookId);
+        $registrationResult = new ThothBookRegistrationResult($thothBookId, $bookToActivate);
 
-        $this->contributionService->registerByPublication($publication);
-        $this->publicationService->registerByPublication($publication);
-        $this->languageService->registerByPublication($publication);
-        $this->subjectService->registerByPublication($publication);
-        $this->referenceService->registerByPublication($publication);
-        $this->workRelationService->registerByPublication($publication, $thothImprintId);
+        try {
+            $this->registerMetadata($publication, $thothBookId);
 
-        return $thothBookId;
+            $this->contributionService->registerByPublication($publication);
+            $this->publicationService->registerByPublication($publication);
+            $this->languageService->registerByPublication($publication);
+            $this->subjectService->registerByPublication($publication);
+            $this->referenceService->registerByPublication($publication);
+            $this->workRelationService->registerByPublication($publication, $thothImprintId);
+        } catch (QueryException $e) {
+            $this->deleteRegisteredEntry($registrationResult);
+            throw $e;
+        }
+
+        return $registrationResult;
     }
 
-    public function deleteRegisteredEntry(): void
+    public function deleteRegisteredEntry(ThothBookRegistrationResult $registrationResult): void
     {
-        if ($this->registeredEntryId === null) {
+        $this->repository->delete($registrationResult->getWorkId());
+    }
+
+    public function setActive(ThothBookRegistrationResult $registrationResult): void
+    {
+        if (!$registrationResult->shouldActivate()) {
             return;
         }
 
-        $this->repository->delete($this->registeredEntryId);
-        $this->registeredEntryId = null;
-    }
-
-    public function setActive(): void
-    {
-        if ($this->originalThothBook === null) {
-            return;
-        }
-
-        $this->originalThothBook->setWorkId($this->registeredEntryId);
-        $this->originalThothBook->setWorkStatus(WorkStatus::ACTIVE);
-        $this->repository->edit($this->originalThothBook);
+        $thothBook = $registrationResult->getBookToActivate();
+        $thothBook->setWorkId($registrationResult->getWorkId());
+        $thothBook->setWorkStatus(WorkStatus::ACTIVE);
+        $this->repository->edit($thothBook);
     }
 
     private function registerMetadata($publication, string $thothBookId): void
