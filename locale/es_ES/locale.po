@@ -281,3 +281,12 @@ msgstr "Capítulo: {$title}"
 
 msgid "plugins.generic.thoth.publicationFormat.thothFiles.file"
 msgstr "Archivo"
+
+msgid "plugins.generic.thoth.field.frontcover"
+msgstr "Cubierta frontal en Thoth"
+
+msgid "plugins.generic.thoth.field.frontcover.label"
+msgstr "Enviar esta imagen de cubierta a Thoth como cubierta frontal."
+
+msgid "plugins.generic.thoth.field.frontcover.missingCdnWritePermission"
+msgstr "El usuario configurado de Thoth necesita el permiso cdnWrite para subir la cubierta frontal."
