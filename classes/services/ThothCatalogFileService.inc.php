@@ -16,6 +16,13 @@
 
 class ThothCatalogFileService
 {
+    private $publicationRepository;
+
+    public function __construct($publicationRepository)
+    {
+        $this->publicationRepository = $publicationRepository;
+    }
+
     public function getFilesByWorkId($thothWorkId)
     {
         if (!$thothWorkId) {
@@ -24,7 +31,7 @@ class ThothCatalogFileService
 
         return array_values(array_filter(array_map(
             [$this, 'formatFile'],
-            ThothRepo::publication()->getFilesByWorkId($thothWorkId)
+            $this->publicationRepository->getFilesByWorkId($thothWorkId)
         )));
     }
 

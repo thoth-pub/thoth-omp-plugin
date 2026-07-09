@@ -19,6 +19,7 @@ require_once(__DIR__ . '/../../../vendor/autoload.php');
 
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
+use ThothApi\GraphQL\Enums\MarkupFormat;
 use ThothApi\GraphQL\Inputs\PatchBiography as ThothBiography;
 
 import('plugins.generic.thoth.classes.repositories.ThothBiographyRepository');
@@ -66,6 +67,48 @@ class ThothBiographyRepositoryTest extends PKPTestCase
         $this->assertEquals('0ee25017-980c-44ab-a18b-164b1bd31b8d', $thothBiographyId);
     }
 
+    public function testAddPlainTextBiographyUsesPlainTextMarkupFormat()
+    {
+        $thothBiography = new ThothBiography([
+            'contributionId' => 'e4b7d5af-1b5c-47cc-9382-c5b3f67972a8',
+            'localeCode' => 'EN',
+            'content' => 'My biography',
+            'canonical' => true,
+        ]);
+
+        $mockThothClient = $this->getMockBuilder(ThothClient::class)
+            ->setMethods(['createBiography'])
+            ->getMock();
+        $mockThothClient->expects($this->once())
+            ->method('createBiography')
+            ->with(MarkupFormat::PLAIN_TEXT, $thothBiography)
+            ->will($this->returnValue('0ee25017-980c-44ab-a18b-164b1bd31b8d'));
+        $repository = new ThothBiographyRepository($mockThothClient);
+
+        $this->assertSame('0ee25017-980c-44ab-a18b-164b1bd31b8d', $repository->add($thothBiography));
+    }
+
+    public function testAddHtmlBiographyUsesHtmlMarkupFormat()
+    {
+        $thothBiography = new ThothBiography([
+            'contributionId' => 'e4b7d5af-1b5c-47cc-9382-c5b3f67972a8',
+            'localeCode' => 'EN',
+            'content' => '<p>My biography</p>',
+            'canonical' => true,
+        ]);
+
+        $mockThothClient = $this->getMockBuilder(ThothClient::class)
+            ->setMethods(['createBiography'])
+            ->getMock();
+        $mockThothClient->expects($this->once())
+            ->method('createBiography')
+            ->with(MarkupFormat::HTML, $thothBiography)
+            ->will($this->returnValue('0ee25017-980c-44ab-a18b-164b1bd31b8d'));
+        $repository = new ThothBiographyRepository($mockThothClient);
+
+        $this->assertSame('0ee25017-980c-44ab-a18b-164b1bd31b8d', $repository->add($thothBiography));
+    }
+
     public function testEditBiography()
     {
         $thothPatchBiography = new ThothBiography([
@@ -88,6 +131,50 @@ class ThothBiographyRepositoryTest extends PKPTestCase
         $thothBiographyId = $repository->edit($thothPatchBiography);
 
         $this->assertEquals('0ee25017-980c-44ab-a18b-164b1bd31b8d', $thothBiographyId);
+    }
+
+    public function testEditPlainTextBiographyUsesPlainTextMarkupFormat()
+    {
+        $thothPatchBiography = new ThothBiography([
+            'biographyId' => '0ee25017-980c-44ab-a18b-164b1bd31b8d',
+            'contributionId' => 'e4b7d5af-1b5c-47cc-9382-c5b3f67972a8',
+            'localeCode' => 'EN',
+            'content' => 'Updated biography',
+            'canonical' => true,
+        ]);
+
+        $mockThothClient = $this->getMockBuilder(ThothClient::class)
+            ->setMethods(['updateBiography'])
+            ->getMock();
+        $mockThothClient->expects($this->once())
+            ->method('updateBiography')
+            ->with(MarkupFormat::PLAIN_TEXT, $thothPatchBiography)
+            ->will($this->returnValue('0ee25017-980c-44ab-a18b-164b1bd31b8d'));
+        $repository = new ThothBiographyRepository($mockThothClient);
+
+        $this->assertSame('0ee25017-980c-44ab-a18b-164b1bd31b8d', $repository->edit($thothPatchBiography));
+    }
+
+    public function testEditHtmlBiographyUsesHtmlMarkupFormat()
+    {
+        $thothPatchBiography = new ThothBiography([
+            'biographyId' => '0ee25017-980c-44ab-a18b-164b1bd31b8d',
+            'contributionId' => 'e4b7d5af-1b5c-47cc-9382-c5b3f67972a8',
+            'localeCode' => 'EN',
+            'content' => '<p>Updated biography</p>',
+            'canonical' => true,
+        ]);
+
+        $mockThothClient = $this->getMockBuilder(ThothClient::class)
+            ->setMethods(['updateBiography'])
+            ->getMock();
+        $mockThothClient->expects($this->once())
+            ->method('updateBiography')
+            ->with(MarkupFormat::HTML, $thothPatchBiography)
+            ->will($this->returnValue('0ee25017-980c-44ab-a18b-164b1bd31b8d'));
+        $repository = new ThothBiographyRepository($mockThothClient);
+
+        $this->assertSame('0ee25017-980c-44ab-a18b-164b1bd31b8d', $repository->edit($thothPatchBiography));
     }
 
     public function testDeleteBiography()

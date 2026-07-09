@@ -93,7 +93,9 @@ class RegisterHandler extends Handler
             $errors = ThothService::book()->validate($this->publication);
 
             if (empty($errors)) {
-                $publishers = (new ThothMeCacheService())->getLinkedPublishers($submissionContext->getId());
+                $publishers = (new ThothMeCacheService(ThothRepo::me()))->getLinkedPublishers(
+                    $submissionContext->getId()
+                );
                 $publisherIds = array_column($publishers, 'publisherId');
                 $imprints = ThothRepo::imprint()->getMany([
                     'publishers' => $publisherIds

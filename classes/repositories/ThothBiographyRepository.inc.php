@@ -14,8 +14,9 @@
  * @brief A repository to manage Thoth biographies
  */
 
-use ThothApi\GraphQL\Enums\MarkupFormat;
 use ThothApi\GraphQL\Inputs\PatchBiography as ThothBiography;
+
+import('plugins.generic.thoth.classes.formatters.ThothMarkupFormat');
 
 class ThothBiographyRepository
 {
@@ -33,12 +34,18 @@ class ThothBiographyRepository
 
     public function add($thothBiography)
     {
-        return $this->thothClient->createBiography(MarkupFormat::HTML, $thothBiography);
+        return $this->thothClient->createBiography(
+            ThothMarkupFormat::fromContent($thothBiography->getContent()),
+            $thothBiography
+        );
     }
 
     public function edit($thothPatchBiography)
     {
-        return $this->thothClient->updateBiography(MarkupFormat::HTML, $thothPatchBiography);
+        return $this->thothClient->updateBiography(
+            ThothMarkupFormat::fromContent($thothPatchBiography->getContent()),
+            $thothPatchBiography
+        );
     }
 
     public function delete($thothBiographyId)

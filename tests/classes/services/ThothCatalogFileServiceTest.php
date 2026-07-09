@@ -32,7 +32,8 @@ class ThothCatalogFileServiceTest extends PKPTestCase
             'mimeType' => 'application/pdf',
             'objectKey' => '10.12345/book.pdf',
         ]);
-        $service = new ThothCatalogFileService();
+        $service = new ThothCatalogFileService(new class () {
+        });
 
         $formattedFile = $service->formatFile($file);
 
@@ -51,7 +52,8 @@ class ThothCatalogFileServiceTest extends PKPTestCase
             'mimeType' => 'application/pdf',
             'objectKey' => '10.12345/book.pdf',
         ]);
-        $service = new ThothCatalogFileService();
+        $service = new ThothCatalogFileService(new class () {
+        });
 
         $formattedFile = $service->formatFile([
             'publicationType' => 'PDF',
@@ -67,7 +69,8 @@ class ThothCatalogFileServiceTest extends PKPTestCase
             'mimeType' => 'application/pdf',
             'objectKey' => '10.12345/book.pdf',
         ]);
-        $service = new ThothCatalogFileService();
+        $service = new ThothCatalogFileService(new class () {
+        });
 
         $formattedFile = $service->formatFile($file);
 
@@ -81,7 +84,8 @@ class ThothCatalogFileServiceTest extends PKPTestCase
             'mimeType' => 'application/pdf',
             'objectKey' => '10.12345/book.pdf',
         ]);
-        $service = new ThothCatalogFileService();
+        $service = new ThothCatalogFileService(new class () {
+        });
 
         $formattedFile = $service->formatFile($file);
 
