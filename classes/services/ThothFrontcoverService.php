@@ -74,7 +74,12 @@ class ThothFrontcoverService
 
     public function sync($publication, string $thothWorkId): void
     {
-        if (!$publication->getData('thothUploadFrontcover') || !$this->canUploadFrontcover($publication)) {
+        if (!$publication->getData('thothUploadFrontcover')) {
+            $this->clearUploadData($publication);
+            return;
+        }
+
+        if (!$this->canUploadFrontcover($publication)) {
             return;
         }
 
@@ -148,6 +153,18 @@ class ThothFrontcoverService
     {
         $publication->setData('thothFrontcoverSha256', $sha256);
         $publication->setData('thothFrontcoverUrl', $cdnUrl);
+
+        $this->persistPublication($publication);
+    }
+
+    protected function clearUploadData($publication): void
+    {
+        if (!$publication->getData('thothFrontcoverSha256') && !$publication->getData('thothFrontcoverUrl')) {
+            return;
+        }
+
+        $publication->setData('thothFrontcoverSha256', null);
+        $publication->setData('thothFrontcoverUrl', null);
 
         $this->persistPublication($publication);
     }
