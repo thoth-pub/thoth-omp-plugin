@@ -16,11 +16,84 @@
  * @brief Test class for the CatalogEntryFormConfig class
  */
 
+use APP\publication\Repository as PublicationRepository;
+use APP\submission\Repository as SubmissionRepository;
+
 import('lib.pkp.tests.PKPTestCase');
 import('plugins.generic.thoth.classes.components.forms.config.CatalogEntryFormConfig');
 
 class CatalogEntryFormConfigTest extends PKPTestCase
 {
+    protected function getMockedContainerKeys(): array
+    {
+        return [...parent::getMockedContainerKeys(), PublicationRepository::class, SubmissionRepository::class];
+    }
+
+    public function testGetsPublicationThroughRepository(): void
+    {
+        $publication = Mockery::mock(\APP\publication\Publication::class);
+        $publicationRepository = Mockery::mock(app(PublicationRepository::class))
+            ->makePartial()
+            ->shouldReceive('get')
+            ->once()
+            ->with(1)
+            ->andReturn($publication)
+            ->getMock();
+        app()->instance(PublicationRepository::class, $publicationRepository);
+
+        $config = new class () extends CatalogEntryFormConfig {
+            public function getPublicationById($publicationId)
+            {
+                return $this->getPublication($publicationId);
+            }
+        };
+
+        $this->assertSame($publication, $config->getPublicationById(1));
+    }
+
+    public function testGetsSubmissionThroughRepositoryBeforeCheckingCdnPermission(): void
+    {
+        $submission = Mockery::mock(\APP\submission\Submission::class)
+            ->shouldReceive('getData')
+            ->once()
+            ->with('contextId')
+            ->andReturn(2)
+            ->getMock();
+        $submissionRepository = Mockery::mock(app(SubmissionRepository::class))
+            ->makePartial()
+            ->shouldReceive('get')
+            ->once()
+            ->with(1)
+            ->andReturn($submission)
+            ->getMock();
+        app()->instance(SubmissionRepository::class, $submissionRepository);
+
+        $publication = Mockery::mock(\APP\publication\Publication::class)
+            ->shouldReceive('getData')
+            ->once()
+            ->with('submissionId')
+            ->andReturn(1)
+            ->getMock();
+        $config = new class () extends CatalogEntryFormConfig {
+            public ?int $contextId = null;
+
+            public function canUploadFilesForPublication($publication): bool
+            {
+                return $this->canUploadFiles($publication);
+            }
+
+            protected function hasCdnWritePermission($contextId): bool
+            {
+                $this->contextId = $contextId;
+                return true;
+            }
+        };
+
+        $config->canUploadFilesForPublication($publication);
+
+        $this->assertSame(2, $config->contextId);
+    }
+
     public function testAddsFrontcoverUploadFieldAfterCoverImage(): void
     {
         $form = $this->getCatalogEntryForm();

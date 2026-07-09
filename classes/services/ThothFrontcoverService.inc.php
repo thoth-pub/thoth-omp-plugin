@@ -14,7 +14,8 @@
  * @brief Coordinates OMP cover image uploads to Thoth frontcover storage.
  */
 
-use PKP\db\DAORegistry;
+use APP\facades\Repo;
+use APP\publication\DAO as PublicationDAO;
 
 import('classes.file.PublicFileManager');
 import('plugins.generic.thoth.classes.facades.ThothRepo');
@@ -112,12 +113,15 @@ class ThothFrontcoverService
     {
         try {
             $contextId = $this->getContextId($publication);
-            return $contextId
-                ? (new ThothMeCacheService(ThothRepo::me()))->hasCdnWritePermission($contextId)
-                : false;
+            return $contextId ? $this->hasCdnWritePermission($contextId) : false;
         } catch (Throwable $exception) {
             return false;
         }
+    }
+
+    protected function hasCdnWritePermission($contextId): bool
+    {
+        return (new ThothMeCacheService(ThothRepo::me()))->hasCdnWritePermission($contextId);
     }
 
     protected function resolveFrontcoverFile($publication): ?array
@@ -168,7 +172,7 @@ class ThothFrontcoverService
 
     protected function persistPublication($publication): void
     {
-        DAORegistry::getDAO('PublicationDAO')->update($publication);
+        app(PublicationDAO::class)->update($publication);
     }
 
     private function getContextId($publication): ?int
@@ -181,7 +185,7 @@ class ThothFrontcoverService
             return null;
         }
 
-        $submission = Services::get('submission')->get($submissionId);
+        $submission = Repo::submission()->get($submissionId);
         return $submission ? (int) $submission->getData('contextId') : null;
     }
 }

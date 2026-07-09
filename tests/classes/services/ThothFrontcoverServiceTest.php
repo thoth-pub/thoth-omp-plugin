@@ -18,6 +18,8 @@
 
 require_once(__DIR__ . '/../../../vendor/autoload.php');
 
+use APP\publication\DAO as PublicationDAO;
+use APP\submission\Repository as SubmissionRepository;
 use ThothApi\GraphQL\Enums\WorkStatus;
 use ThothApi\GraphQL\Enums\WorkType;
 use ThothApi\GraphQL\Inputs\NewFrontcoverFileUpload;
@@ -35,6 +37,89 @@ import('plugins.generic.thoth.classes.services.ThothFrontcoverService');
 class ThothFrontcoverServiceTest extends PKPTestCase
 {
     private $temporaryFiles = [];
+
+    protected function getMockedContainerKeys(): array
+    {
+        return [...parent::getMockedContainerKeys(), PublicationDAO::class, SubmissionRepository::class];
+    }
+
+    public function testPersistsFrontcoverMetadataThroughPublicationDao(): void
+    {
+        $publication = $this->createMock(Publication::class);
+        $persisted = false;
+        $publicationDao = Mockery::mock(app(PublicationDAO::class))
+            ->makePartial()
+            ->shouldReceive('update')
+            ->once()
+            ->with($publication)
+            ->andReturnUsing(function () use (&$persisted) {
+                $persisted = true;
+            })
+            ->getMock();
+        app()->instance(PublicationDAO::class, $publicationDao);
+
+        $service = new class (
+            $this->createMock(ThothFrontcoverFileUploadRepository::class),
+            $this->createMock(ThothWorkRepository::class),
+            $this->createMock(ThothFileUploadService::class)
+        ) extends ThothFrontcoverService {
+            public function persistFrontcoverMetadata($publication): void
+            {
+                $this->persistPublication($publication);
+            }
+        };
+
+        $service->persistFrontcoverMetadata($publication);
+
+        $this->assertTrue($persisted);
+    }
+
+    public function testAllowsFrontcoverUploadWhenSubmissionContextHasCdnWritePermission(): void
+    {
+        $submission = Mockery::mock(\APP\submission\Submission::class)
+            ->shouldReceive('getData')
+            ->once()
+            ->with('contextId')
+            ->andReturn(1)
+            ->getMock();
+        $submissionRepository = Mockery::mock(app(SubmissionRepository::class))
+            ->makePartial()
+            ->shouldReceive('get')
+            ->once()
+            ->with(1)
+            ->andReturn($submission)
+            ->getMock();
+        app()->instance(SubmissionRepository::class, $submissionRepository);
+
+        $publication = $this->getMockBuilder(Publication::class)
+            ->setMethods(['getData'])
+            ->getMock();
+        $publication->method('getData')
+            ->willReturnCallback(function ($key) {
+                return [
+                    'contextId' => null,
+                    'submissionId' => 1,
+                ][$key] ?? null;
+            });
+
+        $service = new class (
+            $this->createMock(ThothFrontcoverFileUploadRepository::class),
+            $this->createMock(ThothWorkRepository::class),
+            $this->createMock(ThothFileUploadService::class)
+        ) extends ThothFrontcoverService {
+            public function canUploadFrontcoverForPublication($publication): bool
+            {
+                return $this->canUploadFrontcover($publication);
+            }
+
+            protected function hasCdnWritePermission($contextId): bool
+            {
+                return true;
+            }
+        };
+
+        $this->assertTrue($service->canUploadFrontcoverForPublication($publication));
+    }
 
     protected function tearDown(): void
     {

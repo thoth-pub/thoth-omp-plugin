@@ -14,6 +14,8 @@
  * @brief Thoth config for catalog entry form
  */
 
+use APP\facades\Repo;
+
 import('plugins.generic.thoth.classes.facades.ThothRepo');
 import('plugins.generic.thoth.classes.services.ThothMeCacheService');
 
@@ -63,19 +65,27 @@ class CatalogEntryFormConfig
 
     protected function getPublication($publicationId)
     {
-        return Services::get('publication')->get($publicationId);
+        return Repo::publication()->get($publicationId);
     }
 
     protected function canUploadFiles($publication): bool
     {
         try {
-            $submission = Services::get('submission')->get($publication->getData('submissionId'));
-            return (new ThothMeCacheService(ThothRepo::me()))->hasCdnWritePermission(
-                $submission->getData('contextId')
-            );
+            $submission = $this->getSubmission($publication->getData('submissionId'));
+            return $this->hasCdnWritePermission($submission->getData('contextId'));
         } catch (Exception $e) {
             error_log($e->getMessage());
             return false;
         }
+    }
+
+    protected function getSubmission($submissionId)
+    {
+        return Repo::submission()->get($submissionId);
+    }
+
+    protected function hasCdnWritePermission($contextId): bool
+    {
+        return (new ThothMeCacheService(ThothRepo::me()))->hasCdnWritePermission($contextId);
     }
 }
