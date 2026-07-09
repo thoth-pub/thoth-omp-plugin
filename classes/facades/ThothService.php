@@ -60,6 +60,11 @@ class ThothService
         return ThothContainer::getInstance()->get('contributorService');
     }
 
+    public static function frontcover()
+    {
+        return ThothContainer::getInstance()->get('frontcoverService');
+    }
+
     public static function language()
     {
         return ThothContainer::getInstance()->get('languageService');

@@ -16,8 +16,8 @@
 
 namespace APP\plugins\generic\thoth\classes\services;
 
-use ThothApi\GraphQL\Enums\WorkStatus;
 use ThothApi\Exception\QueryException;
+use ThothApi\GraphQL\Enums\WorkStatus;
 
 class ThothBookRegistrationService
 {
@@ -31,6 +31,7 @@ class ThothBookRegistrationService
     private ThothSubjectService $subjectService;
     private ThothTitleService $titleService;
     private ThothWorkRelationService $workRelationService;
+    private ?ThothFrontcoverService $frontcoverService;
 
     public function __construct(
         $factory,
@@ -42,7 +43,8 @@ class ThothBookRegistrationService
         ThothReferenceService $referenceService,
         ThothSubjectService $subjectService,
         ThothTitleService $titleService,
-        ThothWorkRelationService $workRelationService
+        ThothWorkRelationService $workRelationService,
+        ?ThothFrontcoverService $frontcoverService = null
     ) {
         $this->factory = $factory;
         $this->repository = $repository;
@@ -54,6 +56,7 @@ class ThothBookRegistrationService
         $this->subjectService = $subjectService;
         $this->titleService = $titleService;
         $this->workRelationService = $workRelationService;
+        $this->frontcoverService = $frontcoverService;
     }
 
     public function register($publication, $thothImprintId): ThothBookRegistrationResult
@@ -80,6 +83,7 @@ class ThothBookRegistrationService
             $this->subjectService->registerByPublication($publication);
             $this->referenceService->registerByPublication($publication);
             $this->workRelationService->registerByPublication($publication, $thothImprintId);
+            $this->frontcoverService?->sync($publication, $thothBookId);
         } catch (QueryException $e) {
             $this->deleteRegisteredEntry($registrationResult);
             throw $e;

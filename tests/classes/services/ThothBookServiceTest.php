@@ -23,6 +23,7 @@ use APP\plugins\generic\thoth\classes\factories\ThothBookFactory;
 use APP\plugins\generic\thoth\classes\repositories\ThothBookRepository;
 use APP\plugins\generic\thoth\classes\services\ThothAbstractService;
 use APP\plugins\generic\thoth\classes\services\ThothBookService;
+use APP\plugins\generic\thoth\classes\services\ThothFrontcoverService;
 use APP\plugins\generic\thoth\classes\services\ThothPublicationService;
 use APP\plugins\generic\thoth\classes\services\ThothTitleService;
 use PKP\tests\PKPTestCase;
@@ -102,13 +103,18 @@ class ThothBookServiceTest extends PKPTestCase
             });
 
         $thothImprintId = 'f740cf4e-16d1-487c-9a92-615882a591e9';
+        $mockFrontcoverService = $this->createMock(ThothFrontcoverService::class);
+        $mockFrontcoverService->expects($this->once())
+            ->method('sync')
+            ->with($mockPublication, 'd8fa2e63-5513-45e5-84c1-e9c2d89f99d3');
 
         $service = new ThothBookService(
             $mockFactory,
             $mockRepository,
             $this->createMock(ThothPublicationService::class),
             $this->createMock(ThothTitleService::class),
-            $this->createMock(ThothAbstractService::class)
+            $this->createMock(ThothAbstractService::class),
+            $mockFrontcoverService
         );
         $thothBookId = $service->register($mockPublication, $thothImprintId);
 
