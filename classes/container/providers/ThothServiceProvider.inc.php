@@ -18,6 +18,8 @@ import('plugins.generic.thoth.classes.services.ThothBookService');
 import('plugins.generic.thoth.classes.services.ThothChapterService');
 import('plugins.generic.thoth.classes.services.ThothContributionService');
 import('plugins.generic.thoth.classes.services.ThothContributorService');
+import('plugins.generic.thoth.classes.services.ThothFileUploadService');
+import('plugins.generic.thoth.classes.services.ThothFrontcoverService');
 import('plugins.generic.thoth.classes.services.ThothLanguageService');
 import('plugins.generic.thoth.classes.services.ThothLocationService');
 import('plugins.generic.thoth.classes.services.ThothPublicationService');
@@ -51,6 +53,7 @@ class ThothServiceProvider implements ContainerProvider
             'publicationService',
             'titleService',
             'abstractService',
+            'frontcoverService',
         ]);
 
         $container->singletonClass('bookRegistrationService', ThothBookRegistrationService::class, [
@@ -64,6 +67,7 @@ class ThothServiceProvider implements ContainerProvider
             'subjectService',
             'titleService',
             'workRelationService',
+            'frontcoverService',
         ]);
 
         $container->singletonClass('chapterService', ThothChapterService::class, [
@@ -87,6 +91,14 @@ class ThothServiceProvider implements ContainerProvider
         $container->singletonClass('contributorService', ThothContributorService::class, [
             new ThothContributorFactory(),
             'contributorRepository',
+        ]);
+
+        $container->singletonClass('fileUploadService', ThothFileUploadService::class);
+
+        $container->singletonClass('frontcoverService', ThothFrontcoverService::class, [
+            'frontcoverFileUploadRepository',
+            'workRepository',
+            'fileUploadService',
         ]);
 
         $container->singletonClass('languageService', ThothLanguageService::class, [

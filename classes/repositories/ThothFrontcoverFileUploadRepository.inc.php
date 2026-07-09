@@ -14,6 +14,7 @@
  * @brief A repository to manage Thoth front cover file uploads.
  */
 
+use ThothApi\GraphQL\Inputs\CompleteFileUpload;
 use ThothApi\GraphQL\Inputs\NewFrontcoverFileUpload;
 
 class ThothFrontcoverFileUploadRepository
@@ -26,6 +27,20 @@ class ThothFrontcoverFileUploadRepository
             'value',
         ],
         'expiresAt',
+    ];
+
+    private const FILE_SELECTION = [
+        'fileId',
+        'fileType',
+        'workId',
+        'publicationId',
+        'additionalResourceId',
+        'workFeaturedVideoId',
+        'objectKey',
+        'cdnUrl',
+        'mimeType',
+        'bytes',
+        'sha256',
     ];
 
     protected $thothClient;
@@ -46,5 +61,13 @@ class ThothFrontcoverFileUploadRepository
             $newFrontcoverFileUpload,
             self::FILE_UPLOAD_RESPONSE_SELECTION
         );
+    }
+
+    public function complete($fileUploadId)
+    {
+        $completeFileUpload = new CompleteFileUpload();
+        $completeFileUpload->setFileUploadId($fileUploadId);
+
+        return $this->thothClient->completeFileUpload($completeFileUpload, self::FILE_SELECTION);
     }
 }

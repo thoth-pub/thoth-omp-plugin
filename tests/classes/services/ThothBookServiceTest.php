@@ -29,6 +29,7 @@ import('plugins.generic.thoth.classes.repositories.ThothBookRepository');
 import('plugins.generic.thoth.classes.services.ThothAbstractService');
 import('plugins.generic.thoth.classes.services.ThothBookService');
 import('plugins.generic.thoth.classes.services.ThothContributionService');
+import('plugins.generic.thoth.classes.services.ThothFrontcoverService');
 import('plugins.generic.thoth.classes.services.ThothLanguageService');
 import('plugins.generic.thoth.classes.services.ThothPublicationService');
 import('plugins.generic.thoth.classes.services.ThothReferenceService');
@@ -71,14 +72,16 @@ class ThothBookServiceTest extends PKPTestCase
         $repository,
         $publicationService = null,
         $titleService = null,
-        $abstractService = null
+        $abstractService = null,
+        $frontcoverService = null
     ) {
         return new ThothBookService(
             $factory,
             $repository,
             $publicationService ?? $this->createMock(ThothPublicationService::class),
             $titleService ?? $this->createMock(ThothTitleService::class),
-            $abstractService ?? $this->createMock(ThothAbstractService::class)
+            $abstractService ?? $this->createMock(ThothAbstractService::class),
+            $frontcoverService
         );
     }
 
@@ -155,8 +158,19 @@ class ThothBookServiceTest extends PKPTestCase
         ]));
 
         $thothImprintId = 'f740cf4e-16d1-487c-9a92-615882a591e9';
+        $mockFrontcoverService = $this->createMock(ThothFrontcoverService::class);
+        $mockFrontcoverService->expects($this->once())
+            ->method('sync')
+            ->with($mockPublication, 'd8fa2e63-5513-45e5-84c1-e9c2d89f99d3');
 
-        $service = $this->createBookService($mockFactory, $mockRepository);
+        $service = $this->createBookService(
+            $mockFactory,
+            $mockRepository,
+            $this->createMock(ThothPublicationService::class),
+            $this->createMock(ThothTitleService::class),
+            $this->createMock(ThothAbstractService::class),
+            $mockFrontcoverService
+        );
         $thothBookId = $service->register($mockPublication, $thothImprintId);
 
         $this->assertSame('d8fa2e63-5513-45e5-84c1-e9c2d89f99d3', $thothBookId);
