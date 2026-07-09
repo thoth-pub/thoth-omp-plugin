@@ -26,6 +26,7 @@ use APP\plugins\generic\thoth\classes\repositories\ThothBookRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothChapterRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothContributionRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothContributorRepository;
+use APP\plugins\generic\thoth\classes\repositories\ThothFrontcoverFileUploadRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothImprintRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothInstitutionRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothLanguageRepository;
@@ -115,6 +116,10 @@ class ThothRepositoryProvider implements ContainerProvider
 
         $container->singleton('publicationFileUploadRepository', function ($container) {
             return new ThothPublicationFileUploadRepository($container->get('client'));
+        });
+
+        $container->singleton('frontcoverFileUploadRepository', function ($container) {
+            return new ThothFrontcoverFileUploadRepository($container->get('client'));
         });
 
         $container->singleton('referenceRepository', function ($container) {
