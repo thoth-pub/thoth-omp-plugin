@@ -15,29 +15,39 @@
 
 class ThothFrontcoverTemplateFilter
 {
+    private $frontcoverUrl;
+
     public function registerFilter($templateMgr, $template)
     {
         if ($template !== 'frontend/pages/book.tpl') {
             return false;
         }
 
+        $publication = $templateMgr->getTemplateVars('publication');
+        $frontcoverUrl = $publication ? $publication->getData('thothFrontcoverUrl') : null;
+        if (!$this->isValidFrontcoverUrl($frontcoverUrl)) {
+            return false;
+        }
+
+        $this->frontcoverUrl = $frontcoverUrl;
         $templateMgr->registerFilter('output', [$this, 'replaceCoverImage']);
 
         return false;
     }
 
-    public function replaceCoverImage($output, $templateMgr)
+    public function replaceCoverImage($output, $template = null)
     {
-        $publication = $templateMgr->getTemplateVars('publication');
-        $frontcoverUrl = $publication ? $publication->getData('thothFrontcoverUrl') : null;
-        if (!$this->isValidFrontcoverUrl($frontcoverUrl)) {
+        if (!$this->frontcoverUrl) {
             return $output;
         }
 
         $pattern = '/(<div class="item cover">\s*<img\b[^>]*\bsrc=")[^"]*("[^>]*>)/';
-        $output = preg_replace($pattern, '$1' . htmlspecialchars($frontcoverUrl, ENT_QUOTES, 'UTF-8') . '$2', $output, 1);
-
-        $templateMgr->unregisterFilter('output', [$this, 'replaceCoverImage']);
+        $output = preg_replace(
+            $pattern,
+            '$1' . htmlspecialchars($this->frontcoverUrl, ENT_QUOTES, 'UTF-8') . '$2',
+            $output,
+            1
+        );
 
         return $output;
     }
