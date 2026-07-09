@@ -17,19 +17,31 @@
 namespace APP\plugins\generic\thoth\classes\services;
 
 use APP\facades\Repo;
-use APP\plugins\generic\thoth\classes\facades\ThothRepository;
-use APP\plugins\generic\thoth\classes\facades\ThothService;
 use PKP\db\DAORegistry;
 
 class ThothContributionService
 {
     public $factory;
     public $repository;
+    public $contributorRepository;
+    public $contributorService;
+    public $biographyService;
+    public $affiliationService;
 
-    public function __construct($factory, $repository)
-    {
+    public function __construct(
+        $factory,
+        $repository,
+        $contributorRepository,
+        $contributorService,
+        $biographyService,
+        $affiliationService
+    ) {
         $this->factory = $factory;
         $this->repository = $repository;
+        $this->contributorRepository = $contributorRepository;
+        $this->contributorService = $contributorService;
+        $this->biographyService = $biographyService;
+        $this->affiliationService = $affiliationService;
     }
 
     public function register($author, $seq, $thothWorkId, $primaryContactId = null)
@@ -38,17 +50,17 @@ class ThothContributionService
         $thothContribution->setWorkId($thothWorkId);
 
         $filter = empty($author->getOrcid()) ? $author->getFullName(false) : $author->getOrcid();
-        $thothContributor = ThothRepository::contributor()->find($filter);
+        $thothContributor = $this->contributorRepository->find($filter);
 
         if ($thothContributor === null) {
-            $thothContributorId = ThothService::contributor()->register($author);
+            $thothContributorId = $this->contributorService->register($author);
             $thothContribution->setContributorId($thothContributorId);
         } else {
             $thothContribution->setContributorId($thothContributor->getContributorId());
         }
 
         $thothContributionId = $this->repository->add($thothContribution);
-        ThothService::biography()->registerByAuthor(
+        $this->biographyService->registerByAuthor(
             $author,
             $thothContributionId,
             $author->getData('locale')
@@ -56,7 +68,7 @@ class ThothContributionService
 
         $affiliationOrdinal = 1;
         foreach ($author->getAffiliations() as $affiliation) {
-            ThothService::affiliation()->register($affiliation, $thothContributionId, $affiliationOrdinal);
+            $this->affiliationService->register($affiliation, $thothContributionId, $affiliationOrdinal);
             $affiliationOrdinal++;
         }
 

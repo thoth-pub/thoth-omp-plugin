@@ -18,7 +18,7 @@ namespace APP\plugins\generic\thoth\classes\container\providers;
 
 require_once(__DIR__ . '/../../../vendor/autoload.php');
 
-use APP\core\Application;
+use APP\plugins\generic\thoth\classes\config\ThothSettings;
 use APP\plugins\generic\thoth\classes\repositories\ThothAbstractRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothAffiliationRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothBiographyRepository;
@@ -38,40 +38,17 @@ use APP\plugins\generic\thoth\classes\repositories\ThothSubjectRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothTitleRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothWorkRelationRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothWorkRepository;
-use Illuminate\Contracts\Encryption\DecryptException;
-use Illuminate\Support\Facades\Crypt;
-use PKP\db\DAORegistry;
 use ThothApi\GraphQL\Client;
 
 class ThothRepositoryProvider implements ContainerProvider
 {
     public function register($container)
     {
-        $container->set('config', function ($container) {
-            $pluginSettingsDao = & DAORegistry::getDAO('PluginSettingsDAO');
-            $contextId = Application::get()->getRequest()->getContext()->getId();
-
-            $customThothApi = $pluginSettingsDao->getSetting($contextId, 'ThothPlugin', 'customThothApi');
-            $customThothApiUrl = $pluginSettingsDao->getSetting($contextId, 'ThothPlugin', 'customThothApiUrl');
-            $token = $pluginSettingsDao->getSetting($contextId, 'ThothPlugin', 'token') ?? '';
-            $decryptedToken = '';
-
-            if ($token) {
-                try {
-                    $decryptedToken = Crypt::decrypt($token);
-                } catch (DecryptException $exception) {
-                    $decryptedToken = '';
-                }
-            }
-
-            return [
-                'customThothApi' => $customThothApi,
-                'customThothApiUrl' => $customThothApiUrl,
-                'token' => $decryptedToken
-            ];
+        $container->singleton('config', function ($container) {
+            return (new ThothSettings())->toArray();
         });
 
-        $container->set('client', function ($container) {
+        $container->singleton('client', function ($container) {
             $config = $container->get('config');
 
             $httpConfig = [];
@@ -83,80 +60,80 @@ class ThothRepositoryProvider implements ContainerProvider
             return $client->setToken($config['token']);
         });
 
-        $container->set('abstractRepository', function ($container) {
+        $container->singleton('abstractRepository', function ($container) {
             return new ThothAbstractRepository($container->get('client'));
         });
 
-        $container->set('affiliationRepository', function ($container) {
+        $container->singleton('affiliationRepository', function ($container) {
             return new ThothAffiliationRepository($container->get('client'));
         });
 
-        $container->set('bookRepository', function ($container) {
+        $container->singleton('bookRepository', function ($container) {
             return new ThothBookRepository($container->get('client'));
         });
 
-        $container->set('biographyRepository', function ($container) {
+        $container->singleton('biographyRepository', function ($container) {
             return new ThothBiographyRepository($container->get('client'));
         });
 
-        $container->set('chapterRepository', function ($container) {
+        $container->singleton('chapterRepository', function ($container) {
             return new ThothChapterRepository($container->get('client'));
         });
 
-        $container->set('contributionRepository', function ($container) {
+        $container->singleton('contributionRepository', function ($container) {
             return new ThothContributionRepository($container->get('client'));
         });
 
-        $container->set('contributorRepository', function ($container) {
+        $container->singleton('contributorRepository', function ($container) {
             return new ThothContributorRepository($container->get('client'));
         });
 
-        $container->set('imprintRepository', function ($container) {
+        $container->singleton('imprintRepository', function ($container) {
             return new ThothImprintRepository($container->get('client'));
         });
 
-        $container->set('institutionRepository', function ($container) {
+        $container->singleton('institutionRepository', function ($container) {
             return new ThothInstitutionRepository($container->get('client'));
         });
 
-        $container->set('languageRepository', function ($container) {
+        $container->singleton('languageRepository', function ($container) {
             return new ThothLanguageRepository($container->get('client'));
         });
 
-        $container->set('locationRepository', function ($container) {
+        $container->singleton('locationRepository', function ($container) {
             return new ThothLocationRepository($container->get('client'));
         });
 
-        $container->set('meRepository', function ($container) {
+        $container->singleton('meRepository', function ($container) {
             $contextId = Application::get()->getRequest()->getContext()->getId();
             return new ThothMeRepository($container->get('client'), $contextId);
         });
 
-        $container->set('publicationRepository', function ($container) {
+        $container->singleton('publicationRepository', function ($container) {
             return new ThothPublicationRepository($container->get('client'));
         });
 
-        $container->set('publicationFileUploadRepository', function ($container) {
+        $container->singleton('publicationFileUploadRepository', function ($container) {
             return new ThothPublicationFileUploadRepository($container->get('client'));
         });
 
-        $container->set('referenceRepository', function ($container) {
+        $container->singleton('referenceRepository', function ($container) {
             return new ThothReferenceRepository($container->get('client'));
         });
 
-        $container->set('subjectRepository', function ($container) {
+        $container->singleton('subjectRepository', function ($container) {
             return new ThothSubjectRepository($container->get('client'));
         });
 
-        $container->set('titleRepository', function ($container) {
+        $container->singleton('titleRepository', function ($container) {
             return new ThothTitleRepository($container->get('client'));
         });
 
-        $container->set('workRelationRepository', function ($container) {
+        $container->singleton('workRelationRepository', function ($container) {
             return new ThothWorkRelationRepository($container->get('client'));
         });
 
-        $container->set('workRepository', function ($container) {
+        $container->singleton('workRepository', function ($container) {
             return new ThothWorkRepository($container->get('client'));
         });
     }

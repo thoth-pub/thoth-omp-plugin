@@ -73,15 +73,11 @@ class ThothChapterServiceTest extends PKPTestCase
 
         $mockAbstractService = $this->createMock(ThothAbstractService::class);
         $mockAbstractService->expects($this->once())->method('registerByChapter');
-        $container->set('abstractService', fn () => $mockAbstractService);
-
         $mockContributionService = $this->createMock(ThothContributionService::class);
-        $mockContributionService->method('registerByChapter');
-        $container->set('contributionService', fn () => $mockContributionService);
+        $mockContributionService->expects($this->once())->method('registerByChapter');
 
         $mockPublicationService = $this->createMock(ThothPublicationService::class);
-        $mockPublicationService->method('registerByChapter');
-        $container->set('publicationService', fn () => $mockPublicationService);
+        $mockPublicationService->expects($this->once())->method('registerByChapter');
 
         $publicationRepoMock = Mockery::mock(app(PublicationRepository::class))
             ->makePartial()
@@ -102,7 +98,6 @@ class ThothChapterServiceTest extends PKPTestCase
 
         $mockTitleService = $this->createMock(ThothTitleService::class);
         $mockTitleService->expects($this->once())->method('registerByChapter');
-        $container->set('titleService', fn () => $mockTitleService);
 
         $mockFactory = $this->getMockBuilder(ThothChapterFactory::class)
             ->onlyMethods(['createFromChapter'])
@@ -146,7 +141,14 @@ class ThothChapterServiceTest extends PKPTestCase
 
         $thothImprintId = 'd7991bfa-0ed3-432f-b9bd-0c7d0a4a1dec';
 
-        $service = new ThothChapterService($mockFactory, $mockRepository);
+        $service = new ThothChapterService(
+            $mockFactory,
+            $mockRepository,
+            $mockContributionService,
+            $mockPublicationService,
+            $mockTitleService,
+            $mockAbstractService
+        );
         $thothChapterId = $service->register($mockChapter, $thothImprintId);
 
         $this->assertSame('fed8b9ee-2537-4a66-a1a1-eeadf4001c59', $thothChapterId);

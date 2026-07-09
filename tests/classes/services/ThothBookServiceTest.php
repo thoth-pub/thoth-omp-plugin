@@ -23,13 +23,8 @@ use APP\plugins\generic\thoth\classes\factories\ThothBookFactory;
 use APP\plugins\generic\thoth\classes\repositories\ThothBookRepository;
 use APP\plugins\generic\thoth\classes\services\ThothAbstractService;
 use APP\plugins\generic\thoth\classes\services\ThothBookService;
-use APP\plugins\generic\thoth\classes\services\ThothContributionService;
-use APP\plugins\generic\thoth\classes\services\ThothLanguageService;
 use APP\plugins\generic\thoth\classes\services\ThothPublicationService;
-use APP\plugins\generic\thoth\classes\services\ThothReferenceService;
-use APP\plugins\generic\thoth\classes\services\ThothSubjectService;
 use APP\plugins\generic\thoth\classes\services\ThothTitleService;
-use APP\plugins\generic\thoth\classes\services\ThothWorkRelationService;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Inputs\PatchWork as ThothWork;
@@ -44,13 +39,8 @@ class ThothBookServiceTest extends PKPTestCase
         $this->backups = [
             'client' => $container->backup('client'),
             'abstractService' => $container->backup('abstractService'),
-            'contributionService' => $container->backup('contributionService'),
             'publicationService' => $container->backup('publicationService'),
-            'languageService' => $container->backup('languageService'),
-            'subjectService' => $container->backup('subjectService'),
-            'referenceService' => $container->backup('referenceService'),
             'titleService' => $container->backup('titleService'),
-            'workRelationService' => $container->backup('workRelationService'),
         ];
     }
 
@@ -70,38 +60,6 @@ class ThothBookServiceTest extends PKPTestCase
         $container->set('client', function () {
             return $this->getMockBuilder(ThothClient::class)->getMock();
         });
-
-        $mockAbstractService = $this->createMock(ThothAbstractService::class);
-        $mockAbstractService->expects($this->once())->method('registerByPublication');
-        $container->set('abstractService', fn () => $mockAbstractService);
-
-        $mockContributionService = $this->createMock(ThothContributionService::class);
-        $mockContributionService->method('registerByPublication');
-        $container->set('contributionService', fn () => $mockContributionService);
-
-        $mockPublicationService = $this->createMock(ThothPublicationService::class);
-        $mockPublicationService->method('registerByPublication');
-        $container->set('publicationService', fn () => $mockPublicationService);
-
-        $mockLanguageService = $this->createMock(ThothLanguageService::class);
-        $mockLanguageService->method('registerByPublication');
-        $container->set('languageService', fn () => $mockLanguageService);
-
-        $mockSubjectService = $this->createMock(ThothSubjectService::class);
-        $mockSubjectService->method('registerByPublication');
-        $container->set('subjectService', fn () => $mockSubjectService);
-
-        $mockReferenceService = $this->createMock(ThothReferenceService::class);
-        $mockReferenceService->method('registerByPublication');
-        $container->set('referenceService', fn () => $mockReferenceService);
-
-        $mockTitleService = $this->createMock(ThothTitleService::class);
-        $mockTitleService->expects($this->once())->method('registerByPublication');
-        $container->set('titleService', fn () => $mockTitleService);
-
-        $mockWorkRelationService = $this->createMock(ThothWorkRelationService::class);
-        $mockWorkRelationService->method('registerByPublication');
-        $container->set('workRelationService', fn () => $mockWorkRelationService);
 
         $mockFactory = $this->getMockBuilder(ThothBookFactory::class)
             ->onlyMethods(['createFromPublication'])
@@ -145,7 +103,13 @@ class ThothBookServiceTest extends PKPTestCase
 
         $thothImprintId = 'f740cf4e-16d1-487c-9a92-615882a591e9';
 
-        $service = new ThothBookService($mockFactory, $mockRepository);
+        $service = new ThothBookService(
+            $mockFactory,
+            $mockRepository,
+            $this->createMock(ThothPublicationService::class),
+            $this->createMock(ThothTitleService::class),
+            $this->createMock(ThothAbstractService::class)
+        );
         $thothBookId = $service->register($mockPublication, $thothImprintId);
 
         $this->assertSame('d8fa2e63-5513-45e5-84c1-e9c2d89f99d3', $thothBookId);
@@ -172,7 +136,13 @@ class ThothBookServiceTest extends PKPTestCase
 
         $mockPublication = $this->getMockBuilder(\APP\publication\Publication::class)->getMock();
 
-        $service = new ThothBookService($mockFactory, $mockRepository);
+        $service = new ThothBookService(
+            $mockFactory,
+            $mockRepository,
+            $this->createMock(ThothPublicationService::class),
+            $this->createMock(ThothTitleService::class),
+            $this->createMock(ThothAbstractService::class)
+        );
         $errors = $service->validate($mockPublication);
 
         $this->assertEquals([
@@ -203,7 +173,13 @@ class ThothBookServiceTest extends PKPTestCase
 
         $mockPublication = $this->getMockBuilder(\APP\publication\Publication::class)->getMock();
 
-        $service = new ThothBookService($mockFactory, $mockRepository);
+        $service = new ThothBookService(
+            $mockFactory,
+            $mockRepository,
+            $this->createMock(ThothPublicationService::class),
+            $this->createMock(ThothTitleService::class),
+            $this->createMock(ThothAbstractService::class)
+        );
         $errors = $service->validate($mockPublication);
 
         $this->assertEquals([
