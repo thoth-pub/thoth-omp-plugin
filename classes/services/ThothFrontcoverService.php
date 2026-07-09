@@ -146,10 +146,15 @@ class ThothFrontcoverService
 
     protected function saveUploadData($publication, string $sha256, string $cdnUrl): void
     {
-        Repo::publication()->edit($publication, [
-            'thothFrontcoverSha256' => $sha256,
-            'thothFrontcoverUrl' => $cdnUrl,
-        ]);
+        $publication->setData('thothFrontcoverSha256', $sha256);
+        $publication->setData('thothFrontcoverUrl', $cdnUrl);
+
+        $this->persistPublication($publication);
+    }
+
+    protected function persistPublication($publication): void
+    {
+        Repo::publication()->dao->update($publication);
     }
 
     private function getContextId($publication): ?int

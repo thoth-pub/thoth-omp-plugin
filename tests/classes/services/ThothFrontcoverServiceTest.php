@@ -85,8 +85,9 @@ class ThothFrontcoverServiceTest extends PKPTestCase
         $frontcoverSha256 = hash_file('sha256', $frontcoverPath);
         $cdnUrl = 'https://cdn.thoth.pub/frontcover.png';
 
+        $metadata = [];
         $publication = $this->getMockBuilder(\APP\publication\Publication::class)
-            ->onlyMethods(['getData'])
+            ->onlyMethods(['getData', 'setData'])
             ->getMock();
         $publication->method('getData')
             ->willReturnCallback(function ($key) {
@@ -94,6 +95,11 @@ class ThothFrontcoverServiceTest extends PKPTestCase
                     'thothUploadFrontcover' => true,
                     'thothFrontcoverSha256' => null,
                 ][$key] ?? null;
+            });
+        $publication->expects($this->exactly(2))
+            ->method('setData')
+            ->willReturnCallback(function ($key, $value) use (&$metadata) {
+                $metadata[$key] = $value;
             });
 
         $newFrontcoverFileUpload = new NewFrontcoverFileUpload();
@@ -168,7 +174,7 @@ class ThothFrontcoverServiceTest extends PKPTestCase
                 $fileUploadService,
                 $this->createMock(ThothMeService::class),
             ])
-            ->onlyMethods(['canUploadFrontcover', 'resolveFrontcoverFile', 'saveUploadData'])
+            ->onlyMethods(['canUploadFrontcover', 'resolveFrontcoverFile', 'persistPublication'])
             ->getMock();
         $service->method('canUploadFrontcover')->willReturn(true);
         $service->method('resolveFrontcoverFile')
@@ -180,10 +186,13 @@ class ThothFrontcoverServiceTest extends PKPTestCase
                 'sha256' => $frontcoverSha256,
             ]);
         $service->expects($this->once())
-            ->method('saveUploadData')
-            ->with($publication, $frontcoverSha256, $cdnUrl);
+            ->method('persistPublication')
+            ->with($publication);
 
         $service->sync($publication, 'work-id');
+
+        $this->assertSame($frontcoverSha256, $metadata['thothFrontcoverSha256']);
+        $this->assertSame($cdnUrl, $metadata['thothFrontcoverUrl']);
     }
 
     private function createTemporaryPng(): string
