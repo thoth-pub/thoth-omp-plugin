@@ -20,6 +20,39 @@ import('plugins.generic.thoth.classes.services.ThothMeCacheService');
 
 class ThothFrontcoverService
 {
+    private const PATCH_WORK_FIELDS = [
+        'workId' => true,
+        'workType' => true,
+        'workStatus' => true,
+        'reference' => true,
+        'edition' => true,
+        'imprintId' => true,
+        'doi' => true,
+        'publicationDate' => true,
+        'withdrawnDate' => true,
+        'place' => true,
+        'pageCount' => true,
+        'pageBreakdown' => true,
+        'imageCount' => true,
+        'tableCount' => true,
+        'audioCount' => true,
+        'videoCount' => true,
+        'license' => true,
+        'copyrightHolder' => true,
+        'landingPage' => true,
+        'lccn' => true,
+        'oclc' => true,
+        'generalNote' => true,
+        'bibliographyNote' => true,
+        'toc' => true,
+        'resourcesDescription' => true,
+        'coverUrl' => true,
+        'coverCaption' => true,
+        'firstPage' => true,
+        'lastPage' => true,
+        'pageInterval' => true,
+    ];
+
     private $frontcoverFileUploadRepository;
     private $workRepository;
     private $fileUploadService;
@@ -56,11 +89,16 @@ class ThothFrontcoverService
         );
 
         $cdnUrl = $file->getCdnUrl();
-        $this->workRepository->edit($this->workRepository->new([
-            'workId' => $thothWorkId,
-            'coverUrl' => $cdnUrl,
-        ]));
+        $this->workRepository->edit($this->workRepository->new(array_merge(
+            $this->getPatchWorkData($this->workRepository->get($thothWorkId)),
+            ['coverUrl' => $cdnUrl]
+        )));
         $this->saveUploadData($publication, $frontcoverFile['sha256'], $cdnUrl);
+    }
+
+    private function getPatchWorkData($thothWork): array
+    {
+        return array_intersect_key($thothWork->toArray(), self::PATCH_WORK_FIELDS);
     }
 
     protected function canUploadFrontcover($publication): bool
