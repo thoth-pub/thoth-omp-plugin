@@ -44,6 +44,7 @@ class ThothPlugin extends GenericPlugin
             HookRegistry::register('TemplateManager::display', [$this, 'addTemplateFilters']);
             HookRegistry::register('TemplateManager::display', [$this, 'addMenu']);
             HookRegistry::register('LoadHandler', [$this, 'addHandlers']);
+            HookRegistry::register('LoadComponentHandler', [$this, 'loadComponentHandler']);
 
             $this->addToSchema();
             $this->addFormConfig();
@@ -386,5 +387,17 @@ class ThothPlugin extends GenericPlugin
         }
 
         $templateMgr->setState(['menu' => $menu]);
+    }
+
+    public function loadComponentHandler($hookName, $args)
+    {
+        $component = &$args[0];
+
+        if (!$this->getEnabled() || $component !== 'submission.CoverHandler') {
+            return false;
+        }
+
+        $component = 'plugins.generic.thoth.classes.handlers.ThothCoverHandler';
+        return true;
     }
 }
