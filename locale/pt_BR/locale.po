@@ -286,10 +286,10 @@ msgid "plugins.generic.thoth.publicationFormat.thothFiles.file"
 msgstr "Arquivo"
 
 msgid "plugins.generic.thoth.field.frontcover"
-msgstr "Capa frontal na Thoth"
+msgstr "Hospedagem do arquivo de capa na Thoth"
 
 msgid "plugins.generic.thoth.field.frontcover.label"
-msgstr "Enviar esta imagem de capa para a Thoth como capa frontal."
+msgstr "Hospedar o arquivo da imagem de capa na Thoth."
 
 msgid "plugins.generic.thoth.field.frontcover.missingCdnWritePermission"
-msgstr "O usuário da Thoth configurado precisa da permissão cdnWrite para enviar a capa frontal."
+msgstr "O usuário da Thoth configurado precisa da permissão cdnWrite para hospedar o arquivo da imagem de capa na Thoth."

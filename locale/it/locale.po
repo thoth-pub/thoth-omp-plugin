@@ -286,10 +286,10 @@ msgid "plugins.generic.thoth.publicationFormat.thothFiles.file"
 msgstr "File"
 
 msgid "plugins.generic.thoth.field.frontcover"
-msgstr "Copertina frontale in Thoth"
+msgstr "Hosting del file di copertina in Thoth"
 
 msgid "plugins.generic.thoth.field.frontcover.label"
-msgstr "Invia questa immagine di copertina a Thoth come copertina frontale."
+msgstr "Ospita il file di questa immagine di copertina su Thoth."
 
 msgid "plugins.generic.thoth.field.frontcover.missingCdnWritePermission"
-msgstr "L'utente Thoth configurato deve avere il permesso cdnWrite per caricare la copertina frontale."
+msgstr "L'utente Thoth configurato deve avere il permesso cdnWrite per ospitare il file dell'immagine di copertina su Thoth."
