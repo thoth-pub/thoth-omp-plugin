@@ -54,6 +54,7 @@ class ThothFileUploadServiceTest extends PKPTestCase
             public function request($method, $url, $options)
             {
                 $this->request = compact('method', 'url', 'options');
+                fclose($options['body']);
             }
         };
 

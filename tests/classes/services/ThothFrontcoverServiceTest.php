@@ -24,6 +24,8 @@ use APP\plugins\generic\thoth\classes\services\ThothFileUploadService;
 use APP\plugins\generic\thoth\classes\services\ThothFrontcoverService;
 use APP\plugins\generic\thoth\classes\services\ThothMeService;
 use PKP\tests\PKPTestCase;
+use ThothApi\GraphQL\Enums\WorkStatus;
+use ThothApi\GraphQL\Enums\WorkType;
 use ThothApi\GraphQL\Inputs\NewFrontcoverFileUpload;
 use ThothApi\GraphQL\Inputs\PatchWork;
 use ThothApi\GraphQL\Schemas\File;
@@ -121,9 +123,26 @@ class ThothFrontcoverServiceTest extends PKPTestCase
 
         $workRepository = $this->createMock(ThothWorkRepository::class);
         $workRepository->expects($this->once())
+            ->method('get')
+            ->with('work-id')
+            ->willReturn(new class () {
+                public function toArray()
+                {
+                    return [
+                        'workId' => 'work-id',
+                        'workType' => WorkType::MONOGRAPH,
+                        'workStatus' => WorkStatus::ACTIVE,
+                        'fullTitle' => 'Ignored title',
+                        'coverUrl' => 'https://old.example/cover.png',
+                    ];
+                }
+            });
+        $workRepository->expects($this->once())
             ->method('new')
             ->with([
                 'workId' => 'work-id',
+                'workType' => WorkType::MONOGRAPH,
+                'workStatus' => WorkStatus::ACTIVE,
                 'coverUrl' => $cdnUrl,
             ])
             ->willReturn(new PatchWork([
