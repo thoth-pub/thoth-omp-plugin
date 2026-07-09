@@ -14,6 +14,8 @@
  * @brief Coordinates OMP cover image uploads to Thoth frontcover storage.
  */
 
+use PKP\db\DAORegistry;
+
 import('classes.file.PublicFileManager');
 import('plugins.generic.thoth.classes.facades.ThothRepo');
 import('plugins.generic.thoth.classes.services.ThothMeCacheService');
@@ -141,10 +143,15 @@ class ThothFrontcoverService
 
     protected function saveUploadData($publication, string $sha256, string $cdnUrl): void
     {
-        Services::get('publication')->edit($publication, [
-            'thothFrontcoverSha256' => $sha256,
-            'thothFrontcoverUrl' => $cdnUrl,
-        ], null);
+        $publication->setData('thothFrontcoverSha256', $sha256);
+        $publication->setData('thothFrontcoverUrl', $cdnUrl);
+
+        $this->persistPublication($publication);
+    }
+
+    protected function persistPublication($publication): void
+    {
+        DAORegistry::getDAO('PublicationDAO')->update($publication);
     }
 
     private function getContextId($publication): ?int
