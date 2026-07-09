@@ -30,7 +30,9 @@ class ThothFileUploadService
                 'body' => $resource,
             ]);
         } finally {
-            fclose($resource);
+            if (is_resource($resource)) {
+                fclose($resource);
+            }
         }
 
         return $fileUploadRepository->complete($fileUploadResponse->getFileUploadId());
