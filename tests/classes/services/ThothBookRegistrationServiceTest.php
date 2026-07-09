@@ -29,6 +29,7 @@ import('plugins.generic.thoth.classes.services.ThothAbstractService');
 import('plugins.generic.thoth.classes.services.ThothBookRegistrationResult');
 import('plugins.generic.thoth.classes.services.ThothBookRegistrationService');
 import('plugins.generic.thoth.classes.services.ThothContributionService');
+import('plugins.generic.thoth.classes.services.ThothFrontcoverService');
 import('plugins.generic.thoth.classes.services.ThothLanguageService');
 import('plugins.generic.thoth.classes.services.ThothPublicationService');
 import('plugins.generic.thoth.classes.services.ThothReferenceService');
@@ -89,6 +90,11 @@ class ThothBookRegistrationServiceTest extends PKPTestCase
         $mockWorkRelationService = $this->createMock(ThothWorkRelationService::class);
         $mockWorkRelationService->expects($this->once())->method('registerByPublication');
 
+        $mockFrontcoverService = $this->createMock(ThothFrontcoverService::class);
+        $mockFrontcoverService->expects($this->once())
+            ->method('sync')
+            ->with($mockPublication, 'd8fa2e63-5513-45e5-84c1-e9c2d89f99d3');
+
         $service = new ThothBookRegistrationService(
             $mockFactory,
             $mockRepository,
@@ -99,7 +105,8 @@ class ThothBookRegistrationServiceTest extends PKPTestCase
             $mockReferenceService,
             $mockSubjectService,
             $mockTitleService,
-            $mockWorkRelationService
+            $mockWorkRelationService,
+            $mockFrontcoverService
         );
 
         $registrationResult = $service->register($mockPublication, 'f740cf4e-16d1-487c-9a92-615882a591e9');

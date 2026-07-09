@@ -19,7 +19,9 @@
 require_once(__DIR__ . '/../../../vendor/autoload.php');
 
 use ThothApi\GraphQL\Client as ThothClient;
+use ThothApi\GraphQL\Inputs\CompleteFileUpload;
 use ThothApi\GraphQL\Inputs\NewFrontcoverFileUpload;
+use ThothApi\GraphQL\Schemas\File;
 use ThothApi\GraphQL\Schemas\FileUploadResponse;
 
 import('lib.pkp.tests.PKPTestCase');
@@ -69,5 +71,44 @@ class ThothFrontcoverFileUploadRepositoryTest extends PKPTestCase
         $response = $repository->init($newFrontcoverFileUpload);
 
         $this->assertSame($fileUploadResponse, $response);
+    }
+
+    public function testCompleteThothFrontcoverFileUpload(): void
+    {
+        $fileUploadId = '123e4567-e89b-12d3-a456-426614174000';
+        $expectedFile = new File([
+            'fileId' => '0c333e20-09f9-4f32-9f8f-20e801437dba',
+            'fileType' => 'FRONTCOVER',
+            'workId' => 'f214b70e-9c0d-4a1f-a254-c8f426783dfd',
+            'objectKey' => '10.12345/frontcover.png',
+            'cdnUrl' => 'https://example.thoth.pub/10.12345/frontcover.png',
+            'mimeType' => 'image/png',
+            'bytes' => 2358735,
+            'sha256' => 'b5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c',
+        ]);
+
+        $fakeThothClient = new class ($expectedFile) {
+            public $completeFileUploadArgs = [];
+            private $expectedFile;
+
+            public function __construct(File $expectedFile)
+            {
+                $this->expectedFile = $expectedFile;
+            }
+
+            public function completeFileUpload($completeFileUpload, array $selection)
+            {
+                $this->completeFileUploadArgs = [$completeFileUpload, $selection];
+                return $this->expectedFile;
+            }
+        };
+        $repository = new ThothFrontcoverFileUploadRepository($fakeThothClient);
+
+        $response = $repository->complete($fileUploadId);
+
+        $this->assertSame($expectedFile, $response);
+        $this->assertInstanceOf(CompleteFileUpload::class, $fakeThothClient->completeFileUploadArgs[0]);
+        $this->assertSame($fileUploadId, $fakeThothClient->completeFileUploadArgs[0]->getFileUploadId());
+        $this->assertIsArray($fakeThothClient->completeFileUploadArgs[1]);
     }
 }
