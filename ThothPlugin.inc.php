@@ -52,6 +52,7 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
             HookRegistry::register('TemplateManager::display', [$this, 'addScripts']);
             HookRegistry::register('TemplateManager::display', [$this, 'addMenu']);
             HookRegistry::register('LoadHandler', [$this, 'addHandlers']);
+            HookRegistry::register('LoadComponentHandler', [$this, 'loadComponentHandler']);
 
             import('plugins.generic.thoth.classes.gridModifier.PublicationFormatGridModifier');
             $publicationFormatGridModifier = new PublicationFormatGridModifier($this);
@@ -388,5 +389,19 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
         }
 
         return false;
+    }
+
+    public function loadComponentHandler($hookName, $args)
+    {
+        $component = $args[0];
+        $componentInstance = &$args[2];
+
+        if (!$this->getEnabled() || $component !== 'submission.CoverHandler') {
+            return false;
+        }
+
+        import('plugins.generic.thoth.classes.handlers.ThothCoverHandler');
+        $componentInstance = new ThothCoverHandler();
+        return true;
     }
 }
