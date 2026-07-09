@@ -30,6 +30,7 @@ import('plugins.generic.thoth.classes.notification.ThothNotification');
 import('plugins.generic.thoth.classes.schema.ThothSchema');
 import('plugins.generic.thoth.classes.services.ThothCatalogFilesCacheService');
 import('plugins.generic.thoth.classes.templateFilters.ThothCatalogFilesTemplateFilter');
+import('plugins.generic.thoth.classes.templateFilters.ThothFrontcoverTemplateFilter');
 import('plugins.generic.thoth.classes.templateFilters.PublicationFormatTemplateFilter');
 import('plugins.generic.thoth.classes.templateFilters.ThothSectionTemplateFilter');
 
@@ -139,6 +140,9 @@ class ThothPlugin extends GenericPlugin
 
         $thothCatalogFilesFilter = new ThothCatalogFilesTemplateFilter();
         $thothCatalogFilesFilter->registerFilter($templateMgr, $template);
+
+        $thothFrontcoverFilter = new ThothFrontcoverTemplateFilter();
+        $thothFrontcoverFilter->registerFilter($templateMgr, $template);
     }
 
     public function addToSchema()
