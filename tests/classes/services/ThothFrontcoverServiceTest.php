@@ -76,6 +76,49 @@ class ThothFrontcoverServiceTest extends PKPTestCase
         $service->sync($publication, 'work-id');
     }
 
+    public function testClearsUploadDataWhenFrontcoverHostingIsDisabled()
+    {
+        $metadata = [];
+        $publication = $this->getMockBuilder(Publication::class)
+            ->setMethods(['getData', 'setData'])
+            ->getMock();
+        $publication->method('getData')
+            ->willReturnCallback(function ($key) {
+                return [
+                    'thothUploadFrontcover' => false,
+                    'thothFrontcoverSha256' => 'previous-sha256',
+                    'thothFrontcoverUrl' => 'https://cdn.thoth.pub/frontcover.png',
+                ][$key] ?? null;
+            });
+        $publication->expects($this->exactly(2))
+            ->method('setData')
+            ->willReturnCallback(function ($key, $value) use (&$metadata) {
+                $metadata[$key] = $value;
+            });
+
+        $frontcoverRepository = $this->createMock(ThothFrontcoverFileUploadRepository::class);
+        $frontcoverRepository->expects($this->never())->method('init');
+
+        $workRepository = $this->createMock(ThothWorkRepository::class);
+        $workRepository->expects($this->never())->method('edit');
+
+        $fileUploadService = $this->createMock(ThothFileUploadService::class);
+        $fileUploadService->expects($this->never())->method('upload');
+
+        $service = $this->getMockBuilder(ThothFrontcoverService::class)
+            ->setConstructorArgs([$frontcoverRepository, $workRepository, $fileUploadService])
+            ->setMethods(['persistPublication'])
+            ->getMock();
+        $service->expects($this->once())
+            ->method('persistPublication')
+            ->with($publication);
+
+        $service->sync($publication, 'work-id');
+
+        $this->assertNull($metadata['thothFrontcoverSha256']);
+        $this->assertNull($metadata['thothFrontcoverUrl']);
+    }
+
     public function testUploadsFrontcoverAndUpdatesWorkCoverUrl()
     {
         $frontcoverPath = $this->createTemporaryPng();
