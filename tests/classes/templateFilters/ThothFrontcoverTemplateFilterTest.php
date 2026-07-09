@@ -31,7 +31,8 @@ class ThothFrontcoverTemplateFilterTest extends PKPTestCase
         $templateMgr = new ThothFrontcoverTemplateManagerStub('https://cdn.thoth.pub/frontcover.png');
         $output = '<div class="item cover"><img src="http://omp.test/public/presses/1/cover_t.jpg" alt=""></div>';
 
-        $result = $filter->replaceCoverImage($output, $templateMgr);
+        $filter->registerFilter($templateMgr, 'frontend/pages/book.tpl');
+        $result = $templateMgr->applyOutputFilter($output);
 
         $this->assertStringContainsString('src="https://cdn.thoth.pub/frontcover.png"', $result);
     }
@@ -42,7 +43,8 @@ class ThothFrontcoverTemplateFilterTest extends PKPTestCase
         $templateMgr = new ThothFrontcoverTemplateManagerStub('javascript:alert(1)');
         $output = '<div class="item cover"><img src="http://omp.test/public/presses/1/cover_t.jpg" alt=""></div>';
 
-        $result = $filter->replaceCoverImage($output, $templateMgr);
+        $filter->registerFilter($templateMgr, 'frontend/pages/book.tpl');
+        $result = $templateMgr->applyOutputFilter($output);
 
         $this->assertSame($output, $result);
     }
@@ -51,6 +53,7 @@ class ThothFrontcoverTemplateFilterTest extends PKPTestCase
 class ThothFrontcoverTemplateManagerStub
 {
     private ThothFrontcoverPublicationStub $publication;
+    private $outputFilter = null;
 
     public function __construct(string $frontcoverUrl)
     {
@@ -64,6 +67,18 @@ class ThothFrontcoverTemplateManagerStub
 
     public function unregisterFilter($type, $callback): void
     {
+    }
+
+    public function registerFilter($type, $callback): void
+    {
+        if ($type === 'output') {
+            $this->outputFilter = $callback;
+        }
+    }
+
+    public function applyOutputFilter(string $output): string
+    {
+        return $this->outputFilter ? call_user_func($this->outputFilter, $output) : $output;
     }
 }
 
