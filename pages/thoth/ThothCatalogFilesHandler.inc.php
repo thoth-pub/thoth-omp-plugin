@@ -39,7 +39,7 @@ class ThothCatalogFilesHandler extends Handler
             return new JSONMessage(false);
         }
 
-        $catalogFileService = new ThothCatalogFileService();
+        $catalogFileService = new ThothCatalogFileService(ThothRepo::publication());
         $catalogFiles = $this->getCachedCatalogFiles($submission, $publication, $catalogFileService);
 
         return new JSONMessage(true, $catalogFiles);

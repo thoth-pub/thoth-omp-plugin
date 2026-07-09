@@ -25,8 +25,10 @@ import('lib.pkp.tests.PKPTestCase');
 import('plugins.generic.thoth.classes.factories.ThothContributionFactory');
 import('plugins.generic.thoth.classes.repositories.ThothContributionRepository');
 import('plugins.generic.thoth.classes.repositories.ThothContributorRepository');
+import('plugins.generic.thoth.classes.services.ThothAffiliationService');
 import('plugins.generic.thoth.classes.services.ThothBiographyService');
 import('plugins.generic.thoth.classes.services.ThothContributionService');
+import('plugins.generic.thoth.classes.services.ThothContributorService');
 
 class ThothContributionServiceTest extends PKPTestCase
 {
@@ -34,19 +36,20 @@ class ThothContributionServiceTest extends PKPTestCase
     {
         $mockBiographyService = $this->createMock(ThothBiographyService::class);
         $mockBiographyService->expects($this->once())->method('registerByAuthor');
-        ThothContainer::getInstance()->set('biographyService', fn () => $mockBiographyService);
 
-        ThothContainer::getInstance()->set('contributorRepository', function () {
-            $mockRepository = $this->getMockBuilder(ThothContributorRepository::class)
-                ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
-                ->setMethods(['find'])
-                ->getMock();
-            $mockRepository->expects($this->once())
-                ->method('find')
-                ->will($this->returnValue(new ThothContributor()));
+        $mockContributorRepository = $this->getMockBuilder(ThothContributorRepository::class)
+            ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
+            ->setMethods(['find'])
+            ->getMock();
+        $mockContributorRepository->expects($this->once())
+            ->method('find')
+            ->will($this->returnValue(new ThothContributor()));
 
-            return $mockRepository;
-        });
+        $mockContributorService = $this->createMock(ThothContributorService::class);
+        $mockContributorService->expects($this->never())->method('register');
+
+        $mockAffiliationService = $this->createMock(ThothAffiliationService::class);
+        $mockAffiliationService->expects($this->never())->method('register');
 
         $mockFactory = $this->getMockBuilder(ThothContributionFactory::class)
             ->setMethods(['createFromAuthor'])
@@ -89,7 +92,14 @@ class ThothContributionServiceTest extends PKPTestCase
         };
         $thothWorkId = '97fcc25c-361b-46f9-8c4b-016bfa36fb6d';
 
-        $service = new ThothContributionService($mockFactory, $mockRepository);
+        $service = new ThothContributionService(
+            $mockFactory,
+            $mockRepository,
+            $mockContributorRepository,
+            $mockContributorService,
+            $mockBiographyService,
+            $mockAffiliationService
+        );
         $thothContributionId = $service->register($mockAuthor, 0, $thothWorkId);
 
         $this->assertSame('e2d8dc3b-a5d9-4941-8ebd-52f0a70515bd', $thothContributionId);

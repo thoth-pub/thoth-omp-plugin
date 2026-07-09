@@ -175,7 +175,7 @@ class UploadThothFileHandler extends Handler
             return [];
         }
 
-        $catalogFileService = new ThothCatalogFileService();
+        $catalogFileService = new ThothCatalogFileService(ThothRepo::publication());
         $thothFiles = [];
 
         $monographFile = $this->getFileByPublicationType(
@@ -275,7 +275,7 @@ class UploadThothFileHandler extends Handler
     private function canUploadFiles($request)
     {
         try {
-            $cacheService = new ThothMeCacheService();
+            $cacheService = new ThothMeCacheService(ThothRepo::me());
             $contextId = $request->getContext()->getId();
             return $cacheService->hasCdnWritePermission($contextId);
         } catch (Exception $e) {

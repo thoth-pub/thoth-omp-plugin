@@ -45,7 +45,7 @@ class ThothHandler extends Handler
         $this->addStyles($request, $templateMgr, $plugin);
 
         try {
-            $publishers = (new ThothMeCacheService())->getLinkedPublishers($context->getId());
+            $publishers = (new ThothMeCacheService(ThothRepo::me()))->getLinkedPublishers($context->getId());
             $publisherIds = array_column($publishers, 'publisherId');
             $imprints = ThothRepo::imprint()->getMany([
                 'publishers' => $publisherIds

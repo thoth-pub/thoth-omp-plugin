@@ -24,6 +24,7 @@ import('classes.monograph.Chapter');
 import('classes.publication.Publication');
 import('classes.publication.PublicationDAO');
 import('lib.pkp.tests.PKPTestCase');
+import('plugins.generic.thoth.classes.container.ThothContainer');
 import('plugins.generic.thoth.classes.factories.ThothChapterFactory');
 import('plugins.generic.thoth.classes.repositories.ThothChapterRepository');
 import('plugins.generic.thoth.classes.services.ThothAbstractService');
@@ -69,15 +70,12 @@ class ThothChapterServiceTest extends PKPTestCase
 
         $mockAbstractService = $this->createMock(ThothAbstractService::class);
         $mockAbstractService->expects($this->once())->method('registerByChapter');
-        ThothContainer::getInstance()->set('abstractService', fn () => $mockAbstractService);
 
         $mockContributionService = $this->createMock(ThothContributionService::class);
-        $mockContributionService->method('registerByChapter');
-        ThothContainer::getInstance()->set('contributionService', fn () => $mockContributionService);
+        $mockContributionService->expects($this->once())->method('registerByChapter');
 
         $mockPublicationService = $this->createMock(ThothPublicationService::class);
-        $mockPublicationService->method('registerByChapter');
-        ThothContainer::getInstance()->set('publicationService', fn () => $mockPublicationService);
+        $mockPublicationService->expects($this->once())->method('registerByChapter');
 
         $mockPublication = $this->getMockBuilder(Publication::class)
             ->setMethods(['getData'])
@@ -114,7 +112,6 @@ class ThothChapterServiceTest extends PKPTestCase
 
         $mockTitleService = $this->createMock(ThothTitleService::class);
         $mockTitleService->expects($this->once())->method('registerByChapter');
-        ThothContainer::getInstance()->set('titleService', fn () => $mockTitleService);
 
         $mockResult = $this->getMockBuilder(DAOResultFactory::class)
             ->setMethods(['toArray'])
@@ -149,7 +146,14 @@ class ThothChapterServiceTest extends PKPTestCase
 
         $thothImprintId = 'd7991bfa-0ed3-432f-b9bd-0c7d0a4a1dec';
 
-        $service = new ThothChapterService($mockFactory, $mockRepository);
+        $service = new ThothChapterService(
+            $mockFactory,
+            $mockRepository,
+            $mockContributionService,
+            $mockPublicationService,
+            $mockTitleService,
+            $mockAbstractService
+        );
         $thothChapterId = $service->register($mockChapter, $thothImprintId);
 
         $this->assertSame('fed8b9ee-2537-4a66-a1a1-eeadf4001c59', $thothChapterId);

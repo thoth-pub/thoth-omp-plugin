@@ -14,18 +14,29 @@
  * @brief Helper class that encapsulates business logic for Thoth contributions
  */
 
-import('plugins.generic.thoth.classes.facades.ThothService');
-import('plugins.generic.thoth.classes.facades.ThothRepo');
-
 class ThothContributionService
 {
     public $factory;
     public $repository;
+    public $contributorRepository;
+    public $contributorService;
+    public $biographyService;
+    public $affiliationService;
 
-    public function __construct($factory, $repository)
-    {
+    public function __construct(
+        $factory,
+        $repository,
+        $contributorRepository,
+        $contributorService,
+        $biographyService,
+        $affiliationService
+    ) {
         $this->factory = $factory;
         $this->repository = $repository;
+        $this->contributorRepository = $contributorRepository;
+        $this->contributorService = $contributorService;
+        $this->biographyService = $biographyService;
+        $this->affiliationService = $affiliationService;
     }
 
     public function register($author, $seq, $thothWorkId, $primaryContactId = null)
@@ -34,20 +45,20 @@ class ThothContributionService
         $thothContribution->setWorkId($thothWorkId);
 
         $filter = empty($author->getOrcid()) ? $author->getFullName(false) : $author->getOrcid();
-        $thothContributor = ThothRepo::contributor()->find($filter);
+        $thothContributor = $this->contributorRepository->find($filter);
 
         if ($thothContributor === null) {
-            $thothContributorId = ThothService::contributor()->register($author);
+            $thothContributorId = $this->contributorService->register($author);
             $thothContribution->setContributorId($thothContributorId);
         } else {
             $thothContribution->setContributorId($thothContributor->getContributorId());
         }
 
         $thothContributionId = $this->repository->add($thothContribution);
-        ThothService::biography()->registerByAuthor($author, $thothContributionId, $author->getData('locale'));
+        $this->biographyService->registerByAuthor($author, $thothContributionId, $author->getData('locale'));
 
         if ($rorId = $author->getData('rorId')) {
-            ThothService::affiliation()->register($rorId, $thothContributionId);
+            $this->affiliationService->register($rorId, $thothContributionId);
         }
 
         return $thothContributionId;
