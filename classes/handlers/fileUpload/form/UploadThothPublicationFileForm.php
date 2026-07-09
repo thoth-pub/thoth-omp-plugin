@@ -24,6 +24,7 @@ use APP\plugins\generic\thoth\classes\facades\ThothRepository;
 use APP\plugins\generic\thoth\classes\factories\ThothPublicationFactory;
 use APP\plugins\generic\thoth\classes\formatters\DoiFormatter;
 use APP\plugins\generic\thoth\classes\services\ThothCatalogFilesCacheService;
+use APP\plugins\generic\thoth\classes\services\ThothFileUploadService;
 use APP\template\TemplateManager;
 use Exception;
 use PKP\db\DAORegistry;
@@ -174,18 +175,11 @@ class UploadThothPublicationFileForm extends Form
                 ->setDeclaredSha256($sha256);
 
             $fileUploadResponse = ThothRepository::publicationFileUpload()->init($newPublicationFileUpload);
-            $headers = array_reduce($fileUploadResponse->getUploadHeaders(), function ($headers, $uploadHeader) {
-                $headers[$uploadHeader->getName()] = $uploadHeader->getValue();
-                return $headers;
-            }, []);
-
-            $resource = fopen($temporaryFilePath, 'r');
-            Application::get()->getHttpClient()->request('PUT', $fileUploadResponse->getUploadUrl(), [
-                'headers' => $headers,
-                'body' => $resource,
-            ]);
-
-            ThothRepository::publicationFileUpload()->complete($fileUploadResponse->getFileUploadId());
+            (new ThothFileUploadService())->upload(
+                $fileUploadResponse,
+                $temporaryFilePath,
+                ThothRepository::publicationFileUpload()
+            );
             $this->flushCatalogFilesCache();
 
             $notificationMgr->createTrivialNotification(
