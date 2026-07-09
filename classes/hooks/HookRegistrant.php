@@ -22,7 +22,6 @@ use APP\plugins\generic\thoth\classes\components\forms\config\CatalogEntryFormCo
 use APP\plugins\generic\thoth\classes\components\forms\config\ContributorFormConfig;
 use APP\plugins\generic\thoth\classes\components\forms\config\PublishFormConfig;
 use APP\plugins\generic\thoth\classes\gridModifier\PublicationFormatGridModifier;
-use APP\plugins\generic\thoth\classes\handlers\ThothCoverHandler;
 use APP\plugins\generic\thoth\classes\listeners\PublicationEditListener;
 use APP\plugins\generic\thoth\classes\listeners\PublicationPublishListener;
 use APP\plugins\generic\thoth\classes\notification\ThothNotification;
@@ -109,20 +108,6 @@ class HookRegistrant
         Hook::add('TemplateManager::display', $this->addScripts(...));
         Hook::add('TemplateManager::display', $thothMenuHandler->addMenu(...));
         Hook::add('LoadHandler', $thothPageHandler->addHandlers(...));
-        Hook::add('LoadComponentHandler', $this->loadComponentHandler(...));
-    }
-
-    private function loadComponentHandler($hookName, $args): bool
-    {
-        $component = $args[0];
-        $componentInstance = &$args[2];
-
-        if ($component !== 'submission.CoverHandler') {
-            return false;
-        }
-
-        $componentInstance = new ThothCoverHandler();
-        return true;
     }
 
     private function addTemplateFilters($hookName, $args): bool
