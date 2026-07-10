@@ -83,6 +83,11 @@ class ThothRepo
         return ThothContainer::getInstance()->get('publicationFileUploadRepository');
     }
 
+    public static function frontcoverFileUpload()
+    {
+        return ThothContainer::getInstance()->get('frontcoverFileUploadRepository');
+    }
+
     public static function reference()
     {
         return ThothContainer::getInstance()->get('referenceRepository');

@@ -31,6 +31,7 @@ class ThothBookRegistrationService
     private $subjectService;
     private $titleService;
     private $workRelationService;
+    private $frontcoverService;
 
     public function __construct(
         $factory,
@@ -42,7 +43,8 @@ class ThothBookRegistrationService
         $referenceService,
         $subjectService,
         $titleService,
-        $workRelationService
+        $workRelationService,
+        $frontcoverService = null
     ) {
         $this->factory = $factory;
         $this->repository = $repository;
@@ -54,6 +56,7 @@ class ThothBookRegistrationService
         $this->subjectService = $subjectService;
         $this->titleService = $titleService;
         $this->workRelationService = $workRelationService;
+        $this->frontcoverService = $frontcoverService;
     }
 
     public function register($publication, $thothImprintId)
@@ -80,6 +83,9 @@ class ThothBookRegistrationService
             $this->subjectService->registerByPublication($publication);
             $this->referenceService->registerByPublication($publication);
             $this->workRelationService->registerByPublication($publication, $thothImprintId);
+            if ($this->frontcoverService) {
+                $this->frontcoverService->sync($publication, $thothBookId);
+            }
         } catch (QueryException $e) {
             $this->deleteRegisteredEntry($registrationResult);
             throw $e;

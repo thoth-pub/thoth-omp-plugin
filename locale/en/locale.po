@@ -284,3 +284,12 @@ msgstr "Chapter: {$title}"
 
 msgid "plugins.generic.thoth.publicationFormat.thothFiles.file"
 msgstr "File"
+
+msgid "plugins.generic.thoth.field.frontcover"
+msgstr "Thoth cover file hosting"
+
+msgid "plugins.generic.thoth.field.frontcover.label"
+msgstr "Host this cover image file on Thoth."
+
+msgid "plugins.generic.thoth.field.frontcover.missingCdnWritePermission"
+msgstr "The configured Thoth user needs the cdnWrite permission to host the cover image file on Thoth."
