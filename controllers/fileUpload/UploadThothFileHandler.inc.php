@@ -95,6 +95,10 @@ class UploadThothFileHandler extends Handler
 
     public function handleThothPublicationFile($args, $request)
     {
+        if (!$this->isValidUploadRequest($request)) {
+            return new JSONMessage(false, __('form.csrfInvalid'));
+        }
+
         if (!$this->canUploadFiles($request)) {
             return new JSONMessage(false, __('plugins.generic.thoth.fileUpload.error.missingCdnWritePermission'));
         }
@@ -112,6 +116,11 @@ class UploadThothFileHandler extends Handler
         } else {
             return new JSONMessage(false, __('manager.plugins.uploadError'));
         }
+    }
+
+    protected function isValidUploadRequest($request)
+    {
+        return $request->checkCSRF();
     }
 
     public function saveUploadThothPublicationFile($args, $request)
