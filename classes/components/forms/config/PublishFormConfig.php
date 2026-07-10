@@ -17,6 +17,7 @@
 namespace APP\plugins\generic\thoth\classes\components\forms\config;
 
 use APP\facades\Repo;
+use APP\plugins\generic\thoth\classes\components\forms\ThothValidationMessageFormatter;
 use APP\plugins\generic\thoth\classes\facades\ThothService;
 use APP\submission\Submission;
 use Exception;
@@ -127,16 +128,8 @@ class PublishFormConfig
 
     private function showErrors($form, $errors)
     {
-        $msg = '<div class="pkpNotification pkpNotification--warning">';
-        $msg .= __('plugins.generic.thoth.register.warning');
-        $msg .= '<ul>';
-        foreach ($errors as $error) {
-            $msg .= '<li>' . $error . '</li>';
-        }
-        $msg .= '</ul></div>';
-
         $form->addField(new \PKP\components\forms\FieldHTML('registerNotice', [
-            'description' => $msg,
+            'description' => ThothValidationMessageFormatter::formatWarning($errors),
             'groupId' => 'default',
         ]));
     }
