@@ -15,6 +15,7 @@
  */
 
 import('lib.pkp.classes.services.PKPSchemaService');
+import('plugins.generic.thoth.classes.services.ThothFrontcoverService');
 
 class ThothBookService
 {
@@ -23,6 +24,7 @@ class ThothBookService
     public $publicationService;
     public $titleService;
     public $abstractService;
+    private $frontcoverService;
 
     private const PATCH_WORK_FIELDS = [
         'workId' => true,
@@ -57,13 +59,20 @@ class ThothBookService
         'pageInterval' => true,
     ];
 
-    public function __construct($factory, $repository, $publicationService, $titleService, $abstractService)
-    {
+    public function __construct(
+        $factory,
+        $repository,
+        $publicationService,
+        $titleService,
+        $abstractService,
+        $frontcoverService = null
+    ) {
         $this->factory = $factory;
         $this->repository = $repository;
         $this->publicationService = $publicationService;
         $this->titleService = $titleService;
         $this->abstractService = $abstractService;
+        $this->frontcoverService = $frontcoverService;
     }
 
     public function register($publication, $thothImprintId)
@@ -73,6 +82,9 @@ class ThothBookService
 
         $thothBookId = $this->repository->add($thothBook);
         $publication->setData('thothBookId', $thothBookId);
+        if ($this->frontcoverService) {
+            $this->frontcoverService->sync($publication, $thothBookId);
+        }
 
         return $thothBookId;
     }
@@ -89,6 +101,9 @@ class ThothBookService
 
         $this->repository->edit($thothBook);
         $this->updateMetadata($publication, $thothBookId, $oldThothBook);
+        if ($this->frontcoverService) {
+            $this->frontcoverService->sync($publication, $thothBookId);
+        }
     }
 
     private function getPatchWorkData($thothBook): array

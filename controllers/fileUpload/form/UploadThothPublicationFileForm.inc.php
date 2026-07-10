@@ -16,6 +16,7 @@
 import('lib.pkp.classes.form.Form');
 import('lib.pkp.classes.plugins.PKPPubIdPluginDAO');
 import('plugins.generic.thoth.classes.services.ThothCatalogFilesCacheService');
+import('plugins.generic.thoth.classes.services.ThothFileUploadService');
 
 class UploadThothPublicationFileForm extends Form
 {
@@ -189,20 +190,11 @@ class UploadThothPublicationFileForm extends Form
                 ->setDeclaredSha256($sha256);
 
             $fileUploadResponse = ThothRepo::publicationFileUpload()->init($newPublicationFileUpload);
-
-            $httpClient = Application::get()->getHttpClient();
-            $headers = array_reduce($fileUploadResponse->getUploadHeaders(), function ($headers, $uploadHeader) {
-                $headers[$uploadHeader->getName()] = $uploadHeader->getValue();
-                return $headers;
-            }, []);
-            $resource = fopen($temporaryFile->getfilePath(), 'r');
-
-            $httpClient->request('PUT', $fileUploadResponse->getUploadUrl(), [
-                'headers' => $headers,
-                'body' => $resource
-            ]);
-
-            $file = ThothRepo::publicationFileUpload()->complete($fileUploadResponse->getFileUploadId());
+            (new ThothFileUploadService())->upload(
+                $fileUploadResponse,
+                $temporaryFile->getfilePath(),
+                ThothRepo::publicationFileUpload()
+            );
             $this->flushCatalogFilesCache();
 
             $notificationMgr->createTrivialNotification(
