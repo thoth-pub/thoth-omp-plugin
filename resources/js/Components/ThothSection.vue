@@ -14,6 +14,7 @@
 			is-link
 			element="a"
 			target="_blank"
+			rel="noopener noreferrer"
 			:href="thothWorkUrl"
 		>
 			{{ t('common.view') }}
