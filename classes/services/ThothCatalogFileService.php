@@ -45,7 +45,7 @@ class ThothCatalogFileService
             $file = $file['file'] ?? null;
         }
 
-        if (!$file || !$file->getCdnUrl()) {
+        if (!$file || !$this->isSafeCdnUrl($file->getCdnUrl())) {
             return null;
         }
 
@@ -65,5 +65,19 @@ class ThothCatalogFileService
         }
 
         return __('common.download');
+    }
+
+    private function isSafeCdnUrl($url): bool
+    {
+        if (!is_string($url) || filter_var($url, FILTER_VALIDATE_URL) === false) {
+            return false;
+        }
+
+        $parts = parse_url($url);
+        return $parts !== false
+            && strtolower($parts['scheme'] ?? '') === 'https'
+            && !empty($parts['host'])
+            && !isset($parts['user'])
+            && !isset($parts['pass']);
     }
 }

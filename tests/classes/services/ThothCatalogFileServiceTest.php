@@ -77,4 +77,30 @@ class ThothCatalogFileServiceTest extends PKPTestCase
 
         $this->assertNull($formattedFile);
     }
+
+    /**
+     * @dataProvider unsafeCdnUrlProvider
+     */
+    public function testFormatFileRejectsUnsafeCdnUrl(string $url): void
+    {
+        $file = new ThothFile([
+            'cdnUrl' => $url,
+            'mimeType' => 'application/pdf',
+            'objectKey' => 'book.pdf',
+        ]);
+        $service = new ThothCatalogFileService(new class () {
+        });
+
+        self::assertNull($service->formatFile($file));
+    }
+
+    public function unsafeCdnUrlProvider(): array
+    {
+        return [
+            'JavaScript URL' => ['javascript:alert(1)'],
+            'data URL' => ['data:text/html,<script>alert(1)</script>'],
+            'cleartext HTTP' => ['http://example.thoth.pub/book.pdf'],
+            'relative URL' => ['/book.pdf'],
+        ];
+    }
 }
