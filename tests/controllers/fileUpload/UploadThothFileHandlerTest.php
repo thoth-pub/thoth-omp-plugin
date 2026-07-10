@@ -11,6 +11,10 @@ class UploadThothFileHandlerTest extends PKPTestCase
     public function testTemporaryUploadRequiresValidCsrfToken(): void
     {
         $handler = new class () extends UploadThothFileHandler {
+            public function __construct()
+            {
+            }
+
             public function isValidUploadRequestForTest($request)
             {
                 return $this->isValidUploadRequest($request);
@@ -29,6 +33,10 @@ class UploadThothFileHandlerTest extends PKPTestCase
     public function testAuthorizationPoliciesScopeUploadToSubmissionAndPublication(): void
     {
         $handler = new class () extends UploadThothFileHandler {
+            public function __construct()
+            {
+            }
+
             public function getPoliciesForTest($request, &$args, $roleAssignments)
             {
                 return $this->getAuthorizationPolicies($request, $args, $roleAssignments);
