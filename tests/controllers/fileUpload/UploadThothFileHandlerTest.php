@@ -9,6 +9,24 @@ import('plugins.generic.thoth.controllers.fileUpload.UploadThothFileHandler');
 
 class UploadThothFileHandlerTest extends PKPTestCase
 {
+    public function testTemporaryUploadRequiresValidCsrfToken(): void
+    {
+        $handler = new class () extends UploadThothFileHandler {
+            public function isValidUploadRequestForTest($request)
+            {
+                return $this->isValidUploadRequest($request);
+            }
+        };
+        $request = new class () {
+            public function checkCSRF()
+            {
+                return false;
+            }
+        };
+
+        self::assertFalse($handler->isValidUploadRequestForTest($request));
+    }
+
     public function testAuthorizationPoliciesScopeUploadToSubmissionAndPublication(): void
     {
         $handler = new class () extends UploadThothFileHandler {
