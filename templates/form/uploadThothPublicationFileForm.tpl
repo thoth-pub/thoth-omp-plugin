@@ -16,7 +16,7 @@
 			{ldelim}
 				$uploader: $('#plupload'),
 				uploaderOptions: {ldelim}
-					uploadUrl: {url|json_encode router=$smarty.const.ROUTE_PAGE page="thoth" op="handleThothPublicationFile" escape=false},
+					uploadUrl: {url|json_encode router=$smarty.const.ROUTE_PAGE page="thoth" op="handleThothPublicationFile" submissionId=$submissionId publicationId=$publicationId escape=false},
 					baseUrl: {$baseUrl|json_encode},
 					filters: {ldelim}
 						max_file_size: '50mb'
@@ -27,7 +27,7 @@
 	{rdelim});
 </script>
 
-<form class="pkp_form" id="uploadThothPublicationFileForm" action="{url router=$smarty.const.ROUTE_PAGE page="thoth" op="saveUploadThothPublicationFile" publicationId=$publicationId representationId=$representationId thothWorkId=$thothWorkId}" method="post">
+<form class="pkp_form" id="uploadThothPublicationFileForm" action="{url router=$smarty.const.ROUTE_PAGE page="thoth" op="saveUploadThothPublicationFile" submissionId=$submissionId publicationId=$publicationId representationId=$representationId thothWorkId=$thothWorkId}" method="post">
 	{csrf}
 	{include file="controllers/notification/inPlaceNotification.tpl" notificationId="uploadThothPublicationFileNotification"}
 

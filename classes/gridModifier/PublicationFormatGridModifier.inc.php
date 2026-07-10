@@ -62,6 +62,7 @@ class PublicationFormatGridModifier
         $publicationFormat = $categoryRow->getData();
 
         $actionArgs = [
+            'submissionId' => $submission->getId(),
             'representationId' => $publicationFormat->getId(),
             'publicationId' => $publicationFormat->getData('publicationId'),
             'thothWorkId' => $thothWorkId

@@ -112,6 +112,7 @@ class UploadThothPublicationFileForm extends Form
     public function fetch($request, $template = null, $display = false)
     {
         $templateMgr = TemplateManager::getManager($request);
+        $templateMgr->assign('submissionId', (int) $request->getUserVar('submissionId'));
         $templateMgr->assign('publicationId', $this->publicationId);
         $templateMgr->assign('representationId', $this->representationId);
         $templateMgr->assign('thothWorkId', $this->thothWorkId);
