@@ -26,7 +26,7 @@ class ThothApiUrlValidatorTest extends PKPTestCase
         self::assertFalse($validator->isSafe($url));
     }
 
-    public function unsafeUrlProvider(): array
+    public static function unsafeUrlProvider(): array
     {
         return [
             'cleartext HTTP' => ['http://api.example.test/graphql', ['93.184.216.34']],

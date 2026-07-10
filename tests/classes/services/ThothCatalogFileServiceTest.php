@@ -94,7 +94,7 @@ class ThothCatalogFileServiceTest extends PKPTestCase
         self::assertNull($service->formatFile($file));
     }
 
-    public function unsafeCdnUrlProvider(): array
+    public static function unsafeCdnUrlProvider(): array
     {
         return [
             'JavaScript URL' => ['javascript:alert(1)'],
