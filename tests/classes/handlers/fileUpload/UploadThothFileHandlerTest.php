@@ -12,6 +12,24 @@ use PKP\tests\PKPTestCase;
 
 class UploadThothFileHandlerTest extends PKPTestCase
 {
+    public function testTemporaryUploadRequiresValidCsrfToken(): void
+    {
+        $handler = new class () extends UploadThothFileHandler {
+            public function isValidUploadRequestForTest($request): bool
+            {
+                return $this->isValidUploadRequest($request);
+            }
+        };
+        $invalidRequest = new class () {
+            public function checkCSRF(): bool
+            {
+                return false;
+            }
+        };
+
+        self::assertFalse($handler->isValidUploadRequestForTest($invalidRequest));
+    }
+
     public function testAuthorizationPoliciesScopeUploadToSubmissionAndPublication(): void
     {
         $handler = new class () extends UploadThothFileHandler {
