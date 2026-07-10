@@ -69,6 +69,11 @@ class ThothFileUploadServiceTest extends PKPTestCase
             {
                 return $this->httpClient;
             }
+
+            protected function isSafeUploadUrl($url)
+            {
+                return true;
+            }
         };
 
         $response = new FileUploadResponse([
@@ -88,5 +93,36 @@ class ThothFileUploadServiceTest extends PKPTestCase
         $this->assertSame(['Content-Type' => 'application/pdf'], $httpClient->request['options']['headers']);
 
         unlink($filePath);
+    }
+
+    public function testRejectsUnsafeUploadUrlBeforeSendingFile(): void
+    {
+        $filePath = tempnam(sys_get_temp_dir(), 'thoth-upload-');
+        file_put_contents($filePath, 'file contents');
+        $service = new class () extends ThothFileUploadService {
+            protected function getHttpClient()
+            {
+                throw new RuntimeException('The HTTP client must not be created');
+            }
+
+            protected function isSafeUploadUrl($url)
+            {
+                return false;
+            }
+        };
+        $response = new FileUploadResponse([
+            'fileUploadId' => 'upload-id',
+            'uploadUrl' => 'http://127.0.0.1/private',
+            'uploadHeaders' => [],
+        ]);
+
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Unsafe Thoth upload URL');
+
+        try {
+            $service->upload($response, $filePath, new stdClass());
+        } finally {
+            unlink($filePath);
+        }
     }
 }
