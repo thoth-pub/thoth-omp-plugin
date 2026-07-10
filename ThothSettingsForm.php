@@ -18,6 +18,7 @@
 
 namespace APP\plugins\generic\thoth;
 
+use APP\plugins\generic\thoth\classes\security\ThothApiUrlValidator;
 use APP\template\TemplateManager;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Contracts\Encryption\DecryptException;
@@ -26,7 +27,6 @@ use PKP\form\Form;
 use PKP\form\validation\FormValidatorCSRF;
 use PKP\form\validation\FormValidatorCustom;
 use PKP\form\validation\FormValidatorPost;
-use PKP\form\validation\FormValidatorUrl;
 use ThothApi\Exception\QueryException;
 use ThothApi\GraphQL\Client;
 
@@ -62,11 +62,18 @@ class ThothSettingsForm extends Form
             }
         ));
 
-        $this->addCheck(new FormValidatorUrl(
+        $this->addCheck(new FormValidatorCustom(
             $this,
             'customThothApiUrl',
             'optional',
-            'plugins.generic.thoth.settings.customThothApiUrl.invalid'
+            'plugins.generic.thoth.settings.customThothApiUrl.invalid',
+            function ($customThothApiUrl) {
+                if (!$this->getData('customThothApi')) {
+                    return true;
+                }
+
+                return (new ThothApiUrlValidator())->isSafe(trim($customThothApiUrl));
+            }
         ));
 
         $this->addCheck(new FormValidatorCustom(
@@ -136,7 +143,12 @@ class ThothSettingsForm extends Form
     {
         $httpConfig = [];
         if ($this->getData('customThothApi') && $this->getData('customThothApiUrl')) {
-            $httpConfig['base_uri'] = trim($this->getData('customThothApiUrl'));
+            $customThothApiUrl = trim($this->getData('customThothApiUrl'));
+            if (!(new ThothApiUrlValidator())->isSafe($customThothApiUrl)) {
+                return false;
+            }
+            $httpConfig['base_uri'] = $customThothApiUrl;
+            $httpConfig['allow_redirects'] = false;
         }
 
         try {
@@ -151,8 +163,15 @@ class ThothSettingsForm extends Form
 
     private function validateCustomThothApiUrl(string $customThothApiUrl): bool
     {
+        if (!(new ThothApiUrlValidator())->isSafe($customThothApiUrl)) {
+            return false;
+        }
+
         try {
-            (new Client(['base_uri' => $customThothApiUrl]))->publisherCount();
+            (new Client([
+                'base_uri' => $customThothApiUrl,
+                'allow_redirects' => false,
+            ]))->publisherCount();
             return true;
         } catch (GuzzleException) {
             return false;

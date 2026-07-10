@@ -42,7 +42,9 @@ use APP\plugins\generic\thoth\classes\repositories\ThothSubjectRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothTitleRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothWorkRelationRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothWorkRepository;
+use APP\plugins\generic\thoth\classes\security\ThothApiUrlValidator;
 use ThothApi\GraphQL\Client;
+use UnexpectedValueException;
 
 class ThothRepositoryProvider implements ContainerProvider
 {
@@ -57,7 +59,12 @@ class ThothRepositoryProvider implements ContainerProvider
 
             $httpConfig = [];
             if ($config['customThothApi'] && $config['customThothApiUrl']) {
-                $httpConfig['base_uri'] = trim($config['customThothApiUrl']);
+                $customThothApiUrl = trim($config['customThothApiUrl']);
+                if (!(new ThothApiUrlValidator())->isSafe($customThothApiUrl)) {
+                    throw new UnexpectedValueException('Unsafe custom Thoth API URL');
+                }
+                $httpConfig['base_uri'] = $customThothApiUrl;
+                $httpConfig['allow_redirects'] = false;
             }
 
             $client = new Client($httpConfig);
