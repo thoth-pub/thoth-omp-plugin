@@ -102,9 +102,11 @@ class ThothHandler extends Handler
             ]
         );
 
+        $userRoles = (array) $this->getAuthorizedContextObject(Application::ASSOC_TYPE_USER_ROLES);
         $collector = Repo::submission()
             ->getCollector()
             ->filterByContextIds([$context->getId()]);
+        $this->scopeCollectorToUser($collector, $request, $userRoles);
         $total = $collector->getCount();
         $submissions = $collector->limit($thothList->count)->getMany();
 
@@ -118,7 +120,7 @@ class ThothHandler extends Handler
                 $submissions,
                 $userGroups,
                 $genres,
-                $this->getAuthorizedContextObject(Application::ASSOC_TYPE_USER_ROLES)
+                $userRoles
             )
             ->values();
 
@@ -135,6 +137,15 @@ class ThothHandler extends Handler
         ]);
 
         return $templateMgr->display($plugin->getTemplateResource('thoth/index.tpl'));
+    }
+
+    protected function scopeCollectorToUser($collector, $request, array $userRoles)
+    {
+        if (!in_array(Role::ROLE_ID_MANAGER, $userRoles, true)) {
+            $collector->assignedTo([$request->getUser()->getId()]);
+        }
+
+        return $collector;
     }
 
 }
