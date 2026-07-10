@@ -62,6 +62,24 @@ class ThothSchema
             'validation' => ['nullable'],
         ];
 
+        $schema->properties->{'thothUploadFrontcover'} = (object) [
+            'type' => 'boolean',
+            'apiSummary' => true,
+            'validation' => ['nullable'],
+        ];
+
+        $schema->properties->{'thothFrontcoverSha256'} = (object) [
+            'type' => 'string',
+            'apiSummary' => true,
+            'validation' => ['nullable'],
+        ];
+
+        $schema->properties->{'thothFrontcoverUrl'} = (object) [
+            'type' => 'string',
+            'apiSummary' => true,
+            'validation' => ['nullable'],
+        ];
+
         return false;
     }
 

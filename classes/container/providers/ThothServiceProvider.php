@@ -34,6 +34,8 @@ use APP\plugins\generic\thoth\classes\services\ThothBookService;
 use APP\plugins\generic\thoth\classes\services\ThothChapterService;
 use APP\plugins\generic\thoth\classes\services\ThothContributionService;
 use APP\plugins\generic\thoth\classes\services\ThothContributorService;
+use APP\plugins\generic\thoth\classes\services\ThothFileUploadService;
+use APP\plugins\generic\thoth\classes\services\ThothFrontcoverService;
 use APP\plugins\generic\thoth\classes\services\ThothLanguageService;
 use APP\plugins\generic\thoth\classes\services\ThothLocationService;
 use APP\plugins\generic\thoth\classes\services\ThothMeService;
@@ -68,6 +70,7 @@ class ThothServiceProvider implements ContainerProvider
             'publicationService',
             'titleService',
             'abstractService',
+            'frontcoverService',
         ]);
 
         $container->singletonClass('bookRegistrationService', ThothBookRegistrationService::class, [
@@ -81,6 +84,7 @@ class ThothServiceProvider implements ContainerProvider
             'subjectService',
             'titleService',
             'workRelationService',
+            'frontcoverService',
         ]);
 
         $container->singletonClass('chapterService', ThothChapterService::class, [
@@ -104,6 +108,15 @@ class ThothServiceProvider implements ContainerProvider
         $container->singletonClass('contributorService', ThothContributorService::class, [
             new ThothContributorFactory(),
             'contributorRepository',
+        ]);
+
+        $container->singletonClass('fileUploadService', ThothFileUploadService::class);
+
+        $container->singletonClass('frontcoverService', ThothFrontcoverService::class, [
+            'frontcoverFileUploadRepository',
+            'workRepository',
+            'fileUploadService',
+            'meService',
         ]);
 
         $container->singletonClass('languageService', ThothLanguageService::class, [

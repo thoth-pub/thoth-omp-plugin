@@ -28,6 +28,7 @@ use APP\plugins\generic\thoth\classes\notification\ThothNotification;
 use APP\plugins\generic\thoth\classes\schema\ThothSchema;
 use APP\plugins\generic\thoth\classes\services\ThothCatalogFilesCacheService;
 use APP\plugins\generic\thoth\classes\templateFilters\ThothCatalogFilesTemplateFilter;
+use APP\plugins\generic\thoth\classes\templateFilters\ThothFrontcoverTemplateFilter;
 use APP\plugins\generic\thoth\classes\templateFilters\ThothSectionTemplateFilter;
 use PKP\plugins\GenericPlugin;
 use PKP\plugins\Hook;
@@ -116,6 +117,9 @@ class HookRegistrant
 
         $thothCatalogFilesFilter = new ThothCatalogFilesTemplateFilter();
         $thothCatalogFilesFilter->registerFilter($templateMgr, $template);
+
+        $thothFrontcoverFilter = new ThothFrontcoverTemplateFilter();
+        $thothFrontcoverFilter->registerFilter($templateMgr, $template);
 
         return false;
     }
