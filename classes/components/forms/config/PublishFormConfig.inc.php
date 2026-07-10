@@ -16,6 +16,7 @@
 use ThothApi\GraphQL\Enums\WorkType;
 
 import('plugins.generic.thoth.classes.facades.ThothService');
+import('plugins.generic.thoth.classes.components.forms.ThothValidationMessageFormatter');
 import('plugins.generic.thoth.classes.facades.ThothRepo');
 import('plugins.generic.thoth.classes.services.ThothMeCacheService');
 
@@ -118,16 +119,8 @@ class PublishFormConfig
 
     private function showErrors($form, $errors)
     {
-        $msg = '<div class="pkpNotification pkpNotification--warning">';
-        $msg .= __('plugins.generic.thoth.register.warning');
-        $msg .= '<ul>';
-        foreach ($errors as $error) {
-            $msg .= '<li>' .  $error . '</li>';
-        }
-        $msg .= '</ul></div>';
-
         $form->addField(new \PKP\components\forms\FieldHTML('registerNotice', [
-            'description' => $msg,
+            'description' => ThothValidationMessageFormatter::formatWarning($errors),
             'groupId' => 'default',
         ]));
     }
