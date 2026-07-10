@@ -52,7 +52,21 @@ class UploadThothFileHandler extends Handler
     {
         import('lib.pkp.classes.security.authorization.PKPSiteAccessPolicy');
         $this->addPolicy(new PKPSiteAccessPolicy($request, null, $roleAssignments));
+        foreach ($this->getAuthorizationPolicies($request, $args, $roleAssignments) as $policy) {
+            $this->addPolicy($policy);
+        }
         return parent::authorize($request, $args, $roleAssignments);
+    }
+
+    protected function getAuthorizationPolicies($request, &$args, $roleAssignments)
+    {
+        import('lib.pkp.classes.security.authorization.SubmissionAccessPolicy');
+        import('lib.pkp.classes.security.authorization.PublicationAccessPolicy');
+
+        return [
+            new SubmissionAccessPolicy($request, $args, $roleAssignments),
+            new PublicationAccessPolicy($request, $args, $roleAssignments),
+        ];
     }
 
     public function initialize($request)
