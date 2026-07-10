@@ -33,6 +33,8 @@ use PKP\db\DAORegistry;
 use PKP\file\TemporaryFileManager;
 use PKP\plugins\PluginRegistry;
 use PKP\security\authorization\PKPSiteAccessPolicy;
+use PKP\security\authorization\PublicationAccessPolicy;
+use PKP\security\authorization\SubmissionAccessPolicy;
 use PKP\security\Role;
 
 class UploadThothFileHandler extends Handler
@@ -61,7 +63,18 @@ class UploadThothFileHandler extends Handler
     public function authorize($request, &$args, $roleAssignments)
     {
         $this->addPolicy(new PKPSiteAccessPolicy($request, null, $roleAssignments));
+        foreach ($this->getAuthorizationPolicies($request, $args, $roleAssignments) as $policy) {
+            $this->addPolicy($policy);
+        }
         return parent::authorize($request, $args, $roleAssignments);
+    }
+
+    protected function getAuthorizationPolicies($request, &$args, $roleAssignments): array
+    {
+        return [
+            new SubmissionAccessPolicy($request, $args, $roleAssignments),
+            new PublicationAccessPolicy($request, $args, $roleAssignments),
+        ];
     }
 
     public function initialize($request, $args = null)

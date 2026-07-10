@@ -70,6 +70,7 @@ class PublicationFormatGridModifier
         $categoryRow = $templateMgr->getTemplateVars('categoryRow');
         $publicationFormat = $categoryRow->getData();
         $actionArgs = [
+            'submissionId' => $submission->getId(),
             'representationId' => $publicationFormat->getId(),
             'publicationId' => $publicationFormat->getData('publicationId'),
             'thothWorkId' => $thothWorkId,
