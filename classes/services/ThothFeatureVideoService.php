@@ -60,6 +60,7 @@ class ThothFeatureVideoService
 
         $this->featureVideoRepository->update([
             'workFeaturedVideoId' => $videoId,
+            'workId' => $workId,
             'url' => $cdnUrl,
         ]);
 
