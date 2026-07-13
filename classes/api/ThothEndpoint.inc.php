@@ -31,6 +31,8 @@ class ThothEndpoint
             return false;
         }
 
+        $rootPattern = $handler->getEndpointPattern();
+
         array_unshift(
             $endpoints['PUT'],
             [
