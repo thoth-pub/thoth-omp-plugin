@@ -1,5 +1,8 @@
 <?php
 
+import('plugins.generic.thoth.classes.facades.ThothRepo');
+import('plugins.generic.thoth.classes.services.ThothFeatureVideoCacheService');
+
 class ThothFeatureVideoTemplateFilter
 {
     private $video = [];
@@ -9,16 +12,26 @@ class ThothFeatureVideoTemplateFilter
         if ($template !== 'frontend/pages/book.tpl') {
             return false;
         }
-        $publication = $templateMgr->getTemplateVars('publication');
-        $url = $publication ? $publication->getData('thothFeatureVideoUrl') : null;
+        $submission = $templateMgr->getTemplateVars('publishedSubmission') ?: $templateMgr->getTemplateVars('monograph');
+        $workId = $submission ? $submission->getData('thothWorkId') : null;
+        if (!$workId) return false;
+        try {
+            $video = (new ThothFeatureVideoCacheService())->get($workId, function () use ($workId) {
+                $featuredVideo = ThothRepo::work()->getFeatureVideo($workId);
+                return $featuredVideo ? $featuredVideo->toArray() : null;
+            });
+        } catch (Throwable $exception) {
+            return false;
+        }
+        $url = $video['url'] ?? null;
         if (!$this->isValidUrl($url)) {
             return false;
         }
         $this->video = [
-            'title' => (string) $publication->getData('thothFeatureVideoTitle'),
+            'title' => (string) ($video['title'] ?? ''),
             'url' => $url,
-            'width' => $this->dimension($publication->getData('thothFeatureVideoWidth'), 640, 1920),
-            'height' => $this->dimension($publication->getData('thothFeatureVideoHeight'), 360, 1080),
+            'width' => $this->dimension($video['width'] ?? null, 640, 1920),
+            'height' => $this->dimension($video['height'] ?? null, 360, 1080),
         ];
         $templateMgr->registerFilter('output', [$this, 'addVideo']);
         return false;
