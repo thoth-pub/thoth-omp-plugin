@@ -66,10 +66,14 @@ class ThothFeatureVideoWorkflowTemplateFilter
         );
 
         $components = $templateMgr->getState('components');
+        $existingVideo = $submission->getData('thothWorkId')
+            ? ThothRepo::work()->getFeatureVideo($submission->getData('thothWorkId'))
+            : null;
         $components[FeatureVideoForm::FORM_FEATURE_VIDEO] = (new FeatureVideoForm(
             $action,
             $temporaryFilesUrl,
-            (new ThothMeCacheService(ThothRepo::me()))->hasCdnWritePermission($request->getContext()->getId())
+            (new ThothMeCacheService(ThothRepo::me()))->hasCdnWritePermission($request->getContext()->getId()),
+            (bool) $existingVideo
         ))->getConfig();
         $templateMgr->setState(['components' => $components]);
 
