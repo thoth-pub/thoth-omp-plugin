@@ -1,7 +1,7 @@
 <?php
 
 use APP\publication\DAO as PublicationDAO;
-use PKP\file\TemporaryFileManager;
+import('lib.pkp.classes.file.TemporaryFileManager');
 
 class FeatureVideoSubmissionService
 {
