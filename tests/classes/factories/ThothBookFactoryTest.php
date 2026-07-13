@@ -18,7 +18,6 @@ require_once(__DIR__ . '/../../../vendor/autoload.php');
  */
 
 use APP\submission\Repository as SubmissionRepository;
-use Mockery;
 use PKP\db\DAORegistry;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Enums\WorkStatus;
