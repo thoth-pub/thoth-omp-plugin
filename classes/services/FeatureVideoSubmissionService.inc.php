@@ -2,7 +2,6 @@
 
 import('plugins.generic.thoth.classes.services.ThothFeatureVideoCacheService');
 
-use APP\publication\DAO as PublicationDAO;
 use PKP\file\TemporaryFileManager;
 
 class FeatureVideoSubmissionService
@@ -19,7 +18,7 @@ class FeatureVideoSubmissionService
         $this->featureVideoService = $featureVideoService;
     }
 
-    public function upload($submission, $publication, string $title, int $fileId, int $userId): array
+    public function upload($submission, string $title, int $fileId, int $userId): array
     {
         $workId = $submission->getData('thothWorkId');
         if (!$workId) {
@@ -57,11 +56,6 @@ class FeatureVideoSubmissionService
     protected function getTemporaryFile(int $fileId, int $userId)
     {
         return (new TemporaryFileManager())->getFile($fileId, $userId);
-    }
-
-    protected function persistPublication($publication): void
-    {
-        app(PublicationDAO::class)->update($publication);
     }
 
     protected function deleteTemporaryFile(int $fileId, int $userId): void

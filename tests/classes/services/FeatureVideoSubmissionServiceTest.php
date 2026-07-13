@@ -5,7 +5,7 @@ import('plugins.generic.thoth.classes.services.FeatureVideoSubmissionService');
 
 class FeatureVideoSubmissionServiceTest extends PKPTestCase
 {
-    public function testUploadsWithoutPersistingFeatureVideoMetadata(): void
+    public function testUploadsFeatureVideoAndDeletesTemporaryFile(): void
     {
         $thothService = new FeatureVideoUploadStub();
         $service = new FeatureVideoSubmissionServiceStub($thothService, [
@@ -14,13 +14,9 @@ class FeatureVideoSubmissionServiceTest extends PKPTestCase
             'mimeType' => 'video/mp4',
             'sha256' => 'video-sha256',
         ]);
-        $publication = new FeatureVideoPublicationStub();
-
-        $service->upload(new FeatureVideoSubmissionStub(), $publication, 'Book trailer', 15, 7);
+        $service->upload(new FeatureVideoSubmissionStub(), 'Book trailer', 15, 7);
 
         $this->assertSame('work-id', $thothService->workId);
-        $this->assertSame([], $publication->data);
-        $this->assertFalse($service->persisted);
         $this->assertTrue($service->deleted);
     }
 
@@ -34,13 +30,12 @@ class FeatureVideoSubmissionServiceTest extends PKPTestCase
         );
 
         $this->expectException(InvalidArgumentException::class);
-        $service->upload(new FeatureVideoSubmissionStub(), new FeatureVideoPublicationStub(), 'Trailer', 15, 7);
+        $service->upload(new FeatureVideoSubmissionStub(), 'Trailer', 15, 7);
     }
 }
 
 class FeatureVideoSubmissionServiceStub extends FeatureVideoSubmissionService
 {
-    public $persisted = false;
     public $deleted = false;
     private $file;
 
@@ -53,11 +48,6 @@ class FeatureVideoSubmissionServiceStub extends FeatureVideoSubmissionService
     protected function resolveTemporaryFile(int $id, int $userId): array
     {
         return $this->file;
-    }
-
-    protected function persistPublication($publication): void
-    {
-        $this->persisted = true;
     }
 
     protected function deleteTemporaryFile(int $id, int $userId): void
@@ -102,16 +92,6 @@ class FeatureVideoSubmissionStub
     public function getData($name)
     {
         return $name === 'thothWorkId' ? 'work-id' : null;
-    }
-}
-
-class FeatureVideoPublicationStub
-{
-    public $data = [];
-
-    public function setData($name, $value): void
-    {
-        $this->data[$name] = $value;
     }
 }
 
