@@ -37,10 +37,7 @@ class ThothFeatureVideoTemplateFilter
             return false;
         }
         try {
-            $video = (new ThothFeatureVideoCacheService())->get($workId, function () use ($workId) {
-                $featuredVideo = ThothRepository::work()->getFeatureVideo($workId);
-                return $featuredVideo ? $featuredVideo->toArray() : null;
-            });
+            $video = $this->loadVideo($workId);
         } catch (Throwable $exception) {
             return false;
         }
@@ -58,6 +55,14 @@ class ThothFeatureVideoTemplateFilter
         $templateMgr->registerFilter('output', $this->addVideo(...));
 
         return false;
+    }
+
+    protected function loadVideo(string $workId): ?array
+    {
+        return (new ThothFeatureVideoCacheService())->get($workId, function () use ($workId) {
+            $featuredVideo = ThothRepository::work()->getFeatureVideo($workId);
+            return $featuredVideo ? $featuredVideo->toArray() : null;
+        });
     }
 
     public function addVideo($output, $template = null): string

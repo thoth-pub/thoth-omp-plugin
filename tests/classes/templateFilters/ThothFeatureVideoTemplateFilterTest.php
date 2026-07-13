@@ -19,13 +19,13 @@ class ThothFeatureVideoTemplateFilterTest extends PKPTestCase
 {
     public function testAddsFeatureVideoToBookMainEntry(): void
     {
-        $filter = new ThothFeatureVideoTemplateFilter();
-        $templateManager = new FeatureVideoTemplateManagerStub([
-            'thothFeatureVideoTitle' => 'Book & trailer',
-            'thothFeatureVideoUrl' => 'https://cdn.thoth.pub/trailer.mp4?x=1&y=2',
-            'thothFeatureVideoWidth' => 640,
-            'thothFeatureVideoHeight' => 360,
+        $filter = new FeatureVideoTemplateFilterStub([
+            'title' => 'Book & trailer',
+            'url' => 'https://cdn.thoth.pub/trailer.mp4?x=1&y=2',
+            'width' => 640,
+            'height' => 360,
         ]);
+        $templateManager = new FeatureVideoTemplateManagerStub();
         $output = '<div class="main_entry"><p>Abstract</p></div><!-- .main_entry -->';
 
         $filter->registerFilter($templateManager, 'frontend/pages/book.tpl');
@@ -43,13 +43,8 @@ class ThothFeatureVideoTemplateFilterTest extends PKPTestCase
 
     public function testDoesNotRenderUnsafeFeatureVideoUrl(): void
     {
-        $filter = new ThothFeatureVideoTemplateFilter();
-        $templateManager = new FeatureVideoTemplateManagerStub([
-            'thothFeatureVideoTitle' => 'Book trailer',
-            'thothFeatureVideoUrl' => 'javascript:alert(1)',
-            'thothFeatureVideoWidth' => 640,
-            'thothFeatureVideoHeight' => 360,
-        ]);
+        $filter = new FeatureVideoTemplateFilterStub(['url' => 'javascript:alert(1)']);
+        $templateManager = new FeatureVideoTemplateManagerStub();
         $output = '<div class="main_entry"></div><!-- .main_entry -->';
 
         $filter->registerFilter($templateManager, 'frontend/pages/book.tpl');
@@ -60,17 +55,17 @@ class ThothFeatureVideoTemplateFilterTest extends PKPTestCase
 
 class FeatureVideoTemplateManagerStub
 {
-    private FeatureVideoPublicationStub $publication;
+    private FeatureVideoSubmissionStub $submission;
     private $outputFilter;
 
-    public function __construct(array $data)
+    public function __construct()
     {
-        $this->publication = new FeatureVideoPublicationStub($data);
+        $this->submission = new FeatureVideoSubmissionStub();
     }
 
     public function getTemplateVars(string $name)
     {
-        return $name === 'publication' ? $this->publication : null;
+        return $name === 'publishedSubmission' ? $this->submission : null;
     }
 
     public function registerFilter(string $type, $callback): void
@@ -84,17 +79,25 @@ class FeatureVideoTemplateManagerStub
     }
 }
 
-class FeatureVideoPublicationStub
+class FeatureVideoSubmissionStub
 {
-    private array $data;
-
-    public function __construct(array $data)
-    {
-        $this->data = $data;
-    }
-
     public function getData(string $name)
     {
-        return $this->data[$name] ?? null;
+        return $name === 'thothWorkId' ? 'work-id' : null;
+    }
+}
+
+class FeatureVideoTemplateFilterStub extends ThothFeatureVideoTemplateFilter
+{
+    private array $video;
+
+    public function __construct(array $video)
+    {
+        $this->video = $video;
+    }
+
+    protected function loadVideo(string $workId): array
+    {
+        return $this->video;
     }
 }
