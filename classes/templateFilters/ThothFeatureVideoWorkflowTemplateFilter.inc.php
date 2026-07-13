@@ -56,7 +56,7 @@ class ThothFeatureVideoWorkflowTemplateFilter
             $request,
             ROUTE_API,
             $contextPath,
-            '_submissions/' . $submission->getId() . '/featureVideo'
+            'submissions/' . $submission->getId() . '/featureVideo'
         );
         $temporaryFilesUrl = $dispatcher->url(
             $request,
