@@ -1,5 +1,7 @@
 <?php
 
+import('plugins.generic.thoth.classes.services.ThothFeatureVideoCacheService');
+
 use APP\publication\DAO as PublicationDAO;
 use PKP\file\TemporaryFileManager;
 
@@ -25,17 +27,7 @@ class FeatureVideoSubmissionService
         }
         $file = $this->resolveTemporaryFile($fileId, $userId);
         $metadata = $this->featureVideoService->upload($workId, trim($title), $file);
-        foreach ([
-            'thothFeatureVideoId' => 'id',
-            'thothFeatureVideoTitle' => 'title',
-            'thothFeatureVideoUrl' => 'url',
-            'thothFeatureVideoWidth' => 'width',
-            'thothFeatureVideoHeight' => 'height',
-            'thothFeatureVideoSha256' => 'sha256',
-        ] as $property => $key) {
-            $publication->setData($property, $metadata[$key]);
-        }
-        $this->persistPublication($publication);
+        (new ThothFeatureVideoCacheService())->flush($workId);
         $this->deleteTemporaryFile($fileId, $userId);
         return $metadata;
     }
