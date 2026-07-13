@@ -34,6 +34,7 @@ import('plugins.generic.thoth.classes.templateFilters.ThothFrontcoverTemplateFil
 import('plugins.generic.thoth.classes.templateFilters.PublicationFormatTemplateFilter');
 import('plugins.generic.thoth.classes.templateFilters.ThothSectionTemplateFilter');
 import('plugins.generic.thoth.classes.templateFilters.ThothFeatureVideoWorkflowTemplateFilter');
+import('plugins.generic.thoth.classes.templateFilters.ThothFeatureVideoTemplateFilter');
 
 class ThothPlugin extends GenericPlugin
 {
@@ -146,6 +147,9 @@ class ThothPlugin extends GenericPlugin
 
         $featureVideoWorkflowFilter = new ThothFeatureVideoWorkflowTemplateFilter();
         $featureVideoWorkflowFilter->registerFilter($templateMgr, $template);
+
+        $featureVideoFilter = new ThothFeatureVideoTemplateFilter();
+        $featureVideoFilter->registerFilter($templateMgr, $template);
     }
 
     public function addToSchema()
