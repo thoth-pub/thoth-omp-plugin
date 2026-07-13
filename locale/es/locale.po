@@ -320,3 +320,5 @@ msgstr "Archivo de vídeo"
 
 msgid "plugins.generic.thoth.featureVideo.invalidFile"
 msgstr "Seleccione un archivo de vídeo MP4, WebM o MOV válido."
+msgid "plugins.generic.thoth.featureVideo.exists"
+msgstr "Este trabajo ya tiene un video destacado en Thoth."

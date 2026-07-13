@@ -254,10 +254,14 @@ class ThothEndpoint
             $context->getData('urlPath'),
             'temporaryFiles'
         );
+        $existingVideo = $submission->getData('thothWorkId')
+            ? ThothRepository::work()->getFeatureVideo($submission->getData('thothWorkId'))
+            : null;
         $form = new FeatureVideoForm(
             $featureVideoUrl,
             $temporaryFilesUrl,
-            ThothService::me()->hasCdnWritePermission()
+            ThothService::me()->hasCdnWritePermission(),
+            (bool) $existingVideo
         );
 
         return response()->json($form->getConfig(), Response::HTTP_OK);
