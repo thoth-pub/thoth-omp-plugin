@@ -3,8 +3,19 @@ import test from 'node:test';
 
 import {
 	addFeatureVideoMenuItem,
+	getTranslator,
 	getFeatureVideoPrimaryItems,
 } from '../../resources/js/featureVideoWorkflow.mjs';
+
+test('gets the translator from the OMP localize module', () => {
+	const useLocalizeModule = {
+		useLocalize: () => ({
+			t: (key) => `translated:${key}`,
+		}),
+	};
+
+	assert.equal(getTranslator(useLocalizeModule)('translation.key'), 'translated:translation.key');
+});
 
 test('adds feature video immediately after publication dates', () => {
 	const menuItems = [

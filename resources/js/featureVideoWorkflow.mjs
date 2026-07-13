@@ -1,3 +1,10 @@
+export function getTranslator(useLocalizeModule) {
+	const {useLocalize} = useLocalizeModule;
+	const {t} = useLocalize();
+
+	return t;
+}
+
 export function addFeatureVideoMenuItem(menuItems, label) {
 	return menuItems.map((menuItem) => {
 		if (menuItem.key !== 'marketing') {
