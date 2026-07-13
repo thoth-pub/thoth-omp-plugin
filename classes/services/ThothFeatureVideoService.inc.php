@@ -2,8 +2,11 @@
 
 /**
  * @file plugins/generic/thoth/classes/services/ThothFeatureVideoService.inc.php
+ *
  * @class ThothFeatureVideoService
+ *
  * @ingroup plugins_generic_thoth
+ *
  * @brief Creates and uploads a hosted featured video in Thoth.
  */
 

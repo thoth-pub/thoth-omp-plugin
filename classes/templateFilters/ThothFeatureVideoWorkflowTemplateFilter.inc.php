@@ -8,6 +8,7 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothFeatureVideoWorkflowTemplateFilter
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief Adds the featured video form to the legacy OMP workflow.

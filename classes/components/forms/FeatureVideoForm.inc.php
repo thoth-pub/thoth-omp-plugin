@@ -8,14 +8,15 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class FeatureVideoForm
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief Form used to upload a featured video for a Thoth work.
  */
 
+use PKP\components\forms\FieldHTML;
 use PKP\components\forms\FieldText;
 use PKP\components\forms\FieldUpload;
-use PKP\components\forms\FieldHTML;
 use PKP\components\forms\FormComponent;
 
 class FeatureVideoForm extends FormComponent
