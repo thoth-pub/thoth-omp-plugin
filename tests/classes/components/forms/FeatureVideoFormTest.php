@@ -46,4 +46,12 @@ class FeatureVideoFormTest extends PKPTestCase
         $this->assertNull($form->getField('video'));
         $this->assertNotNull($form->getField('permissionNotice'));
     }
+    public function testHidesUploadFieldsWhenThothVideoExists(): void
+    {
+        $form = new FeatureVideoForm('https://example.test/upload', 'https://example.test/temp', true, true);
+
+        $this->assertNull($form->getField('title'));
+        $this->assertNull($form->getField('video'));
+        $this->assertNotNull($form->getField('existingVideoNotice'));
+    }
 }
