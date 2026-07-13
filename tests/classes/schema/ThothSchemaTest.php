@@ -43,7 +43,7 @@ class ThothSchemaTest extends PKPTestCase
         (new ThothSchema())->addToPublicationSchema('Schema::get::publication', $args);
 
         foreach (['Id', 'Title', 'Url', 'Width', 'Height', 'Sha256'] as $suffix) {
-            $this->assertObjectNotHasAttribute('thothFeatureVideo' . $suffix, $schema->properties);
+            $this->assertObjectNotHasProperty('thothFeatureVideo' . $suffix, $schema->properties);
         }
     }
 }
