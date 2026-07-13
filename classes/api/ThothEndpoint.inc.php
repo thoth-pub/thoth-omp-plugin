@@ -134,7 +134,7 @@ class ThothEndpoint
     public function uploadFeatureVideo($slimRequest, $response, $args)
     {
         $request = Application::get()->getRequest();
-        $submission = Repo::submission()->get((int) $args['submissionId']);
+        $submission = Services::get('submission')->get((int) $args['submissionId']);
         $context = $request->getContext();
         $user = $request->getUser();
         if (!$submission) {
