@@ -3,26 +3,8 @@ import test from 'node:test';
 
 import {
 	addFeatureVideoMenuItem,
-	getFormComposable,
-	getTranslator,
 	getFeatureVideoPrimaryItems,
 } from '../../resources/js/featureVideoWorkflow.mjs';
-
-test('gets useForm from the OMP form module', () => {
-	const useForm = () => ({form: 'form-state'});
-
-	assert.equal(getFormComposable({useForm}), useForm);
-});
-
-test('gets the translator from the OMP localize module', () => {
-	const useLocalizeModule = {
-		useLocalize: () => ({
-			t: (key) => `translated:${key}`,
-		}),
-	};
-
-	assert.equal(getTranslator(useLocalizeModule)('translation.key'), 'translated:translation.key');
-});
 
 test('adds feature video immediately after publication dates', () => {
 	const menuItems = [

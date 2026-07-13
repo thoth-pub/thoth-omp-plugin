@@ -13,7 +13,6 @@ import ThothListPanel from './Components/ThothListPanel.vue';
 import FeatureVideoForm from './Components/FeatureVideoForm.vue';
 import {
 	addFeatureVideoMenuItem,
-	getTranslator,
 	getFeatureVideoPrimaryItems,
 } from './featureVideoWorkflow.mjs';
 import './thoth.css';
@@ -24,7 +23,8 @@ pkp.registry.registerComponent('FeatureVideoForm', FeatureVideoForm);
 
 pkp.registry.storeExtend('workflow', (piniaContext) => {
 	const workflowStore = piniaContext.store;
-	const t = getTranslator(pkp.modules.useLocalize);
+	const {useLocalize} = pkp.modules.useLocalize;
+	const {t} = useLocalize();
 	const featureVideoLabel = t('plugins.generic.thoth.featureVideo');
 
 	workflowStore.extender.extendFn('getMenuItems', (menuItems) =>
