@@ -43,20 +43,38 @@ class FeatureVideoBookTemplateManagerStub
     public function __construct()
     {
         $this->publication = new class () {
-            public function getData($name) { return $name === 'thothWorkId' ? 'work-id' : null; }
+            public function getData($name)
+            {
+                return $name === 'thothWorkId' ? 'work-id' : null;
+            }
         };
     }
 
-    public function getTemplateVars($name) { return $this->publication; }
-    public function registerFilter($type, $callback): void { $this->filter = $callback; }
-    public function apply($output) { return $this->filter ? call_user_func($this->filter, $output) : $output; }
+    public function getTemplateVars($name)
+    {
+        return $this->publication;
+    }
+    public function registerFilter($type, $callback): void
+    {
+        $this->filter = $callback;
+    }
+    public function apply($output)
+    {
+        return $this->filter ? call_user_func($this->filter, $output) : $output;
+    }
 }
 
 class FeatureVideoTemplateFilterStub extends ThothFeatureVideoTemplateFilter
 {
     private $video;
 
-    public function __construct(array $video) { $this->video = $video; }
+    public function __construct(array $video)
+    {
+        $this->video = $video;
+    }
 
-    protected function loadVideo($workId) { return $this->video; }
+    protected function loadVideo($workId)
+    {
+        return $this->video;
+    }
 }

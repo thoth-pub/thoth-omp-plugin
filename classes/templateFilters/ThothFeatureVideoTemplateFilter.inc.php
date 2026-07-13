@@ -14,7 +14,9 @@ class ThothFeatureVideoTemplateFilter
         }
         $submission = $templateMgr->getTemplateVars('publishedSubmission') ?: $templateMgr->getTemplateVars('monograph');
         $workId = $submission ? $submission->getData('thothWorkId') : null;
-        if (!$workId) return false;
+        if (!$workId) {
+            return false;
+        }
         try {
             $video = $this->loadVideo($workId);
         } catch (Throwable $exception) {
