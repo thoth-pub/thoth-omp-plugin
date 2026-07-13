@@ -8,6 +8,7 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothFeatureVideoService
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief Creates and uploads a hosted featured video in Thoth.

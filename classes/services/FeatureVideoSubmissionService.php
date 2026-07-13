@@ -8,6 +8,7 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class FeatureVideoSubmissionService
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief Validates an OMP temporary video and persists its Thoth metadata.
