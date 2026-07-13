@@ -14,6 +14,8 @@
  */
 
 import('plugins.generic.thoth.classes.components.forms.FeatureVideoForm');
+import('plugins.generic.thoth.classes.facades.ThothRepo');
+import('plugins.generic.thoth.classes.services.ThothMeCacheService');
 
 class ThothFeatureVideoWorkflowTemplateFilter
 {
@@ -66,7 +68,8 @@ class ThothFeatureVideoWorkflowTemplateFilter
         $components = $templateMgr->getState('components');
         $components[FeatureVideoForm::FORM_FEATURE_VIDEO] = (new FeatureVideoForm(
             $action,
-            $temporaryFilesUrl
+            $temporaryFilesUrl,
+            (new ThothMeCacheService(ThothRepo::me()))->hasCdnWritePermission($request->getContext()->getId())
         ))->getConfig();
         $templateMgr->setState(['components' => $components]);
 
