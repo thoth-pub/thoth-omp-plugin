@@ -168,7 +168,6 @@ class ThothEndpoint
             }
             $metadata = ThothService::featureVideoSubmission()->upload(
                 $submission,
-                $submission->getCurrentPublication(),
                 $title,
                 $temporaryFileId,
                 (int) $user->getId()
