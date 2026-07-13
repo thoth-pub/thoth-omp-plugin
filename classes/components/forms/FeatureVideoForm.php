@@ -16,9 +16,9 @@
 
 namespace APP\plugins\generic\thoth\classes\components\forms;
 
+use PKP\components\forms\FieldHTML;
 use PKP\components\forms\FieldText;
 use PKP\components\forms\FieldUpload;
-use PKP\components\forms\FieldHTML;
 use PKP\components\forms\FormComponent;
 
 class FeatureVideoForm extends FormComponent
