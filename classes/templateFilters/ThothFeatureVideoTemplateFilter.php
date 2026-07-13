@@ -53,7 +53,7 @@ class ThothFeatureVideoTemplateFilter
         $url = htmlspecialchars($this->video['url'], ENT_QUOTES, 'UTF-8');
         $html = '<div class="item thoth_feature_video">'
             . '<h2 class="label">' . $title . '</h2>'
-            . '<video controls preload="metadata" width="' . $this->video['width']
+            . '<video controls preload="metadata" style="display:block;max-width:100%;height:auto" width="' . $this->video['width']
             . '" height="' . $this->video['height'] . '" src="' . $url . '"></video>'
             . '</div>';
 
