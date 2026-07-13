@@ -36,6 +36,7 @@ import('plugins.generic.thoth.classes.schema.ThothSchema');
 import('plugins.generic.thoth.classes.services.ThothCatalogFilesCacheService');
 import('plugins.generic.thoth.classes.templateFilters.ThothCatalogFilesTemplateFilter');
 import('plugins.generic.thoth.classes.templateFilters.ThothFrontcoverTemplateFilter');
+import('plugins.generic.thoth.classes.templateFilters.ThothFeatureVideoWorkflowTemplateFilter');
 
 class ThothPlugin extends \PKP\plugins\GenericPlugin
 {
@@ -154,6 +155,9 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
 
         $thothFrontcoverFilter = new ThothFrontcoverTemplateFilter();
         $thothFrontcoverFilter->registerFilter($templateMgr, $template);
+
+        $featureVideoWorkflowFilter = new ThothFeatureVideoWorkflowTemplateFilter();
+        $featureVideoWorkflowFilter->registerFilter($templateMgr, $template);
     }
 
     public function addScripts($hookName, $args)
@@ -166,6 +170,9 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
         $thothSectionFilter->addJavaScriptData($request, $templateMgr, $template);
         $thothSectionFilter->addJavaScript($request, $templateMgr, $this);
         $thothSectionFilter->addStyleSheet($request, $templateMgr, $this);
+
+        $featureVideoWorkflowFilter = new ThothFeatureVideoWorkflowTemplateFilter();
+        $featureVideoWorkflowFilter->addFormConfig($request, $templateMgr, $template);
 
         $thothNotification = new ThothNotification();
         $thothNotification->addJavaScriptData($request, $templateMgr);
