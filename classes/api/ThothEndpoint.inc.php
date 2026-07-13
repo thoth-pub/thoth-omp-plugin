@@ -175,9 +175,18 @@ class ThothEndpoint
             );
             return $response->withJson($metadata, 200);
         } catch (InvalidArgumentException $exception) {
-            return $response->withStatus(400)->withJson([
-                'video' => [__('plugins.generic.thoth.featureVideo.invalidFile')],
-            ]);
+            $message = $exception->getMessage();
+            if (
+                strpos($message, 'temporary video file was not found') !== false
+                || strpos($message, 'supported video') !== false
+            ) {
+                return $response->withStatus(400)->withJson([
+                    'video' => [__('plugins.generic.thoth.featureVideo.invalidFile')],
+                ]);
+            }
+
+            error_log($message);
+            return $response->withStatus(500)->withJsonError('plugins.generic.thoth.connectionError');
         } catch (Throwable $exception) {
             error_log($exception->getMessage());
             return $response->withStatus(500)->withJsonError('plugins.generic.thoth.connectionError');
