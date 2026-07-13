@@ -62,6 +62,8 @@ class ThothFeatureVideoService
             'workFeaturedVideoId' => $videoId,
             'workId' => $workId,
             'title' => $title,
+            'width' => self::WIDTH,
+            'height' => self::HEIGHT,
             'url' => $cdnUrl,
         ]);
 
