@@ -5,7 +5,7 @@ import('plugins.generic.thoth.classes.services.FeatureVideoSubmissionService');
 
 class FeatureVideoSubmissionServiceTest extends PKPTestCase
 {
-    public function testUploadsAndPersistsFeatureVideoMetadata(): void
+    public function testUploadsWithoutPersistingFeatureVideoMetadata(): void
     {
         $thothService = new FeatureVideoUploadStub();
         $service = new FeatureVideoSubmissionServiceStub($thothService, [
@@ -19,9 +19,8 @@ class FeatureVideoSubmissionServiceTest extends PKPTestCase
         $service->upload(new FeatureVideoSubmissionStub(), $publication, 'Book trailer', 15, 7);
 
         $this->assertSame('work-id', $thothService->workId);
-        $this->assertSame('video-id', $publication->data['thothFeatureVideoId']);
-        $this->assertSame('https://cdn.thoth.pub/trailer.mp4', $publication->data['thothFeatureVideoUrl']);
-        $this->assertTrue($service->persisted);
+        $this->assertSame([], $publication->data);
+        $this->assertFalse($service->persisted);
         $this->assertTrue($service->deleted);
     }
 
