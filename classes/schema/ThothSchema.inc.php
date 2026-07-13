@@ -68,6 +68,21 @@ class ThothSchema
             'validation' => ['nullable'],
         ];
 
+        foreach ([
+            'thothFeatureVideoId' => 'string',
+            'thothFeatureVideoTitle' => 'string',
+            'thothFeatureVideoUrl' => 'string',
+            'thothFeatureVideoWidth' => 'integer',
+            'thothFeatureVideoHeight' => 'integer',
+            'thothFeatureVideoSha256' => 'string',
+        ] as $property => $type) {
+            $schema->properties->{$property} = (object) [
+                'type' => $type,
+                'apiSummary' => true,
+                'validation' => ['nullable'],
+            ];
+        }
+
         return false;
     }
 

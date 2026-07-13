@@ -34,4 +34,19 @@ class ThothSchemaTest extends PKPTestCase
         $this->assertSame('string', $schema->properties->thothFrontcoverSha256->type);
         $this->assertSame('string', $schema->properties->thothFrontcoverUrl->type);
     }
+
+    public function testAddsFeatureVideoFieldsToPublicationSchema(): void
+    {
+        $schema = new stdClass();
+        $schema->properties = new stdClass();
+        $args = [&$schema];
+        (new ThothSchema())->addToPublicationSchema('Schema::get::publication', $args);
+
+        $this->assertSame('string', $schema->properties->thothFeatureVideoId->type);
+        $this->assertSame('string', $schema->properties->thothFeatureVideoTitle->type);
+        $this->assertSame('string', $schema->properties->thothFeatureVideoUrl->type);
+        $this->assertSame('integer', $schema->properties->thothFeatureVideoWidth->type);
+        $this->assertSame('integer', $schema->properties->thothFeatureVideoHeight->type);
+        $this->assertSame('string', $schema->properties->thothFeatureVideoSha256->type);
+    }
 }

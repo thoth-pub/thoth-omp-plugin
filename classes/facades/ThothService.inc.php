@@ -49,6 +49,11 @@ class ThothService
         return ThothContainer::getInstance()->get('frontcoverService');
     }
 
+    public static function featureVideoSubmission()
+    {
+        return ThothContainer::getInstance()->get('featureVideoSubmissionService');
+    }
+
     public static function language()
     {
         return ThothContainer::getInstance()->get('languageService');
