@@ -311,3 +311,12 @@ msgstr "Ospita il file di questa immagine di copertina su Thoth."
 
 msgid "plugins.generic.thoth.field.frontcover.missingCdnWritePermission"
 msgstr "L'utente Thoth configurato deve avere il permesso cdnWrite per ospitare il file dell'immagine di copertina su Thoth."
+
+msgid "plugins.generic.thoth.featureVideo"
+msgstr "Video in evidenza"
+
+msgid "plugins.generic.thoth.featureVideo.file"
+msgstr "File video"
+
+msgid "plugins.generic.thoth.featureVideo.invalidFile"
+msgstr "Seleziona un file video MP4, WebM o MOV valido."
