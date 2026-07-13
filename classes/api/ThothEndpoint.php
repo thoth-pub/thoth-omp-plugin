@@ -18,6 +18,7 @@ namespace APP\plugins\generic\thoth\classes\api;
 
 use APP\core\Application;
 use APP\facades\Repo;
+use APP\plugins\generic\thoth\classes\components\forms\FeatureVideoForm;
 use APP\plugins\generic\thoth\classes\facades\ThothRepository;
 use APP\plugins\generic\thoth\classes\facades\ThothService;
 use APP\plugins\generic\thoth\classes\notification\ThothNotification;
@@ -51,6 +52,19 @@ class ThothEndpoint
             '{submissionId}/thothWorkStatus',
             $this->getWorkStatus(...),
             'thoth.workStatus',
+            [
+                Role::ROLE_ID_SITE_ADMIN,
+                Role::ROLE_ID_MANAGER,
+                Role::ROLE_ID_SUB_EDITOR,
+                Role::ROLE_ID_ASSISTANT,
+            ]
+        );
+
+        $apiHandler->addRoute(
+            'GET',
+            '{submissionId}/featureVideo',
+            $this->getFeatureVideoForm(...),
+            'thoth.featureVideo.form',
             [
                 Role::ROLE_ID_SITE_ADMIN,
                 Role::ROLE_ID_MANAGER,
@@ -191,6 +205,44 @@ class ThothEndpoint
                 Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
+    }
+
+    public function getFeatureVideoForm(IlluminateRequest $illuminateRequest): JsonResponse
+    {
+        $submissionId = (int) $illuminateRequest->route('submissionId');
+        $submission = Repo::submission()->get($submissionId);
+        if (!$submission) {
+            return response()->json(
+                ['error' => __('api.404.resourceNotFound')],
+                Response::HTTP_NOT_FOUND
+            );
+        }
+
+        $request = Application::get()->getRequest();
+        $context = $request->getContext();
+        if (!$context || (int) $submission->getData('contextId') !== (int) $context->getId()) {
+            return response()->json(
+                ['error' => __('api.submissions.403.contextRequired')],
+                Response::HTTP_FORBIDDEN
+            );
+        }
+
+        $dispatcher = $request->getDispatcher();
+        $featureVideoUrl = $dispatcher->url(
+            $request,
+            Application::ROUTE_API,
+            $context->getData('urlPath'),
+            '_submissions/' . $submissionId . '/featureVideo'
+        );
+        $temporaryFilesUrl = $dispatcher->url(
+            $request,
+            Application::ROUTE_API,
+            $context->getData('urlPath'),
+            'temporaryFiles'
+        );
+        $form = new FeatureVideoForm($featureVideoUrl, $temporaryFilesUrl);
+
+        return response()->json($form->getConfig(), Response::HTTP_OK);
     }
 
     public function handleNotification($request, $submission, $success, $disableNotification, $errorMessage = null)
