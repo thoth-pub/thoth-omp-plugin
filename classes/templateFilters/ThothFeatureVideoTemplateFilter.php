@@ -16,6 +16,10 @@
 
 namespace APP\plugins\generic\thoth\classes\templateFilters;
 
+use APP\plugins\generic\thoth\classes\facades\ThothRepository;
+use APP\plugins\generic\thoth\classes\services\ThothFeatureVideoCacheService;
+use Throwable;
+
 class ThothFeatureVideoTemplateFilter
 {
     private array $video = [];
@@ -26,17 +30,30 @@ class ThothFeatureVideoTemplateFilter
             return false;
         }
 
-        $publication = $templateMgr->getTemplateVars('publication');
-        $url = $publication ? $publication->getData('thothFeatureVideoUrl') : null;
+        $submission = $templateMgr->getTemplateVars('publishedSubmission')
+            ?: $templateMgr->getTemplateVars('monograph');
+        $workId = $submission ? $submission->getData('thothWorkId') : null;
+        if (!$workId) {
+            return false;
+        }
+        try {
+            $video = (new ThothFeatureVideoCacheService())->get($workId, function () use ($workId) {
+                $featuredVideo = ThothRepository::work()->getFeatureVideo($workId);
+                return $featuredVideo ? $featuredVideo->toArray() : null;
+            });
+        } catch (Throwable $exception) {
+            return false;
+        }
+        $url = $video['url'] ?? null;
         if (!$this->isValidUrl($url)) {
             return false;
         }
 
         $this->video = [
-            'title' => (string) $publication->getData('thothFeatureVideoTitle'),
+            'title' => (string) ($video['title'] ?? ''),
             'url' => $url,
-            'width' => $this->normalizeDimension($publication->getData('thothFeatureVideoWidth'), 640, 1920),
-            'height' => $this->normalizeDimension($publication->getData('thothFeatureVideoHeight'), 360, 1080),
+            'width' => $this->normalizeDimension($video['width'] ?? null, 640, 1920),
+            'height' => $this->normalizeDimension($video['height'] ?? null, 360, 1080),
         ];
         $templateMgr->registerFilter('output', $this->addVideo(...));
 
