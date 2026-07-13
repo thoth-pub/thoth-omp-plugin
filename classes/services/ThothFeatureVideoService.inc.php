@@ -46,6 +46,7 @@ class ThothFeatureVideoService
         $cdnUrl = $uploadedFile->getCdnUrl();
         $this->featureVideoRepository->update([
             'workFeaturedVideoId' => $videoId,
+            'workId' => $workId,
             'url' => $cdnUrl,
         ]);
 
