@@ -11,12 +11,11 @@
  *
  * @ingroup plugins_generic_thoth
  *
- * @brief Validates an OMP temporary video and persists its Thoth metadata.
+ * @brief Validates an OMP temporary video and uploads it to Thoth.
  */
 
 namespace APP\plugins\generic\thoth\classes\services;
 
-use APP\facades\Repo;
 use InvalidArgumentException;
 use PKP\file\TemporaryFileManager;
 
@@ -35,7 +34,7 @@ class FeatureVideoSubmissionService
         $this->featureVideoService = $featureVideoService;
     }
 
-    public function upload($submission, $publication, string $title, int $temporaryFileId, int $userId): array
+    public function upload($submission, string $title, int $temporaryFileId, int $userId): array
     {
         $workId = $submission->getData('thothWorkId');
         if (!$workId) {
@@ -80,25 +79,9 @@ class FeatureVideoSubmissionService
         return (new TemporaryFileManager())->getFile($temporaryFileId, $userId);
     }
 
-    protected function persistPublication($publication): void
-    {
-        Repo::publication()->dao->update($publication);
-    }
-
     protected function deleteTemporaryFile(int $temporaryFileId, int $userId): void
     {
         (new TemporaryFileManager())->deleteById($temporaryFileId, $userId);
     }
 
-    private function getPublicationData(array $metadata): array
-    {
-        return [
-            'thothFeatureVideoId' => $metadata['id'],
-            'thothFeatureVideoTitle' => $metadata['title'],
-            'thothFeatureVideoUrl' => $metadata['url'],
-            'thothFeatureVideoWidth' => $metadata['width'],
-            'thothFeatureVideoHeight' => $metadata['height'],
-            'thothFeatureVideoSha256' => $metadata['sha256'],
-        ];
-    }
 }

@@ -18,7 +18,7 @@ use PKP\tests\PKPTestCase;
 
 class FeatureVideoSubmissionServiceTest extends PKPTestCase
 {
-    public function testUploadsWithoutPersistingFeatureVideoMetadata(): void
+    public function testUploadsFeatureVideoAndDeletesTemporaryFile(): void
     {
         $thothService = new ThothFeatureVideoUploadStub();
         $service = new FeatureVideoSubmissionServiceStub($thothService, [
@@ -28,15 +28,11 @@ class FeatureVideoSubmissionServiceTest extends PKPTestCase
             'sha256' => 'video-sha256',
         ]);
         $submission = new FeatureVideoSubmissionStub('work-id');
-        $publication = new FeatureVideoPublicationStub();
-
-        $service->upload($submission, $publication, 'Book trailer', 15, 7);
+        $service->upload($submission, 'Book trailer', 15, 7);
 
         $this->assertSame(15, $service->temporaryFileId);
         $this->assertSame(7, $service->userId);
         $this->assertSame('work-id', $thothService->workId);
-        $this->assertSame([], $publication->data);
-        $this->assertFalse($service->persisted);
         $this->assertTrue($service->deleted);
     }
 
@@ -52,7 +48,6 @@ class FeatureVideoSubmissionServiceTest extends PKPTestCase
         $this->expectException(InvalidArgumentException::class);
         $service->upload(
             new FeatureVideoSubmissionStub('work-id'),
-            new FeatureVideoPublicationStub(),
             'Book trailer',
             15,
             7
@@ -64,7 +59,6 @@ class FeatureVideoSubmissionServiceStub extends FeatureVideoSubmissionService
 {
     public int $temporaryFileId = 0;
     public int $userId = 0;
-    public bool $persisted = false;
     public bool $deleted = false;
     private array $file;
 
@@ -79,11 +73,6 @@ class FeatureVideoSubmissionServiceStub extends FeatureVideoSubmissionService
         $this->temporaryFileId = $temporaryFileId;
         $this->userId = $userId;
         return $this->file;
-    }
-
-    protected function persistPublication($publication): void
-    {
-        $this->persisted = true;
     }
 
     protected function deleteTemporaryFile(int $temporaryFileId, int $userId): void
@@ -138,16 +127,6 @@ class FeatureVideoSubmissionStub
     public function getData(string $name)
     {
         return $name === 'thothWorkId' ? $this->workId : null;
-    }
-}
-
-class FeatureVideoPublicationStub
-{
-    public array $data = [];
-
-    public function setData(string $name, $value): void
-    {
-        $this->data[$name] = $value;
     }
 }
 
