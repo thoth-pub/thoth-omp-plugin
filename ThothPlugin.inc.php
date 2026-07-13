@@ -37,6 +37,7 @@ import('plugins.generic.thoth.classes.services.ThothCatalogFilesCacheService');
 import('plugins.generic.thoth.classes.templateFilters.ThothCatalogFilesTemplateFilter');
 import('plugins.generic.thoth.classes.templateFilters.ThothFrontcoverTemplateFilter');
 import('plugins.generic.thoth.classes.templateFilters.ThothFeatureVideoWorkflowTemplateFilter');
+import('plugins.generic.thoth.classes.templateFilters.ThothFeatureVideoTemplateFilter');
 
 class ThothPlugin extends \PKP\plugins\GenericPlugin
 {
@@ -158,6 +159,9 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
 
         $featureVideoWorkflowFilter = new ThothFeatureVideoWorkflowTemplateFilter();
         $featureVideoWorkflowFilter->registerFilter($templateMgr, $template);
+
+        $featureVideoFilter = new ThothFeatureVideoTemplateFilter();
+        $featureVideoFilter->registerFilter($templateMgr, $template);
     }
 
     public function addScripts($hookName, $args)
