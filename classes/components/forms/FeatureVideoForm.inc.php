@@ -22,9 +22,17 @@ class FeatureVideoForm extends FormComponent
 {
     public const FORM_FEATURE_VIDEO = 'featureVideo';
 
-    public function __construct(string $action, string $temporaryFilesUrl, bool $canUpload = true)
+    public function __construct(string $action, string $temporaryFilesUrl, bool $canUpload = true, bool $hasVideo = false)
     {
         parent::__construct(self::FORM_FEATURE_VIDEO, 'POST', $action, []);
+
+        if ($hasVideo) {
+            $this->addField(new FieldHTML('existingVideoNotice', [
+                'description' => '<div class="pkpNotification pkpNotification--warning">'
+                    . __('plugins.generic.thoth.featureVideo.exists') . '</div>',
+            ]));
+            return;
+        }
 
         if (!$canUpload) {
             $this->addField(new FieldHTML('permissionNotice', [
