@@ -1,3 +1,7 @@
+export function getFormComposable(useFormModule) {
+	return useFormModule.useForm;
+}
+
 export function getTranslator(useLocalizeModule) {
 	const {useLocalize} = useLocalizeModule;
 	const {t} = useLocalize();

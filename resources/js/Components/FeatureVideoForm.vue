@@ -5,8 +5,9 @@
 
 <script setup>
 import {onMounted, ref} from 'vue';
+import {getFormComposable} from '../featureVideoWorkflow.mjs';
 
-const {useForm} = pkp.modules;
+const useForm = getFormComposable(pkp.modules.useForm);
 
 const props = defineProps({
 	submission: {type: Object, required: true},
