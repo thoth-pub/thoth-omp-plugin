@@ -19,6 +19,8 @@ import('plugins.generic.thoth.classes.services.ThothChapterService');
 import('plugins.generic.thoth.classes.services.ThothContributionService');
 import('plugins.generic.thoth.classes.services.ThothContributorService');
 import('plugins.generic.thoth.classes.services.ThothFileUploadService');
+import('plugins.generic.thoth.classes.services.FeatureVideoSubmissionService');
+import('plugins.generic.thoth.classes.services.ThothFeatureVideoService');
 import('plugins.generic.thoth.classes.services.ThothFrontcoverService');
 import('plugins.generic.thoth.classes.services.ThothLanguageService');
 import('plugins.generic.thoth.classes.services.ThothLocationService');
@@ -94,6 +96,16 @@ class ThothServiceProvider implements ContainerProvider
         ]);
 
         $container->singletonClass('fileUploadService', ThothFileUploadService::class);
+
+        $container->singletonClass('featureVideoService', ThothFeatureVideoService::class, [
+            'featureVideoRepository',
+            'featureVideoFileUploadRepository',
+            'fileUploadService',
+        ]);
+
+        $container->singletonClass('featureVideoSubmissionService', FeatureVideoSubmissionService::class, [
+            'featureVideoService',
+        ]);
 
         $container->singletonClass('frontcoverService', ThothFrontcoverService::class, [
             'frontcoverFileUploadRepository',

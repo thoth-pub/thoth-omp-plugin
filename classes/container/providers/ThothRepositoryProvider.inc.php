@@ -34,6 +34,8 @@ import('plugins.generic.thoth.classes.repositories.ThothChapterRepository');
 import('plugins.generic.thoth.classes.repositories.ThothContributionRepository');
 import('plugins.generic.thoth.classes.repositories.ThothContributorRepository');
 import('plugins.generic.thoth.classes.repositories.ThothFrontcoverFileUploadRepository');
+import('plugins.generic.thoth.classes.repositories.ThothFeatureVideoFileUploadRepository');
+import('plugins.generic.thoth.classes.repositories.ThothFeatureVideoRepository');
 import('plugins.generic.thoth.classes.repositories.ThothImprintRepository');
 import('plugins.generic.thoth.classes.repositories.ThothInstitutionRepository');
 import('plugins.generic.thoth.classes.repositories.ThothLanguageRepository');
@@ -125,6 +127,14 @@ class ThothRepositoryProvider implements ContainerProvider
 
         $container->singleton('frontcoverFileUploadRepository', function ($container) {
             return new ThothFrontcoverFileUploadRepository($container->get('client'));
+        });
+
+        $container->singleton('featureVideoRepository', function ($container) {
+            return new ThothFeatureVideoRepository($container->get('client'));
+        });
+
+        $container->singleton('featureVideoFileUploadRepository', function ($container) {
+            return new ThothFeatureVideoFileUploadRepository($container->get('client'));
         });
 
         $container->singleton('referenceRepository', function ($container) {
