@@ -18,6 +18,7 @@ namespace APP\plugins\generic\thoth\classes\container\providers;
 
 require_once(__DIR__ . '/../../../vendor/autoload.php');
 
+use APP\core\Application;
 use APP\plugins\generic\thoth\classes\config\ThothSettings;
 use APP\plugins\generic\thoth\classes\repositories\ThothAbstractRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothAffiliationRepository;
@@ -26,9 +27,9 @@ use APP\plugins\generic\thoth\classes\repositories\ThothBookRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothChapterRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothContributionRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothContributorRepository;
-use APP\plugins\generic\thoth\classes\repositories\ThothFrontcoverFileUploadRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothFeatureVideoFileUploadRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothFeatureVideoRepository;
+use APP\plugins\generic\thoth\classes\repositories\ThothFrontcoverFileUploadRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothImprintRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothInstitutionRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothLanguageRepository;
