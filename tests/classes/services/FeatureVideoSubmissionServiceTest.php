@@ -18,7 +18,7 @@ use PKP\tests\PKPTestCase;
 
 class FeatureVideoSubmissionServiceTest extends PKPTestCase
 {
-    public function testUploadsAndPersistsFeatureVideoMetadata(): void
+    public function testUploadsWithoutPersistingFeatureVideoMetadata(): void
     {
         $thothService = new ThothFeatureVideoUploadStub();
         $service = new FeatureVideoSubmissionServiceStub($thothService, [
@@ -35,9 +35,8 @@ class FeatureVideoSubmissionServiceTest extends PKPTestCase
         $this->assertSame(15, $service->temporaryFileId);
         $this->assertSame(7, $service->userId);
         $this->assertSame('work-id', $thothService->workId);
-        $this->assertSame('video-id', $publication->data['thothFeatureVideoId']);
-        $this->assertSame('https://cdn.thoth.pub/trailer.mp4', $publication->data['thothFeatureVideoUrl']);
-        $this->assertTrue($service->persisted);
+        $this->assertSame([], $publication->data);
+        $this->assertFalse($service->persisted);
         $this->assertTrue($service->deleted);
     }
 
