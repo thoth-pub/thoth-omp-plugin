@@ -15,7 +15,7 @@ class ThothFeatureVideoWorkflowTemplateFilterTest extends PKPTestCase
 {
     public function testAddsFeatureVideoTabAfterPublicationDates(): void
     {
-        $filter = new ThothFeatureVideoWorkflowTemplateFilter();
+        $filter = new FeatureVideoWorkflowTemplateFilterStub();
         $templateManager = new FeatureVideoWorkflowTemplateManagerStub();
         $output = '<tab id="publicationDates"><pkp-form /></tab></tabs>';
 
@@ -31,7 +31,7 @@ class ThothFeatureVideoWorkflowTemplateFilterTest extends PKPTestCase
 
     public function testAddsOmpUploadFormToWorkflowComponents(): void
     {
-        $filter = new ThothFeatureVideoWorkflowTemplateFilter();
+        $filter = new FeatureVideoWorkflowTemplateFilterStub();
         $templateManager = new FeatureVideoWorkflowTemplateManagerStub();
 
         $filter->addFormConfig(
@@ -45,13 +45,26 @@ class ThothFeatureVideoWorkflowTemplateFilterTest extends PKPTestCase
             return $field['name'] === 'video';
         }))[0];
         $this->assertSame('api/temporaryFiles', $videoField['options']['url']);
-        $this->assertSame('api/_submissions/12/featureVideo', $form['action']);
+        $this->assertSame('api/submissions/12/featureVideo', $form['action']);
     }
 
     private function getTabIds(string $output): array
     {
         preg_match_all('/<tab id="([^"]+)"/', $output, $matches);
         return $matches[1];
+    }
+}
+
+class FeatureVideoWorkflowTemplateFilterStub extends ThothFeatureVideoWorkflowTemplateFilter
+{
+    protected function hasExistingVideo($submission)
+    {
+        return false;
+    }
+
+    protected function canUpload($request)
+    {
+        return true;
     }
 }
 
@@ -71,6 +84,11 @@ class FeatureVideoWorkflowTemplateManagerStub
             public function getId(): int
             {
                 return 12;
+            }
+
+            public function getData($name)
+            {
+                return null;
             }
         };
     }
