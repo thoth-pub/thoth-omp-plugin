@@ -10,13 +10,32 @@
 
 import ThothSection from './Components/ThothSection.vue';
 import ThothListPanel from './Components/ThothListPanel.vue';
+import FeatureVideoForm from './Components/FeatureVideoForm.vue';
+import {
+	addFeatureVideoMenuItem,
+	getFeatureVideoPrimaryItems,
+} from './featureVideoWorkflow.mjs';
 import './thoth.css';
 
 pkp.registry.registerComponent('ThothSection', ThothSection);
 pkp.registry.registerComponent('ThothListPanel', ThothListPanel);
+pkp.registry.registerComponent('FeatureVideoForm', FeatureVideoForm);
 
 pkp.registry.storeExtend('workflow', (piniaContext) => {
 	const workflowStore = piniaContext.store;
+	const {t} = pkp.modules.useLocalize();
+
+	workflowStore.extender.extendFn('getMenuItems', (menuItems) =>
+		addFeatureVideoMenuItem(
+			menuItems,
+			t('plugins.generic.thoth.featureVideo'),
+		),
+	);
+
+	workflowStore.extender.extendFn(
+		'getPrimaryItems',
+		(primaryItems, args) => getFeatureVideoPrimaryItems(primaryItems, args),
+	);
 
 	workflowStore.extender.extendFn(
 		'getPrimaryControlsLeft',
