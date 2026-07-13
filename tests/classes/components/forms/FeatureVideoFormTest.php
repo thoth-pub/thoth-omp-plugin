@@ -31,4 +31,12 @@ class FeatureVideoFormTest extends PKPTestCase
         $this->assertSame($temporaryFilesUrl, $videoField->options['url']);
         $this->assertSame('.mp4,.webm,.mov', $videoField->options['acceptedFiles']);
     }
+    public function testHidesUploadFieldsWhenThothVideoExists(): void
+    {
+        $form = new FeatureVideoForm('https://example.test/upload', 'https://example.test/temp', true, true);
+
+        $this->assertNull($form->getField('title'));
+        $this->assertNull($form->getField('video'));
+        $this->assertNotNull($form->getField('existingVideoNotice'));
+    }
 }
