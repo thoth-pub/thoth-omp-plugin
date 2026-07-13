@@ -29,6 +29,7 @@ use APP\plugins\generic\thoth\classes\schema\ThothSchema;
 use APP\plugins\generic\thoth\classes\services\ThothCatalogFilesCacheService;
 use APP\plugins\generic\thoth\classes\templateFilters\ThothCatalogFilesTemplateFilter;
 use APP\plugins\generic\thoth\classes\templateFilters\ThothFrontcoverTemplateFilter;
+use APP\plugins\generic\thoth\classes\templateFilters\ThothFeatureVideoTemplateFilter;
 use APP\plugins\generic\thoth\classes\templateFilters\ThothSectionTemplateFilter;
 use PKP\plugins\GenericPlugin;
 use PKP\plugins\Hook;
@@ -120,6 +121,9 @@ class HookRegistrant
 
         $thothFrontcoverFilter = new ThothFrontcoverTemplateFilter();
         $thothFrontcoverFilter->registerFilter($templateMgr, $template);
+
+        $thothFeatureVideoFilter = new ThothFeatureVideoTemplateFilter();
+        $thothFeatureVideoFilter->registerFilter($templateMgr, $template);
 
         return false;
     }
