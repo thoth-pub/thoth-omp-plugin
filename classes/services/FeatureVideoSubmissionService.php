@@ -45,10 +45,7 @@ class FeatureVideoSubmissionService
         $file = $this->resolveTemporaryFile($temporaryFileId, $userId);
         $metadata = $this->featureVideoService->upload($workId, trim($title), $file);
 
-        foreach ($this->getPublicationData($metadata) as $name => $value) {
-            $publication->setData($name, $value);
-        }
-        $this->persistPublication($publication);
+        (new ThothFeatureVideoCacheService())->flush($workId);
         $this->deleteTemporaryFile($temporaryFileId, $userId);
 
         return $metadata;
