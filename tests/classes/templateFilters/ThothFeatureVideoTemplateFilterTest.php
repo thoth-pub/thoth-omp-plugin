@@ -7,13 +7,13 @@ class ThothFeatureVideoTemplateFilterTest extends PKPTestCase
 {
     public function testAddsFeatureVideoToBookMainEntry(): void
     {
-        $filter = new ThothFeatureVideoTemplateFilter();
-        $manager = new FeatureVideoBookTemplateManagerStub([
-            'thothFeatureVideoTitle' => 'Book & trailer',
-            'thothFeatureVideoUrl' => 'https://cdn.thoth.pub/trailer.mp4?x=1&y=2',
-            'thothFeatureVideoWidth' => 640,
-            'thothFeatureVideoHeight' => 360,
+        $filter = new FeatureVideoTemplateFilterStub([
+            'title' => 'Book & trailer',
+            'url' => 'https://cdn.thoth.pub/trailer.mp4?x=1&y=2',
+            'width' => 640,
+            'height' => 360,
         ]);
+        $manager = new FeatureVideoBookTemplateManagerStub();
         $output = '<div class="main_entry"></div><!-- .main_entry -->';
 
         $filter->registerFilter($manager, 'frontend/pages/book.tpl');
@@ -27,10 +27,8 @@ class ThothFeatureVideoTemplateFilterTest extends PKPTestCase
 
     public function testDoesNotRenderUnsafeUrl(): void
     {
-        $filter = new ThothFeatureVideoTemplateFilter();
-        $manager = new FeatureVideoBookTemplateManagerStub([
-            'thothFeatureVideoUrl' => 'javascript:alert(1)',
-        ]);
+        $filter = new FeatureVideoTemplateFilterStub(['url' => 'javascript:alert(1)']);
+        $manager = new FeatureVideoBookTemplateManagerStub();
         $output = '<div class="main_entry"></div><!-- .main_entry -->';
         $filter->registerFilter($manager, 'frontend/pages/book.tpl');
         $this->assertSame($output, $manager->apply($output));
@@ -42,16 +40,23 @@ class FeatureVideoBookTemplateManagerStub
     private $publication;
     private $filter;
 
-    public function __construct(array $data)
+    public function __construct()
     {
-        $this->publication = new class ($data) {
-            private $data;
-            public function __construct(array $data) { $this->data = $data; }
-            public function getData($name) { return $this->data[$name] ?? null; }
+        $this->publication = new class () {
+            public function getData($name) { return $name === 'thothWorkId' ? 'work-id' : null; }
         };
     }
 
     public function getTemplateVars($name) { return $this->publication; }
     public function registerFilter($type, $callback): void { $this->filter = $callback; }
     public function apply($output) { return $this->filter ? call_user_func($this->filter, $output) : $output; }
+}
+
+class FeatureVideoTemplateFilterStub extends ThothFeatureVideoTemplateFilter
+{
+    private $video;
+
+    public function __construct(array $video) { $this->video = $video; }
+
+    protected function loadVideo($workId) { return $this->video; }
 }
