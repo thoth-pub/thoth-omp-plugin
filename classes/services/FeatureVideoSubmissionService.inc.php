@@ -1,6 +1,5 @@
 <?php
 
-use APP\publication\DAO as PublicationDAO;
 import('lib.pkp.classes.file.TemporaryFileManager');
 
 class FeatureVideoSubmissionService
@@ -69,7 +68,7 @@ class FeatureVideoSubmissionService
 
     protected function persistPublication($publication): void
     {
-        app(PublicationDAO::class)->update($publication);
+        DAORegistry::getDAO('PublicationDAO')->updateObject($publication);
     }
 
     protected function deleteTemporaryFile(int $fileId, int $userId): void
