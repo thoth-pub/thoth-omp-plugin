@@ -27,6 +27,8 @@ use APP\plugins\generic\thoth\classes\repositories\ThothChapterRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothContributionRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothContributorRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothFrontcoverFileUploadRepository;
+use APP\plugins\generic\thoth\classes\repositories\ThothFeatureVideoFileUploadRepository;
+use APP\plugins\generic\thoth\classes\repositories\ThothFeatureVideoRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothImprintRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothInstitutionRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothLanguageRepository;
@@ -120,6 +122,14 @@ class ThothRepositoryProvider implements ContainerProvider
 
         $container->singleton('frontcoverFileUploadRepository', function ($container) {
             return new ThothFrontcoverFileUploadRepository($container->get('client'));
+        });
+
+        $container->singleton('featureVideoRepository', function ($container) {
+            return new ThothFeatureVideoRepository($container->get('client'));
+        });
+
+        $container->singleton('featureVideoFileUploadRepository', function ($container) {
+            return new ThothFeatureVideoFileUploadRepository($container->get('client'));
         });
 
         $container->singleton('referenceRepository', function ($container) {

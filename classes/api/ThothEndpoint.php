@@ -25,6 +25,7 @@ use APP\plugins\generic\thoth\classes\notification\ThothNotification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request as IlluminateRequest;
 use Illuminate\Http\Response;
+use InvalidArgumentException;
 use PKP\core\PKPBaseController;
 use PKP\db\DAORegistry;
 use PKP\handler\APIHandler;
@@ -65,6 +66,19 @@ class ThothEndpoint
             '{submissionId}/featureVideo',
             $this->getFeatureVideoForm(...),
             'thoth.featureVideo.form',
+            [
+                Role::ROLE_ID_SITE_ADMIN,
+                Role::ROLE_ID_MANAGER,
+                Role::ROLE_ID_SUB_EDITOR,
+                Role::ROLE_ID_ASSISTANT,
+            ]
+        );
+
+        $apiHandler->addRoute(
+            'POST',
+            '{submissionId}/featureVideo',
+            $this->uploadFeatureVideo(...),
+            'thoth.featureVideo.upload',
             [
                 Role::ROLE_ID_SITE_ADMIN,
                 Role::ROLE_ID_MANAGER,
@@ -243,6 +257,69 @@ class ThothEndpoint
         $form = new FeatureVideoForm($featureVideoUrl, $temporaryFilesUrl);
 
         return response()->json($form->getConfig(), Response::HTTP_OK);
+    }
+
+    public function uploadFeatureVideo(IlluminateRequest $illuminateRequest): JsonResponse
+    {
+        $request = Application::get()->getRequest();
+        $context = $request->getContext();
+        $user = $request->getUser();
+        $submissionId = (int) $illuminateRequest->route('submissionId');
+        $submission = Repo::submission()->get($submissionId);
+        if (!$submission) {
+            return response()->json(
+                ['error' => __('api.404.resourceNotFound')],
+                Response::HTTP_NOT_FOUND
+            );
+        }
+        if (!$context || (int) $submission->getData('contextId') !== (int) $context->getId() || !$user) {
+            return response()->json(
+                ['error' => __('api.submissions.403.contextRequired')],
+                Response::HTTP_FORBIDDEN
+            );
+        }
+
+        $title = trim((string) $illuminateRequest->input('title'));
+        $temporaryFileId = (int) $illuminateRequest->input('video.temporaryFileId');
+        $errors = [];
+        if ($title === '') {
+            $errors['title'] = [__('form.required')];
+        }
+        if (!$temporaryFileId) {
+            $errors['video'] = [__('form.required')];
+        }
+        if ($errors) {
+            return response()->json($errors, Response::HTTP_BAD_REQUEST);
+        }
+
+        try {
+            if (!ThothService::me()->hasCdnWritePermission()) {
+                return response()->json(
+                    ['video' => [__('plugins.generic.thoth.fileUpload.error.missingCdnWritePermission')]],
+                    Response::HTTP_FORBIDDEN
+                );
+            }
+
+            $metadata = ThothService::featureVideoSubmission()->upload(
+                $submission,
+                $submission->getCurrentPublication(),
+                $title,
+                $temporaryFileId,
+                (int) $user->getId()
+            );
+            return response()->json($metadata, Response::HTTP_OK);
+        } catch (InvalidArgumentException $exception) {
+            return response()->json(
+                ['video' => [__('plugins.generic.thoth.featureVideo.invalidFile')]],
+                Response::HTTP_BAD_REQUEST
+            );
+        } catch (\Throwable $exception) {
+            error_log($exception->getMessage());
+            return response()->json(
+                ['error' => __('plugins.generic.thoth.connectionError')],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
     }
 
     public function handleNotification($request, $submission, $success, $disableNotification, $errorMessage = null)
