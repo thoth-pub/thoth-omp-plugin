@@ -10,12 +10,13 @@
 
 namespace APP\plugins\generic\thoth\tests\locale;
 
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class FeatureVideoLocaleTest extends TestCase
 {
-    #[DataProvider('localeProvider')]
+    /**
+     * @dataProvider localeProvider
+     */
     public function testFeatureVideoKeysAreTranslated(string $locale): void
     {
         $contents = file_get_contents(__DIR__ . '/../../locale/' . $locale . '/locale.po');
@@ -31,6 +32,6 @@ class FeatureVideoLocaleTest extends TestCase
 
     public static function localeProvider(): array
     {
-        return [['en'], ['es'], ['it'], ['pt_BR']];
+        return [['en_US'], ['es_ES'], ['it_IT'], ['pt_BR']];
     }
 }
