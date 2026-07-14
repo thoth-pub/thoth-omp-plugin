@@ -27,13 +27,16 @@ use Illuminate\Http\Request as IlluminateRequest;
 use Illuminate\Http\Response;
 use InvalidArgumentException;
 use PKP\core\PKPBaseController;
+use PKP\core\PKPRequest;
 use PKP\db\DAORegistry;
 use PKP\handler\APIHandler;
+use PKP\plugins\interfaces\HasAuthorizationPolicy;
+use PKP\security\authorization\SubmissionAccessPolicy;
 use PKP\security\Role;
 use PKP\userGroup\UserGroup;
 use ThothApi\Exception\QueryException;
 
-class ThothEndpoint
+class ThothEndpoint implements HasAuthorizationPolicy
 {
     public function addEndpoints(string $hookName, PKPBaseController $apiController, APIHandler $apiHandler): bool
     {
@@ -45,7 +48,8 @@ class ThothEndpoint
             [
                 Role::ROLE_ID_SITE_ADMIN,
                 Role::ROLE_ID_MANAGER,
-            ]
+            ],
+            $this
         );
 
         $apiHandler->addRoute(
@@ -58,7 +62,8 @@ class ThothEndpoint
                 Role::ROLE_ID_MANAGER,
                 Role::ROLE_ID_SUB_EDITOR,
                 Role::ROLE_ID_ASSISTANT,
-            ]
+            ],
+            $this
         );
 
         $apiHandler->addRoute(
@@ -88,6 +93,11 @@ class ThothEndpoint
         );
 
         return false;
+    }
+
+    public function getPolicies(PKPRequest $request, array &$args, array $roleAssignments): array
+    {
+        return [new SubmissionAccessPolicy($request, $args, $roleAssignments)];
     }
 
     public function register(IlluminateRequest $illuminateRequest): JsonResponse

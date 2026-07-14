@@ -17,11 +17,18 @@
 namespace APP\plugins\generic\thoth\classes\services;
 
 use APP\core\Application;
+use APP\plugins\generic\thoth\classes\security\ThothApiUrlValidator;
+use Exception;
 
 class ThothFileUploadService
 {
     public function upload($fileUploadResponse, string $filePath, $fileUploadRepository)
     {
+        $uploadUrl = $fileUploadResponse->getUploadUrl();
+        if (!$this->isSafeUploadUrl($uploadUrl)) {
+            throw new Exception('Unsafe Thoth upload URL');
+        }
+
         $headers = array_reduce($fileUploadResponse->getUploadHeaders(), function ($headers, $uploadHeader) {
             $headers[$uploadHeader->getName()] = $uploadHeader->getValue();
             return $headers;
@@ -29,9 +36,10 @@ class ThothFileUploadService
 
         $resource = fopen($filePath, 'r');
         try {
-            $this->getHttpClient()->request('PUT', $fileUploadResponse->getUploadUrl(), [
+            $this->getHttpClient()->request('PUT', $uploadUrl, [
                 'headers' => $headers,
                 'body' => $resource,
+                'allow_redirects' => false,
             ]);
         } finally {
             if (is_resource($resource)) {
@@ -45,5 +53,10 @@ class ThothFileUploadService
     protected function getHttpClient()
     {
         return Application::get()->getHttpClient();
+    }
+
+    protected function isSafeUploadUrl(string $url): bool
+    {
+        return (new ThothApiUrlValidator())->isSafe($url);
     }
 }
