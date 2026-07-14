@@ -72,12 +72,36 @@ After metadata is registered, a link to the book on Thoth will appear at the top
 
 <img src="/docs/images/view_button.png" alt="View link to the Thoth book record" width="700">
 
-### Featured Video
+### Hosting Files in Thoth
 
-For a book already registered in Thoth, open the **Marketing** tab in the publication workflow and select
-**Featured video**, below **Publication dates**. Add a title and upload an MP4, WebM, or MOV file. The file is hosted
-by Thoth and displayed with playback controls on the public book page. The configured Thoth user must have the
-`cdnWrite` permission.
+The plugin can send publication files, the front cover, and a featured video to Thoth. These features are available
+after the book has been registered in Thoth and require the configured Thoth user to have the `cdnWrite` permission.
+
+#### Publication Files
+
+In the publication workflow, open the publication formats grid and use **Upload to Thoth** on the desired format.
+Select a file and, when the book contains chapters, indicate whether it belongs to the monograph or to a chapter.
+The selected monograph or chapter must have a DOI. Files can be up to 50 MB.
+
+Uploaded files are listed in the **Thoth files** column and are made available for download on the public book page.
+
+> **Screenshot placeholder:** Uploading and viewing Thoth files in the publication formats grid.
+
+#### Front Cover
+
+In the catalog entry form, upload the book cover and select **Host this cover image file on Thoth**, below the cover
+field. After the publication is saved and synchronized, the public book page uses the cover hosted by Thoth.
+Clearing this option stops the plugin from using the previously hosted cover.
+
+> **Screenshot placeholder:** Thoth cover hosting option in the catalog entry form.
+
+#### Featured Video
+
+Open the **Marketing** tab in the publication workflow and select **Featured video**, below **Publication dates**.
+Add a title and upload an MP4, WebM, or MOV file. The file is hosted by Thoth and displayed with playback controls on
+the public book page. Each book can have one featured video.
+
+> **Screenshot placeholder:** Featured video form and video displayed on the public book page.
 
 ### Bulk Registration
 
