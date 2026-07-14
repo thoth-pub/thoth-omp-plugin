@@ -71,12 +71,42 @@ Después de que los metadatos estén registrados, aparecerá un enlace al libro 
 
 <img src="/docs/images/view_button.png" alt="Enlace al registro del libro en Thoth" width="700">
 
-### Vídeo Destacado
+### Envío y Alojamiento de Archivos en Thoth
 
-Para un libro ya registrado en Thoth, abra la pestaña **Marketing** en el flujo de publicación y seleccione
-**Vídeo destacado**, debajo de **Fechas de publicación**. Añada un título y cargue un archivo MP4, WebM o MOV. Thoth
-aloja el archivo y lo muestra con controles de reproducción en la página pública del libro. El usuario configurado
-en Thoth debe tener el permiso `cdnWrite`.
+El plugin permite enviar a Thoth archivos de publicación, la portada y un vídeo destacado. Estas funciones están
+disponibles después de registrar el libro en Thoth y requieren que el usuario configurado en Thoth tenga el permiso
+`cdnWrite`.
+
+#### Archivos de Publicación
+
+En el flujo de publicación, abra la cuadrícula de formatos de publicación y use **Enviar a Thoth** en el formato
+deseado. Seleccione un archivo y, cuando el libro contenga capítulos, indique si pertenece a la monografía o a un
+capítulo. La monografía o el capítulo seleccionado debe tener DOI. Los archivos pueden tener hasta 50 MB.
+
+Los archivos enviados aparecen en la columna **Archivos en Thoth** y quedan disponibles para su descarga en la
+página pública del libro.
+
+> **Espacio para captura de pantalla:** envío y visualización de archivos de Thoth en la cuadrícula de formatos de
+> publicación.
+
+#### Portada
+
+En el formulario de entrada de catálogo, cargue la portada del libro y seleccione **Alojar el archivo de esta imagen
+de cubierta en Thoth**, debajo del campo de portada. Después de guardar y sincronizar la publicación, la página
+pública del libro utilizará la portada alojada en Thoth. Al desmarcar esta opción, el plugin deja de utilizar la portada
+alojada anteriormente.
+
+> **Espacio para captura de pantalla:** opción de alojamiento de la portada en Thoth en el formulario de entrada de
+> catálogo.
+
+#### Vídeo Destacado
+
+Abra la pestaña **Marketing** en el flujo de publicación y seleccione **Vídeo destacado**, debajo de **Fechas de
+publicación**. Añada un título y cargue un archivo MP4, WebM o MOV. Thoth aloja el archivo y lo muestra con controles
+de reproducción en la página pública del libro. Cada libro puede tener un vídeo destacado.
+
+> **Espacio para captura de pantalla:** formulario del vídeo destacado y vídeo mostrado en la página pública del
+> libro.
 
 ### Registro Masivo
 
