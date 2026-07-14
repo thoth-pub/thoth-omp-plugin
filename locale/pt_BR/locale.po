@@ -290,3 +290,14 @@ msgstr "Hospedar o arquivo da imagem de capa na Thoth."
 
 msgid "plugins.generic.thoth.field.frontcover.missingCdnWritePermission"
 msgstr "O usuário da Thoth configurado precisa da permissão cdnWrite para hospedar o arquivo da imagem de capa na Thoth."
+
+msgid "plugins.generic.thoth.featureVideo"
+msgstr "Vídeo em destaque"
+
+msgid "plugins.generic.thoth.featureVideo.file"
+msgstr "Arquivo de vídeo"
+
+msgid "plugins.generic.thoth.featureVideo.invalidFile"
+msgstr "Selecione um arquivo de vídeo MP4, WebM ou MOV válido."
+msgid "plugins.generic.thoth.featureVideo.exists"
+msgstr "Esta obra já possui um vídeo em destaque no Thoth."

@@ -17,6 +17,9 @@ use ThothApi\GraphQL\Inputs\PatchWork as ThothWork;
 
 class ThothWorkRepository
 {
+    private const FEATURE_VIDEO_SELECTION = [
+        'featuredVideo' => ['workFeaturedVideoId', 'title', 'url', 'width', 'height'],
+    ];
     private const WORK_SELECTION = [
         'workId',
         'workType',
@@ -63,6 +66,11 @@ class ThothWorkRepository
     public function get($thothWorkId)
     {
         return $this->thothClient->work($thothWorkId, self::WORK_SELECTION);
+    }
+
+    public function getFeatureVideo($thothWorkId)
+    {
+        return $this->thothClient->work($thothWorkId, self::FEATURE_VIDEO_SELECTION)->getFeaturedVideo();
     }
 
     public function add($thothWork)

@@ -71,6 +71,13 @@ After metadata is registered, a link to the book on Thoth will appear at the top
 
 <img src="/docs/images/view_button.png" alt="View link to the Thoth book record" width="700">
 
+### Featured Video
+
+For a book already registered in Thoth, open the **Marketing** tab in the publication workflow and select
+**Featured video**, below **Publication dates**. Add a title and upload an MP4, WebM, or MOV file. The file is hosted
+by Thoth and displayed with playback controls on the public book page. The configured Thoth user must have the
+`cdnWrite` permission.
+
 ### Bulk Registration
 
 On the Thoth management page, you can submit a selection of titles from OMP into Thoth in bulk.

@@ -71,6 +71,13 @@ Después de que los metadatos estén registrados, aparecerá un enlace al libro 
 
 <img src="/docs/images/view_button.png" alt="Enlace al registro del libro en Thoth" width="700">
 
+### Vídeo Destacado
+
+Para un libro ya registrado en Thoth, abra la pestaña **Marketing** en el flujo de publicación y seleccione
+**Vídeo destacado**, debajo de **Fechas de publicación**. Añada un título y cargue un archivo MP4, WebM o MOV. Thoth
+aloja el archivo y lo muestra con controles de reproducción en la página pública del libro. El usuario configurado
+en Thoth debe tener el permiso `cdnWrite`.
+
 ### Registro Masivo
 
 En la página de gestión de Thoth, puede enviar en masa una selección de títulos desde OMP hacia Thoth.

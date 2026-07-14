@@ -33,6 +33,8 @@ import('plugins.generic.thoth.classes.templateFilters.ThothCatalogFilesTemplateF
 import('plugins.generic.thoth.classes.templateFilters.ThothFrontcoverTemplateFilter');
 import('plugins.generic.thoth.classes.templateFilters.PublicationFormatTemplateFilter');
 import('plugins.generic.thoth.classes.templateFilters.ThothSectionTemplateFilter');
+import('plugins.generic.thoth.classes.templateFilters.ThothFeatureVideoWorkflowTemplateFilter');
+import('plugins.generic.thoth.classes.templateFilters.ThothFeatureVideoTemplateFilter');
 
 class ThothPlugin extends GenericPlugin
 {
@@ -142,6 +144,12 @@ class ThothPlugin extends GenericPlugin
 
         $thothFrontcoverFilter = new ThothFrontcoverTemplateFilter();
         $thothFrontcoverFilter->registerFilter($templateMgr, $template);
+
+        $featureVideoWorkflowFilter = new ThothFeatureVideoWorkflowTemplateFilter();
+        $featureVideoWorkflowFilter->registerFilter($templateMgr, $template);
+
+        $featureVideoFilter = new ThothFeatureVideoTemplateFilter();
+        $featureVideoFilter->registerFilter($templateMgr, $template);
     }
 
     public function addToSchema()
@@ -201,6 +209,9 @@ class ThothPlugin extends GenericPlugin
         $thothSectionFilter->addJavaScriptData($request, $templateMgr, $template);
         $thothSectionFilter->addJavaScript($request, $templateMgr, $this);
         $thothSectionFilter->addStyleSheet($request, $templateMgr, $this);
+
+        $featureVideoWorkflowFilter = new ThothFeatureVideoWorkflowTemplateFilter();
+        $featureVideoWorkflowFilter->addFormConfig($request, $templateMgr, $template);
 
         $this->addCatalogFilesAssets($request, $templateMgr, $template);
     }

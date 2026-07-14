@@ -290,3 +290,14 @@ msgstr "Host this cover image file on Thoth."
 
 msgid "plugins.generic.thoth.field.frontcover.missingCdnWritePermission"
 msgstr "The configured Thoth user needs the cdnWrite permission to host the cover image file on Thoth."
+
+msgid "plugins.generic.thoth.featureVideo"
+msgstr "Featured video"
+
+msgid "plugins.generic.thoth.featureVideo.file"
+msgstr "Video file"
+
+msgid "plugins.generic.thoth.featureVideo.invalidFile"
+msgstr "Select a valid MP4, WebM, or MOV video file."
+msgid "plugins.generic.thoth.featureVideo.exists"
+msgstr "This work already has a featured video in Thoth."
