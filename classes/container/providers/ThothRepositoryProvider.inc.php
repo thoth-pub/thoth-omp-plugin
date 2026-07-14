@@ -48,6 +48,7 @@ import('plugins.generic.thoth.classes.repositories.ThothSubjectRepository');
 import('plugins.generic.thoth.classes.repositories.ThothTitleRepository');
 import('plugins.generic.thoth.classes.repositories.ThothWorkRelationRepository');
 import('plugins.generic.thoth.classes.repositories.ThothWorkRepository');
+import('plugins.generic.thoth.classes.security.ThothApiUrlValidator');
 
 class ThothRepositoryProvider implements ContainerProvider
 {
@@ -62,7 +63,12 @@ class ThothRepositoryProvider implements ContainerProvider
 
             $httpConfig = [];
             if ($config['customThothApi'] && $config['customThothApiUrl']) {
-                $httpConfig['base_uri'] = trim($config['customThothApiUrl']);
+                $customThothApiUrl = trim($config['customThothApiUrl']);
+                if (!(new ThothApiUrlValidator())->isSafe($customThothApiUrl)) {
+                    throw new UnexpectedValueException('Unsafe custom Thoth API URL');
+                }
+                $httpConfig['base_uri'] = $customThothApiUrl;
+                $httpConfig['allow_redirects'] = false;
             }
 
             $client = new Client($httpConfig);

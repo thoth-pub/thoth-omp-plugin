@@ -81,8 +81,13 @@ class ThothEndpoint
             return $response->withStatus(404)->withJsonError('api.404.resourceNotFound');
         }
 
-        if (!$request->getContext()) {
+        $context = $request->getContext();
+        if (!$context) {
             return $response->withStatus(403)->withJsonError('api.submissions.403.contextRequired');
+        }
+
+        if (!$this->isSubmissionInContext($submission, $context)) {
+            return $response->withStatus(404)->withJsonError('api.404.resourceNotFound');
         }
 
         if ($submission->getData('thothWorkId')) {
@@ -191,6 +196,13 @@ class ThothEndpoint
             error_log($exception->getMessage());
             return $response->withStatus(500)->withJsonError('plugins.generic.thoth.connectionError');
         }
+    }
+
+    protected function isSubmissionInContext($submission, $context)
+    {
+        return $submission
+            && $context
+            && (int) $submission->getData('contextId') === (int) $context->getId();
     }
 
 

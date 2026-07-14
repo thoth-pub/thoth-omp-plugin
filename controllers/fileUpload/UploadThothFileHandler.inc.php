@@ -52,7 +52,21 @@ class UploadThothFileHandler extends Handler
     {
         import('lib.pkp.classes.security.authorization.PKPSiteAccessPolicy');
         $this->addPolicy(new PKPSiteAccessPolicy($request, null, $roleAssignments));
+        foreach ($this->getAuthorizationPolicies($request, $args, $roleAssignments) as $policy) {
+            $this->addPolicy($policy);
+        }
         return parent::authorize($request, $args, $roleAssignments);
+    }
+
+    protected function getAuthorizationPolicies($request, &$args, $roleAssignments)
+    {
+        import('lib.pkp.classes.security.authorization.SubmissionAccessPolicy');
+        import('lib.pkp.classes.security.authorization.PublicationAccessPolicy');
+
+        return [
+            new SubmissionAccessPolicy($request, $args, $roleAssignments),
+            new PublicationAccessPolicy($request, $args, $roleAssignments),
+        ];
     }
 
     public function initialize($request)
@@ -85,6 +99,10 @@ class UploadThothFileHandler extends Handler
 
     public function handleThothPublicationFile($args, $request)
     {
+        if (!$this->isValidUploadRequest($request)) {
+            return new JSONMessage(false, __('form.csrfInvalid'));
+        }
+
         if (!$this->canUploadFiles($request)) {
             return new JSONMessage(false, __('plugins.generic.thoth.fileUpload.error.missingCdnWritePermission'));
         }
@@ -102,6 +120,11 @@ class UploadThothFileHandler extends Handler
         } else {
             return new JSONMessage(false, __('manager.plugins.uploadError'));
         }
+    }
+
+    protected function isValidUploadRequest($request)
+    {
+        return $request->checkCSRF();
     }
 
     public function saveUploadThothPublicationFile($args, $request)
