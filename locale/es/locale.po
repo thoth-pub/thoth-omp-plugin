@@ -311,3 +311,14 @@ msgstr "Alojar el archivo de esta imagen de cubierta en Thoth."
 
 msgid "plugins.generic.thoth.field.frontcover.missingCdnWritePermission"
 msgstr "El usuario configurado de Thoth necesita el permiso cdnWrite para alojar el archivo de la imagen de cubierta en Thoth."
+
+msgid "plugins.generic.thoth.featureVideo"
+msgstr "Vídeo destacado"
+
+msgid "plugins.generic.thoth.featureVideo.file"
+msgstr "Archivo de vídeo"
+
+msgid "plugins.generic.thoth.featureVideo.invalidFile"
+msgstr "Seleccione un archivo de vídeo MP4, WebM o MOV válido."
+msgid "plugins.generic.thoth.featureVideo.exists"
+msgstr "Este trabajo ya tiene un video destacado en Thoth."

@@ -26,6 +26,7 @@ use APP\plugins\generic\thoth\classes\factories\ThothContributorFactory;
 use APP\plugins\generic\thoth\classes\factories\ThothLocationFactory;
 use APP\plugins\generic\thoth\classes\factories\ThothPublicationFactory;
 use APP\plugins\generic\thoth\classes\factories\ThothTitleFactory;
+use APP\plugins\generic\thoth\classes\services\FeatureVideoSubmissionService;
 use APP\plugins\generic\thoth\classes\services\ThothAbstractService;
 use APP\plugins\generic\thoth\classes\services\ThothAffiliationService;
 use APP\plugins\generic\thoth\classes\services\ThothBiographyService;
@@ -34,6 +35,7 @@ use APP\plugins\generic\thoth\classes\services\ThothBookService;
 use APP\plugins\generic\thoth\classes\services\ThothChapterService;
 use APP\plugins\generic\thoth\classes\services\ThothContributionService;
 use APP\plugins\generic\thoth\classes\services\ThothContributorService;
+use APP\plugins\generic\thoth\classes\services\ThothFeatureVideoService;
 use APP\plugins\generic\thoth\classes\services\ThothFileUploadService;
 use APP\plugins\generic\thoth\classes\services\ThothFrontcoverService;
 use APP\plugins\generic\thoth\classes\services\ThothLanguageService;
@@ -111,6 +113,16 @@ class ThothServiceProvider implements ContainerProvider
         ]);
 
         $container->singletonClass('fileUploadService', ThothFileUploadService::class);
+
+        $container->singletonClass('featureVideoService', ThothFeatureVideoService::class, [
+            'featureVideoRepository',
+            'featureVideoFileUploadRepository',
+            'fileUploadService',
+        ]);
+
+        $container->singletonClass('featureVideoSubmissionService', FeatureVideoSubmissionService::class, [
+            'featureVideoService',
+        ]);
 
         $container->singletonClass('frontcoverService', ThothFrontcoverService::class, [
             'frontcoverFileUploadRepository',

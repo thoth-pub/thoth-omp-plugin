@@ -21,6 +21,9 @@ use ThothApi\GraphQL\SchemaSelection;
 
 class ThothWorkRepository
 {
+    private const FEATURE_VIDEO_SELECTION = [
+        'featuredVideo' => ['workFeaturedVideoId', 'title', 'url', 'width', 'height'],
+    ];
     protected $thothClient;
 
     public function __construct($thothClient)
@@ -36,6 +39,11 @@ class ThothWorkRepository
     public function get($thothWorkId)
     {
         return $this->thothClient->work($thothWorkId, SchemaSelection::for('Work'));
+    }
+
+    public function getFeatureVideo($thothWorkId)
+    {
+        return $this->thothClient->work($thothWorkId, self::FEATURE_VIDEO_SELECTION)->getFeaturedVideo();
     }
 
     public function add($thothWork)
