@@ -16,7 +16,7 @@
         {translate key="plugins.generic.thoth.thothBook"}
     </strong>
     <span v-if="submission.thothWorkId">
-        <a class="pkpButton" target="_blank" :href="'https://thoth.pub/books/' + submission.thothWorkId">
+        <a class="pkpButton" target="_blank" rel="noopener noreferrer" :href="'https://thoth.pub/books/' + submission.thothWorkId">
             {translate key="common.view"}
         </a>
         <pkp-button
