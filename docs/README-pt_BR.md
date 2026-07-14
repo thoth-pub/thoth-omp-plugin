@@ -65,12 +65,38 @@ Após o registro dos metadados, um link para o livro no Thoth aparecerá no topo
 
 <img src="/docs/images/view_button.png" alt="Link para o registro do livro no Thoth" width="700">
 
-### Vídeo em Destaque
+### Envio e Hospedagem de Arquivos no Thoth
 
-Para um livro já registrado no Thoth, abra a aba **Marketing** no fluxo da publicação e selecione
-**Vídeo em destaque**, abaixo de **Datas de publicação**. Informe um título e envie um arquivo MP4, WebM ou MOV. O
-arquivo será hospedado pelo Thoth e exibido com controles de reprodução na página pública do livro. O usuário
-configurado no Thoth precisa da permissão `cdnWrite`.
+O plugin permite enviar ao Thoth arquivos de publicação, a capa e um vídeo em destaque. Essas funcionalidades ficam
+disponíveis depois que o livro é registrado no Thoth e exigem que o usuário configurado no Thoth tenha a permissão
+`cdnWrite`.
+
+#### Arquivos de Publicação
+
+No fluxo da publicação, abra a grade de formatos de publicação e use **Enviar para Thoth** no formato desejado.
+Selecione um arquivo e, quando o livro possuir capítulos, indique se ele pertence à monografia ou a um capítulo. A
+monografia ou o capítulo selecionado precisa ter DOI. Os arquivos podem ter até 50 MB.
+
+Os arquivos enviados são listados na coluna **Arquivos no Thoth** e ficam disponíveis para download na página
+pública do livro.
+
+> **Espaço para captura de tela:** envio e visualização dos arquivos do Thoth na grade de formatos de publicação.
+
+#### Capa
+
+No formulário de entrada de catálogo, envie a capa do livro e selecione **Hospedar o arquivo da imagem de capa na
+Thoth**, abaixo do campo de capa. Depois que a publicação for salva e sincronizada, a página pública do livro usará a
+capa hospedada pelo Thoth. Desmarcar essa opção faz com que o plugin deixe de usar a capa hospedada anteriormente.
+
+> **Espaço para captura de tela:** opção de hospedagem da capa no Thoth no formulário de entrada de catálogo.
+
+#### Vídeo em Destaque
+
+Abra a aba **Marketing** no fluxo da publicação e selecione **Vídeo em destaque**, abaixo de **Datas de publicação**.
+Informe um título e envie um arquivo MP4, WebM ou MOV. O arquivo será hospedado pelo Thoth e exibido com controles de
+reprodução na página pública do livro. Cada livro pode ter um vídeo em destaque.
+
+> **Espaço para captura de tela:** formulário do vídeo em destaque e vídeo exibido na página pública do livro.
 
 ### Registro em Massa
 
