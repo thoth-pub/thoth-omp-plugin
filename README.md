@@ -73,12 +73,25 @@ after the book has been registered in Thoth and require the configured Thoth use
 #### Publication Files
 
 In the publication workflow, open the publication formats grid and use **Upload to Thoth** on the desired format.
-Select a file and, when the book contains chapters, indicate whether it belongs to the monograph or to a chapter.
-The selected monograph or chapter must have a DOI. Files can be up to 50 MB.
+The action appears below the format details and above the files associated with it.
 
-Uploaded files are listed in the **Thoth files** column and are made available for download on the public book page.
+<img src="/docs/images/publication_file_upload_action.png" alt="Upload to Thoth action in the publication formats grid" width="700">
 
-> **Screenshot placeholder:** Uploading and viewing Thoth files in the publication formats grid.
+In the upload form, select a file and indicate whether it belongs to the monograph or to a chapter. The selected
+monograph or chapter must have a DOI. Files can be up to 50 MB.
+
+<img src="/docs/images/publication_file_upload_form.png" alt="Upload to Thoth form with the file and related publication component" width="700">
+
+After the upload, the **View** button in the **Thoth files** column opens a list of the monograph and chapter files
+hosted by Thoth. Each filename is a link to the file identified by its DOI.
+
+<img src="/docs/images/publication_file_view_action.png" alt="View button in the Thoth files column" width="700">
+
+<img src="/docs/images/publication_file_view_form.png" alt="List of monograph and chapter files hosted by Thoth" width="700">
+
+On the public book page, files hosted by Thoth are displayed alongside the files from OMP publication formats.
+
+<img src="/docs/images/publication_file_landing_page.png" alt="Public book page displaying files hosted by Thoth alongside OMP publication format files" width="700">
 
 #### Front Cover
 
@@ -86,15 +99,17 @@ In the catalog entry form, upload the book cover and select **Host this cover im
 field. After the publication is saved and synchronized, the public book page uses the cover hosted by Thoth.
 Clearing this option stops the plugin from using the previously hosted cover.
 
-> **Screenshot placeholder:** Thoth cover hosting option in the catalog entry form.
+<img src="/docs/images/cover_upload.png" alt="Thoth cover file hosting option below the cover image field" width="700">
 
 #### Featured Video
 
 Open the **Marketing** tab in the publication workflow and select **Featured video**, below **Publication dates**.
 Add a title and upload an MP4, WebM, or MOV file. The file is hosted by Thoth and displayed with playback controls on
-the public book page. Each book can have one featured video.
+the public book page, after the book information and synopsis. Each book can have one featured video.
 
-> **Screenshot placeholder:** Featured video form and video displayed on the public book page.
+<img src="/docs/images/feature_video_form.png" alt="Featured video form with title and uploaded video file" width="700">
+
+<img src="/docs/images/feature_video_landing_page.png" alt="Featured video player on the public book page" width="700">
 
 ### Bulk Registration
 

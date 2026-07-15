@@ -74,13 +74,26 @@ disponíveis depois que o livro é registrado no Thoth e exigem que o usuário c
 #### Arquivos de Publicação
 
 No fluxo da publicação, abra a grade de formatos de publicação e use **Enviar para Thoth** no formato desejado.
-Selecione um arquivo e, quando o livro possuir capítulos, indique se ele pertence à monografia ou a um capítulo. A
-monografia ou o capítulo selecionado precisa ter DOI. Os arquivos podem ter até 50 MB.
+A ação aparece abaixo dos detalhes do formato e acima dos arquivos associados a ele.
 
-Os arquivos enviados são listados na coluna **Arquivos no Thoth** e ficam disponíveis para download na página
-pública do livro.
+<img src="/docs/images/publication_file_upload_action.png" alt="Ação Enviar para Thoth na grade de formatos de publicação" width="700">
 
-> **Espaço para captura de tela:** envio e visualização dos arquivos do Thoth na grade de formatos de publicação.
+No formulário de envio, selecione um arquivo e indique se ele pertence à monografia ou a um capítulo. A monografia
+ou o capítulo selecionado precisa ter DOI. Os arquivos podem ter até 50 MB.
+
+<img src="/docs/images/publication_file_upload_form.png" alt="Formulário de envio para o Thoth com o arquivo e o componente da publicação relacionado" width="700">
+
+Após o envio, o botão **Visualizar**, na coluna **Arquivos no Thoth**, abre a lista dos arquivos da monografia e dos
+capítulos hospedados pelo Thoth. Cada nome de arquivo é um link para o arquivo identificado pelo respectivo DOI.
+
+<img src="/docs/images/publication_file_view_action.png" alt="Botão Visualizar na coluna Arquivos no Thoth" width="700">
+
+<img src="/docs/images/publication_file_view_form.png" alt="Lista de arquivos da monografia e dos capítulos hospedados pelo Thoth" width="700">
+
+Na página pública do livro, os arquivos hospedados pelo Thoth são exibidos junto aos arquivos dos formatos de
+publicação do OMP.
+
+<img src="/docs/images/publication_file_landing_page.png" alt="Página pública do livro exibindo arquivos hospedados pelo Thoth junto aos arquivos dos formatos de publicação do OMP" width="700">
 
 #### Capa
 
@@ -88,15 +101,17 @@ No formulário de entrada de catálogo, envie a capa do livro e selecione **Hosp
 Thoth**, abaixo do campo de capa. Depois que a publicação for salva e sincronizada, a página pública do livro usará a
 capa hospedada pelo Thoth. Desmarcar essa opção faz com que o plugin deixe de usar a capa hospedada anteriormente.
 
-> **Espaço para captura de tela:** opção de hospedagem da capa no Thoth no formulário de entrada de catálogo.
+<img src="/docs/images/cover_upload.png" alt="Opção de hospedagem do arquivo da capa no Thoth abaixo do campo de imagem da capa" width="700">
 
 #### Vídeo em Destaque
 
 Abra a aba **Marketing** no fluxo da publicação e selecione **Vídeo em destaque**, abaixo de **Datas de publicação**.
 Informe um título e envie um arquivo MP4, WebM ou MOV. O arquivo será hospedado pelo Thoth e exibido com controles de
-reprodução na página pública do livro. Cada livro pode ter um vídeo em destaque.
+reprodução na página pública do livro, depois das informações e da sinopse. Cada livro pode ter um vídeo em destaque.
 
-> **Espaço para captura de tela:** formulário do vídeo em destaque e vídeo exibido na página pública do livro.
+<img src="/docs/images/feature_video_form.png" alt="Formulário do vídeo em destaque com título e arquivo de vídeo enviado" width="700">
+
+<img src="/docs/images/feature_video_landing_page.png" alt="Player do vídeo em destaque na página pública do livro" width="700">
 
 ### Registro em Massa
 
