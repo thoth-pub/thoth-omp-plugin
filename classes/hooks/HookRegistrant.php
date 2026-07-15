@@ -156,7 +156,6 @@ class HookRegistrant
             ?: $templateMgr->getTemplateVars('monograph');
         $publication = $templateMgr->getTemplateVars('publication');
         $chapters = (array) $templateMgr->getTemplateVars('chapters');
-        $availableFiles = (array) $templateMgr->getTemplateVars('availableFiles');
 
         if (!$monograph || !$publication || !$monograph->getData('thothWorkId')) {
             return false;
@@ -183,7 +182,6 @@ class HookRegistrant
                 'downloadsLabel' => __('submission.downloads'),
                 'loadingLabel' => __('common.loading'),
                 'chapters' => $this->getCatalogFilesChapterData($chapters),
-                'publicationFormatFiles' => $this->getCatalogFilesPublicationFormatFileData($availableFiles),
                 'cacheTtl' => ThothCatalogFilesCacheService::TTL,
                 'cacheKeySuffix' => $catalogFilesCacheService->getClientCacheKeySuffix($publication->getId()),
             ]) . ';',
@@ -213,63 +211,4 @@ class HookRegistrant
         }, array_values($chapters));
     }
 
-    private function getCatalogFilesPublicationFormatFileData($availableFiles): array
-    {
-        $publicationFormatFiles = [];
-
-        foreach ($availableFiles as $file) {
-            if (!$this->isCatalogFilesMonographFile($file)) {
-                continue;
-            }
-
-            $publicationFormatId = $file->getData('assocId');
-            if (!$publicationFormatId) {
-                continue;
-            }
-
-            $fileName = $this->getCatalogFileName($file);
-            if ($fileName) {
-                $publicationFormatFiles[$publicationFormatId][] = $fileName;
-            }
-        }
-
-        return $publicationFormatFiles;
-    }
-
-    private function getCatalogFileName($file): ?string
-    {
-        if (method_exists($file, 'getLocalizedName')) {
-            return $this->normalizeCatalogFileName($file->getLocalizedName());
-        }
-
-        if (method_exists($file, 'getOriginalFileName')) {
-            return $this->normalizeCatalogFileName($file->getOriginalFileName());
-        }
-
-        return $this->normalizeCatalogFileName(
-            $file->getData('name')
-                ?: $file->getData('originalFileName')
-                ?: $file->getData('serverFileName')
-        );
-    }
-
-    private function normalizeCatalogFileName($fileName): ?string
-    {
-        if (is_array($fileName)) {
-            $fileName = reset($fileName);
-        }
-
-        $fileName = trim((string) $fileName);
-
-        return $fileName !== '' ? $fileName : null;
-    }
-
-    private function isCatalogFilesMonographFile($file): bool
-    {
-        if (method_exists($file, 'getChapterId')) {
-            return !$file->getChapterId();
-        }
-
-        return $file->getData('chapterId') == null;
-    }
 }

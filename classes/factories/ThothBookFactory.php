@@ -57,7 +57,7 @@ class ThothBookFactory
                     PKPSubmission::PERMISSIONS_FIELD_COPYRIGHT_HOLDER,
                     $publication
                 ),
-            'coverUrl' => $publication->getLocalizedCoverImageUrl($submission->getData('contextId')),
+            'coverUrl' => $this->getCoverUrl($publication, $submission->getData('contextId')),
             'landingPage' => $request->getDispatcher()->url(
                 $request,
                 ROUTE_PAGE,
@@ -67,6 +67,18 @@ class ThothBookFactory
                 [$submission->getBestId()]
             )
         ]);
+    }
+
+    private function getCoverUrl($publication, int $contextId): ?string
+    {
+        if (
+            $publication->getData('thothUploadFrontcover')
+            && $frontcoverUrl = $publication->getData('thothFrontcoverUrl')
+        ) {
+            return $frontcoverUrl;
+        }
+
+        return $publication->getLocalizedCoverImageUrl($contextId);
     }
 
     public function getWorkTypeBySubmissionWorkType($submissionWorkType)

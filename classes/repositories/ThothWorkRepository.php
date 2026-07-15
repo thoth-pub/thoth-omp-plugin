@@ -17,12 +17,41 @@
 namespace APP\plugins\generic\thoth\classes\repositories;
 
 use ThothApi\GraphQL\Inputs\PatchWork as ThothWork;
-use ThothApi\GraphQL\SchemaSelection;
 
 class ThothWorkRepository
 {
     private const FEATURE_VIDEO_SELECTION = [
         'featuredVideo' => ['workFeaturedVideoId', 'title', 'url', 'width', 'height'],
+    ];
+    private const WORK_SELECTION = [
+        'workId',
+        'workType',
+        'workStatus',
+        'fullTitle',
+        'title',
+        'subtitle',
+        'edition',
+        'imprintId',
+        'doi',
+        'publicationDate',
+        'place',
+        'pageCount',
+        'imageCount',
+        'license',
+        'copyrightHolder',
+        'landingPage',
+        'coverUrl',
+        'titles' => [
+            'titleId',
+            'localeCode',
+            'canonical',
+        ],
+        'abstracts' => [
+            'abstractId',
+            'localeCode',
+            'abstractType',
+            'canonical',
+        ],
     ];
     protected $thothClient;
 
@@ -38,7 +67,7 @@ class ThothWorkRepository
 
     public function get($thothWorkId)
     {
-        return $this->thothClient->work($thothWorkId, SchemaSelection::for('Work'));
+        return $this->thothClient->work($thothWorkId, self::WORK_SELECTION);
     }
 
     public function getFeatureVideo($thothWorkId)

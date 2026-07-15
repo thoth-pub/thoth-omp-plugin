@@ -36,7 +36,7 @@ class CatalogEntryFormConfigTest extends PKPTestCase
         $field = $form->fields['thothUploadFrontcover'];
         $this->assertInstanceOf(FieldOptions::class, $field);
         $this->assertSame(['after', 'coverImage'], $form->positions['thothUploadFrontcover']);
-        $this->assertSame([true], $field->value);
+        $this->assertTrue($field->value);
         $this->assertFalse($field->options[0]['disabled'] ?? false);
     }
 
@@ -49,7 +49,7 @@ class CatalogEntryFormConfigTest extends PKPTestCase
 
         $field = $form->fields['thothUploadFrontcover'];
         $this->assertInstanceOf(FieldOptions::class, $field);
-        $this->assertSame([], $field->value);
+        $this->assertFalse($field->value);
         $this->assertTrue($field->options[0]['disabled']);
     }
 

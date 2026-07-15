@@ -12,6 +12,18 @@ use PKP\tests\PKPTestCase;
 
 class UploadThothFileHandlerTest extends PKPTestCase
 {
+    public function testTemporaryUploadIncludesCsrfToken(): void
+    {
+        $template = file_get_contents(
+            dirname(__DIR__, 4) . '/templates/form/uploadThothPublicationFileForm.tpl'
+        );
+
+        self::assertMatchesRegularExpression(
+            '/multipart_params:\s*\{ldelim\}\s*csrfToken:\s*\{csrf type="json"\}\s*\{rdelim\}/',
+            $template
+        );
+    }
+
     public function testTemporaryUploadRequiresValidCsrfToken(): void
     {
         $handler = new class () extends UploadThothFileHandler {
