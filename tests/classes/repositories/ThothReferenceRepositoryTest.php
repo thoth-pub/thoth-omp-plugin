@@ -19,9 +19,10 @@
 namespace APP\plugins\generic\thoth\tests\classes\repositories;
 
 use APP\plugins\generic\thoth\classes\repositories\ThothReferenceRepository;
+use Mockery;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Reference as ThothReference;
+use ThothApi\GraphQL\Inputs\PatchReference as ThothReference;
 
 class ThothReferenceRepositoryTest extends PKPTestCase
 {
@@ -51,13 +52,10 @@ class ThothReferenceRepositoryTest extends PKPTestCase
             'unstructuredCitation' => 'Roe, Richard. (2019). A reference used in my book. University of Harvard.'
         ]);
 
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['reference'])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('reference')
-            ->willReturn($expectedThothReference);
-
+        $mockThothClient = Mockery::mock(ThothClient::class);
+        $mockThothClient->shouldReceive('reference')
+            ->zeroOrMoreTimes()
+            ->andReturn($expectedThothReference);
         $repository = new ThothReferenceRepository($mockThothClient);
 
         $thothReference = $repository->get('071ace7c-b65b-4bb8-b883-fb2d695d1ad9');
@@ -73,13 +71,10 @@ class ThothReferenceRepositoryTest extends PKPTestCase
             'unstructuredCitation' => 'Roe, Richard. (2019). A reference used in my book. University of Harvard.'
         ]);
 
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['createReference'])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('createReference')
-            ->willReturn('730cf906-472c-4aee-9ebd-67b41e590161');
-
+        $mockThothClient = Mockery::mock(ThothClient::class);
+        $mockThothClient->shouldReceive('createReference')
+            ->zeroOrMoreTimes()
+            ->andReturn('730cf906-472c-4aee-9ebd-67b41e590161');
         $repository = new ThothReferenceRepository($mockThothClient);
 
         $thothReferenceId = $repository->add($thothReference);
@@ -96,13 +91,10 @@ class ThothReferenceRepositoryTest extends PKPTestCase
             'unstructuredCitation' => 'Doe, John. (2022). A reference used in my book. Harvard University.'
         ]);
 
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['updateReference'])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('updateReference')
-            ->willReturn('071ace7c-b65b-4bb8-b883-fb2d695d1ad9');
-
+        $mockThothClient = Mockery::mock(ThothClient::class);
+        $mockThothClient->shouldReceive('updateReference')
+            ->zeroOrMoreTimes()
+            ->andReturn('071ace7c-b65b-4bb8-b883-fb2d695d1ad9');
         $repository = new ThothReferenceRepository($mockThothClient);
 
         $thothReferenceId = $repository->edit($thothPatchReference);
@@ -112,13 +104,11 @@ class ThothReferenceRepositoryTest extends PKPTestCase
 
     public function testDeleteReference()
     {
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['deleteReference'])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('deleteReference')
-            ->willReturn('45896198-2823-4260-95b9-1ff5f4898b7c');
+        $mockThothClient = Mockery::mock(ThothClient::class);
 
+        $mockThothClient->shouldReceive('deleteReference')
+            ->zeroOrMoreTimes()
+            ->andReturn('45896198-2823-4260-95b9-1ff5f4898b7c');
         $repository = new ThothReferenceRepository($mockThothClient);
 
         $thothReferenceId = $repository->delete('45896198-2823-4260-95b9-1ff5f4898b7c');

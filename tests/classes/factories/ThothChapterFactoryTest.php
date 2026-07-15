@@ -28,7 +28,9 @@ use Mockery;
 use PKP\core\Registry;
 use PKP\db\DAORegistry;
 use PKP\tests\PKPTestCase;
-use ThothApi\GraphQL\Models\Work as ThothWork;
+use ThothApi\GraphQL\Enums\WorkStatus;
+use ThothApi\GraphQL\Enums\WorkType;
+use ThothApi\GraphQL\Inputs\PatchWork as ThothWork;
 
 class ThothChapterFactoryTest extends PKPTestCase
 {
@@ -158,8 +160,8 @@ class ThothChapterFactoryTest extends PKPTestCase
         $thothChapter = $factory->createFromChapter($mockChapter);
 
         $this->assertEquals(new ThothWork([
-            'workType' => ThothWork::WORK_TYPE_BOOK_CHAPTER,
-            'workStatus' => ThothWork::WORK_STATUS_ACTIVE,
+            'workType' => WorkType::BOOK_CHAPTER,
+            'workStatus' => WorkStatus::ACTIVE,
             'publicationDate' => '2024-01-01',
             'doi' => 'https://doi.org/10.12345/11112222',
             'firstPage' => '31',
@@ -181,9 +183,9 @@ class ThothChapterFactoryTest extends PKPTestCase
 
         $factory = new ThothChapterFactory();
         $workStatus = $factory->getWorkStatusByDatePublished($mockChapter, null);
-        $this->assertEquals(ThothWork::WORK_STATUS_ACTIVE, $workStatus);
+        $this->assertEquals(WorkStatus::ACTIVE, $workStatus);
 
         $workStatus = $factory->getWorkStatusByDatePublished($mockChapter, null);
-        $this->assertEquals(ThothWork::WORK_STATUS_FORTHCOMING, $workStatus);
+        $this->assertEquals(WorkStatus::FORTHCOMING, $workStatus);
     }
 }

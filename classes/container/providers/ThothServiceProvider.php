@@ -17,24 +17,30 @@
 
 namespace APP\plugins\generic\thoth\classes\container\providers;
 
-use APP\plugins\generic\thoth\classes\factories\ThothBookFactory;
-use APP\plugins\generic\thoth\classes\factories\ThothChapterFactory;
 use APP\plugins\generic\thoth\classes\factories\ThothAbstractFactory;
 use APP\plugins\generic\thoth\classes\factories\ThothBiographyFactory;
+use APP\plugins\generic\thoth\classes\factories\ThothBookFactory;
+use APP\plugins\generic\thoth\classes\factories\ThothChapterFactory;
 use APP\plugins\generic\thoth\classes\factories\ThothContributionFactory;
 use APP\plugins\generic\thoth\classes\factories\ThothContributorFactory;
 use APP\plugins\generic\thoth\classes\factories\ThothLocationFactory;
 use APP\plugins\generic\thoth\classes\factories\ThothPublicationFactory;
 use APP\plugins\generic\thoth\classes\factories\ThothTitleFactory;
-use APP\plugins\generic\thoth\classes\services\ThothAffiliationService;
+use APP\plugins\generic\thoth\classes\services\FeatureVideoSubmissionService;
 use APP\plugins\generic\thoth\classes\services\ThothAbstractService;
+use APP\plugins\generic\thoth\classes\services\ThothAffiliationService;
 use APP\plugins\generic\thoth\classes\services\ThothBiographyService;
+use APP\plugins\generic\thoth\classes\services\ThothBookRegistrationService;
 use APP\plugins\generic\thoth\classes\services\ThothBookService;
 use APP\plugins\generic\thoth\classes\services\ThothChapterService;
 use APP\plugins\generic\thoth\classes\services\ThothContributionService;
 use APP\plugins\generic\thoth\classes\services\ThothContributorService;
+use APP\plugins\generic\thoth\classes\services\ThothFeatureVideoService;
+use APP\plugins\generic\thoth\classes\services\ThothFileUploadService;
+use APP\plugins\generic\thoth\classes\services\ThothFrontcoverService;
 use APP\plugins\generic\thoth\classes\services\ThothLanguageService;
 use APP\plugins\generic\thoth\classes\services\ThothLocationService;
+use APP\plugins\generic\thoth\classes\services\ThothMeService;
 use APP\plugins\generic\thoth\classes\services\ThothPublicationService;
 use APP\plugins\generic\thoth\classes\services\ThothReferenceService;
 use APP\plugins\generic\thoth\classes\services\ThothSubjectService;
@@ -45,87 +51,121 @@ class ThothServiceProvider implements ContainerProvider
 {
     public function register($container)
     {
-        $container->set('affiliationService', function ($container) {
-            return new ThothAffiliationService($container->get('affiliationRepository'));
-        });
+        $container->singletonClass('affiliationService', ThothAffiliationService::class, [
+            'affiliationRepository',
+            'institutionRepository',
+        ]);
 
-        $container->set('abstractService', function ($container) {
-            return new ThothAbstractService(
-                new ThothAbstractFactory(),
-                $container->get('abstractRepository')
-            );
-        });
+        $container->singletonClass('abstractService', ThothAbstractService::class, [
+            new ThothAbstractFactory(),
+            'abstractRepository',
+        ]);
 
-        $container->set('biographyService', function ($container) {
-            return new ThothBiographyService(
-                new ThothBiographyFactory(),
-                $container->get('biographyRepository')
-            );
-        });
+        $container->singletonClass('biographyService', ThothBiographyService::class, [
+            new ThothBiographyFactory(),
+            'biographyRepository',
+        ]);
 
-        $container->set('bookService', function ($container) {
-            return new ThothBookService(
-                new ThothBookFactory(),
-                $container->get('bookRepository')
-            );
-        });
+        $container->singletonClass('bookService', ThothBookService::class, [
+            new ThothBookFactory(),
+            'bookRepository',
+            'publicationService',
+            'titleService',
+            'abstractService',
+            'frontcoverService',
+        ]);
 
-        $container->set('chapterService', function ($container) {
-            return new ThothChapterService(
-                new ThothChapterFactory(),
-                $container->get('chapterRepository')
-            );
-        });
+        $container->singletonClass('bookRegistrationService', ThothBookRegistrationService::class, [
+            new ThothBookFactory(),
+            'bookRepository',
+            'abstractService',
+            'contributionService',
+            'languageService',
+            'publicationService',
+            'referenceService',
+            'subjectService',
+            'titleService',
+            'workRelationService',
+            'frontcoverService',
+        ]);
 
-        $container->set('contributionService', function ($container) {
-            return new ThothContributionService(
-                new ThothContributionFactory(),
-                $container->get('contributionRepository')
-            );
-        });
+        $container->singletonClass('chapterService', ThothChapterService::class, [
+            new ThothChapterFactory(),
+            'chapterRepository',
+            'contributionService',
+            'publicationService',
+            'titleService',
+            'abstractService',
+        ]);
 
-        $container->set('contributorService', function ($container) {
-            return new ThothContributorService(
-                new ThothContributorFactory(),
-                $container->get('contributorRepository')
-            );
-        });
+        $container->singletonClass('contributionService', ThothContributionService::class, [
+            new ThothContributionFactory(),
+            'contributionRepository',
+            'contributorRepository',
+            'contributorService',
+            'biographyService',
+            'affiliationService',
+        ]);
 
-        $container->set('languageService', function ($container) {
-            return new ThothLanguageService($container->get('languageRepository'));
-        });
+        $container->singletonClass('contributorService', ThothContributorService::class, [
+            new ThothContributorFactory(),
+            'contributorRepository',
+        ]);
 
-        $container->set('locationService', function ($container) {
-            return new ThothLocationService(
-                new ThothLocationFactory(),
-                $container->get('locationRepository')
-            );
-        });
+        $container->singletonClass('fileUploadService', ThothFileUploadService::class);
 
-        $container->set('publicationService', function ($container) {
-            return new ThothPublicationService(
-                new ThothPublicationFactory(),
-                $container->get('publicationRepository')
-            );
-        });
+        $container->singletonClass('featureVideoService', ThothFeatureVideoService::class, [
+            'featureVideoRepository',
+            'featureVideoFileUploadRepository',
+            'fileUploadService',
+        ]);
 
-        $container->set('referenceService', function ($container) {
-            return new ThothReferenceService($container->get('referenceRepository'));
-        });
+        $container->singletonClass('featureVideoSubmissionService', FeatureVideoSubmissionService::class, [
+            'featureVideoService',
+        ]);
 
-        $container->set('subjectService', function ($container) {
-            return new ThothSubjectService($container->get('subjectRepository'));
-        });
+        $container->singletonClass('frontcoverService', ThothFrontcoverService::class, [
+            'frontcoverFileUploadRepository',
+            'workRepository',
+            'fileUploadService',
+            'meService',
+        ]);
 
-        $container->set('titleService', function ($container) {
-            return new ThothTitleService(
-                new ThothTitleFactory(),
-                $container->get('titleRepository')
-            );
-        });
+        $container->singletonClass('languageService', ThothLanguageService::class, [
+            'languageRepository',
+        ]);
 
-        $container->set('workRelationService', function ($container) {
-            return new ThothWorkRelationService($container->get('workRelationRepository'));
-        });
+        $container->singletonClass('locationService', ThothLocationService::class, [
+            new ThothLocationFactory(),
+            'locationRepository',
+        ]);
+
+        $container->singletonClass('meService', ThothMeService::class, [
+            'meRepository',
+        ]);
+
+        $container->singletonClass('publicationService', ThothPublicationService::class, [
+            new ThothPublicationFactory(),
+            'publicationRepository',
+            'locationService',
+        ]);
+
+        $container->singletonClass('referenceService', ThothReferenceService::class, [
+            'referenceRepository',
+        ]);
+
+        $container->singletonClass('subjectService', ThothSubjectService::class, [
+            'subjectRepository',
+        ]);
+
+        $container->singletonClass('titleService', ThothTitleService::class, [
+            new ThothTitleFactory(),
+            'titleRepository',
+        ]);
+
+        $container->singletonClass('workRelationService', ThothWorkRelationService::class, [
+            'workRelationRepository',
+            'chapterService',
+        ]);
     }
 }

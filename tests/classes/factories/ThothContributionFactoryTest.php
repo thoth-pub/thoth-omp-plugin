@@ -22,7 +22,8 @@ require_once(__DIR__ . '/../../../vendor/autoload.php');
 
 use APP\plugins\generic\thoth\classes\factories\ThothContributionFactory;
 use PKP\tests\PKPTestCase;
-use ThothApi\GraphQL\Models\Contribution as ThothContribution;
+use ThothApi\GraphQL\Enums\ContributionType;
+use ThothApi\GraphQL\Inputs\PatchContribution as ThothContribution;
 
 class ThothContributionFactoryTest extends PKPTestCase
 {
@@ -80,7 +81,7 @@ class ThothContributionFactoryTest extends PKPTestCase
         $thothContribution = $factory->createFromAuthor($mockAuthor, 0, $primaryContactId);
 
         $this->assertEquals(new ThothContribution([
-            'contributionType' => ThothContribution::CONTRIBUTION_TYPE_AUTHOR,
+            'contributionType' => ContributionType::AUTHOR,
             'mainContribution' => true,
             'contributionOrdinal' => 1,
             'firstName' => 'John',

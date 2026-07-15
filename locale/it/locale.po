@@ -239,3 +239,86 @@ msgstr "Rinviato a tempo indeterminato"
 
 msgid "plugins.generic.thoth.workStatus.cancelled"
 msgstr "Annullato"
+
+msgid "plugins.generic.thoth.grid.action.thothFileUpload"
+msgstr "Carica su Thoth"
+
+msgid "plugins.generic.thoth.submissionComponent.title"
+msgstr "Componente della proposta collegato al file"
+
+msgid "plugins.generic.thoth.submissionComponent.description"
+msgstr "Seleziona la monografia o il capitolo collegato al file. Le monografie e i capitoli devono avere un DOI per caricare file su Thoth."
+
+msgid "plugins.generic.thoth.fileUpload.success"
+msgstr "File caricato su Thoth con successo."
+
+msgid "plugins.generic.thoth.fileUpload.error.invalidPublication"
+msgstr "La pubblicazione selezionata per il caricamento del file su Thoth non è stata trovata."
+
+msgid "plugins.generic.thoth.fileUpload.error.publicationContextMismatch"
+msgstr "La pubblicazione selezionata per il caricamento del file su Thoth non appartiene al contesto corrente."
+
+msgid "plugins.generic.thoth.fileUpload.error.thothWorkMismatch"
+msgstr "L'opera Thoth associata a questo caricamento non corrisponde alla pubblicazione selezionata."
+
+msgid "plugins.generic.thoth.fileUpload.error.invalidPublicationFormat"
+msgstr "Il formato di pubblicazione selezionato per il caricamento del file su Thoth non è stato trovato."
+
+msgid "plugins.generic.thoth.fileUpload.error.invalidSubmissionComponent"
+msgstr "Il componente della proposta selezionato per il caricamento del file su Thoth non è stato trovato in questa pubblicazione."
+
+msgid "plugins.generic.thoth.fileUpload.error.missingDoi"
+msgstr "È necessario un DOI nella pubblicazione o in almeno un capitolo per caricare file su Thoth."
+
+msgid "plugins.generic.thoth.fileUpload.error.missingCdnWritePermission"
+msgstr "L'utente Thoth deve disporre dell'autorizzazione cdnWrite per caricare file."
+
+msgid "plugins.generic.thoth.fileUpload.error.chapterNotFoundInThoth"
+msgstr "Non è stato possibile trovare un capitolo in Thoth con DOI \"{$doi}\"."
+
+msgid "plugins.generic.thoth.fileUpload.error.chapterLookupFailed"
+msgstr "Si è verificato un problema durante la verifica del capitolo selezionato in Thoth prima del caricamento del file."
+
+msgid "plugins.generic.thoth.grid.column.thothFiles"
+msgstr "File in Thoth"
+
+msgid "plugins.generic.thoth.grid.action.viewThothFiles"
+msgstr "File in Thoth"
+
+msgid "plugins.generic.thoth.grid.action.viewThothFilesLabel"
+msgstr "Visualizza"
+
+msgid "plugins.generic.thoth.publicationFormat.thothFiles.empty"
+msgstr "Nessun file è stato trovato in Thoth per questo formato di pubblicazione."
+
+msgid "plugins.generic.thoth.publicationFormat.thothFiles.component"
+msgstr "Elemento"
+
+msgid "plugins.generic.thoth.publicationFormat.thothFiles.component.publication"
+msgstr "Pubblicazione: {$title}"
+
+msgid "plugins.generic.thoth.publicationFormat.thothFiles.component.chapter"
+msgstr "Capitolo: {$title}"
+
+msgid "plugins.generic.thoth.publicationFormat.thothFiles.file"
+msgstr "File"
+
+msgid "plugins.generic.thoth.field.frontcover"
+msgstr "Hosting del file di copertina in Thoth"
+
+msgid "plugins.generic.thoth.field.frontcover.label"
+msgstr "Ospita il file di questa immagine di copertina su Thoth."
+
+msgid "plugins.generic.thoth.field.frontcover.missingCdnWritePermission"
+msgstr "L'utente Thoth configurato deve avere il permesso cdnWrite per ospitare il file dell'immagine di copertina su Thoth."
+
+msgid "plugins.generic.thoth.featureVideo"
+msgstr "Video in evidenza"
+
+msgid "plugins.generic.thoth.featureVideo.file"
+msgstr "File video"
+
+msgid "plugins.generic.thoth.featureVideo.invalidFile"
+msgstr "Seleziona un file video MP4, WebM o MOV valido."
+msgid "plugins.generic.thoth.featureVideo.exists"
+msgstr "Quest'opera ha già un video in evidenza su Thoth."

@@ -25,7 +25,7 @@ use APP\plugins\generic\thoth\classes\services\ThothAffiliationService;
 use PKP\affiliation\Affiliation;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Institution as ThothInstitution;
+use ThothApi\GraphQL\Inputs\PatchInstitution as ThothInstitution;
 
 class ThothAffiliationServiceTest extends PKPTestCase
 {
@@ -65,8 +65,6 @@ class ThothAffiliationServiceTest extends PKPTestCase
                 'institutionId' => 'f5ae4d0e-1234-5678-9abc-def012345678'
             ]));
 
-        ThothContainer::getInstance()->set('institutionRepository', fn () => $mockInstitutionRepository);
-
         $mockRepository = $this->getMockBuilder(ThothAffiliationRepository::class)
             ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
             ->onlyMethods(['add'])
@@ -79,7 +77,7 @@ class ThothAffiliationServiceTest extends PKPTestCase
 
         $thothContributionId = '7315563c-e5c3-40b2-8558-8d1f9cede901';
 
-        $service = new ThothAffiliationService($mockRepository);
+        $service = new ThothAffiliationService($mockRepository, $mockInstitutionRepository);
         $thothAffiliationId = $service->register($affiliation, $thothContributionId, 1);
 
         $this->assertSame('43f98edb-ac8c-45b4-9faa-2941a05c133c', $thothAffiliationId);
@@ -96,8 +94,6 @@ class ThothAffiliationServiceTest extends PKPTestCase
             ->with('https://ror.org/00101234')
             ->willReturn(null);
 
-        ThothContainer::getInstance()->set('institutionRepository', fn () => $mockInstitutionRepository);
-
         $mockRepository = $this->getMockBuilder(ThothAffiliationRepository::class)
             ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
             ->onlyMethods(['add'])
@@ -109,7 +105,7 @@ class ThothAffiliationServiceTest extends PKPTestCase
 
         $thothContributionId = '7315563c-e5c3-40b2-8558-8d1f9cede901';
 
-        $service = new ThothAffiliationService($mockRepository);
+        $service = new ThothAffiliationService($mockRepository, $mockInstitutionRepository);
         $result = $service->register($affiliation, $thothContributionId, 1);
 
         $this->assertNull($result);
@@ -124,11 +120,18 @@ class ThothAffiliationServiceTest extends PKPTestCase
         $mockRepository->expects($this->never())
             ->method('add');
 
+        $mockInstitutionRepository = $this->getMockBuilder(ThothInstitutionRepository::class)
+            ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
+            ->onlyMethods(['find'])
+            ->getMock();
+        $mockInstitutionRepository->expects($this->never())
+            ->method('find');
+
         $affiliation = $this->createAffiliationMock(null);
 
         $thothContributionId = '7315563c-e5c3-40b2-8558-8d1f9cede901';
 
-        $service = new ThothAffiliationService($mockRepository);
+        $service = new ThothAffiliationService($mockRepository, $mockInstitutionRepository);
         $result = $service->register($affiliation, $thothContributionId, 1);
 
         $this->assertNull($result);

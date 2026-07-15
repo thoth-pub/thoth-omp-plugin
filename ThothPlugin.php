@@ -18,6 +18,8 @@
 
 namespace APP\plugins\generic\thoth;
 
+require_once __DIR__ . '/vendor/autoload.php';
+
 use APP\plugins\generic\thoth\classes\hooks\HookRegistrant;
 use PKP\core\JSONMessage;
 use PKP\linkAction\LinkAction;

@@ -17,12 +17,11 @@
 namespace APP\plugins\generic\thoth\classes\components\forms\config;
 
 use APP\facades\Repo;
-use APP\plugins\generic\thoth\classes\facades\ThothRepository;
+use APP\plugins\generic\thoth\classes\components\forms\ThothValidationMessageFormatter;
 use APP\plugins\generic\thoth\classes\facades\ThothService;
-use APP\plugins\generic\thoth\classes\notification\ThothNotification;
 use APP\submission\Submission;
 use Exception;
-use ThothApi\GraphQL\Models\Work as ThothWork;
+use ThothApi\GraphQL\Enums\WorkType;
 
 class PublishFormConfig
 {
@@ -72,8 +71,7 @@ class PublishFormConfig
 
     protected function getImprints(): array
     {
-        $publishers = ThothRepository::account()->getLinkedPublishers();
-        return ThothRepository::imprint()->getMany(array_column($publishers, 'publisherId'));
+        return ThothService::me()->getImprints();
     }
 
     private function addFields($form, $imprints, $workType)
@@ -109,11 +107,11 @@ class PublishFormConfig
 
         $workTypeOptions = [
             [
-                'value' => ThothWork::WORK_TYPE_MONOGRAPH,
+                'value' => WorkType::MONOGRAPH,
                 'label' => __('plugins.generic.thoth.workType.monograph')
             ],
             [
-                'value' => ThothWork::WORK_TYPE_TEXTBOOK,
+                'value' => WorkType::TEXTBOOK,
                 'label' => __('plugins.generic.thoth.workType.textbook')
             ],
         ];
@@ -130,16 +128,8 @@ class PublishFormConfig
 
     private function showErrors($form, $errors)
     {
-        $msg = '<div class="pkpNotification pkpNotification--warning">';
-        $msg .= __('plugins.generic.thoth.register.warning');
-        $msg .= '<ul>';
-        foreach ($errors as $error) {
-            $msg .= '<li>' . $error . '</li>';
-        }
-        $msg .= '</ul></div>';
-
         $form->addField(new \PKP\components\forms\FieldHTML('registerNotice', [
-            'description' => $msg,
+            'description' => ThothValidationMessageFormatter::formatWarning($errors),
             'groupId' => 'default',
         ]));
     }

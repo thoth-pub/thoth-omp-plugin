@@ -65,6 +65,56 @@ Después de que los metadatos estén registrados, aparecerá un enlace al libro 
 
 <img src="/docs/images/view_button.png" alt="Enlace al registro del libro en Thoth" width="700">
 
+### Envío y Alojamiento de Archivos en Thoth
+
+El plugin permite enviar a Thoth archivos de publicación, la portada y un vídeo destacado. Estas funciones están
+disponibles después de registrar el libro en Thoth y requieren que el usuario configurado en Thoth tenga el permiso
+`cdnWrite`.
+
+#### Archivos de Publicación
+
+En el flujo de publicación, abra la cuadrícula de formatos de publicación y use **Enviar a Thoth** en el formato
+deseado. La acción aparece debajo de los detalles del formato y encima de los archivos asociados a este.
+
+<img src="/docs/images/publication_file_upload_action.png" alt="Acción Enviar a Thoth en la cuadrícula de formatos de publicación" width="700">
+
+En el formulario de envío, seleccione un archivo e indique si pertenece a la monografía o a un capítulo. La monografía
+o el capítulo seleccionado debe tener DOI. Los archivos pueden tener hasta 50 MB.
+
+<img src="/docs/images/publication_file_upload_form.png" alt="Formulario de envío a Thoth con el archivo y el componente de publicación relacionado" width="700">
+
+Después del envío, el botón **Ver**, en la columna **Archivos en Thoth**, abre la lista de archivos de la monografía y
+de los capítulos alojados por Thoth. Cada nombre de archivo es un enlace al archivo identificado por su DOI.
+
+<img src="/docs/images/publication_file_view_action.png" alt="Botón Ver en la columna Archivos en Thoth" width="700">
+
+<img src="/docs/images/publication_file_view_form.png" alt="Lista de archivos de la monografía y los capítulos alojados por Thoth" width="700">
+
+En la página pública del libro, los archivos alojados por Thoth se muestran junto con los archivos de los formatos de
+publicación de OMP.
+
+<img src="/docs/images/publication_file_landing_page.png" alt="Página pública del libro mostrando archivos alojados por Thoth junto con los archivos de los formatos de publicación de OMP" width="700">
+
+#### Portada
+
+En el formulario de entrada de catálogo, cargue la portada del libro y seleccione **Alojar el archivo de esta imagen
+de cubierta en Thoth**, debajo del campo de portada. Después de guardar y sincronizar la publicación, la página
+pública del libro utilizará la portada alojada en Thoth. Al desmarcar esta opción, el plugin deja de utilizar la portada
+alojada anteriormente.
+
+<img src="/docs/images/cover_upload.png" alt="Opción de alojamiento del archivo de portada en Thoth debajo del campo de imagen de portada" width="700">
+
+#### Vídeo Destacado
+
+Abra la pestaña **Marketing** en el flujo de publicación y seleccione **Vídeo destacado**, debajo de **Fechas de
+publicación**. Añada un título y cargue un archivo MP4, WebM o MOV. Thoth aloja el archivo y lo muestra con controles
+de reproducción en la página pública del libro, después de la información y la sinopsis. Cada libro puede tener un
+vídeo destacado.
+
+<img src="/docs/images/feature_video_form.png" alt="Formulario del vídeo destacado con título y archivo de vídeo cargado" width="700">
+
+<img src="/docs/images/feature_video_landing_page.png" alt="Reproductor del vídeo destacado en la página pública del libro" width="700">
+
 ### Registro Masivo
 
 En la página de gestión de Thoth, puede enviar en masa una selección de títulos desde OMP hacia Thoth.

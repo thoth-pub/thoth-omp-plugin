@@ -20,11 +20,6 @@ use APP\plugins\generic\thoth\classes\container\ThothContainer;
 
 class ThothRepository
 {
-    public static function account()
-    {
-        return ThothContainer::getInstance()->get('accountRepository');
-    }
-
     public static function abstract()
     {
         return ThothContainer::getInstance()->get('abstractRepository');
@@ -33,6 +28,11 @@ class ThothRepository
     public static function biography()
     {
         return ThothContainer::getInstance()->get('biographyRepository');
+    }
+
+    public static function chapter()
+    {
+        return ThothContainer::getInstance()->get('chapterRepository');
     }
 
     public static function affiliation()
@@ -70,9 +70,24 @@ class ThothRepository
         return ThothContainer::getInstance()->get('locationRepository');
     }
 
+    public static function me()
+    {
+        return ThothContainer::getInstance()->get('meRepository');
+    }
+
     public static function publication()
     {
         return ThothContainer::getInstance()->get('publicationRepository');
+    }
+
+    public static function publicationFileUpload()
+    {
+        return ThothContainer::getInstance()->get('publicationFileUploadRepository');
+    }
+
+    public static function frontcoverFileUpload()
+    {
+        return ThothContainer::getInstance()->get('frontcoverFileUploadRepository');
     }
 
     public static function reference()

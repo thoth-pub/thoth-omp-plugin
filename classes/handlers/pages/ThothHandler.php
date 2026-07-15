@@ -23,8 +23,7 @@ use APP\facades\Repo;
 use APP\handler\Handler;
 use APP\i18n\AppLocale;
 use APP\plugins\generic\thoth\classes\components\listPanels\ThothListPanel;
-use APP\plugins\generic\thoth\classes\facades\ThothRepository;
-use APP\plugins\generic\thoth\classes\notification\ThothNotification;
+use APP\plugins\generic\thoth\classes\facades\ThothService;
 use APP\template\TemplateManager;
 use PKP\db\DAORegistry;
 use PKP\plugins\PluginRegistry;
@@ -69,8 +68,7 @@ class ThothHandler extends Handler
         $templateMgr = TemplateManager::getManager($request);
 
         try {
-            $publishers = ThothRepository::account()->getLinkedPublishers();
-            $imprints = ThothRepository::imprint()->getMany(array_column($publishers, 'publisherId'));
+            $imprints = ThothService::me()->getImprints();
         } catch (\Exception $e) {
             error_log($e->getMessage());
             $connectionError = true;
@@ -104,9 +102,11 @@ class ThothHandler extends Handler
             ]
         );
 
+        $userRoles = (array) $this->getAuthorizedContextObject(Application::ASSOC_TYPE_USER_ROLES);
         $collector = Repo::submission()
             ->getCollector()
             ->filterByContextIds([$context->getId()]);
+        $this->scopeCollectorToUser($collector, $request, $userRoles);
         $total = $collector->getCount();
         $submissions = $collector->limit($thothList->count)->getMany();
 
@@ -120,7 +120,7 @@ class ThothHandler extends Handler
                 $submissions,
                 $userGroups,
                 $genres,
-                $this->getAuthorizedContextObject(Application::ASSOC_TYPE_USER_ROLES)
+                $userRoles
             )
             ->values();
 
@@ -137,6 +137,15 @@ class ThothHandler extends Handler
         ]);
 
         return $templateMgr->display($plugin->getTemplateResource('thoth/index.tpl'));
+    }
+
+    protected function scopeCollectorToUser($collector, $request, array $userRoles)
+    {
+        if (!in_array(Role::ROLE_ID_MANAGER, $userRoles, true)) {
+            $collector->assignedTo([$request->getUser()->getId()]);
+        }
+
+        return $collector;
     }
 
 }

@@ -23,7 +23,9 @@ use PKP\core\Core;
 use PKP\db\DAORegistry;
 use PKP\doi\Doi;
 use PKP\submission\PKPSubmission;
-use ThothApi\GraphQL\Models\Work as ThothWork;
+use ThothApi\GraphQL\Enums\WorkStatus;
+use ThothApi\GraphQL\Enums\WorkType;
+use ThothApi\GraphQL\Inputs\PatchWork as ThothWork;
 
 class ThothBookFactory
 {
@@ -55,7 +57,7 @@ class ThothBookFactory
                     PKPSubmission::PERMISSIONS_FIELD_COPYRIGHT_HOLDER,
                     $publication
                 ),
-            'coverUrl' => $publication->getLocalizedCoverImageUrl($submission->getData('contextId')),
+            'coverUrl' => $this->getCoverUrl($publication, $submission->getData('contextId')),
             'landingPage' => $request->getDispatcher()->url(
                 $request,
                 ROUTE_PAGE,
@@ -67,23 +69,35 @@ class ThothBookFactory
         ]);
     }
 
+    private function getCoverUrl($publication, int $contextId): ?string
+    {
+        if (
+            $publication->getData('thothUploadFrontcover')
+            && $frontcoverUrl = $publication->getData('thothFrontcoverUrl')
+        ) {
+            return $frontcoverUrl;
+        }
+
+        return $publication->getLocalizedCoverImageUrl($contextId);
+    }
+
     public function getWorkTypeBySubmissionWorkType($submissionWorkType)
     {
         $workTypeMapping = [
-            Submission::WORK_TYPE_EDITED_VOLUME => ThothWork::WORK_TYPE_EDITED_BOOK,
-            Submission::WORK_TYPE_AUTHORED_WORK => ThothWork::WORK_TYPE_MONOGRAPH
+            Submission::WORK_TYPE_EDITED_VOLUME => WorkType::EDITED_BOOK,
+            Submission::WORK_TYPE_AUTHORED_WORK => WorkType::MONOGRAPH
         ];
 
-        return $workTypeMapping[$submissionWorkType] ?? ThothWork::WORK_TYPE_MONOGRAPH;
+        return $workTypeMapping[$submissionWorkType] ?? WorkType::MONOGRAPH;
     }
 
     public function getWorkStatusByDatePublished($datePublished)
     {
         if ($datePublished && $datePublished <= Core::getCurrentDate()) {
-            return ThothWork::WORK_STATUS_ACTIVE;
+            return WorkStatus::ACTIVE;
         }
 
-        return ThothWork::WORK_STATUS_FORTHCOMING;
+        return WorkStatus::FORTHCOMING;
     }
 
     public function getDoi($publication)

@@ -16,16 +16,17 @@
 
 namespace APP\plugins\generic\thoth\classes\services;
 
-use APP\plugins\generic\thoth\classes\facades\ThothRepository;
 use PKP\affiliation\Affiliation;
 
 class ThothAffiliationService
 {
     public $repository;
+    public $institutionRepository;
 
-    public function __construct($repository)
+    public function __construct($repository, $institutionRepository)
     {
         $this->repository = $repository;
+        $this->institutionRepository = $institutionRepository;
     }
 
     public function register(Affiliation $affiliation, $thothContributionId, $affiliationOrdinal)
@@ -36,7 +37,7 @@ class ThothAffiliationService
             return null;
         }
 
-        $thothInstitution = ThothRepository::institution()->find($ror);
+        $thothInstitution = $this->institutionRepository->find($ror);
 
         if ($thothInstitution === null) {
             return null;

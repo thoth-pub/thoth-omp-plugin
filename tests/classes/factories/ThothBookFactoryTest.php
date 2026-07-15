@@ -29,7 +29,9 @@ use Mockery;
 use PKP\core\Registry;
 use PKP\db\DAORegistry;
 use PKP\tests\PKPTestCase;
-use ThothApi\GraphQL\Models\Work as ThothWork;
+use ThothApi\GraphQL\Enums\WorkStatus;
+use ThothApi\GraphQL\Enums\WorkType;
+use ThothApi\GraphQL\Inputs\PatchWork as ThothWork;
 
 class ThothBookFactoryTest extends PKPTestCase
 {
@@ -49,7 +51,7 @@ class ThothBookFactoryTest extends PKPTestCase
         return ['request'];
     }
 
-    private function setUpMockEnvironment()
+    private function setUpMockEnvironment(bool $uploadFrontcover = false, ?string $frontcoverUrl = null)
     {
         $submissionRepoMock = Mockery::mock(app(SubmissionRepository::class))
             ->makePartial()
@@ -144,6 +146,12 @@ class ThothBookFactoryTest extends PKPTestCase
             ->withAnyArgs()
             ->andReturn('https://omp.publicknowledgeproject.org/templates/images/book-default.png')
             ->shouldReceive('getData')
+            ->with('thothUploadFrontcover')
+            ->andReturn($uploadFrontcover)
+            ->shouldReceive('getData')
+            ->with('thothFrontcoverUrl')
+            ->andReturn($frontcoverUrl)
+            ->shouldReceive('getData')
             ->with('place')
             ->andReturn('Salvador, BR')
             ->shouldReceive('getData')
@@ -167,8 +175,8 @@ class ThothBookFactoryTest extends PKPTestCase
         $thothWork = $factory->createFromPublication($mockPublication);
 
         $this->assertEquals(new ThothWork([
-            'workType' => ThothWork::WORK_TYPE_MONOGRAPH,
-            'workStatus' => ThothWork::WORK_STATUS_ACTIVE,
+            'workType' => WorkType::MONOGRAPH,
+            'workStatus' => WorkStatus::ACTIVE,
             'edition' => 1,
             'publicationDate' => '2020-01-01',
             'place' => 'Salvador, BR',
@@ -182,24 +190,35 @@ class ThothBookFactoryTest extends PKPTestCase
         ]), $thothWork);
     }
 
+    public function testCreateThothBookPreservesHostedFrontcoverUrl()
+    {
+        $frontcoverUrl = 'https://cdn.thoth.pub/frontcover.png';
+        $this->setUpMockEnvironment(true, $frontcoverUrl);
+
+        $factory = new ThothBookFactory();
+        $thothWork = $factory->createFromPublication($this->mocks['publication']);
+
+        $this->assertSame($frontcoverUrl, $thothWork->getCoverUrl());
+    }
+
     public function testGetWorkTypeBySubmissionWorkType()
     {
         $factory = new ThothBookFactory();
         $workType = $factory->getWorkTypeBySubmissionWorkType(Submission::WORK_TYPE_AUTHORED_WORK);
-        $this->assertEquals(ThothWork::WORK_TYPE_MONOGRAPH, $workType);
+        $this->assertEquals(WorkType::MONOGRAPH, $workType);
 
         $workType = $factory->getWorkTypeBySubmissionWorkType(Submission::WORK_TYPE_EDITED_VOLUME);
-        $this->assertEquals(ThothWork::WORK_TYPE_EDITED_BOOK, $workType);
+        $this->assertEquals(WorkType::EDITED_BOOK, $workType);
     }
 
     public function testGetWorkStatusByDatePublished()
     {
         $factory = new ThothBookFactory();
         $workStatus = $factory->getWorkStatusByDatePublished('2020-01-01');
-        $this->assertEquals(ThothWork::WORK_STATUS_ACTIVE, $workStatus);
+        $this->assertEquals(WorkStatus::ACTIVE, $workStatus);
 
         $workStatus = $factory->getWorkStatusByDatePublished('2050-12-12');
-        $this->assertEquals(ThothWork::WORK_STATUS_FORTHCOMING, $workStatus);
+        $this->assertEquals(WorkStatus::FORTHCOMING, $workStatus);
     }
 
     public function testGetDoiFromPublication()

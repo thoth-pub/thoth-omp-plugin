@@ -16,7 +16,7 @@
 
 namespace APP\plugins\generic\thoth\classes\repositories;
 
-use ThothApi\GraphQL\Models\Publication as ThothPublication;
+use ThothApi\GraphQL\Inputs\PatchPublication as ThothPublication;
 
 class ThothPublicationRepository
 {
@@ -57,6 +57,36 @@ class ThothPublicationRepository
         $result = $this->thothClient->rawQuery($query, $variables);
         $thothPublications = $result['work']['publications'];
         return !empty($thothPublications) ? $thothPublications[0]['publicationId'] : null;
+    }
+
+    public function getFilesByWorkId($thothWorkId)
+    {
+        $thothWork = $this->thothClient->work($thothWorkId, [
+            'workId',
+            'publications' => [
+                'publicationId',
+                'publicationType',
+                'file' => [
+                    'fileId',
+                    'cdnUrl',
+                    'mimeType',
+                    'objectKey',
+                ],
+            ],
+        ]);
+
+        $files = [];
+        foreach ($thothWork->getPublications() ?? [] as $thothPublication) {
+            $file = $thothPublication->getFile();
+            if ($file) {
+                $files[] = [
+                    'publicationType' => $thothPublication->getPublicationType(),
+                    'file' => $file,
+                ];
+            }
+        }
+
+        return $files;
     }
 
     public function find($filter)

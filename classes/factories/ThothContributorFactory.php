@@ -16,7 +16,7 @@
 
 namespace APP\plugins\generic\thoth\classes\factories;
 
-use ThothApi\GraphQL\Models\Contributor as ThothContributor;
+use ThothApi\GraphQL\Inputs\PatchContributor as ThothContributor;
 
 class ThothContributorFactory
 {

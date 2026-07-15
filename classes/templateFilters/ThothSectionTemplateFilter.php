@@ -53,12 +53,19 @@ class ThothSectionTemplateFilter
             $request->getContext()->getData('urlPath'),
             '_submissions/__submissionId__/thothWorkStatus'
         );
+        $featureVideoUrl = $request->getDispatcher()->url(
+            $request,
+            ROUTE_API,
+            $request->getContext()->getData('urlPath'),
+            '_submissions/__submissionId__/featureVideo'
+        );
 
         $data = [
             'registerTitle' => $registerTitle,
             'registerUrl' => $registerUrl,
             'publicationUrl' => $publicationUrl,
-            'workStatusUrl' => $workStatusUrl
+            'workStatusUrl' => $workStatusUrl,
+            'featureVideoUrl' => $featureVideoUrl,
         ];
 
         $output = 'pkp.plugins = pkp.plugins || {};';

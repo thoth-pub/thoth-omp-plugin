@@ -16,12 +16,11 @@
 
 namespace APP\plugins\generic\thoth\classes\repositories;
 
-use ThothApi\GraphQL\Models\AbstractText as ThothAbstract;
+use APP\plugins\generic\thoth\classes\formatters\ThothMarkupFormat;
+use ThothApi\GraphQL\Inputs\PatchAbstract as ThothAbstract;
 
 class ThothAbstractRepository
 {
-    private const MARKUP_FORMAT = 'HTML';
-
     protected $thothClient;
 
     public function __construct($thothClient)
@@ -36,12 +35,18 @@ class ThothAbstractRepository
 
     public function add($thothAbstract)
     {
-        return $this->thothClient->createAbstract($thothAbstract, self::MARKUP_FORMAT);
+        return $this->thothClient->createAbstract(
+            ThothMarkupFormat::fromContent($thothAbstract->getContent()),
+            $thothAbstract
+        );
     }
 
     public function edit($thothPatchAbstract)
     {
-        return $this->thothClient->updateAbstract($thothPatchAbstract, self::MARKUP_FORMAT);
+        return $this->thothClient->updateAbstract(
+            ThothMarkupFormat::fromContent($thothPatchAbstract->getContent()),
+            $thothPatchAbstract
+        );
     }
 
     public function delete($thothAbstractId)

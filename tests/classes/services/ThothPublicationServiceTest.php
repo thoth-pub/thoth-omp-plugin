@@ -21,11 +21,12 @@ namespace APP\plugins\generic\thoth\tests\classes\services;
 use APP\plugins\generic\thoth\classes\container\ThothContainer;
 use APP\plugins\generic\thoth\classes\factories\ThothPublicationFactory;
 use APP\plugins\generic\thoth\classes\repositories\ThothPublicationRepository;
+use APP\plugins\generic\thoth\classes\services\ThothLocationService;
 use APP\plugins\generic\thoth\classes\services\ThothPublicationService;
 use APP\publicationFormat\PublicationFormat;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Publication as ThothPublication;
+use ThothApi\GraphQL\Inputs\PatchPublication as ThothPublication;
 
 class ThothPublicationServiceTest extends PKPTestCase
 {
@@ -67,10 +68,14 @@ class ThothPublicationServiceTest extends PKPTestCase
             ->willReturn(null);
 
         $mockPubFormat = $this->getMockBuilder(PublicationFormat::class)->getMock();
+        $mockLocationService = $this->createMock(ThothLocationService::class);
+        $mockLocationService->expects($this->once())
+            ->method('registerByPublicationFormat')
+            ->with($mockPubFormat, null);
 
         $thothWorkId = '14d026ea-803f-4e51-a813-cea355287ab6';
 
-        $service = new ThothPublicationService($mockFactory, $mockRepository);
+        $service = new ThothPublicationService($mockFactory, $mockRepository, $mockLocationService);
         $thothPublicationId = $service->register($mockPubFormat, $thothWorkId);
 
         $this->assertSame('4296c934-0f05-4920-a208-a5ab214b908a', $thothPublicationId);
@@ -93,7 +98,11 @@ class ThothPublicationServiceTest extends PKPTestCase
 
         $mockPubFormat = $this->getMockBuilder(PublicationFormat::class)->getMock();
 
-        $service = new ThothPublicationService($mockFactory, $mockRepository);
+        $service = new ThothPublicationService(
+            $mockFactory,
+            $mockRepository,
+            $this->createMock(ThothLocationService::class)
+        );
         $errors = $service->validate($mockPubFormat);
 
         $this->assertEquals([
@@ -121,7 +130,11 @@ class ThothPublicationServiceTest extends PKPTestCase
 
         $mockPubFormat = $this->getMockBuilder(PublicationFormat::class)->getMock();
 
-        $service = new ThothPublicationService($mockFactory, $mockRepository);
+        $service = new ThothPublicationService(
+            $mockFactory,
+            $mockRepository,
+            $this->createMock(ThothLocationService::class)
+        );
         $errors = $service->validate($mockPubFormat);
 
         $this->assertEquals([

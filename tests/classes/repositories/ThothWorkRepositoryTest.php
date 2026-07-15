@@ -18,10 +18,14 @@
 
 namespace APP\plugins\generic\thoth\tests\classes\repositories;
 
+require_once(__DIR__ . '/../../../vendor/autoload.php');
+
 use APP\plugins\generic\thoth\classes\repositories\ThothWorkRepository;
+use Mockery;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Work as ThothWork;
+use ThothApi\GraphQL\Enums\WorkType;
+use ThothApi\GraphQL\Inputs\PatchWork as ThothWork;
 
 class ThothWorkRepositoryTest extends PKPTestCase
 {
@@ -29,8 +33,8 @@ class ThothWorkRepositoryTest extends PKPTestCase
     {
         $data = [
             'imprintId' => '5eaef26f-adf6-4d68-b938-d61bdc389ebd',
-            'workType' => ThothWork::WORK_TYPE_EDITED_BOOK,
-            'workStatus' => ThothWork::WORK_TYPE_EDITED_BOOK,
+            'workType' => WorkType::EDITED_BOOK,
+            'workStatus' => WorkType::EDITED_BOOK,
             'fullTitle' => 'My book title',
             'title' => 'My book title',
         ];
@@ -49,19 +53,49 @@ class ThothWorkRepositoryTest extends PKPTestCase
         $expectedThothWork = new ThothWork([
             'workId' => '35a27dc3-8117-4381-9a8f-54ef5def6f0b',
             'imprintId' => '5eaef26f-adf6-4d68-b938-d61bdc389ebd',
-            'workType' => ThothWork::WORK_TYPE_EDITED_BOOK,
-            'workStatus' => ThothWork::WORK_TYPE_EDITED_BOOK,
+            'workType' => WorkType::EDITED_BOOK,
+            'workStatus' => WorkType::EDITED_BOOK,
             'fullTitle' => 'My book title',
             'title' => 'My book title',
         ]);
 
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['work'])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('work')
-            ->willReturn($expectedThothWork);
-
+        $mockThothClient = Mockery::mock(ThothClient::class);
+        $mockThothClient->shouldReceive('work')
+            ->once()
+            ->with(
+                '35a27dc3-8117-4381-9a8f-54ef5def6f0b',
+                [
+                    'workId',
+                    'workType',
+                    'workStatus',
+                    'fullTitle',
+                    'title',
+                    'subtitle',
+                    'edition',
+                    'imprintId',
+                    'doi',
+                    'publicationDate',
+                    'place',
+                    'pageCount',
+                    'imageCount',
+                    'license',
+                    'copyrightHolder',
+                    'landingPage',
+                    'coverUrl',
+                    'titles' => [
+                        'titleId',
+                        'localeCode',
+                        'canonical',
+                    ],
+                    'abstracts' => [
+                        'abstractId',
+                        'localeCode',
+                        'abstractType',
+                        'canonical',
+                    ],
+                ]
+            )
+            ->andReturn($expectedThothWork);
         $repository = new ThothWorkRepository($mockThothClient);
 
         $thothWork = $repository->get('35a27dc3-8117-4381-9a8f-54ef5def6f0b');
@@ -73,19 +107,16 @@ class ThothWorkRepositoryTest extends PKPTestCase
     {
         $thothWork = new ThothWork([
             'imprintId' => '5eaef26f-adf6-4d68-b938-d61bdc389ebd',
-            'workType' => ThothWork::WORK_TYPE_EDITED_BOOK,
-            'workStatus' => ThothWork::WORK_TYPE_EDITED_BOOK,
+            'workType' => WorkType::EDITED_BOOK,
+            'workStatus' => WorkType::EDITED_BOOK,
             'fullTitle' => 'My book title',
             'title' => 'My book title',
         ]);
 
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['createWork'])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('createWork')
-            ->willReturn('4c64863b-ce51-4cf5-bedf-0dd911147f6d');
-
+        $mockThothClient = Mockery::mock(ThothClient::class);
+        $mockThothClient->shouldReceive('createWork')
+            ->zeroOrMoreTimes()
+            ->andReturn('4c64863b-ce51-4cf5-bedf-0dd911147f6d');
         $repository = new ThothWorkRepository($mockThothClient);
 
         $thothWorkId = $repository->add($thothWork);
@@ -98,19 +129,16 @@ class ThothWorkRepositoryTest extends PKPTestCase
         $thothPatchWork = new ThothWork([
             'workId' => '8ea11ca6-a2e2-4da7-8f4e-7738e9dcaac9',
             'imprintId' => '5eaef26f-adf6-4d68-b938-d61bdc389ebd',
-            'workType' => ThothWork::WORK_TYPE_EDITED_BOOK,
-            'workStatus' => ThothWork::WORK_TYPE_EDITED_BOOK,
+            'workType' => WorkType::EDITED_BOOK,
+            'workStatus' => WorkType::EDITED_BOOK,
             'fullTitle' => 'My edited book title',
             'title' => 'My edited book title',
         ]);
 
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['updateWork'])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('updateWork')
-            ->willReturn('8ea11ca6-a2e2-4da7-8f4e-7738e9dcaac9');
-
+        $mockThothClient = Mockery::mock(ThothClient::class);
+        $mockThothClient->shouldReceive('updateWork')
+            ->zeroOrMoreTimes()
+            ->andReturn('8ea11ca6-a2e2-4da7-8f4e-7738e9dcaac9');
         $repository = new ThothWorkRepository($mockThothClient);
 
         $thothWorkId = $repository->edit($thothPatchWork);
@@ -120,13 +148,11 @@ class ThothWorkRepositoryTest extends PKPTestCase
 
     public function testDeleteWork()
     {
-        $mockThothClient = $this->getMockBuilder(ThothClient::class)
-            ->onlyMethods(['deleteWork'])
-            ->getMock();
-        $mockThothClient->expects($this->any())
-            ->method('deleteWork')
-            ->willReturn('8de75f0d-36c3-4ab7-8c84-bc53dfc0c3a4');
+        $mockThothClient = Mockery::mock(ThothClient::class);
 
+        $mockThothClient->shouldReceive('deleteWork')
+            ->zeroOrMoreTimes()
+            ->andReturn('8de75f0d-36c3-4ab7-8c84-bc53dfc0c3a4');
         $repository = new ThothWorkRepository($mockThothClient);
 
         $thothWorkId = $repository->delete('8de75f0d-36c3-4ab7-8c84-bc53dfc0c3a4');
