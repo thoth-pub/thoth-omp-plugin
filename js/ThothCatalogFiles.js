@@ -30,12 +30,8 @@
         return label + ' (Thoth)';
     }
 
-    function getObjectKeyLabel(file) {
-        return getThothLabel(file.label);
-    }
-
     function getPublicationTypeLabel(file) {
-        return getThothLabel(file.publicationType || file.label);
+        return getThothLabel(file.publicationType);
     }
 
     function isValidFileUrl(file) {
@@ -52,7 +48,7 @@
     }
 
     function createLink(file, label) {
-        var link = createElement('a', 'cmp_download_link', label || getObjectKeyLabel(file));
+        var link = createElement('a', 'cmp_download_link', label || getPublicationTypeLabel(file));
 
         link.href = file.url;
         link.target = '_blank';
@@ -111,7 +107,7 @@
                 wrapper.className = getRemotePublicationFormatClass(file);
             }
 
-            wrapper.appendChild(createLink(file, (options.labelGetter || getObjectKeyLabel)(file)));
+            wrapper.appendChild(createLink(file, (options.labelGetter || getPublicationTypeLabel)(file)));
             container.appendChild(wrapper);
         });
     }
@@ -145,9 +141,11 @@
             return false;
         }
 
+        var label = getPublicationTypeLabel(file);
+
         list.appendChild(createPublicationFormatItem(
-            getObjectKeyLabel(file),
-            createLink(file),
+            label,
+            createLink(file, label),
             true
         ));
 
@@ -162,45 +160,7 @@
             return value;
         }
 
-        var single = document.querySelector(selector + '.pub_format_single');
-        return single ? convertSinglePublicationFormat(single) : null;
-    }
-
-    function convertSinglePublicationFormat(single) {
-        var existingLink = single.querySelector('a');
-
-        if (!existingLink) {
-            return null;
-        }
-
-        var existingLabel = existingLink.textContent.trim();
-        var publicationFormatId = getPublicationFormatId(single);
-        var existingFileName = getPublicationFormatFileName(publicationFormatId, existingLabel);
-        var label = createElement('span', 'label', existingLabel);
-        var value = createElement('span', 'value');
-        var list = document.createElement('ul');
-
-        single.className = single.className.replace(/\s*pub_format_single\s*/, ' ').trim();
-        single.textContent = '';
-
-        list.appendChild(createPublicationFormatItem(existingFileName, existingLink, false));
-        value.appendChild(list);
-        single.appendChild(label);
-        single.appendChild(value);
-
-        return value;
-    }
-
-    function getPublicationFormatId(element) {
-        var match = element.className.match(/(?:^|\s)pub_format_(\d+)(?:\s|$)/);
-
-        return match ? match[1] : null;
-    }
-
-    function getPublicationFormatFileName(publicationFormatId, fallbackLabel) {
-        var files = (config.publicationFormatFiles || {})[publicationFormatId] || [];
-
-        return files[0] || fallbackLabel;
+        return null;
     }
 
     function getTargetSelector(target, id) {
@@ -244,26 +204,6 @@
         chapterItem.appendChild(target);
 
         return target;
-    }
-
-    function hasChapterPublicationFiles(target) {
-        if (!target || !target.parentNode) {
-            return false;
-        }
-
-        var fileBlocks = target.parentNode.querySelectorAll('.files');
-
-        for (var i = 0; i < fileBlocks.length; i++) {
-            if (
-                fileBlocks[i] !== target
-                && fileBlocks[i].className.indexOf('thoth_files') < 0
-                && fileBlocks[i].querySelector('.cmp_download_link')
-            ) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     function getMonographTarget() {
@@ -399,7 +339,7 @@
             var target = getChapterTarget(chapterId);
 
             renderFiles(target, chapters[chapterId], {
-                labelGetter: hasChapterPublicationFiles(target) ? getObjectKeyLabel : getPublicationTypeLabel
+                labelGetter: getPublicationTypeLabel
             });
         });
     }

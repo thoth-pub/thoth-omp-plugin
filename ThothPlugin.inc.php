@@ -219,7 +219,6 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
         $monograph = $templateMgr->getTemplateVars('publishedSubmission');
         $publication = $templateMgr->getTemplateVars('publication');
         $chapters = $templateMgr->getTemplateVars('chapters') ?: [];
-        $availableFiles = $templateMgr->getTemplateVars('availableFiles') ?: [];
 
         if (!$monograph || !$publication) {
             return false;
@@ -246,7 +245,6 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
                 'downloadsLabel' => __('submission.downloads'),
                 'loadingLabel' => __('common.loading'),
                 'chapters' => $this->getCatalogFilesChapterData($chapters),
-                'publicationFormatFiles' => $this->getCatalogFilesPublicationFormatFileData($availableFiles),
                 'cacheTtl' => ThothCatalogFilesCacheService::TTL,
                 'cacheKeySuffix' => $catalogFilesCacheService->getClientCacheKeySuffix($publication->getId()),
             ]) . ';',
@@ -283,35 +281,6 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
                 'title' => $chapter->getLocalizedTitle(),
             ];
         }, array_values($chapters));
-    }
-
-    private function getCatalogFilesPublicationFormatFileData($availableFiles)
-    {
-        $publicationFormatFiles = [];
-
-        foreach ($availableFiles as $file) {
-            if (!$this->isCatalogFilesMonographFile($file)) {
-                continue;
-            }
-
-            $publicationFormatId = $file->getData('assocId');
-            if (!$publicationFormatId) {
-                continue;
-            }
-
-            if (!isset($publicationFormatFiles[$publicationFormatId])) {
-                $publicationFormatFiles[$publicationFormatId] = [];
-            }
-
-            $publicationFormatFiles[$publicationFormatId][] = $file->getLocalizedData('name');
-        }
-
-        return $publicationFormatFiles;
-    }
-
-    private function isCatalogFilesMonographFile($file)
-    {
-        return method_exists($file, 'getChapterId') && !$file->getChapterId();
     }
 
     public function addListeners()
