@@ -14,12 +14,12 @@
  * @brief A repository to manage Thoth titles
  */
 
-use ThothApi\GraphQL\Models\Title as ThothTitle;
+use ThothApi\GraphQL\Inputs\PatchTitle as ThothTitle;
+
+import('plugins.generic.thoth.classes.formatters.ThothMarkupFormat');
 
 class ThothTitleRepository
 {
-    private const MARKUP_FORMAT = 'PLAIN_TEXT';
-
     protected $thothClient;
 
     public function __construct($thothClient)
@@ -34,12 +34,18 @@ class ThothTitleRepository
 
     public function add($thothTitle)
     {
-        return $this->thothClient->createTitle($thothTitle, self::MARKUP_FORMAT);
+        return $this->thothClient->createTitle(
+            ThothMarkupFormat::fromContent($thothTitle->getFullTitle()),
+            $thothTitle
+        );
     }
 
     public function edit($thothPatchTitle)
     {
-        return $this->thothClient->updateTitle($thothPatchTitle, self::MARKUP_FORMAT);
+        return $this->thothClient->updateTitle(
+            ThothMarkupFormat::fromContent($thothPatchTitle->getFullTitle()),
+            $thothPatchTitle
+        );
     }
 
     public function delete($thothTitleId)

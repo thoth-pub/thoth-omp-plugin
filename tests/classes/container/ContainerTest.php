@@ -8,7 +8,9 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ContainerTest
+ *
  * @ingroup plugins_generic_thoth_tests
+ *
  * @see Container
  *
  * @brief Test class for the Container class
@@ -52,6 +54,70 @@ class ContainerTest extends PKPTestCase
         $this->assertSame($callable, $fooBackup);
     }
 
+    public function testSingletonReturnsSameInstance()
+    {
+        $container = new Container();
+
+        $container->singleton('class', function ($container) {
+            return new class () {
+            };
+        });
+
+        $firstClass = $container->get('class');
+        $secondClass = $container->get('class');
+
+        $this->assertSame($firstClass, $secondClass);
+    }
+
+    public function testSetReplacesSingletonBinding()
+    {
+        $container = new Container();
+
+        $container->singleton('foo', function () {
+            return 'foo';
+        });
+        $container->get('foo');
+
+        $container->set('foo', function () {
+            return 'bar';
+        });
+
+        $this->assertSame('bar', $container->get('foo'));
+    }
+
+    public function testMakeResolvesDependencies()
+    {
+        $container = new Container();
+        $container->set('foo', function () {
+            return 'foo';
+        });
+
+        $class = $container->make(ContainerTestResolvedClass::class, [
+            'foo',
+            function () {
+                return 'bar';
+            },
+            'baz',
+        ]);
+
+        $this->assertSame(['foo', 'bar', 'baz'], $class->dependencies);
+    }
+
+    public function testSingletonClassReturnsSameInstance()
+    {
+        $container = new Container();
+        $container->set('foo', function () {
+            return 'foo';
+        });
+        $container->singletonClass('class', ContainerTestResolvedClass::class, ['foo']);
+
+        $firstClass = $container->get('class');
+        $secondClass = $container->get('class');
+
+        $this->assertSame($firstClass, $secondClass);
+        $this->assertSame(['foo'], $firstClass->dependencies);
+    }
+
     public function testInvalidBindingThrownException()
     {
         $this->expectException(Exception::class);
@@ -83,5 +149,15 @@ class ContainerTest extends PKPTestCase
         $class = $container->get('class');
 
         $this->assertEquals('foo', $class->foo());
+    }
+}
+
+class ContainerTestResolvedClass
+{
+    public $dependencies;
+
+    public function __construct(...$dependencies)
+    {
+        $this->dependencies = $dependencies;
     }
 }

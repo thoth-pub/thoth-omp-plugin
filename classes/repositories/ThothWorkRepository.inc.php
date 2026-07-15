@@ -14,10 +14,44 @@
  * @brief A repository to manage Thoth works
  */
 
-use ThothApi\GraphQL\Models\Work as ThothWork;
+use ThothApi\GraphQL\Inputs\PatchWork as ThothWork;
 
 class ThothWorkRepository
 {
+    private const FEATURE_VIDEO_SELECTION = [
+        'featuredVideo' => ['workFeaturedVideoId', 'title', 'url', 'width', 'height'],
+    ];
+    private const WORK_SELECTION = [
+        'workId',
+        'workType',
+        'workStatus',
+        'fullTitle',
+        'title',
+        'subtitle',
+        'edition',
+        'imprintId',
+        'doi',
+        'publicationDate',
+        'place',
+        'pageCount',
+        'imageCount',
+        'license',
+        'copyrightHolder',
+        'landingPage',
+        'coverUrl',
+        'titles' => [
+            'titleId',
+            'localeCode',
+            'canonical',
+        ],
+        'abstracts' => [
+            'abstractId',
+            'localeCode',
+            'abstractType',
+            'canonical',
+        ],
+    ];
+
     protected $thothClient;
 
     public function __construct($thothClient)
@@ -32,7 +66,12 @@ class ThothWorkRepository
 
     public function get($thothWorkId)
     {
-        return $this->thothClient->work($thothWorkId);
+        return $this->thothClient->work($thothWorkId, self::WORK_SELECTION);
+    }
+
+    public function getFeatureVideo($thothWorkId)
+    {
+        return $this->thothClient->work($thothWorkId, self::FEATURE_VIDEO_SELECTION)->getFeaturedVideo();
     }
 
     public function add($thothWork)

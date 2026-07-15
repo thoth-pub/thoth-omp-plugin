@@ -8,6 +8,7 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothSectionTemplateFilter
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief Template filter to include Thoth section in workflow page
@@ -25,7 +26,7 @@ class ThothSectionTemplateFilter
 
         $this->plugin = $plugin;
 
-        $templateMgr->registerFilter("output", [$this, 'thothSectionFilter']);
+        $templateMgr->registerFilter('output', [$this, 'thothSectionFilter']);
 
         return false;
     }
@@ -40,7 +41,7 @@ class ThothSectionTemplateFilter
             $newOutput .= $templateMgr->fetch($this->plugin->getTemplateResource('thothSection.tpl'));
             $newOutput .= substr($output, $offset + strlen($match));
             $output = $newOutput;
-            $templateMgr->unregisterFilter('output', array($this, 'thothSectionFilter'));
+            $templateMgr->unregisterFilter('output', [$this, 'thothSectionFilter']);
         }
         return $output;
     }

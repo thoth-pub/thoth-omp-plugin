@@ -16,6 +16,7 @@
 
 use APP\core\Application;
 use APP\facades\Repo;
+use APP\notification\Notification;
 use APP\notification\NotificationManager;
 use PKP\log\event\PKPSubmissionEventLogEntry;
 
@@ -23,7 +24,7 @@ class ThothNotification
 {
     public function notifySuccess($request, $submission)
     {
-        $this->notify($request, $submission, NOTIFICATION_TYPE_SUCCESS, 'plugins.generic.thoth.register.success');
+        $this->notify($request, $submission, Notification::NOTIFICATION_TYPE_SUCCESS, 'plugins.generic.thoth.register.success');
     }
 
     public function notifyError($request, $submission, $error)
@@ -33,7 +34,7 @@ class ThothNotification
         $this->notify(
             $request,
             $submission,
-            NOTIFICATION_TYPE_ERROR,
+            Notification::NOTIFICATION_TYPE_ERROR,
             'plugins.generic.thoth.register.error',
             $error
         );

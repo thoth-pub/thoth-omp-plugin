@@ -24,7 +24,7 @@ class DataEncryption
     private function getSecretFromConfig(): string
     {
         $secret = Config::getVar('security', 'api_key_secret');
-        if ($secret === "") {
+        if ($secret === '') {
             throw new Exception("Thoth Error: A secret must be set in the config file ('api_key_secret') so that keys can be encrypted and decrypted");
         }
 
@@ -58,7 +58,7 @@ class DataEncryption
         try {
             $encryptedString = $encrypter->encrypt($plainText);
         } catch (Exception $e) {
-            throw new Exception("Thoth Error: Failed to encrypt string");
+            throw new Exception('Thoth Error: Failed to encrypt string');
         }
 
         return self::BASE64_PREFIX . base64_encode($encryptedString);
@@ -75,7 +75,7 @@ class DataEncryption
         try {
             $decryptedString = $encrypter->decrypt($payload);
         } catch (Exception $e) {
-            throw new Exception("Thoth Error: Failed to decrypt string");
+            throw new Exception('Thoth Error: Failed to decrypt string');
         }
 
         return $decryptedString;

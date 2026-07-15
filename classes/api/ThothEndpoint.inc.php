@@ -22,7 +22,9 @@ use PKP\security\Role;
 use ThothApi\Exception\QueryException;
 
 import('plugins.generic.thoth.classes.facades.ThothService');
+import('plugins.generic.thoth.classes.facades.ThothRepo');
 import('plugins.generic.thoth.classes.notification.ThothNotification');
+import('plugins.generic.thoth.classes.services.ThothMeCacheService');
 
 class ThothEndpoint
 {
@@ -43,6 +45,17 @@ class ThothEndpoint
             'roles' => [
                 Role::ROLE_ID_SITE_ADMIN,
                 Role::ROLE_ID_MANAGER,
+            ],
+        ];
+
+        $endpoints['POST'][] = [
+            'pattern' => "{$rootPattern}/{submissionId:\d+}/featureVideo",
+            'handler' => [$this, 'uploadFeatureVideo'],
+            'roles' => [
+                Role::ROLE_ID_SITE_ADMIN,
+                Role::ROLE_ID_MANAGER,
+                Role::ROLE_ID_SUB_EDITOR,
+                Role::ROLE_ID_ASSISTANT,
             ],
         ];
 
@@ -68,8 +81,13 @@ class ThothEndpoint
             return $response->withStatus(404)->withJsonError('api.404.resourceNotFound');
         }
 
-        if (!$request->getContext()) {
+        $context = $request->getContext();
+        if (!$context) {
             return $response->withStatus(403)->withJsonError('api.submissions.403.contextRequired');
+        }
+
+        if (!$this->isSubmissionInContext($submission, $context)) {
+            return $response->withStatus(404)->withJsonError('api.404.resourceNotFound');
         }
 
         if ($submission->getData('thothWorkId')) {
@@ -96,14 +114,18 @@ class ThothEndpoint
         AppLocale::requireComponents(LOCALE_COMPONENT_PKP_SUBMISSION, LOCALE_COMPONENT_APP_SUBMISSION);
 
         $disableNotification = $params['disableNotification'] ?? false;
+        $registrationResult = null;
         try {
-            $thothBookService = ThothService::book();
-            $thothBookId = $thothBookService->register($publication, $thothImprintId);
-            $thothBookService->setActive();
+            $thothBookRegistrationService = ThothService::bookRegistration();
+            $registrationResult = $thothBookRegistrationService->register($publication, $thothImprintId);
+            $thothBookRegistrationService->setActive($registrationResult);
+            $thothBookId = $registrationResult->getWorkId();
             Repo::submission()->edit($submission, ['thothWorkId' => $thothBookId]);
             $this->handleNotification($request, $submission, true, $disableNotification);
         } catch (QueryException $e) {
-            $thothBookService->deleteRegisteredEntry();
+            if ($registrationResult !== null) {
+                $thothBookRegistrationService->deleteRegisteredEntry($registrationResult);
+            }
             $this->handleNotification($request, $submission, false, $disableNotification, $e);
             $failure['errors'][] = __('plugins.generic.thoth.register.error.log', ['reason' => $e->getMessage()]);
             return $response->withStatus(403)->withJson($failure);
@@ -122,6 +144,65 @@ class ThothEndpoint
             Repo::submission()->getSchemaMap()->mapToSubmissionsList($submission, $userGroups, $genres),
             200
         );
+    }
+
+    public function uploadFeatureVideo($slimRequest, $response, $args)
+    {
+        $request = Application::get()->getRequest();
+        $submission = Repo::submission()->get((int) $args['submissionId']);
+        $context = $request->getContext();
+        $user = $request->getUser();
+        if (!$submission) {
+            return $response->withStatus(404)->withJsonError('api.404.resourceNotFound');
+        }
+        if (!$context || (int) $submission->getData('contextId') !== (int) $context->getId() || !$user) {
+            return $response->withStatus(403)->withJsonError('api.submissions.403.contextRequired');
+        }
+
+        $params = (array) $slimRequest->getParsedBody();
+        $title = trim((string) ($params['title'] ?? ''));
+        $temporaryFileId = (int) ($params['video']['temporaryFileId'] ?? 0);
+        $errors = [];
+        if ($title === '') {
+            $errors['title'] = [__('form.required')];
+        }
+        if (!$temporaryFileId) {
+            $errors['video'] = [__('form.required')];
+        }
+        if ($errors) {
+            return $response->withStatus(400)->withJson($errors);
+        }
+
+        try {
+            $canUpload = (new ThothMeCacheService(ThothRepo::me()))
+                ->hasCdnWritePermission($context->getId());
+            if (!$canUpload) {
+                return $response->withStatus(403)->withJson([
+                    'video' => [__('plugins.generic.thoth.fileUpload.error.missingCdnWritePermission')],
+                ]);
+            }
+            $metadata = ThothService::featureVideoSubmission()->upload(
+                $submission,
+                $title,
+                $temporaryFileId,
+                (int) $user->getId()
+            );
+            return $response->withJson($metadata, 200);
+        } catch (InvalidArgumentException $exception) {
+            return $response->withStatus(400)->withJson([
+                'video' => [__('plugins.generic.thoth.featureVideo.invalidFile')],
+            ]);
+        } catch (Throwable $exception) {
+            error_log($exception->getMessage());
+            return $response->withStatus(500)->withJsonError('plugins.generic.thoth.connectionError');
+        }
+    }
+
+    protected function isSubmissionInContext($submission, $context)
+    {
+        return $submission
+            && $context
+            && (int) $submission->getData('contextId') === (int) $context->getId();
     }
 
 

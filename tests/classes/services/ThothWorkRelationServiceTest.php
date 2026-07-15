@@ -1,5 +1,6 @@
 <?php
 
+require_once(__DIR__ . '/../../../vendor/autoload.php');
 /**
  * @file plugins/generic/thoth/tests/classes/services/ThothWorkRelationServiceTest.php
  *
@@ -29,24 +30,10 @@ class ThothWorkRelationServiceTest extends PKPTestCase
 {
     public function testRegisterWorkRelation()
     {
-        ThothContainer::getInstance()->set('chapterService', function () {
-            $mockService = $this->getMockBuilder(ThothChapterService::class)
-                ->setConstructorArgs([
-                    $this->getMockBuilder(ThothChapterFactory::class)->getMock(),
-                    $this->getMockBuilder(ThothChapterRepository::class)
-                        ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)
-                            ->getMock()
-                        ])
-                        ->getMock(),
-                ])
-                ->setMethods(['register'])
-                ->getMock();
-            $mockService->expects($this->any())
-                ->method('register')
-                ->will($this->returnValue('dccd9dfd-fee2-4e85-b1f8-0440f9b43ce8'));
-
-            return $mockService;
-        });
+        $mockChapterService = $this->createMock(ThothChapterService::class);
+        $mockChapterService->expects($this->once())
+            ->method('register')
+            ->will($this->returnValue('dccd9dfd-fee2-4e85-b1f8-0440f9b43ce8'));
 
         $mockRepository = $this->getMockBuilder(ThothWorkRelationRepository::class)
             ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
@@ -60,7 +47,7 @@ class ThothWorkRelationServiceTest extends PKPTestCase
         $thothRelatedWorkId = '813e0519-05ca-455b-b330-af623456dace';
         $thothImprintId = '41b6a2a4-c3e1-4045-882c-c0f31386dee5';
 
-        $service = new ThothWorkRelationService($mockRepository);
+        $service = new ThothWorkRelationService($mockRepository, $mockChapterService);
         $thothWorkRelationId = $service->register($mockChapter, $thothRelatedWorkId, $thothImprintId);
 
         $this->assertSame('91966e15-0203-4eb8-b7e7-02b72c57cedc', $thothWorkRelationId);

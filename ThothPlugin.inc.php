@@ -20,6 +20,7 @@ use APP\core\Application;
 use PKP\core\JSONMessage;
 use PKP\linkAction\LinkAction;
 use PKP\linkAction\request\AjaxModal;
+use PKP\security\Role;
 
 import('plugins.generic.thoth.classes.api.ThothEndpoint');
 import('plugins.generic.thoth.classes.components.forms.config.CatalogEntryFormConfig');
@@ -32,6 +33,11 @@ import('plugins.generic.thoth.classes.listeners.PublicationEditListener');
 import('plugins.generic.thoth.classes.listeners.PublicationPublishListener');
 import('plugins.generic.thoth.classes.notification.ThothNotification');
 import('plugins.generic.thoth.classes.schema.ThothSchema');
+import('plugins.generic.thoth.classes.services.ThothCatalogFilesCacheService');
+import('plugins.generic.thoth.classes.templateFilters.ThothCatalogFilesTemplateFilter');
+import('plugins.generic.thoth.classes.templateFilters.ThothFrontcoverTemplateFilter');
+import('plugins.generic.thoth.classes.templateFilters.ThothFeatureVideoWorkflowTemplateFilter');
+import('plugins.generic.thoth.classes.templateFilters.ThothFeatureVideoTemplateFilter');
 
 class ThothPlugin extends \PKP\plugins\GenericPlugin
 {
@@ -49,6 +55,9 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
             HookRegistry::register('TemplateManager::display', [$this, 'addScripts']);
             HookRegistry::register('TemplateManager::display', [$this, 'addMenu']);
             HookRegistry::register('LoadHandler', [$this, 'addHandlers']);
+
+            import('plugins.generic.thoth.classes.gridModifier.PublicationFormatGridModifier');
+            $publicationFormatGridModifier = new PublicationFormatGridModifier($this);
         }
 
         return $success;
@@ -141,6 +150,18 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
 
         $thothSectionFilter = new ThothSectionTemplateFilter();
         $thothSectionFilter->registerFilter($templateMgr, $template, $this);
+
+        $thothCatalogFilesFilter = new ThothCatalogFilesTemplateFilter();
+        $thothCatalogFilesFilter->registerFilter($templateMgr, $template);
+
+        $thothFrontcoverFilter = new ThothFrontcoverTemplateFilter();
+        $thothFrontcoverFilter->registerFilter($templateMgr, $template);
+
+        $featureVideoWorkflowFilter = new ThothFeatureVideoWorkflowTemplateFilter();
+        $featureVideoWorkflowFilter->registerFilter($templateMgr, $template);
+
+        $featureVideoFilter = new ThothFeatureVideoTemplateFilter();
+        $featureVideoFilter->registerFilter($templateMgr, $template);
     }
 
     public function addScripts($hookName, $args)
@@ -154,9 +175,14 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
         $thothSectionFilter->addJavaScript($request, $templateMgr, $this);
         $thothSectionFilter->addStyleSheet($request, $templateMgr, $this);
 
+        $featureVideoWorkflowFilter = new ThothFeatureVideoWorkflowTemplateFilter();
+        $featureVideoWorkflowFilter->addFormConfig($request, $templateMgr, $template);
+
         $thothNotification = new ThothNotification();
         $thothNotification->addJavaScriptData($request, $templateMgr);
         $thothNotification->addJavaScript($request, $templateMgr, $this);
+
+        $this->addCatalogFilesAssets($request, $templateMgr, $template);
     }
 
     public function addFormConfig()
@@ -182,6 +208,79 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
         HookRegistry::register('publicationformatform::readuservars', [$publicationFormatFormModifier, 'handleFormReadUserVars']);
         HookRegistry::register('publicationformatform::validate', [$publicationFormatFormModifier, 'handleFormValidate']);
         HookRegistry::register('publicationformatform::execute', [$publicationFormatFormModifier, 'handleFormExecute']);
+    }
+
+    public function addCatalogFilesAssets($request, $templateMgr, $template)
+    {
+        if ($template !== 'frontend/pages/book.tpl') {
+            return false;
+        }
+
+        $monograph = $templateMgr->getTemplateVars('publishedSubmission');
+        $publication = $templateMgr->getTemplateVars('publication');
+        $chapters = $templateMgr->getTemplateVars('chapters') ?: [];
+
+        if (!$monograph || !$publication) {
+            return false;
+        }
+
+        $catalogFilesUrl = $request->getDispatcher()->url(
+            $request,
+            ROUTE_PAGE,
+            null,
+            'thoth',
+            'catalogFiles',
+            null,
+            [
+                'submissionId' => $monograph->getId(),
+                'publicationId' => $publication->getId(),
+            ]
+        );
+        $catalogFilesCacheService = new ThothCatalogFilesCacheService();
+
+        $templateMgr->addJavaScript(
+            'thoth-catalog-files-data',
+            'window.thothCatalogFiles = ' . json_encode([
+                'url' => $catalogFilesUrl,
+                'downloadsLabel' => __('submission.downloads'),
+                'loadingLabel' => __('common.loading'),
+                'chapters' => $this->getCatalogFilesChapterData($chapters),
+                'cacheTtl' => ThothCatalogFilesCacheService::TTL,
+                'cacheKeySuffix' => $catalogFilesCacheService->getClientCacheKeySuffix($publication->getId()),
+            ]) . ';',
+            [
+                'inline' => true,
+                'contexts' => 'frontend',
+            ]
+        );
+        $templateMgr->addJavaScript(
+            'thoth-catalog-files-js',
+            $request->getBaseUrl() . '/' . $this->getPluginPath() . '/js/ThothCatalogFiles.js',
+            [
+                'contexts' => 'frontend',
+                'priority' => STYLE_SEQUENCE_LATE,
+            ]
+        );
+        $templateMgr->addStyleSheet(
+            'thoth-catalog-files-css',
+            '.thoth_files:empty { display: none; } .thoth_files_loading { color: #666; font-size: 0.93em; }',
+            [
+                'inline' => true,
+                'contexts' => 'frontend',
+            ]
+        );
+
+        return false;
+    }
+
+    private function getCatalogFilesChapterData($chapters)
+    {
+        return array_map(function ($chapter) {
+            return [
+                'id' => (int) $chapter->getId(),
+                'title' => $chapter->getLocalizedTitle(),
+            ];
+        }, array_values($chapters));
     }
 
     public function addListeners()
@@ -214,8 +313,8 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
             return false;
         }
 
-        if (in_array(ROLE_ID_MANAGER, $userRoles)) {
-            $offset = array_search("settings", array_keys($menu));
+        if (in_array(Role::ROLE_ID_MANAGER, $userRoles)) {
+            $offset = array_search('settings', array_keys($menu));
 
             $menu = array_slice($menu, 0, $offset, true) +
             [
@@ -252,6 +351,27 @@ class ThothPlugin extends \PKP\plugins\GenericPlugin
             return true;
         }
 
+        if ($op === 'catalogFiles') {
+            $this->import('pages/thoth/ThothCatalogFilesHandler');
+            define('HANDLER_CLASS', 'ThothCatalogFilesHandler');
+            return true;
+        }
+
+        if (in_array(
+            $op,
+            [
+                'uploadThothPublicationFile',
+                'handleThothPublicationFile',
+                'saveUploadThothPublicationFile',
+                'viewThothPublicationFormatFiles',
+            ]
+        )) {
+            $this->import('controllers/fileUpload/UploadThothFileHandler');
+            define('HANDLER_CLASS', 'UploadThothFileHandler');
+            return true;
+        }
+
         return false;
     }
+
 }

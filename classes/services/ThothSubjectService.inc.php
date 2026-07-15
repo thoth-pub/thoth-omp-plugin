@@ -8,12 +8,13 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothSubjectService
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief Helper class that encapsulates business logic for Thoth Subjects
  */
 
-use ThothApi\GraphQL\Models\Subject as ThothSubject;
+use ThothApi\GraphQL\Enums\SubjectType;
 
 class ThothSubjectService
 {
@@ -28,7 +29,7 @@ class ThothSubjectService
     {
         $thothSubject = $this->repository->new([
             'workId' => $thothWorkId,
-            'subjectType' => ThothSubject::SUBJECT_TYPE_KEYWORD,
+            'subjectType' => SubjectType::KEYWORD,
             'subjectCode' => $subject,
             'subjectOrdinal' => $sequence
         ]);

@@ -8,12 +8,12 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ContributorFormConfig
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief Thoth configuration for contributor form
  */
 
-use APP\facades\Repo;
 
 class ContributorFormConfig
 {

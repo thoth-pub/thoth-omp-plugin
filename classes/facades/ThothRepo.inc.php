@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @file plugins/generic/thoth/classes/facades/ThothRepository.inc.php
+ * @file plugins/generic/thoth/classes/facades/ThothRepo.inc.php
  *
  * Copyright (c) 2014-2021 Simon Fraser University
  * Copyright (c) 2000-2021 John Willinsky
@@ -9,18 +9,18 @@
  * Copyright (c) 2024-2025 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
- * @class ThothRepository
+ * @class ThothRepo
  *
  * @brief This facade provides access to all repositories for Thoth.
  */
 
 import('plugins.generic.thoth.classes.container.ThothContainer');
 
-class ThothRepository
+class ThothRepo
 {
-    public static function account()
+    public static function me()
     {
-        return ThothContainer::getInstance()->get('accountRepository');
+        return ThothContainer::getInstance()->get('meRepository');
     }
 
     public static function abstract()
@@ -36,6 +36,11 @@ class ThothRepository
     public static function affiliation()
     {
         return ThothContainer::getInstance()->get('affiliationRepository');
+    }
+
+    public static function chapter()
+    {
+        return ThothContainer::getInstance()->get('chapterRepository');
     }
 
     public static function contribution()
@@ -71,6 +76,16 @@ class ThothRepository
     public static function publication()
     {
         return ThothContainer::getInstance()->get('publicationRepository');
+    }
+
+    public static function publicationFileUpload()
+    {
+        return ThothContainer::getInstance()->get('publicationFileUploadRepository');
+    }
+
+    public static function frontcoverFileUpload()
+    {
+        return ThothContainer::getInstance()->get('frontcoverFileUploadRepository');
     }
 
     public static function reference()
