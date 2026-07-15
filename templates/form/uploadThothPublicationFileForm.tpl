@@ -19,6 +19,9 @@
 					baseUrl: {$baseUrl|json_encode},
 					filters: {ldelim}
 						max_file_size: '50mb'
+					{rdelim},
+					multipart_params: {ldelim}
+						csrfToken: {csrf type="json"}
 					{rdelim}
 				{rdelim}
 			{rdelim}
