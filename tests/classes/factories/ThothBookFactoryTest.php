@@ -51,7 +51,7 @@ class ThothBookFactoryTest extends PKPTestCase
         return ['request'];
     }
 
-    private function setUpMockEnvironment()
+    private function setUpMockEnvironment(bool $uploadFrontcover = false, ?string $frontcoverUrl = null)
     {
         $submissionRepoMock = Mockery::mock(app(SubmissionRepository::class))
             ->makePartial()
@@ -146,6 +146,12 @@ class ThothBookFactoryTest extends PKPTestCase
             ->withAnyArgs()
             ->andReturn('https://omp.publicknowledgeproject.org/templates/images/book-default.png')
             ->shouldReceive('getData')
+            ->with('thothUploadFrontcover')
+            ->andReturn($uploadFrontcover)
+            ->shouldReceive('getData')
+            ->with('thothFrontcoverUrl')
+            ->andReturn($frontcoverUrl)
+            ->shouldReceive('getData')
             ->with('place')
             ->andReturn('Salvador, BR')
             ->shouldReceive('getData')
@@ -182,6 +188,17 @@ class ThothBookFactoryTest extends PKPTestCase
             'landingPage' => 'https://omp.publicknowledgeproject.org/index.php/press/catalog/book/3',
             'coverUrl' => 'https://omp.publicknowledgeproject.org/templates/images/book-default.png',
         ]), $thothWork);
+    }
+
+    public function testCreateThothBookPreservesHostedFrontcoverUrl()
+    {
+        $frontcoverUrl = 'https://cdn.thoth.pub/frontcover.png';
+        $this->setUpMockEnvironment(true, $frontcoverUrl);
+
+        $factory = new ThothBookFactory();
+        $thothWork = $factory->createFromPublication($this->mocks['publication']);
+
+        $this->assertSame($frontcoverUrl, $thothWork->getCoverUrl());
     }
 
     public function testGetWorkTypeBySubmissionWorkType()
