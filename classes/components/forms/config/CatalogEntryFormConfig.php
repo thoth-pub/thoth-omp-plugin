@@ -60,7 +60,7 @@ class CatalogEntryFormConfig
                     'disabled' => !$canUploadFiles,
                 ],
             ],
-            'value' => $publication->getData('thothUploadFrontcover') && $canUploadFiles ? [true] : [],
+            'value' => (bool) $publication->getData('thothUploadFrontcover') && $canUploadFiles,
         ]), ['after', 'coverImage']);
 
         return false;
