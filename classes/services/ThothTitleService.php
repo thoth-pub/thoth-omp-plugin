@@ -61,22 +61,44 @@ class ThothTitleService
     private function update(array $thothTitles, array $existingTitles): void
     {
         $existingThothTitlesByLocale = $this->indexEntriesByLocale($existingTitles, 'titleId');
+        $canonicalTitle = null;
+        $existingCanonicalTitle = null;
 
         foreach ($thothTitles as $localeKey => $thothTitle) {
-            $existingThothTitle = $existingThothTitlesByLocale[$localeKey] ?? null;
-            if ($existingThothTitle === null) {
-                $this->repository->add($thothTitle);
+            if (!$thothTitle->getCanonical()) {
                 continue;
             }
 
-            $thothTitle->setTitleId($existingThothTitle['titleId']);
-            $this->repository->edit($thothTitle);
+            $canonicalTitle = $thothTitle;
+            $existingCanonicalTitle = $existingThothTitlesByLocale[$localeKey] ?? null;
+            unset($thothTitles[$localeKey], $existingThothTitlesByLocale[$localeKey]);
+            break;
+        }
+
+        foreach ($thothTitles as $localeKey => $thothTitle) {
+            $existingThothTitle = $existingThothTitlesByLocale[$localeKey] ?? null;
+            $this->save($thothTitle, $existingThothTitle);
             unset($existingThothTitlesByLocale[$localeKey]);
         }
 
         foreach ($existingThothTitlesByLocale as $existingThothTitle) {
             $this->repository->delete($existingThothTitle['titleId']);
         }
+
+        if ($canonicalTitle !== null) {
+            $this->save($canonicalTitle, $existingCanonicalTitle);
+        }
+    }
+
+    private function save($thothTitle, ?array $existingThothTitle): void
+    {
+        if ($existingThothTitle === null) {
+            $this->repository->add($thothTitle);
+            return;
+        }
+
+        $thothTitle->setTitleId($existingThothTitle['titleId']);
+        $this->repository->edit($thothTitle);
     }
 
     private function indexEntriesByLocale(array $entries, string $idKey): array
