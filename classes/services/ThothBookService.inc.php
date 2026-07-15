@@ -14,43 +14,65 @@
  * @brief Helper class that encapsulates business logic for Thoth books
  */
 
-use ThothApi\GraphQL\Models\Work as ThothWork;
-
-import('plugins.generic.thoth.classes.facades.ThothService');
 import('lib.pkp.classes.services.PKPSchemaService');
+import('plugins.generic.thoth.classes.services.ThothFrontcoverService');
 
 class ThothBookService
 {
     public $factory;
     public $repository;
+    public $publicationService;
+    public $titleService;
+    public $abstractService;
+    private $frontcoverService;
 
-    private $originalThothBook;
-    private $registeredEntryId;
+    private const PATCH_WORK_FIELDS = [
+        'workId' => true,
+        'workType' => true,
+        'workStatus' => true,
+        'reference' => true,
+        'edition' => true,
+        'imprintId' => true,
+        'doi' => true,
+        'publicationDate' => true,
+        'withdrawnDate' => true,
+        'place' => true,
+        'pageCount' => true,
+        'pageBreakdown' => true,
+        'imageCount' => true,
+        'tableCount' => true,
+        'audioCount' => true,
+        'videoCount' => true,
+        'license' => true,
+        'copyrightHolder' => true,
+        'landingPage' => true,
+        'lccn' => true,
+        'oclc' => true,
+        'generalNote' => true,
+        'bibliographyNote' => true,
+        'toc' => true,
+        'resourcesDescription' => true,
+        'coverUrl' => true,
+        'coverCaption' => true,
+        'firstPage' => true,
+        'lastPage' => true,
+        'pageInterval' => true,
+    ];
 
-    public function __construct($factory, $repository)
-    {
+    public function __construct(
+        $factory,
+        $repository,
+        $publicationService,
+        $titleService,
+        $abstractService,
+        $frontcoverService = null
+    ) {
         $this->factory = $factory;
         $this->repository = $repository;
-    }
-
-    public function getOriginalThothBook()
-    {
-        return $this->originalThothBook;
-    }
-
-    public function setOriginalThothBook($originalThothBook)
-    {
-        $this->originalThothBook = $originalThothBook;
-    }
-
-    public function getRegisteredEntryId()
-    {
-        return $this->registeredEntryId;
-    }
-
-    public function setRegisteredEntryId($registeredEntryId)
-    {
-        $this->registeredEntryId = $registeredEntryId;
+        $this->publicationService = $publicationService;
+        $this->titleService = $titleService;
+        $this->abstractService = $abstractService;
+        $this->frontcoverService = $frontcoverService;
     }
 
     public function register($publication, $thothImprintId)
@@ -58,22 +80,11 @@ class ThothBookService
         $thothBook = $this->factory->createFromPublication($publication);
         $thothBook->setImprintId($thothImprintId);
 
-        if ($thothBook->getWorkStatus() === ThothWork::WORK_STATUS_ACTIVE) {
-            $this->setOriginalThothBook($thothBook);
-            $thothBook->setWorkStatus(ThothWork::WORK_STATUS_FORTHCOMING);
-        }
-
         $thothBookId = $this->repository->add($thothBook);
         $publication->setData('thothBookId', $thothBookId);
-        $this->setRegisteredEntryId($thothBookId);
-        $this->registerMetadata($publication, $thothBookId);
-
-        ThothService::contribution()->registerByPublication($publication);
-        ThothService::publication()->registerByPublication($publication);
-        ThothService::language()->registerByPublication($publication);
-        ThothService::subject()->registerByPublication($publication);
-        ThothService::reference()->registerByPublication($publication);
-        ThothService::workRelation()->registerByPublication($publication, $thothImprintId);
+        if ($this->frontcoverService) {
+            $this->frontcoverService->sync($publication, $thothBookId);
+        }
 
         return $thothBookId;
     }
@@ -84,12 +95,20 @@ class ThothBookService
         $newThothBook = $this->factory->createFromPublication($publication);
 
         $thothBook = $this->repository->new(array_merge(
-            $oldThothBook->getAllData(),
+            $this->getPatchWorkData($oldThothBook),
             $newThothBook->getAllData()
         ));
 
         $this->repository->edit($thothBook);
         $this->updateMetadata($publication, $thothBookId, $oldThothBook);
+        if ($this->frontcoverService) {
+            $this->frontcoverService->sync($publication, $thothBookId);
+        }
+    }
+
+    private function getPatchWorkData($thothBook): array
+    {
+        return array_intersect_key($thothBook->toArray(), self::PATCH_WORK_FIELDS);
     }
 
     public function validate($publication)
@@ -117,60 +136,24 @@ class ThothBookService
             $publicationFormats = $publicationFormats->toArray();
         }
         foreach ($publicationFormats as $publicationFormat) {
-            $errors = array_merge($errors, ThothService::publication()->validate($publicationFormat));
+            $errors = array_merge($errors, $this->publicationService->validate($publicationFormat));
         }
 
         return $errors;
     }
 
-    public function deleteRegisteredEntry()
-    {
-        if ($this->getRegisteredEntryId() === null) {
-            return;
-        }
-
-        $this->repository->delete($this->getRegisteredEntryId());
-        $this->setRegisteredEntryId(null);
-    }
-
-    public function setActive()
-    {
-        if ($this->getOriginalThothBook() === null) {
-            return;
-        }
-
-        $thothBook = $this->getOriginalThothBook();
-        $thothBook->setWorkId($this->getRegisteredEntryId());
-        $thothBook->setWorkStatus(ThothWork::WORK_STATUS_ACTIVE);
-        $this->repository->edit($thothBook);
-    }
-
-    private function registerMetadata($publication, $thothBookId)
-    {
-        ThothService::title()->registerByPublication(
-            $publication,
-            $thothBookId,
-            $publication->getData('locale')
-        );
-        ThothService::abstract()->registerByPublication(
-            $publication,
-            $thothBookId,
-            $publication->getData('locale')
-        );
-    }
-
     private function updateMetadata($publication, $thothBookId, $oldThothBook)
     {
-        ThothService::title()->updateByPublication(
+        $this->titleService->updateByPublication(
             $publication,
             $thothBookId,
-            $oldThothBook->getData('titles') ?? [],
+            $oldThothBook->toArray()['titles'] ?? [],
             $publication->getData('locale')
         );
-        ThothService::abstract()->updateByPublication(
+        $this->abstractService->updateByPublication(
             $publication,
             $thothBookId,
-            $oldThothBook->getData('abstracts') ?? [],
+            $oldThothBook->toArray()['abstracts'] ?? [],
             $publication->getData('locale')
         );
     }

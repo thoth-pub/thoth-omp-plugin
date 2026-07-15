@@ -24,6 +24,11 @@ class ThothService
         return ThothContainer::getInstance()->get('bookService');
     }
 
+    public static function bookRegistration()
+    {
+        return ThothContainer::getInstance()->get('bookRegistrationService');
+    }
+
     public static function chapter()
     {
         return ThothContainer::getInstance()->get('chapterService');
@@ -39,9 +44,14 @@ class ThothService
         return ThothContainer::getInstance()->get('contributorService');
     }
 
-    public static function institution()
+    public static function frontcover()
     {
-        return ThothContainer::getInstance()->get('institutionService');
+        return ThothContainer::getInstance()->get('frontcoverService');
+    }
+
+    public static function featureVideoSubmission()
+    {
+        return ThothContainer::getInstance()->get('featureVideoSubmissionService');
     }
 
     public static function language()

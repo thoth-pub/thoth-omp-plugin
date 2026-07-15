@@ -13,7 +13,9 @@
  * @brief A factory to create Thoth books
  */
 
-use ThothApi\GraphQL\Models\Work as ThothWork;
+use ThothApi\GraphQL\Enums\WorkStatus;
+use ThothApi\GraphQL\Enums\WorkType;
+use ThothApi\GraphQL\Inputs\PatchWork as ThothWork;
 
 import('classes.submission.Submission');
 import('plugins.generic.thoth.classes.formatters.DoiFormatter');
@@ -29,7 +31,7 @@ class ThothChapterFactory
         $pages = $this->extractPages($chapter);
 
         return new ThothWork([
-            'workType' => ThothWork::WORK_TYPE_BOOK_CHAPTER,
+            'workType' => WorkType::BOOK_CHAPTER,
             'workStatus' => $this->getWorkStatusByDatePublished($chapter, $publication),
             'doi' => DoiFormatter::resolveUrl($chapter->getStoredPubId('doi')),
             'pageInterval' => $pages['pageInterval'] ?? null,
@@ -74,9 +76,9 @@ class ThothChapterFactory
         $dataPublished = $chapter->getDatePublished() ?? $publication->getData('datePublished');
 
         if ($dataPublished && $dataPublished <= \Core::getCurrentDate()) {
-            return ThothWork::WORK_STATUS_ACTIVE;
+            return WorkStatus::ACTIVE;
         }
 
-        return ThothWork::WORK_STATUS_FORTHCOMING;
+        return WorkStatus::FORTHCOMING;
     }
 }

@@ -1,5 +1,6 @@
 <?php
 
+require_once(__DIR__ . '/../../../vendor/autoload.php');
 /**
  * @file plugins/generic/thoth/tests/classes/factories/ThothLocationFactoryTest.php
  *
@@ -14,7 +15,8 @@
  * @brief Test class for the ThothLocationFactory class
  */
 
-use ThothApi\GraphQL\Models\Location as ThothLocation;
+use ThothApi\GraphQL\Enums\LocationPlatform;
+use ThothApi\GraphQL\Inputs\PatchLocation as ThothLocation;
 
 import('classes.press.Press');
 import('classes.press.PressDAO');
@@ -172,7 +174,7 @@ class ThothLocationFactoryTest extends PKPTestCase
         $this->assertEquals(new ThothLocation([
             'landingPage' => 'https://omp.publicknowledgeproject.org/press/catalog/book/12',
             'fullTextUrl' => 'https://omp.publicknowledgeproject.org/press/catalog/view/12/1/1',
-            'locationPlatform' => ThothLocation::LOCATION_PLATFORM_OTHER
+            'locationPlatform' => LocationPlatform::OTHER
         ]), $thothLocation);
     }
 }

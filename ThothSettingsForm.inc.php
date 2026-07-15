@@ -20,6 +20,8 @@ use ThothApi\GraphQL\Client;
 
 import('lib.pkp.classes.form.Form');
 import('plugins.generic.thoth.classes.encryption.DataEncryption');
+import('plugins.generic.thoth.classes.services.ThothMeCacheService');
+import('plugins.generic.thoth.classes.security.ThothApiUrlValidator');
 
 class ThothSettingsForm extends Form
 {
@@ -65,7 +67,7 @@ class ThothSettingsForm extends Form
                 if (!$this->getData('customThothApi') || !trim($customThothApiUrl)) {
                     return true;
                 }
-                return filter_var(trim($customThothApiUrl), FILTER_VALIDATE_URL) !== false;
+                return (new ThothApiUrlValidator())->isSafe(trim($customThothApiUrl));
             }
         ));
 
@@ -90,7 +92,12 @@ class ThothSettingsForm extends Form
             function ($token) use ($form) {
                 $httpConfig = [];
                 if ($this->getData('customThothApi') && $this->getData('customThothApiUrl')) {
-                    $httpConfig['base_uri'] = trim($this->getData('customThothApiUrl'));
+                    $customThothApiUrl = trim($this->getData('customThothApiUrl'));
+                    if (!(new ThothApiUrlValidator())->isSafe($customThothApiUrl)) {
+                        return false;
+                    }
+                    $httpConfig['base_uri'] = $customThothApiUrl;
+                    $httpConfig['allow_redirects'] = false;
                 }
 
                 $client = new Client($httpConfig);
@@ -148,6 +155,7 @@ class ThothSettingsForm extends Form
         foreach (self::SETTINGS as $setting) {
             $this->plugin->updateSetting($this->contextId, $setting, trim($this->getData($setting)), 'string');
         }
+        (new ThothMeCacheService())->flush($this->contextId);
         parent::execute(...$functionArgs);
     }
 
@@ -164,12 +172,15 @@ class ThothSettingsForm extends Form
 
     private function validateCustomThothApiUrl($customThothApiUrl)
     {
-        if (!$customThothApiUrl) {
+        if (!(new ThothApiUrlValidator())->isSafe($customThothApiUrl)) {
             return false;
         }
 
         try {
-            (new Client(['base_uri' => $customThothApiUrl]))->publisherCount();
+            (new Client([
+                'base_uri' => $customThothApiUrl,
+                'allow_redirects' => false,
+            ]))->publisherCount();
             return true;
         } catch (Exception $e) {
             return false;

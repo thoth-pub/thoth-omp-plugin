@@ -14,7 +14,6 @@
  */
 
 use ThothApi\Exception\QueryException;
-use ThothApi\GraphQL\Models\Work as ThothWork;
 
 import('plugins.generic.thoth.classes.repositories.ThothWorkRepository');
 

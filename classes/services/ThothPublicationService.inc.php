@@ -16,17 +16,18 @@
 use Biblys\Isbn\Isbn;
 use Biblys\Isbn\IsbnParsingException;
 use Biblys\Isbn\IsbnValidationException;
-use ThothApi\GraphQL\Models\Publication as ThothPublication;
 
 class ThothPublicationService
 {
     public $factory;
     public $repository;
+    public $locationService;
 
-    public function __construct($factory, $repository)
+    public function __construct($factory, $repository, $locationService)
     {
         $this->factory = $factory;
         $this->repository = $repository;
+        $this->locationService = $locationService;
     }
 
     public function register($publicationFormat, $thothWorkId, $chapterId = null, $submissionFile = null)
@@ -49,7 +50,7 @@ class ThothPublicationService
 
         $publicationFormat->setData('thothPublicationId', $thothPublicationId);
 
-        ThothService::location()->registerByPublicationFormat($publicationFormat, $chapterId);
+        $this->locationService->registerByPublicationFormat($publicationFormat, $chapterId);
 
         return $thothPublicationId;
     }

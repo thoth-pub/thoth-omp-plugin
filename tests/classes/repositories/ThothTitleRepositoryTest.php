@@ -14,8 +14,11 @@
  * @brief Test class for the ThothTitleRepository class
  */
 
+require_once(__DIR__ . '/../../../vendor/autoload.php');
+
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Title as ThothTitle;
+use ThothApi\GraphQL\Enums\MarkupFormat;
+use ThothApi\GraphQL\Inputs\PatchTitle as ThothTitle;
 
 import('lib.pkp.tests.PKPTestCase');
 import('plugins.generic.thoth.classes.repositories.ThothTitleRepository');
@@ -67,6 +70,52 @@ class ThothTitleRepositoryTest extends PKPTestCase
         $this->assertEquals('0ee25017-980c-44ab-a18b-164b1bd31b8d', $thothTitleId);
     }
 
+    public function testAddPlainTextTitleUsesPlainTextMarkupFormat()
+    {
+        $thothTitle = new ThothTitle([
+            'workId' => 'e4b7d5af-1b5c-47cc-9382-c5b3f67972a8',
+            'localeCode' => 'EN',
+            'fullTitle' => 'My book title: My subtitle',
+            'title' => 'My book title',
+            'subtitle' => 'My subtitle',
+            'canonical' => true,
+        ]);
+
+        $mockThothClient = $this->getMockBuilder(ThothClient::class)
+            ->setMethods(['createTitle'])
+            ->getMock();
+        $mockThothClient->expects($this->once())
+            ->method('createTitle')
+            ->with(MarkupFormat::PLAIN_TEXT, $thothTitle)
+            ->will($this->returnValue('0ee25017-980c-44ab-a18b-164b1bd31b8d'));
+        $repository = new ThothTitleRepository($mockThothClient);
+
+        $this->assertSame('0ee25017-980c-44ab-a18b-164b1bd31b8d', $repository->add($thothTitle));
+    }
+
+    public function testAddHtmlTitleUsesHtmlMarkupFormat()
+    {
+        $thothTitle = new ThothTitle([
+            'workId' => 'e4b7d5af-1b5c-47cc-9382-c5b3f67972a8',
+            'localeCode' => 'EN',
+            'fullTitle' => '<em>My book title</em>: My subtitle',
+            'title' => '<em>My book title</em>',
+            'subtitle' => 'My subtitle',
+            'canonical' => true,
+        ]);
+
+        $mockThothClient = $this->getMockBuilder(ThothClient::class)
+            ->setMethods(['createTitle'])
+            ->getMock();
+        $mockThothClient->expects($this->once())
+            ->method('createTitle')
+            ->with(MarkupFormat::HTML, $thothTitle)
+            ->will($this->returnValue('0ee25017-980c-44ab-a18b-164b1bd31b8d'));
+        $repository = new ThothTitleRepository($mockThothClient);
+
+        $this->assertSame('0ee25017-980c-44ab-a18b-164b1bd31b8d', $repository->add($thothTitle));
+    }
+
     public function testEditTitle()
     {
         $thothPatchTitle = new ThothTitle([
@@ -91,6 +140,54 @@ class ThothTitleRepositoryTest extends PKPTestCase
         $thothTitleId = $repository->edit($thothPatchTitle);
 
         $this->assertEquals('0ee25017-980c-44ab-a18b-164b1bd31b8d', $thothTitleId);
+    }
+
+    public function testEditPlainTextTitleUsesPlainTextMarkupFormat()
+    {
+        $thothPatchTitle = new ThothTitle([
+            'titleId' => '0ee25017-980c-44ab-a18b-164b1bd31b8d',
+            'workId' => 'e4b7d5af-1b5c-47cc-9382-c5b3f67972a8',
+            'localeCode' => 'EN',
+            'fullTitle' => 'My updated title: My updated subtitle',
+            'title' => 'My updated title',
+            'subtitle' => 'My updated subtitle',
+            'canonical' => true,
+        ]);
+
+        $mockThothClient = $this->getMockBuilder(ThothClient::class)
+            ->setMethods(['updateTitle'])
+            ->getMock();
+        $mockThothClient->expects($this->once())
+            ->method('updateTitle')
+            ->with(MarkupFormat::PLAIN_TEXT, $thothPatchTitle)
+            ->will($this->returnValue('0ee25017-980c-44ab-a18b-164b1bd31b8d'));
+        $repository = new ThothTitleRepository($mockThothClient);
+
+        $this->assertSame('0ee25017-980c-44ab-a18b-164b1bd31b8d', $repository->edit($thothPatchTitle));
+    }
+
+    public function testEditHtmlTitleUsesHtmlMarkupFormat()
+    {
+        $thothPatchTitle = new ThothTitle([
+            'titleId' => '0ee25017-980c-44ab-a18b-164b1bd31b8d',
+            'workId' => 'e4b7d5af-1b5c-47cc-9382-c5b3f67972a8',
+            'localeCode' => 'EN',
+            'fullTitle' => '<em>My updated title</em>: My updated subtitle',
+            'title' => '<em>My updated title</em>',
+            'subtitle' => 'My updated subtitle',
+            'canonical' => true,
+        ]);
+
+        $mockThothClient = $this->getMockBuilder(ThothClient::class)
+            ->setMethods(['updateTitle'])
+            ->getMock();
+        $mockThothClient->expects($this->once())
+            ->method('updateTitle')
+            ->with(MarkupFormat::HTML, $thothPatchTitle)
+            ->will($this->returnValue('0ee25017-980c-44ab-a18b-164b1bd31b8d'));
+        $repository = new ThothTitleRepository($mockThothClient);
+
+        $this->assertSame('0ee25017-980c-44ab-a18b-164b1bd31b8d', $repository->edit($thothPatchTitle));
     }
 
     public function testDeleteTitle()

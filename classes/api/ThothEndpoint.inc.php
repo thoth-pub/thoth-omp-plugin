@@ -18,6 +18,7 @@ use ThothApi\Exception\QueryException;
 import('plugins.generic.thoth.classes.facades.ThothService');
 import('plugins.generic.thoth.classes.facades.ThothRepo');
 import('plugins.generic.thoth.classes.notification.ThothNotification');
+import('plugins.generic.thoth.classes.services.ThothMeCacheService');
 
 class ThothEndpoint
 {
@@ -30,6 +31,8 @@ class ThothEndpoint
             return false;
         }
 
+        $rootPattern = $handler->getEndpointPattern();
+
         array_unshift(
             $endpoints['PUT'],
             [
@@ -40,6 +43,16 @@ class ThothEndpoint
         );
 
         $handler->requiresSubmissionAccess[] = 'register';
+
+        $endpoints['POST'][] = [
+            'pattern' => "{$rootPattern}/{submissionId:\d+}/featureVideo",
+            'handler' => [$this, 'uploadFeatureVideo'],
+            'roles' => [
+                ROLE_ID_MANAGER,
+                ROLE_ID_SUB_EDITOR,
+                ROLE_ID_ASSISTANT,
+            ],
+        ];
 
         return false;
     }
@@ -90,14 +103,18 @@ class ThothEndpoint
         AppLocale::requireComponents(LOCALE_COMPONENT_PKP_SUBMISSION, LOCALE_COMPONENT_APP_SUBMISSION);
 
         $disableNotification = $params['disableNotification'] ?? false;
+        $registrationResult = null;
         try {
-            $thothBookService = ThothService::book();
-            $thothBookId = $thothBookService->register($publication, $thothImprintId);
-            $thothBookService->setActive();
+            $thothBookRegistrationService = ThothService::bookRegistration();
+            $registrationResult = $thothBookRegistrationService->register($publication, $thothImprintId);
+            $thothBookRegistrationService->setActive($registrationResult);
+            $thothBookId = $registrationResult->getWorkId();
             $submission = Services::get('submission')->edit($submission, ['thothWorkId' => $thothBookId], $request);
             $this->handleNotification($request, $submission, true, $disableNotification);
         } catch (QueryException $e) {
-            $thothBookService->deleteRegisteredEntry();
+            if ($registrationResult !== null) {
+                $thothBookRegistrationService->deleteRegisteredEntry($registrationResult);
+            }
             $this->handleNotification($request, $submission, false, $disableNotification, $e);
             $failure['errors'][] = __('plugins.generic.thoth.register.error.log', ['reason' => $e->getMessage()]);
             return $response->withStatus(403)->withJson($failure);
@@ -112,6 +129,67 @@ class ThothEndpoint
         ]);
 
         return $response->withJson($submissionProps, 200);
+    }
+
+    public function uploadFeatureVideo($slimRequest, $response, $args)
+    {
+        $request = Application::get()->getRequest();
+        $submission = Services::get('submission')->get((int) $args['submissionId']);
+        $context = $request->getContext();
+        $user = $request->getUser();
+        if (!$submission) {
+            return $response->withStatus(404)->withJsonError('api.404.resourceNotFound');
+        }
+        if (!$context || (int) $submission->getData('contextId') !== (int) $context->getId() || !$user) {
+            return $response->withStatus(403)->withJsonError('api.submissions.403.contextRequired');
+        }
+
+        $params = (array) $slimRequest->getParsedBody();
+        $title = trim((string) ($params['title'] ?? ''));
+        $temporaryFileId = (int) ($params['video']['temporaryFileId'] ?? 0);
+        $errors = [];
+        if ($title === '') {
+            $errors['title'] = [__('form.required')];
+        }
+        if (!$temporaryFileId) {
+            $errors['video'] = [__('form.required')];
+        }
+        if ($errors) {
+            return $response->withStatus(400)->withJson($errors);
+        }
+
+        try {
+            $canUpload = (new ThothMeCacheService(ThothRepo::me()))
+                ->hasCdnWritePermission($context->getId());
+            if (!$canUpload) {
+                return $response->withStatus(403)->withJson([
+                    'video' => [__('plugins.generic.thoth.fileUpload.error.missingCdnWritePermission')],
+                ]);
+            }
+            $metadata = ThothService::featureVideoSubmission()->upload(
+                $submission,
+                $title,
+                $temporaryFileId,
+                (int) $user->getId()
+            );
+            return $response->withJson($metadata, 200);
+        } catch (InvalidArgumentException $exception) {
+            $message = $exception->getMessage();
+            if (
+                strpos($message, 'temporary video file was not found') !== false
+                || strpos($message, 'supported video') !== false
+            ) {
+                return $response->withStatus(400)->withJson([
+                    'video' => [__('plugins.generic.thoth.featureVideo.invalidFile')],
+                ]);
+            }
+
+            error_log($message);
+            return $response->withStatus(500)->withJsonError('plugins.generic.thoth.connectionError');
+        } catch (Throwable $exception) {
+            error_log($exception->getMessage());
+            return $response->withStatus(500)->withJsonError('plugins.generic.thoth.connectionError');
+        }
     }
 
 

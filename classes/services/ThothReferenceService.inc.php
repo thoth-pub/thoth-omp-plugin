@@ -13,7 +13,6 @@
  * @brief Helper class that encapsulates business logic for Thoth References
  */
 
-use ThothApi\GraphQL\Models\Reference as ThothReference;
 
 class ThothReferenceService
 {
@@ -42,7 +41,7 @@ class ThothReferenceService
             ->getByPublicationId($publication->getId())
             ->toArray();
         foreach ($citations as $citation) {
-            ThothService::reference()->register($citation, $thothBookId);
+            $this->register($citation, $thothBookId);
         }
     }
 }

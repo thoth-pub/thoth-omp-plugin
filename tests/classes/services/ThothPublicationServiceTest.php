@@ -1,5 +1,6 @@
 <?php
 
+require_once(__DIR__ . '/../../../vendor/autoload.php');
 /**
  * @file plugins/generic/thoth/tests/classes/services/ThothPublicationServiceTest.php
  *
@@ -15,10 +16,13 @@
  */
 
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Publication as ThothPublication;
+use ThothApi\GraphQL\Enums\PublicationType;
+use ThothApi\GraphQL\Inputs\PatchPublication as ThothPublication;
 
 import('lib.pkp.tests.PKPTestCase');
+import('plugins.generic.thoth.classes.container.ThothContainer');
 import('plugins.generic.thoth.classes.repositories.ThothPublicationRepository');
+import('plugins.generic.thoth.classes.services.ThothLocationService');
 import('plugins.generic.thoth.classes.services.ThothPublicationService');
 
 class ThothPublicationServiceTest extends PKPTestCase
@@ -27,11 +31,13 @@ class ThothPublicationServiceTest extends PKPTestCase
     {
         parent::setUp();
         $this->backup = ThothContainer::getInstance()->backup('client');
+        $this->locationServiceBackup = ThothContainer::getInstance()->backup('locationService');
     }
 
     protected function tearDown(): void
     {
         ThothContainer::getInstance()->set('client', $this->backup);
+        ThothContainer::getInstance()->set('locationService', $this->locationServiceBackup);
         parent::tearDown();
     }
 
@@ -40,7 +46,10 @@ class ThothPublicationServiceTest extends PKPTestCase
         ThothContainer::getInstance()->set('client', function () {
             return $this->getMockBuilder(ThothClient::class)->getMock();
         });
-
+        $mockLocationService = $this->createMock(ThothLocationService::class);
+        $mockLocationService->expects($this->once())
+            ->method('registerByPublicationFormat')
+            ->with($this->isInstanceOf(PublicationFormat::class), null);
         $mockFactory = $this->getMockBuilder(ThothPublicationFactory::class)
             ->setMethods(['createFromPublicationFormat'])
             ->getMock();
@@ -59,11 +68,16 @@ class ThothPublicationServiceTest extends PKPTestCase
             ->method('getIdByType')
             ->will($this->returnValue(null));
 
-        $mockPubFormat = $this->getMockBuilder(PublicationFormat::class)->getMock();
+        $mockPubFormat = $this->getMockBuilder(PublicationFormat::class)
+            ->setMethods(['setData'])
+            ->getMock();
+        $mockPubFormat->expects($this->once())
+            ->method('setData')
+            ->with('thothPublicationId', '4296c934-0f05-4920-a208-a5ab214b908a');
 
         $thothWorkId = '14d026ea-803f-4e51-a813-cea355287ab6';
 
-        $service = new ThothPublicationService($mockFactory, $mockRepository);
+        $service = new ThothPublicationService($mockFactory, $mockRepository, $mockLocationService);
         $thothPublicationId = $service->register($mockPubFormat, $thothWorkId);
 
         $this->assertSame('4296c934-0f05-4920-a208-a5ab214b908a', $thothPublicationId);
@@ -84,9 +98,18 @@ class ThothPublicationServiceTest extends PKPTestCase
             ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
             ->getMock();
 
-        $mockPubFormat = $this->getMockBuilder(PublicationFormat::class)->getMock();
+        $mockPubFormat = $this->getMockBuilder(PublicationFormat::class)
+            ->setMethods(['getLocalizedName'])
+            ->getMock();
+        $mockPubFormat->expects($this->once())
+            ->method('getLocalizedName')
+            ->will($this->returnValue('PDF'));
 
-        $service = new ThothPublicationService($mockFactory, $mockRepository);
+        $service = new ThothPublicationService(
+            $mockFactory,
+            $mockRepository,
+            $this->createMock(ThothLocationService::class)
+        );
         $errors = $service->validate($mockPubFormat);
 
         $this->assertEquals([
@@ -112,9 +135,18 @@ class ThothPublicationServiceTest extends PKPTestCase
             ->method('find')
             ->will($this->returnValue(new ThothPublication()));
 
-        $mockPubFormat = $this->getMockBuilder(PublicationFormat::class)->getMock();
+        $mockPubFormat = $this->getMockBuilder(PublicationFormat::class)
+            ->setMethods(['getLocalizedName'])
+            ->getMock();
+        $mockPubFormat->expects($this->once())
+            ->method('getLocalizedName')
+            ->will($this->returnValue('PDF'));
 
-        $service = new ThothPublicationService($mockFactory, $mockRepository);
+        $service = new ThothPublicationService(
+            $mockFactory,
+            $mockRepository,
+            $this->createMock(ThothLocationService::class)
+        );
         $errors = $service->validate($mockPubFormat);
 
         $this->assertEquals([

@@ -96,6 +96,9 @@ msgstr "\"{$isbn}\" do formato de publicação \"{$formatName}\" não é um ISBN
 msgid "plugins.generic.thoth.validation.doiExists"
 msgstr "Um trabalho com o DOI \"{$doi}\" já existe."
 
+msgid "plugins.generic.thoth.validation.doiNotFound"
+msgstr "Não foi possível encontrar uma monografia ou capítulo no Thoth com o DOI \"{$doi}\"."
+
 msgid "plugins.generic.thoth.validation.landingPageExists"
 msgstr "Um trabalho com a página de destino \"{$landingPage}\" já existe."
 
@@ -215,3 +218,86 @@ msgstr "Ônus desproporcional"
 
 msgid "plugins.generic.thoth.publicationFormat.accessibilityException.fundamentalAlteration"
 msgstr "Alteração fundamental"
+
+msgid "plugins.generic.thoth.grid.action.thothFileUpload"
+msgstr "Enviar para Thoth"
+
+msgid "plugins.generic.thoth.submissionComponent.title"
+msgstr "Componente da submissão relacionado ao arquivo"
+
+msgid "plugins.generic.thoth.submissionComponent.description"
+msgstr "Selecione a monografia ou o capítulo relacionado ao arquivo. Monografias e capítulos precisam ter DOI para o envio de arquivos para Thoth."
+
+msgid "plugins.generic.thoth.fileUpload.success"
+msgstr "Arquivo enviado para Thoth com sucesso."
+
+msgid "plugins.generic.thoth.fileUpload.error.invalidPublication"
+msgstr "A publicação selecionada para o envio do arquivo ao Thoth não foi encontrada."
+
+msgid "plugins.generic.thoth.fileUpload.error.publicationContextMismatch"
+msgstr "A publicação selecionada para o envio do arquivo ao Thoth não pertence ao contexto atual."
+
+msgid "plugins.generic.thoth.fileUpload.error.thothWorkMismatch"
+msgstr "A obra do Thoth associada a este envio não corresponde à publicação selecionada."
+
+msgid "plugins.generic.thoth.fileUpload.error.invalidPublicationFormat"
+msgstr "O formato de publicação selecionado para o envio do arquivo ao Thoth não foi encontrado."
+
+msgid "plugins.generic.thoth.fileUpload.error.invalidSubmissionComponent"
+msgstr "O componente da submissão selecionado para o envio do arquivo ao Thoth não foi encontrado nesta publicação."
+
+msgid "plugins.generic.thoth.fileUpload.error.missingDoi"
+msgstr "É necessário ter DOI na publicação ou em pelo menos um capítulo para enviar arquivos para Thoth."
+
+msgid "plugins.generic.thoth.fileUpload.error.missingCdnWritePermission"
+msgstr "O usuário da Thoth precisa da permissão cdnWrite para enviar arquivos."
+
+msgid "plugins.generic.thoth.fileUpload.error.chapterNotFoundInThoth"
+msgstr "Não foi possível encontrar um capítulo no Thoth com o DOI \"{$doi}\"."
+
+msgid "plugins.generic.thoth.fileUpload.error.chapterLookupFailed"
+msgstr "Houve um problema ao verificar o capítulo selecionado no Thoth antes do envio do arquivo."
+
+msgid "plugins.generic.thoth.grid.column.thothFiles"
+msgstr "Arquivos no Thoth"
+
+msgid "plugins.generic.thoth.grid.action.viewThothFiles"
+msgstr "Arquivos no Thoth"
+
+msgid "plugins.generic.thoth.grid.action.viewThothFilesLabel"
+msgstr "Ver"
+
+msgid "plugins.generic.thoth.publicationFormat.thothFiles.empty"
+msgstr "Nenhum arquivo foi encontrado no Thoth para este formato de publicação."
+
+msgid "plugins.generic.thoth.publicationFormat.thothFiles.component"
+msgstr "Item"
+
+msgid "plugins.generic.thoth.publicationFormat.thothFiles.component.publication"
+msgstr "Publicação: {$title}"
+
+msgid "plugins.generic.thoth.publicationFormat.thothFiles.component.chapter"
+msgstr "Capítulo: {$title}"
+
+msgid "plugins.generic.thoth.publicationFormat.thothFiles.file"
+msgstr "Arquivo"
+
+msgid "plugins.generic.thoth.field.frontcover"
+msgstr "Hospedagem do arquivo de capa na Thoth"
+
+msgid "plugins.generic.thoth.field.frontcover.label"
+msgstr "Hospedar o arquivo da imagem de capa na Thoth."
+
+msgid "plugins.generic.thoth.field.frontcover.missingCdnWritePermission"
+msgstr "O usuário da Thoth configurado precisa da permissão cdnWrite para hospedar o arquivo da imagem de capa na Thoth."
+
+msgid "plugins.generic.thoth.featureVideo"
+msgstr "Vídeo em destaque"
+
+msgid "plugins.generic.thoth.featureVideo.file"
+msgstr "Arquivo de vídeo"
+
+msgid "plugins.generic.thoth.featureVideo.invalidFile"
+msgstr "Selecione um arquivo de vídeo MP4, WebM ou MOV válido."
+msgid "plugins.generic.thoth.featureVideo.exists"
+msgstr "Esta obra já possui um vídeo em destaque no Thoth."

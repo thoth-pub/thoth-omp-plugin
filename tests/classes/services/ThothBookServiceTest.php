@@ -1,5 +1,6 @@
 <?php
 
+require_once(__DIR__ . '/../../../vendor/autoload.php');
 /**
  * @file plugins/generic/thoth/tests/classes/services/ThothBookServiceTest.php
  *
@@ -15,16 +16,20 @@
  */
 
 use ThothApi\GraphQL\Client as ThothClient;
-use ThothApi\GraphQL\Models\Work as ThothWork;
+use ThothApi\GraphQL\Enums\WorkStatus;
+use ThothApi\GraphQL\Enums\WorkType;
+use ThothApi\GraphQL\Inputs\PatchWork as ThothWork;
 
 import('classes.publication.Publication');
 import('lib.pkp.classes.core.PKPRequest');
 import('lib.pkp.tests.PKPTestCase');
+import('plugins.generic.thoth.classes.container.ThothContainer');
 import('plugins.generic.thoth.classes.factories.ThothBookFactory');
 import('plugins.generic.thoth.classes.repositories.ThothBookRepository');
 import('plugins.generic.thoth.classes.services.ThothAbstractService');
 import('plugins.generic.thoth.classes.services.ThothBookService');
 import('plugins.generic.thoth.classes.services.ThothContributionService');
+import('plugins.generic.thoth.classes.services.ThothFrontcoverService');
 import('plugins.generic.thoth.classes.services.ThothLanguageService');
 import('plugins.generic.thoth.classes.services.ThothPublicationService');
 import('plugins.generic.thoth.classes.services.ThothReferenceService');
@@ -34,6 +39,8 @@ import('plugins.generic.thoth.classes.services.ThothWorkRelationService');
 
 class ThothBookServiceTest extends PKPTestCase
 {
+    protected $backups = [];
+
     public function setUp(): void
     {
         parent::setUp();
@@ -60,6 +67,24 @@ class ThothBookServiceTest extends PKPTestCase
         parent::tearDown();
     }
 
+    private function createBookService(
+        $factory,
+        $repository,
+        $publicationService = null,
+        $titleService = null,
+        $abstractService = null,
+        $frontcoverService = null
+    ) {
+        return new ThothBookService(
+            $factory,
+            $repository,
+            $publicationService ?? $this->createMock(ThothPublicationService::class),
+            $titleService ?? $this->createMock(ThothTitleService::class),
+            $abstractService ?? $this->createMock(ThothAbstractService::class),
+            $frontcoverService
+        );
+    }
+
     public function testRegisterBook()
     {
         ThothContainer::getInstance()->set('client', function () {
@@ -67,7 +92,7 @@ class ThothBookServiceTest extends PKPTestCase
         });
 
         $mockAbstractService = $this->createMock(ThothAbstractService::class);
-        $mockAbstractService->expects($this->once())->method('registerByPublication');
+        $mockAbstractService->expects($this->never())->method('registerByPublication');
         ThothContainer::getInstance()->set('abstractService', fn () => $mockAbstractService);
 
         $mockContributionService = $this->createMock(ThothContributionService::class);
@@ -106,7 +131,7 @@ class ThothBookServiceTest extends PKPTestCase
             ->will($this->returnValue('d8fa2e63-5513-45e5-84c1-e9c2d89f99d3'));
 
         $mockTitleService = $this->createMock(ThothTitleService::class);
-        $mockTitleService->expects($this->once())->method('registerByPublication');
+        $mockTitleService->expects($this->never())->method('registerByPublication');
         ThothContainer::getInstance()->set('titleService', fn () => $mockTitleService);
 
         $mockWorkRelationService = $this->createMock(ThothWorkRelationService::class);
@@ -133,18 +158,112 @@ class ThothBookServiceTest extends PKPTestCase
         ]));
 
         $thothImprintId = 'f740cf4e-16d1-487c-9a92-615882a591e9';
+        $mockFrontcoverService = $this->createMock(ThothFrontcoverService::class);
+        $mockFrontcoverService->expects($this->once())
+            ->method('sync')
+            ->with($mockPublication, 'd8fa2e63-5513-45e5-84c1-e9c2d89f99d3');
 
-        $service = new ThothBookService($mockFactory, $mockRepository);
+        $service = $this->createBookService(
+            $mockFactory,
+            $mockRepository,
+            $this->createMock(ThothPublicationService::class),
+            $this->createMock(ThothTitleService::class),
+            $this->createMock(ThothAbstractService::class),
+            $mockFrontcoverService
+        );
         $thothBookId = $service->register($mockPublication, $thothImprintId);
 
         $this->assertSame('d8fa2e63-5513-45e5-84c1-e9c2d89f99d3', $thothBookId);
+    }
+
+    public function testUpdateBookIgnoresSchemaOnlyFields()
+    {
+        $mockTitleService = $this->createMock(ThothTitleService::class);
+        $mockTitleService->expects($this->once())
+            ->method('updateByPublication')
+            ->with(
+                $this->isInstanceOf(Publication::class),
+                '9f65f147-1d9d-4dd1-9f78-89b58d088a2c',
+                [['titleId' => 'title-id']],
+                'en_US'
+            );
+        $mockAbstractService = $this->createMock(ThothAbstractService::class);
+        $mockAbstractService->expects($this->once())
+            ->method('updateByPublication')
+            ->with(
+                $this->isInstanceOf(Publication::class),
+                '9f65f147-1d9d-4dd1-9f78-89b58d088a2c',
+                [['abstractId' => 'abstract-id']],
+                'en_US'
+            );
+        $oldThothBook = new class () {
+            public function toArray()
+            {
+                return [
+                    'workId' => '9f65f147-1d9d-4dd1-9f78-89b58d088a2c',
+                    'workType' => WorkType::MONOGRAPH,
+                    'workStatus' => WorkStatus::ACTIVE,
+                    'fullTitle' => 'Old title',
+                    'title' => 'Old title',
+                    'subtitle' => 'Old subtitle',
+                    'titles' => [['titleId' => 'title-id']],
+                    'abstracts' => [['abstractId' => 'abstract-id']],
+                ];
+            }
+        };
+
+        $newThothBook = new ThothWork([
+            'doi' => 'https://doi.org/10.12345/updated',
+        ]);
+
+        $mockFactory = $this->getMockBuilder(ThothBookFactory::class)
+            ->setMethods(['createFromPublication'])
+            ->getMock();
+        $mockFactory->expects($this->once())
+            ->method('createFromPublication')
+            ->willReturn($newThothBook);
+
+        $mockRepository = $this->getMockBuilder(ThothBookRepository::class)
+            ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
+            ->setMethods(['get', 'new', 'edit'])
+            ->getMock();
+        $mockRepository->expects($this->once())
+            ->method('get')
+            ->with('9f65f147-1d9d-4dd1-9f78-89b58d088a2c')
+            ->willReturn($oldThothBook);
+        $mockRepository->expects($this->once())
+            ->method('new')
+            ->with([
+                'workId' => '9f65f147-1d9d-4dd1-9f78-89b58d088a2c',
+                'workType' => WorkType::MONOGRAPH,
+                'workStatus' => WorkStatus::ACTIVE,
+                'doi' => 'https://doi.org/10.12345/updated',
+            ])
+            ->willReturn(new ThothWork());
+        $mockRepository->expects($this->once())
+            ->method('edit');
+
+        $mockPublication = $this->getMockBuilder(Publication::class)
+            ->setMethods(['getData'])
+            ->getMock();
+        $mockPublication->method('getData')->will($this->returnValueMap([
+            ['locale', null, 'en_US'],
+        ]));
+
+        $service = $this->createBookService(
+            $mockFactory,
+            $mockRepository,
+            null,
+            $mockTitleService,
+            $mockAbstractService
+        );
+        $service->update($mockPublication, '9f65f147-1d9d-4dd1-9f78-89b58d088a2c');
     }
 
     public function testDoiExistsBookValidationFails()
     {
         $mockPublicationService = $this->createMock(ThothPublicationService::class);
         $mockPublicationService->method('validate')->willReturn([]);
-        ThothContainer::getInstance()->set('publicationService', fn () => $mockPublicationService);
 
         $mockPublicationFormatDao = $this->getMockBuilder(stdClass::class)
             ->addMethods(['getByPublicationId'])
@@ -174,7 +293,7 @@ class ThothBookServiceTest extends PKPTestCase
             ->getMock();
         $mockPublication->method('getId')->willReturn(1);
 
-        $service = new ThothBookService($mockFactory, $mockRepository);
+        $service = $this->createBookService($mockFactory, $mockRepository, $mockPublicationService);
         $errors = $service->validate($mockPublication);
 
         $this->assertEquals([
@@ -186,7 +305,6 @@ class ThothBookServiceTest extends PKPTestCase
     {
         $mockPublicationService = $this->createMock(ThothPublicationService::class);
         $mockPublicationService->method('validate')->willReturn([]);
-        ThothContainer::getInstance()->set('publicationService', fn () => $mockPublicationService);
 
         $mockPublicationFormatDao = $this->getMockBuilder(stdClass::class)
             ->addMethods(['getByPublicationId'])
@@ -218,7 +336,7 @@ class ThothBookServiceTest extends PKPTestCase
             ->getMock();
         $mockPublication->method('getId')->willReturn(1);
 
-        $service = new ThothBookService($mockFactory, $mockRepository);
+        $service = $this->createBookService($mockFactory, $mockRepository, $mockPublicationService);
         $errors = $service->validate($mockPublication);
 
         $this->assertEquals([
@@ -233,7 +351,6 @@ class ThothBookServiceTest extends PKPTestCase
             ->method('validate')
             ->with($this->isInstanceOf(stdClass::class))
             ->willReturn(['format-error']);
-        ThothContainer::getInstance()->set('publicationService', fn () => $mockPublicationService);
 
         $mockPublicationFormats = new class () {
             public function toArray()
@@ -267,7 +384,7 @@ class ThothBookServiceTest extends PKPTestCase
             ->getMock();
         $mockPublication->method('getId')->willReturn(1);
 
-        $service = new ThothBookService($mockFactory, $mockRepository);
+        $service = $this->createBookService($mockFactory, $mockRepository, $mockPublicationService);
         $errors = $service->validate($mockPublication);
 
         $this->assertEquals(['format-error'], $errors);

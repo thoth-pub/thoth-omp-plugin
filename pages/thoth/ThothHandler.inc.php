@@ -2,6 +2,7 @@
 
 import('classes.handler.Handler');
 import('plugins.generic.thoth.classes.components.listPanels.ThothListPanel');
+import('plugins.generic.thoth.classes.services.ThothMeCacheService');
 
 class ThothHandler extends Handler
 {
@@ -44,8 +45,14 @@ class ThothHandler extends Handler
         $this->addStyles($request, $templateMgr, $plugin);
 
         try {
-            $publishers = ThothRepo::account()->getLinkedPublishers();
-            $imprints = ThothRepo::imprint()->getMany(array_column($publishers, 'publisherId'));
+            $publishers = (new ThothMeCacheService(ThothRepo::me()))->getLinkedPublishers($context->getId());
+            $publisherIds = array_column($publishers, 'publisherId');
+            $imprints = ThothRepo::imprint()->getMany([
+                'publishers' => $publisherIds
+            ], [
+                'imprintId',
+                'imprintName',
+            ]);
         } catch (\Exception $e) {
             error_log($e->getMessage());
             $connectionError = true;
@@ -84,6 +91,11 @@ class ThothHandler extends Handler
             'count' => $thothList->count,
             'contextId' => $context->getId(),
         ]);
+        $params = $this->scopeParamsToUser(
+            $params,
+            $request,
+            (array) $this->getAuthorizedContextObject(ASSOC_TYPE_USER_ROLES)
+        );
         $submissionsIterator = $submissionService->getMany($params);
         $items = [];
         foreach ($submissionsIterator as $submission) {
@@ -103,6 +115,15 @@ class ThothHandler extends Handler
         ]);
 
         return $templateMgr->display($plugin->getTemplateResource('thoth/index.tpl'));
+    }
+
+    protected function scopeParamsToUser($params, $request, $userRoles)
+    {
+        if (!in_array(ROLE_ID_MANAGER, $userRoles, true)) {
+            $params['assignedTo'] = [$request->getUser()->getId()];
+        }
+
+        return $params;
     }
 
     private function addScripts($request, $templateMgr, $plugin)
