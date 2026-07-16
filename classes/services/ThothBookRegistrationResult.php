@@ -20,6 +20,7 @@ class ThothBookRegistrationResult
 {
     private string $workId;
     private $bookToActivate;
+    private ?string $warning = null;
 
     public function __construct(string $workId, $bookToActivate = null)
     {
@@ -40,5 +41,15 @@ class ThothBookRegistrationResult
     public function shouldActivate(): bool
     {
         return $this->bookToActivate !== null;
+    }
+
+    public function setWarning(?string $warning): void
+    {
+        $this->warning = $warning;
+    }
+
+    public function getWarning(): ?string
+    {
+        return $this->warning;
     }
 }
