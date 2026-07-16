@@ -25,7 +25,7 @@ import('plugins.generic.thoth.classes.factories.ThothContributionFactory');
 
 class ThothContributionFactoryTest extends PKPTestCase
 {
-    private function setUpMockEnvironment()
+    private function setUpMockEnvironment($givenName = 'John')
     {
         $mockUserGroup = $this->getMockBuilder(UserGroup::class)
             ->setMethods(['getData'])
@@ -63,7 +63,7 @@ class ThothContributionFactoryTest extends PKPTestCase
             ]));
         $mockAuthor->expects($this->any())
             ->method('getLocalizedGivenName')
-            ->will($this->returnValue('John'));
+            ->will($this->returnValue($givenName));
         $mockAuthor->expects($this->any())
             ->method('getSequence')
             ->will($this->returnValue(0));
@@ -92,5 +92,15 @@ class ThothContributionFactoryTest extends PKPTestCase
             'lastName' => 'Doe',
             'fullName' => 'John Doe',
         ]), $thothContribution);
+    }
+
+    public function testCreateThothContributionOmitsEmptyOptionalMetadata()
+    {
+        $this->setUpMockEnvironment('');
+
+        $factory = new ThothContributionFactory();
+        $data = $factory->createFromAuthor($this->mocks['author'], 0, 1)->getAllData();
+
+        $this->assertArrayNotHasKey('firstName', $data);
     }
 }

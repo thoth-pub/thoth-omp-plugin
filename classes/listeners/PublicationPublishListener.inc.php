@@ -60,11 +60,17 @@ class PublicationPublishListener
             $thothBookId = $registrationResult->getWorkId();
             $submission = Services::get('submission')->edit($submission, ['thothWorkId' => $thothBookId], $request);
             $thothNotification->notifySuccess($request, $submission);
+            if ($warning = $registrationResult->getWarning()) {
+                $thothNotification->notifyWarning($request, $submission, $warning);
+            }
         } catch (QueryException $e) {
             if ($registrationResult !== null) {
                 $thothBookRegistrationService->deleteRegisteredEntry($registrationResult);
             }
             $thothNotification->notifyError($request, $submission, $e);
+            if ($registrationResult && $warning = $registrationResult->getWarning()) {
+                $thothNotification->notifyWarning($request, $submission, $warning);
+            }
         }
 
         return false;
