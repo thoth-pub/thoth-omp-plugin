@@ -48,10 +48,14 @@ class ThothLocationFactory
                 [$submission->getBestId(), $publicationFormat->getBestId(), $fileId]
             ) : $publicationFormat->getData('urlRemote');
 
-        return new ThothLocation([
+        $locationData = [
             'landingPage' => $landingPage,
-            'fullTextUrl' => $fullTextUrl,
-            'locationPlatform' => LocationPlatform::OTHER
-        ]);
+            'locationPlatform' => LocationPlatform::OTHER,
+        ];
+        if ($fullTextUrl !== null && $fullTextUrl !== '') {
+            $locationData['fullTextUrl'] = $fullTextUrl;
+        }
+
+        return new ThothLocation($locationData);
     }
 }

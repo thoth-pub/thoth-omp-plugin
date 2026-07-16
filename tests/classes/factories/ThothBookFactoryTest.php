@@ -51,8 +51,11 @@ class ThothBookFactoryTest extends PKPTestCase
         return ['request'];
     }
 
-    private function setUpMockEnvironment(bool $uploadFrontcover = false, ?string $frontcoverUrl = null)
-    {
+    private function setUpMockEnvironment(
+        bool $uploadFrontcover = false,
+        ?string $frontcoverUrl = null,
+        bool $emptyOptionalMetadata = false
+    ) {
         $submissionRepoMock = Mockery::mock(app(SubmissionRepository::class))
             ->makePartial()
             ->shouldReceive('get')
@@ -65,6 +68,12 @@ class ThothBookFactoryTest extends PKPTestCase
                     ->shouldReceive('getData')
                     ->with('contextId')
                     ->andReturn(99)
+                    ->shouldReceive('getData')
+                    ->with('locale')
+                    ->andReturn('en')
+                    ->shouldReceive('_getContextLicenseFieldValue')
+                    ->withAnyArgs()
+                    ->andReturn('')
                     ->shouldReceive('getBestId')
                     ->withAnyArgs()
                     ->andReturn(3)
@@ -133,18 +142,20 @@ class ThothBookFactoryTest extends PKPTestCase
                     ->makePartial()
                     ->shouldReceive('getResolvingUrl')
                     ->withAnyArgs()
-                    ->andReturn('https://doi.org/10.12345/0101010101')
+                    ->andReturn($emptyOptionalMetadata ? '' : 'https://doi.org/10.12345/0101010101')
                     ->getMock()
             )
             ->shouldReceive('getData')
             ->with('licenseUrl')
-            ->andReturn('https://creativecommons.org/licenses/by-nc/4.0/')
+            ->andReturn($emptyOptionalMetadata ? '' : 'https://creativecommons.org/licenses/by-nc/4.0/')
             ->shouldReceive('getLocalizedData')
             ->with('copyrightHolder')
-            ->andReturn('Public Knowledge Press')
+            ->andReturn($emptyOptionalMetadata ? '' : 'Public Knowledge Press')
             ->shouldReceive('getLocalizedCoverImageUrl')
             ->withAnyArgs()
-            ->andReturn('https://omp.publicknowledgeproject.org/templates/images/book-default.png')
+            ->andReturn(
+                $emptyOptionalMetadata ? '' : 'https://omp.publicknowledgeproject.org/templates/images/book-default.png'
+            )
             ->shouldReceive('getData')
             ->with('thothUploadFrontcover')
             ->andReturn($uploadFrontcover)
@@ -153,7 +164,7 @@ class ThothBookFactoryTest extends PKPTestCase
             ->andReturn($frontcoverUrl)
             ->shouldReceive('getData')
             ->with('place')
-            ->andReturn('Salvador, BR')
+            ->andReturn($emptyOptionalMetadata ? '' : 'Salvador, BR')
             ->shouldReceive('getData')
             ->with('pageCount')
             ->andReturn(64)
@@ -199,6 +210,19 @@ class ThothBookFactoryTest extends PKPTestCase
         $thothWork = $factory->createFromPublication($this->mocks['publication']);
 
         $this->assertSame($frontcoverUrl, $thothWork->getCoverUrl());
+    }
+
+    public function testCreateThothBookOmitsEmptyOptionalMetadata()
+    {
+        $this->setUpMockEnvironment(false, null, true);
+
+        $factory = new ThothBookFactory();
+        $thothWork = $factory->createFromPublication($this->mocks['publication']);
+        $data = $thothWork->getAllData();
+
+        foreach (['doi', 'place', 'license', 'copyrightHolder', 'coverUrl'] as $fieldName) {
+            $this->assertArrayNotHasKey($fieldName, $data);
+        }
     }
 
     public function testGetWorkTypeBySubmissionWorkType()

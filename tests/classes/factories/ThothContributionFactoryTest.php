@@ -28,7 +28,7 @@ use ThothApi\GraphQL\Inputs\PatchContribution as ThothContribution;
 class ThothContributionFactoryTest extends PKPTestCase
 {
     protected array $mocks = [];
-    private function setUpMockEnvironment()
+    private function setUpMockEnvironment(string $givenName = 'John')
     {
         $mockUserGroup = new class () {
             public $nameLocaleKey = 'default.groups.name.author';
@@ -59,7 +59,7 @@ class ThothContributionFactoryTest extends PKPTestCase
             ->willReturn('Doe');
         $mockAuthor->expects($this->any())
             ->method('getLocalizedGivenName')
-            ->willReturn('John');
+            ->willReturn($givenName);
         $mockAuthor->expects($this->any())
             ->method('getSequence')
             ->willReturn(0);
@@ -88,5 +88,15 @@ class ThothContributionFactoryTest extends PKPTestCase
             'lastName' => 'Doe',
             'fullName' => 'John Doe',
         ]), $thothContribution);
+    }
+
+    public function testCreateThothContributionOmitsEmptyOptionalMetadata()
+    {
+        $this->setUpMockEnvironment('');
+
+        $factory = new ThothContributionFactory();
+        $data = $factory->createFromAuthor($this->mocks['author'], 0, 1)->getAllData();
+
+        $this->assertArrayNotHasKey('firstName', $data);
     }
 }
