@@ -34,13 +34,9 @@ class ThothChapterFactory
 
         $pages = $this->extractPages($chapter);
 
-        return new ThothWork([
+        $workData = [
             'workType' => WorkType::BOOK_CHAPTER,
             'workStatus' => $this->getWorkStatusByDatePublished($chapter, $publication),
-            'doi' => $chapter->getData('doiObject')?->getResolvingUrl(),
-            'pageInterval' => $pages['pageInterval'] ?? null,
-            'firstPage' => $pages['firstPage'] ?? null,
-            'lastPage' => $pages['lastPage'] ?? null,
             'publicationDate' => $chapter->getDatePublished() ?? $publication->getData('datePublished'),
             'landingPage' => $request->getDispatcher()->url(
                 $request,
@@ -49,8 +45,22 @@ class ThothChapterFactory
                 'catalog',
                 'book',
                 [$submission->getBestId()]
-            )
-        ]);
+            ),
+        ];
+
+        $optionalData = [
+            'doi' => $chapter->getData('doiObject')?->getResolvingUrl(),
+            'pageInterval' => $pages['pageInterval'] ?? null,
+            'firstPage' => $pages['firstPage'] ?? null,
+            'lastPage' => $pages['lastPage'] ?? null,
+        ];
+        foreach ($optionalData as $fieldName => $fieldValue) {
+            if ($fieldValue !== null && $fieldValue !== '') {
+                $workData[$fieldName] = $fieldValue;
+            }
+        }
+
+        return new ThothWork($workData);
     }
 
     public function getWorkStatusByDatePublished($chapter, $publication)

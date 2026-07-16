@@ -129,9 +129,9 @@ class ThothFrontcoverServiceTest extends PKPTestCase
 
     public function testUploadsFrontcoverAndUpdatesWorkCoverUrl(): void
     {
-        $frontcoverPath = $this->createTemporaryPng();
+        $frontcoverPath = $this->createTemporaryJpeg();
         $frontcoverSha256 = hash_file('sha256', $frontcoverPath);
-        $cdnUrl = 'https://cdn.thoth.pub/frontcover.png';
+        $cdnUrl = 'https://cdn.thoth.pub/frontcover.jpg';
 
         $metadata = [];
         $publication = $this->getMockBuilder(\APP\publication\Publication::class)
@@ -165,8 +165,8 @@ class ThothFrontcoverServiceTest extends PKPTestCase
             ->method('new')
             ->with([
                 'workId' => 'work-id',
-                'declaredExtension' => 'png',
-                'declaredMimeType' => 'image/png',
+                'declaredExtension' => 'jpg',
+                'declaredMimeType' => 'image/jpeg',
                 'declaredSha256' => $frontcoverSha256,
             ])
             ->willReturn($newFrontcoverFileUpload);
@@ -229,8 +229,8 @@ class ThothFrontcoverServiceTest extends PKPTestCase
             ->with($publication)
             ->willReturn([
                 'path' => $frontcoverPath,
-                'extension' => 'png',
-                'mimeType' => 'image/png',
+                'extension' => 'jpg',
+                'mimeType' => 'image/jpeg',
                 'sha256' => $frontcoverSha256,
             ]);
         $service->expects($this->once())
@@ -243,13 +243,58 @@ class ThothFrontcoverServiceTest extends PKPTestCase
         $this->assertSame($cdnUrl, $metadata['thothFrontcoverUrl']);
     }
 
-    private function createTemporaryPng(): string
+    public function testDoesNotUploadUnsupportedFrontcoverFormat(): void
     {
-        $filePath = tempnam(sys_get_temp_dir(), 'thoth-frontcover-') . '.png';
-        file_put_contents(
-            $filePath,
-            base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=')
-        );
+        $metadata = [];
+        $publication = $this->getMockBuilder(\APP\publication\Publication::class)
+            ->onlyMethods(['getData', 'setData'])
+            ->getMock();
+        $publication->method('getData')->willReturnCallback(function ($key) {
+            return ['thothUploadFrontcover' => true, 'thothFrontcoverSha256' => null][$key] ?? null;
+        });
+        $publication->expects($this->exactly(3))
+            ->method('setData')
+            ->willReturnCallback(function ($key, $value) use (&$metadata) {
+                $metadata[$key] = $value;
+            });
+
+        $frontcoverRepository = $this->createMock(ThothFrontcoverFileUploadRepository::class);
+        $frontcoverRepository->expects($this->never())->method('new');
+        $workRepository = $this->createMock(ThothWorkRepository::class);
+        $workRepository->expects($this->never())->method('edit');
+        $fileUploadService = $this->createMock(ThothFileUploadService::class);
+        $fileUploadService->expects($this->never())->method('upload');
+
+        $service = $this->getMockBuilder(ThothFrontcoverService::class)
+            ->setConstructorArgs([
+                $frontcoverRepository,
+                $workRepository,
+                $fileUploadService,
+                $this->createMock(ThothMeService::class),
+            ])
+            ->onlyMethods(['canUploadFrontcover', 'resolveFrontcoverFile', 'persistPublication'])
+            ->getMock();
+        $service->method('canUploadFrontcover')->willReturn(true);
+        $service->method('resolveFrontcoverFile')->willReturn([
+            'path' => '/tmp/frontcover.png',
+            'extension' => 'png',
+            'mimeType' => 'image/png',
+            'sha256' => 'png-sha256',
+        ]);
+        $service->expects($this->once())->method('persistPublication')->with($publication);
+
+        $warning = $service->sync($publication, 'work-id');
+
+        $this->assertFalse($metadata['thothUploadFrontcover']);
+        $this->assertNull($metadata['thothFrontcoverSha256']);
+        $this->assertNull($metadata['thothFrontcoverUrl']);
+        $this->assertSame('plugins.generic.thoth.frontcover.unsupportedFormat', $warning);
+    }
+
+    private function createTemporaryJpeg(): string
+    {
+        $filePath = tempnam(sys_get_temp_dir(), 'thoth-frontcover-') . '.jpg';
+        file_put_contents($filePath, 'jpeg fixture');
         $this->temporaryFiles[] = $filePath;
 
         return $filePath;

@@ -100,7 +100,7 @@ class ThothBookService
 
         $this->repository->edit($thothBook);
         $this->updateMetadata($publication, $thothBookId, $oldThothBook);
-        $this->frontcoverService?->sync($publication, $thothBookId);
+        return $this->frontcoverService?->sync($publication, $thothBookId);
     }
 
     private function getPatchWorkData($thothBook): array

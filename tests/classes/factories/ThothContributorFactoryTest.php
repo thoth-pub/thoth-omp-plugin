@@ -28,8 +28,10 @@ use ThothApi\GraphQL\Inputs\PatchContributor as ThothContributor;
 class ThothContributorFactoryTest extends PKPTestCase
 {
     protected array $mock = [];
-    private function setUpMockEnvironment()
-    {
+    private function setUpMockEnvironment(
+        ?string $orcid = 'https://orcid.org/0000-0001-2345-678X',
+        ?string $website = 'https://john.doe.org/'
+    ) {
         $mockAuthor = $this->getMockBuilder(Author::class)
             ->onlyMethods([
                 'getFullName',
@@ -50,10 +52,10 @@ class ThothContributorFactoryTest extends PKPTestCase
             ->willReturn('John');
         $mockAuthor->expects($this->any())
             ->method('getOrcid')
-            ->willReturn('https://orcid.org/0000-0001-2345-678X');
+            ->willReturn($orcid);
         $mockAuthor->expects($this->any())
             ->method('getUrl')
-            ->willReturn('https://john.doe.org/');
+            ->willReturn($website);
 
         $this->mock = [];
         $this->mock['author'] = $mockAuthor;
@@ -74,5 +76,16 @@ class ThothContributorFactoryTest extends PKPTestCase
             'orcid' => 'https://orcid.org/0000-0001-2345-678X',
             'website' => 'https://john.doe.org/'
         ]), $thothContributor);
+    }
+
+    public function testCreateThothContributorOmitsEmptyOptionalMetadata()
+    {
+        $this->setUpMockEnvironment('', '');
+
+        $factory = new ThothContributorFactory();
+        $thothContributor = $factory->createFromAuthor($this->mock['author']);
+
+        $this->assertArrayNotHasKey('orcid', $thothContributor->getAllData());
+        $this->assertArrayNotHasKey('website', $thothContributor->getAllData());
     }
 }
