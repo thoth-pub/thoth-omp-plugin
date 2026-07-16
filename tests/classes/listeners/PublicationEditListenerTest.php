@@ -35,7 +35,24 @@ class PublicationEditListenerTest extends PKPTestCase
         $this->assertSame(1, $notification->successes);
     }
 
-    private function createListener()
+    public function testUnsupportedFrontcoverShowsWarningAndSuccess()
+    {
+        $warning = 'plugins.generic.thoth.frontcover.unsupportedFormat';
+        [$listener, $bookService, $notification] = $this->createListener($warning);
+
+        $listener->updateThothBook('Publication::edit', [
+            $this->createPublication(),
+            null,
+            ['thothUploadFrontcover' => true],
+            new stdClass(),
+        ]);
+
+        $this->assertSame(1, $bookService->updates);
+        $this->assertSame(1, $notification->successes);
+        $this->assertSame([$warning], $notification->warnings);
+    }
+
+    private function createListener($warning = null)
     {
         $submission = new class () {
             public function getData($key)
@@ -56,16 +73,24 @@ class PublicationEditListenerTest extends PKPTestCase
                 return $this->submission;
             }
         };
-        $bookService = new class () {
+        $bookService = new class ($warning) {
             public $updates = 0;
+            private $warning;
+
+            public function __construct($warning)
+            {
+                $this->warning = $warning;
+            }
 
             public function update($publication, $workId)
             {
                 $this->updates++;
+                return $this->warning;
             }
         };
         $notification = new class () {
             public $successes = 0;
+            public $warnings = [];
 
             public function notifySuccess($request, $submission)
             {
@@ -74,6 +99,11 @@ class PublicationEditListenerTest extends PKPTestCase
 
             public function notifyError($request, $submission, $error)
             {
+            }
+
+            public function notifyWarning($request, $submission, $messageKey)
+            {
+                $this->warnings[] = $messageKey;
             }
         };
 
