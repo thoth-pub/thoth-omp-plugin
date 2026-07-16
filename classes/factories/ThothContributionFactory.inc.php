@@ -24,14 +24,20 @@ class ThothContributionFactory
     {
         $userGroupLocaleKey = $author->getUserGroup()->getData('nameLocaleKey');
 
-        return new ThothContribution([
+        $contributionData = [
             'contributionType' => $this->getContributionTypeByUserGroupLocaleKey($userGroupLocaleKey),
             'mainContribution' => $this->isMainContribution($author, $primaryContactId),
             'contributionOrdinal' => $seq + 1,
-            'firstName' => $author->getLocalizedGivenName(),
             'lastName' => $author->getLocalizedData('familyName'),
             'fullName' => $author->getFullName(false),
-        ]);
+        ];
+
+        $firstName = $author->getLocalizedGivenName();
+        if ($firstName !== null && $firstName !== '') {
+            $contributionData['firstName'] = $firstName;
+        }
+
+        return new ThothContribution($contributionData);
     }
 
     private function isMainContribution($author, $primaryContactId = null)
