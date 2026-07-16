@@ -40,6 +40,16 @@ class ThothNotification
         );
     }
 
+    public function notifyWarning($request, $submission, $messageKey)
+    {
+        $notificationMgr = new NotificationManager();
+        $notificationMgr->createTrivialNotification(
+            $request->getUser()->getId(),
+            Notification::NOTIFICATION_TYPE_WARNING,
+            ['contents' => __($messageKey)]
+        );
+    }
+
     public function notify($request, $submission, $notificationType, $messageKey, $error = null)
     {
         $currentUser = $request->getUser();

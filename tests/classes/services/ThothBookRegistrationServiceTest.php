@@ -93,7 +93,8 @@ class ThothBookRegistrationServiceTest extends PKPTestCase
         $mockFrontcoverService = $this->createMock(ThothFrontcoverService::class);
         $mockFrontcoverService->expects($this->once())
             ->method('sync')
-            ->with($mockPublication, 'd8fa2e63-5513-45e5-84c1-e9c2d89f99d3');
+            ->with($mockPublication, 'd8fa2e63-5513-45e5-84c1-e9c2d89f99d3')
+            ->willReturn('plugins.generic.thoth.frontcover.unsupportedFormat');
 
         $service = new ThothBookRegistrationService(
             $mockFactory,
@@ -113,6 +114,10 @@ class ThothBookRegistrationServiceTest extends PKPTestCase
 
         $this->assertInstanceOf(ThothBookRegistrationResult::class, $registrationResult);
         $this->assertSame('d8fa2e63-5513-45e5-84c1-e9c2d89f99d3', $registrationResult->getWorkId());
+        $this->assertSame(
+            'plugins.generic.thoth.frontcover.unsupportedFormat',
+            $registrationResult->getWarning()
+        );
     }
 
     public function testSetActiveUsesOnlyTheGivenRegistrationResult()
