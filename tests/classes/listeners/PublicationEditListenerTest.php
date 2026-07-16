@@ -40,7 +40,24 @@ class PublicationEditListenerTest extends PKPTestCase
         $this->assertSame(1, $notification->successes);
     }
 
-    private function createListener(): array
+    public function testUnsupportedFrontcoverShowsWarningAndSuccess(): void
+    {
+        $warning = 'plugins.generic.thoth.frontcover.unsupportedFormat';
+        [$listener, $bookService, $notification] = $this->createListener($warning);
+
+        $listener->updateThothBook('Publication::edit', [
+            $this->createPublication(),
+            null,
+            ['thothUploadFrontcover' => true],
+            new stdClass(),
+        ]);
+
+        $this->assertSame(1, $bookService->updates);
+        $this->assertSame(1, $notification->successes);
+        $this->assertSame([$warning], $notification->warnings);
+    }
+
+    private function createListener(?string $warning = null): array
     {
         $submission = new class () {
             public function getData($key)
@@ -61,16 +78,24 @@ class PublicationEditListenerTest extends PKPTestCase
                 return $this->submission;
             }
         };
-        $bookService = new class () {
+        $bookService = new class ($warning) {
             public int $updates = 0;
+            private ?string $warning;
 
-            public function update($publication, $workId): void
+            public function __construct(?string $warning)
+            {
+                $this->warning = $warning;
+            }
+
+            public function update($publication, $workId): ?string
             {
                 $this->updates++;
+                return $this->warning;
             }
         };
         $notification = new class () {
             public int $successes = 0;
+            public array $warnings = [];
 
             public function notifySuccess($request, $submission): void
             {
@@ -79,6 +104,11 @@ class PublicationEditListenerTest extends PKPTestCase
 
             public function notifyError($request, $submission, $error): void
             {
+            }
+
+            public function notifyWarning($request, $submission, $messageKey): void
+            {
+                $this->warnings[] = $messageKey;
             }
         };
 

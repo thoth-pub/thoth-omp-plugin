@@ -22,6 +22,11 @@ use Throwable;
 
 class ThothFrontcoverService
 {
+    public const UNSUPPORTED_FORMAT_WARNING = 'plugins.generic.thoth.frontcover.unsupportedFormat';
+
+    private const SUPPORTED_EXTENSIONS = ['jpg', 'jpeg'];
+    private const SUPPORTED_MIME_TYPE = 'image/jpeg';
+
     private const PATCH_WORK_FIELDS = [
         'workId' => true,
         'workType' => true,
@@ -72,20 +77,29 @@ class ThothFrontcoverService
         $this->meService = $meService;
     }
 
-    public function sync($publication, string $thothWorkId): void
+    public function sync($publication, string $thothWorkId): ?string
     {
         if (!$publication->getData('thothUploadFrontcover')) {
             $this->clearUploadData($publication);
-            return;
+            return null;
         }
 
         if (!$this->canUploadFrontcover($publication)) {
-            return;
+            return null;
         }
 
         $frontcoverFile = $this->resolveFrontcoverFile($publication);
-        if (!$frontcoverFile || $frontcoverFile['sha256'] === $publication->getData('thothFrontcoverSha256')) {
-            return;
+        if (!$frontcoverFile) {
+            return null;
+        }
+
+        if (!$this->isSupportedFrontcover($frontcoverFile)) {
+            $this->disableUnsupportedFrontcoverHosting($publication);
+            return self::UNSUPPORTED_FORMAT_WARNING;
+        }
+
+        if ($frontcoverFile['sha256'] === $publication->getData('thothFrontcoverSha256')) {
+            return null;
         }
 
         $newFrontcoverFileUpload = $this->frontcoverFileUploadRepository->new([
@@ -107,11 +121,27 @@ class ThothFrontcoverService
             ['coverUrl' => $cdnUrl]
         )));
         $this->saveUploadData($publication, $frontcoverFile['sha256'], $cdnUrl);
+
+        return null;
     }
 
     private function getPatchWorkData($thothWork): array
     {
         return array_intersect_key($thothWork->toArray(), self::PATCH_WORK_FIELDS);
+    }
+
+    private function isSupportedFrontcover(array $frontcoverFile): bool
+    {
+        return in_array($frontcoverFile['extension'] ?? null, self::SUPPORTED_EXTENSIONS, true)
+            && ($frontcoverFile['mimeType'] ?? null) === self::SUPPORTED_MIME_TYPE;
+    }
+
+    private function disableUnsupportedFrontcoverHosting($publication): void
+    {
+        $publication->setData('thothUploadFrontcover', false);
+        $publication->setData('thothFrontcoverSha256', null);
+        $publication->setData('thothFrontcoverUrl', null);
+        $this->persistPublication($publication);
     }
 
     protected function canUploadFrontcover($publication): bool

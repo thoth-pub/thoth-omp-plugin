@@ -212,6 +212,19 @@ class ThothBookFactoryTest extends PKPTestCase
         $this->assertSame($frontcoverUrl, $thothWork->getCoverUrl());
     }
 
+    public function testCreateThothBookUsesOmpCoverUrlWhenFrontcoverIsNotHosted()
+    {
+        $this->setUpMockEnvironment(true);
+
+        $factory = new ThothBookFactory();
+        $thothWork = $factory->createFromPublication($this->mocks['publication']);
+
+        $this->assertSame(
+            'https://omp.publicknowledgeproject.org/templates/images/book-default.png',
+            $thothWork->getCoverUrl()
+        );
+    }
+
     public function testCreateThothBookOmitsEmptyOptionalMetadata()
     {
         $this->setUpMockEnvironment(false, null, true);

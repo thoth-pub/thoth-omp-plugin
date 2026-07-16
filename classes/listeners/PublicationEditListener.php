@@ -50,9 +50,12 @@ class PublicationEditListener
         $bookService = $this->bookService ?: ThothService::book();
         $notification = $this->notification ?: new ThothNotification();
         try {
-            $bookService->update($publication, $thothBookId);
+            $warning = $bookService->update($publication, $thothBookId);
             if (!$this->isDoiAssignment($params)) {
                 $notification->notifySuccess($request, $submission);
+            }
+            if ($warning) {
+                $notification->notifyWarning($request, $submission, $warning);
             }
         } catch (QueryException $e) {
             $notification->notifyError($request, $submission, $e);

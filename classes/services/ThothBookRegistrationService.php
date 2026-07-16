@@ -83,7 +83,7 @@ class ThothBookRegistrationService
             $this->subjectService->registerByPublication($publication);
             $this->referenceService->registerByPublication($publication);
             $this->workRelationService->registerByPublication($publication, $thothImprintId);
-            $this->frontcoverService?->sync($publication, $thothBookId);
+            $registrationResult->setWarning($this->frontcoverService?->sync($publication, $thothBookId));
         } catch (QueryException $e) {
             $this->deleteRegisteredEntry($registrationResult);
             throw $e;
