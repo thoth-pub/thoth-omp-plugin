@@ -44,7 +44,7 @@ class ThothChapterFactoryTest extends PKPTestCase
         return ['request'];
     }
 
-    private function setUpMockEnvironment()
+    private function setUpMockEnvironment(bool $emptyOptionalMetadata = false)
     {
         $publicationRepoMock = Mockery::mock(app(PublicationRepository::class))
             ->makePartial()
@@ -129,6 +129,7 @@ class ThothChapterFactoryTest extends PKPTestCase
             ->shouldReceive('getData')
             ->with('doiObject')
             ->andReturn(
+                $emptyOptionalMetadata ? null :
                 Mockery::mock(\PKP\doi\Doi::class)
                     ->makePartial()
                     ->shouldReceive('getResolvingUrl')
@@ -138,7 +139,7 @@ class ThothChapterFactoryTest extends PKPTestCase
             )
             ->shouldReceive('getPages')
             ->withAnyArgs()
-            ->andReturn('31 - 50')
+            ->andReturn($emptyOptionalMetadata ? '' : '31 - 50')
             ->getMock();
 
         $this->mocks = [];
@@ -181,5 +182,17 @@ class ThothChapterFactoryTest extends PKPTestCase
 
         $workStatus = $factory->getWorkStatusByDatePublished($mockChapter, null);
         $this->assertEquals(WorkStatus::FORTHCOMING, $workStatus);
+    }
+
+    public function testCreateThothChapterOmitsEmptyOptionalMetadata()
+    {
+        $this->setUpMockEnvironment(true);
+
+        $factory = new ThothChapterFactory();
+        $data = $factory->createFromChapter($this->mocks['chapter'])->getAllData();
+
+        foreach (['doi', 'pageInterval', 'firstPage', 'lastPage'] as $fieldName) {
+            $this->assertArrayNotHasKey($fieldName, $data);
+        }
     }
 }

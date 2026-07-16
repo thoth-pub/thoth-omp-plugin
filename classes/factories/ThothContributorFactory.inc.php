@@ -20,12 +20,22 @@ class ThothContributorFactory
 {
     public function createFromAuthor($author)
     {
-        return new ThothContributor([
-            'firstName' => $author->getLocalizedGivenName(),
+        $contributorData = [
             'lastName' => $author->getLocalizedFamilyName(),
             'fullName' => $author->getFullName(false),
+        ];
+
+        $optionalData = [
+            'firstName' => $author->getLocalizedGivenName(),
             'orcid' => $author->getOrcid(),
-            'website' => $author->getUrl()
-        ]);
+            'website' => $author->getUrl(),
+        ];
+        foreach ($optionalData as $fieldName => $fieldValue) {
+            if ($fieldValue !== null && $fieldValue !== '') {
+                $contributorData[$fieldName] = $fieldValue;
+            }
+        }
+
+        return new ThothContributor($contributorData);
     }
 }

@@ -121,12 +121,26 @@ class ThothEndpoint
             $thothBookRegistrationService->setActive($registrationResult);
             $thothBookId = $registrationResult->getWorkId();
             Repo::submission()->edit($submission, ['thothWorkId' => $thothBookId]);
-            $this->handleNotification($request, $submission, true, $disableNotification);
+            $this->handleNotification(
+                $request,
+                $submission,
+                true,
+                $disableNotification,
+                null,
+                $registrationResult->getWarning()
+            );
         } catch (QueryException $e) {
             if ($registrationResult !== null) {
                 $thothBookRegistrationService->deleteRegisteredEntry($registrationResult);
             }
-            $this->handleNotification($request, $submission, false, $disableNotification, $e);
+            $this->handleNotification(
+                $request,
+                $submission,
+                false,
+                $disableNotification,
+                $e,
+                $registrationResult ? $registrationResult->getWarning() : null
+            );
             $failure['errors'][] = __('plugins.generic.thoth.register.error.log', ['reason' => $e->getMessage()]);
             return $response->withStatus(403)->withJson($failure);
         }
@@ -206,8 +220,14 @@ class ThothEndpoint
     }
 
 
-    public function handleNotification($request, $submission, $success, $disableNotification, $errorMessage = null)
-    {
+    public function handleNotification(
+        $request,
+        $submission,
+        $success,
+        $disableNotification,
+        $errorMessage = null,
+        $warning = null
+    ) {
         $thothNotification = new ThothNotification();
 
         if ($disableNotification) {
@@ -223,5 +243,8 @@ class ThothEndpoint
         $success
             ? $thothNotification->notifySuccess($request, $submission)
             : $thothNotification->notifyError($request, $submission, $errorMessage);
+        if ($warning) {
+            $thothNotification->notifyWarning($request, $submission, $warning);
+        }
     }
 }

@@ -94,7 +94,7 @@ class CatalogEntryFormConfigTest extends PKPTestCase
         $this->assertSame(2, $config->contextId);
     }
 
-    public function testAddsFrontcoverUploadFieldAfterCoverImage(): void
+    public function testAddsFrontcoverUploadFieldWithoutRestrictingOmpCoverFormats(): void
     {
         $form = $this->getCatalogEntryForm();
         $config = $this->getConfig(true, true);
@@ -106,6 +106,7 @@ class CatalogEntryFormConfigTest extends PKPTestCase
         $this->assertSame(['after', 'coverImage'], $form->positions['thothUploadFrontcover']);
         $this->assertSame([true], $field->value);
         $this->assertFalse($field->options[0]['disabled'] ?? false);
+        $this->assertSame('image/*', $form->getField('coverImage')->options['acceptedFiles']);
     }
 
     public function testDisablesFrontcoverUploadFieldWithoutCdnWritePermission(): void
@@ -130,11 +131,24 @@ class CatalogEntryFormConfigTest extends PKPTestCase
             public array $fields = [];
             public array $positions = [];
 
+            public function __construct()
+            {
+                $this->fields['coverImage'] = (object) [
+                    'name' => 'coverImage',
+                    'options' => ['acceptedFiles' => 'image/*'],
+                ];
+            }
+
             public function addField($field, $position = [])
             {
                 $this->fields[$field->name] = $field;
                 $this->positions[$field->name] = $position;
                 return $this;
+            }
+
+            public function getField($fieldName)
+            {
+                return $this->fields[$fieldName] ?? null;
             }
         };
     }
