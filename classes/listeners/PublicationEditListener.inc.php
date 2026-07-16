@@ -22,25 +22,46 @@ import('plugins.generic.thoth.classes.notification.ThothNotification');
 
 class PublicationEditListener
 {
+    private $submissionRepository;
+    private $bookService;
+    private $notification;
+
+    public function __construct($submissionRepository = null, $bookService = null, $notification = null)
+    {
+        $this->submissionRepository = $submissionRepository;
+        $this->bookService = $bookService;
+        $this->notification = $notification;
+    }
+
     public function updateThothBook($hookName, $args)
     {
         $publication = $args[0];
+        $params = $args[2];
         $request = $args[3];
-        $submission = Repo::submission()->get($publication->getData('submissionId'));
+        $submissionRepository = $this->submissionRepository ?: Repo::submission();
+        $submission = $submissionRepository->get($publication->getData('submissionId'));
 
         $thothBookId = $submission->getData('thothWorkId');
         if ($thothBookId === null) {
             return false;
         }
 
-        $thothNotification = new ThothNotification();
+        $bookService = $this->bookService ?: ThothService::book();
+        $notification = $this->notification ?: new ThothNotification();
         try {
-            ThothService::book()->update($publication, $thothBookId);
-            $thothNotification->notifySuccess($request, $submission);
+            $bookService->update($publication, $thothBookId);
+            if (!$this->isDoiAssignment($params)) {
+                $notification->notifySuccess($request, $submission);
+            }
         } catch (QueryException $e) {
-            $thothNotification->notifyError($request, $submission, $e);
+            $notification->notifyError($request, $submission, $e);
         }
 
         return false;
+    }
+
+    private function isDoiAssignment($params)
+    {
+        return count($params) === 1 && array_key_exists('doiId', $params);
     }
 }
