@@ -130,7 +130,7 @@ On the Thoth management page, you can submit a selection of titles from OMP into
 - ISBN must be properly formatted as ISBN-13 (e.g., `978-3-16-148410-0`).
 - To avoid incorrect affiliation assignment in Thoth, use the [ROR plugin](https://github.com/withanage/ror) to populate affiliations in OMP.
 
-## OMP-Thoth Mapping
+## OMP-Thoth Mapping of Data Fields
 
 <details>
 <summary>Click here to see the data relationship between OMP and Thoth</summary>
@@ -182,7 +182,7 @@ On the Thoth management page, you can submit a selection of titles from OMP into
 
 ## Credits
 
-This plugin was idealized and sponsored by [Thoth](https://thoth.pub/).
+This plugin was idealized and sponsored by [Thoth Open Metadata](https://thoth.pub/).
 
 Developed by [Lepidus Tecnologia](https://github.com/lepidus).
 

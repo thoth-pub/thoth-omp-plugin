@@ -62,7 +62,7 @@ msgid "plugins.generic.thoth.workType.monograph"
 msgstr "Monografia"
 
 msgid "plugins.generic.thoth.workType.textbook"
-msgstr "Manuale"
+msgstr "Textbook"
 
 msgid "plugins.generic.thoth.thothBook"
 msgstr "Libro Thoth: "
