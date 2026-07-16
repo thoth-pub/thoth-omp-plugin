@@ -45,10 +45,10 @@ class ThothBookFactoryTest extends PKPTestCase
         return ['request'];
     }
 
-    private function setUpMockEnvironment()
+    private function setUpMockEnvironment($emptyOptionalMetadata = false)
     {
         $mockSubmission = $this->getMockBuilder(Submission::class)
-            ->setMethods(['getData', 'getBestId'])
+            ->setMethods(['getData', 'getBestId', '_getContextLicenseFieldValue'])
             ->getMock();
         $mockSubmission->expects($this->any())
             ->method('getData')
@@ -56,6 +56,9 @@ class ThothBookFactoryTest extends PKPTestCase
         $mockSubmission->expects($this->any())
             ->method('getBestId')
             ->will($this->returnValue(3));
+        $mockSubmission->expects($this->any())
+            ->method('_getContextLicenseFieldValue')
+            ->will($this->returnValue(''));
 
         $mockSubmissionDao = $this->getMockBuilder(SubmissionDAO::class)
             ->setMethods(['getById'])
@@ -108,29 +111,35 @@ class ThothBookFactoryTest extends PKPTestCase
             ->will($this->returnValueMap([
                 ['version', null, 1],
                 ['datePublished', null, '2020-01-01'],
-                ['place', null, 'Salvador, BR'],
+                ['place', null, $emptyOptionalMetadata ? '' : 'Salvador, BR'],
                 ['pageCount', null, 64],
                 ['imageCount', null, 32],
-                ['licenseUrl', null, 'https://creativecommons.org/licenses/by-nc/4.0/']
+                [
+                    'licenseUrl',
+                    null,
+                    $emptyOptionalMetadata ? '' : 'https://creativecommons.org/licenses/by-nc/4.0/'
+                ]
             ]));
         $mockPublication->expects($this->any())
             ->method('getLocalizedData')
-            ->will($this->returnCallback(function ($key) {
+            ->will($this->returnCallback(function ($key) use ($emptyOptionalMetadata) {
                 $values = [
                     'subtitle' => 'My book subtitle',
                     'abstract' => 'This is my book abstract',
-                    'copyrightHolder' => 'Public Knowledge Press',
+                    'copyrightHolder' => $emptyOptionalMetadata ? '' : 'Public Knowledge Press',
                 ];
 
                 return $values[$key] ?? null;
             }));
         $mockPublication->expects($this->once())
             ->method('getLocalizedCoverImageUrl')
-            ->will($this->returnValue('https://omp.publicknowledgeproject.org/templates/images/book-default.png'));
+            ->will($this->returnValue(
+                $emptyOptionalMetadata ? '' : 'https://omp.publicknowledgeproject.org/templates/images/book-default.png'
+            ));
         $mockPublication->expects($this->once())
             ->method('getStoredPubId')
             ->with($this->equalTo('doi'))
-            ->will($this->returnValue('10.12345/0101010101'));
+            ->will($this->returnValue($emptyOptionalMetadata ? '' : '10.12345/0101010101'));
 
         $this->mocks = [];
         $this->mocks['publication'] = $mockPublication;
@@ -158,6 +167,19 @@ class ThothBookFactoryTest extends PKPTestCase
             'landingPage' => 'https://omp.publicknowledgeproject.org/index.php/press/catalog/book/3',
             'coverUrl' => 'https://omp.publicknowledgeproject.org/templates/images/book-default.png',
         ]), $thothWork);
+    }
+
+    public function testCreateThothBookOmitsEmptyOptionalMetadata()
+    {
+        $this->setUpMockEnvironment(true);
+
+        $factory = new ThothBookFactory();
+        $thothWork = $factory->createFromPublication($this->mocks['publication']);
+        $data = $thothWork->getAllData();
+
+        foreach (['doi', 'place', 'license', 'copyrightHolder', 'coverUrl'] as $fieldName) {
+            $this->assertArrayNotHasKey($fieldName, $data);
+        }
     }
 
     public function testGetWorkTypeBySubmissionWorkType()

@@ -43,7 +43,7 @@ class ThothChapterFactoryTest extends PKPTestCase
         return ['request'];
     }
 
-    private function setUpMockEnvironment()
+    private function setUpMockEnvironment($emptyOptionalMetadata = false)
     {
         $mockPublication = $this->getMockBuilder(Publication::class)
             ->setMethods(['getData'])
@@ -136,10 +136,10 @@ class ThothChapterFactoryTest extends PKPTestCase
             ]));
         $mockChapter->expects($this->any())
             ->method('getStoredPubId')
-            ->will($this->returnValue('10.12345/11112222'));
+            ->will($this->returnValue($emptyOptionalMetadata ? '' : '10.12345/11112222'));
         $mockChapter->expects($this->any())
             ->method('getPages')
-            ->will($this->returnValue('31 - 50'));
+            ->will($this->returnValue($emptyOptionalMetadata ? '' : '31 - 50'));
         $mockChapter->expects($this->any())
             ->method('getDatePublished')
             ->will($this->returnValue('2024-01-01'));
@@ -184,5 +184,17 @@ class ThothChapterFactoryTest extends PKPTestCase
 
         $workStatus = $factory->getWorkStatusByDatePublished($mockChapter, null);
         $this->assertEquals(WorkStatus::FORTHCOMING, $workStatus);
+    }
+
+    public function testCreateThothChapterOmitsEmptyOptionalMetadata()
+    {
+        $this->setUpMockEnvironment(true);
+
+        $factory = new ThothChapterFactory();
+        $data = $factory->createFromChapter($this->mocks['chapter'])->getAllData();
+
+        foreach (['doi', 'pageInterval', 'firstPage', 'lastPage'] as $fieldName) {
+            $this->assertArrayNotHasKey($fieldName, $data);
+        }
     }
 }
