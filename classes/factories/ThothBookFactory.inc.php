@@ -30,28 +30,13 @@ class ThothBookFactory
         $context = Application::getContextDAO()->getById($submission->getData('contextId'));
         $thothWorkType = $request->getUserVar('thothWorkType');
 
-        return new ThothWork([
+        $workData = [
             'workType' => $thothWorkType ?? $this->getWorkTypeBySubmissionWorkType($submission->getData('workType')),
             'workStatus' => $this->getWorkStatusByDatePublished($publication->getData('datePublished')),
             'edition' => $publication->getData('version'),
-            'doi' => $this->getDoi($publication),
             'publicationDate' => $publication->getData('datePublished'),
-            'place' => $publication->getData('place'),
             'pageCount' => $publication->getData('pageCount'),
             'imageCount' => $publication->getData('imageCount'),
-            'license' => $publication->getData('licenseUrl')
-                ?? $submission->_getContextLicenseFieldValue(
-                    null,
-                    PKPSubmission::PERMISSIONS_FIELD_LICENSE_URL,
-                    $publication
-                ),
-            'copyrightHolder' => $publication->getLocalizedData('copyrightHolder')
-                ?? $submission->_getContextLicenseFieldValue(
-                    $submission->getData('locale'),
-                    PKPSubmission::PERMISSIONS_FIELD_COPYRIGHT_HOLDER,
-                    $publication
-                ),
-            'coverUrl' => $publication->getLocalizedCoverImageUrl($submission->getData('contextId')),
             'landingPage' => $request->getDispatcher()->url(
                 $request,
                 ROUTE_PAGE,
@@ -59,8 +44,41 @@ class ThothBookFactory
                 'catalog',
                 'book',
                 $submission->getBestId()
-            )
-        ]);
+            ),
+        ];
+
+        $license = $publication->getData('licenseUrl');
+        if ($license === null || $license === '') {
+            $license = $submission->_getContextLicenseFieldValue(
+                null,
+                PKPSubmission::PERMISSIONS_FIELD_LICENSE_URL,
+                $publication
+            );
+        }
+
+        $copyrightHolder = $publication->getLocalizedData('copyrightHolder');
+        if ($copyrightHolder === null || $copyrightHolder === '') {
+            $copyrightHolder = $submission->_getContextLicenseFieldValue(
+                $submission->getData('locale'),
+                PKPSubmission::PERMISSIONS_FIELD_COPYRIGHT_HOLDER,
+                $publication
+            );
+        }
+
+        $optionalData = [
+            'doi' => $this->getDoi($publication),
+            'place' => $publication->getData('place'),
+            'license' => $license,
+            'copyrightHolder' => $copyrightHolder,
+            'coverUrl' => $publication->getLocalizedCoverImageUrl($submission->getData('contextId')),
+        ];
+        foreach ($optionalData as $fieldName => $fieldValue) {
+            if ($fieldValue !== null && $fieldValue !== '') {
+                $workData[$fieldName] = $fieldValue;
+            }
+        }
+
+        return new ThothWork($workData);
     }
 
     public function getWorkTypeBySubmissionWorkType($submissionWorkType)

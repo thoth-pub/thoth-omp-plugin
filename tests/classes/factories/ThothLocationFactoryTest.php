@@ -172,4 +172,14 @@ class ThothLocationFactoryTest extends PKPTestCase
             'locationPlatform' => LocationPlatform::OTHER
         ]), $thothLocation);
     }
+
+    public function testCreateThothLocationOmitsEmptyOptionalMetadata()
+    {
+        $this->setUpMockEnvironment();
+
+        $factory = new ThothLocationFactory();
+        $data = $factory->createFromPublicationFormat($this->mocks['publicationFormat'], null)->getAllData();
+
+        $this->assertArrayNotHasKey('fullTextUrl', $data);
+    }
 }
