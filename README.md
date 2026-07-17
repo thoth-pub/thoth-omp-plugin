@@ -68,7 +68,7 @@ After metadata is registered, a link to the book on Thoth will appear at the top
 ### Hosting Files in Thoth
 
 The plugin can send publication files, the front cover, and a featured video to Thoth. These features are available
-after the book has been registered in Thoth and require the configured Thoth user to have the `cdnWrite` permission.
+after the book has been registered in Thoth and require the configured Thoth user to have the `cdnWrite` permission, which is available to publishers subscribing to Thoth Open Metadata's [Obelisk](https://thoth.pub/packages/obelisk), [Sphinx](https://thoth.pub/packages/sphinx), and [Pyramid](https://thoth.pub/packages/pyramid) service packages.
 
 #### Publication Files
 
