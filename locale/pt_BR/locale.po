@@ -307,7 +307,7 @@ msgid "plugins.generic.thoth.field.frontcover"
 msgstr "Hospedagem do arquivo de capa na Thoth"
 
 msgid "plugins.generic.thoth.field.frontcover.label"
-msgstr "Hospedar o arquivo da imagem de capa na Thoth."
+msgstr "Hospedar o arquivo da imagem de capa na Thoth (apenas arquivos JPG / JPEG)."
 
 msgid "plugins.generic.thoth.field.frontcover.missingCdnWritePermission"
 msgstr "O usuário da Thoth configurado precisa da permissão cdnWrite para hospedar o arquivo da imagem de capa na Thoth."
