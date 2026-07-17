@@ -1,0 +1,50 @@
+msgid "plugins.generic.thoth.navigation.thoth"
+msgstr "Thoth"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibility"
+msgstr "Metapodatki o dostopnosti"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityStandard"
+msgstr "Standard dostopnosti"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityException"
+msgstr "Izjema dostopnosti"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityAdditionalStandard"
+msgstr "Dodatni standard dostopnosti"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityReportUrl"
+msgstr "URL do poročila o dostopnosti"
+
+msgid "plugins.generic.thoth.field.place.label"
+msgstr "Kraj objave"
+
+msgid "plugins.generic.thoth.field.pageCount.label"
+msgstr "Število strani"
+
+msgid "plugins.generic.thoth.field.imageCount.label"
+msgstr "Število slik"
+
+msgid "plugins.generic.thoth.status.unregistered"
+msgstr "Neregistriano"
+
+msgid "plugins.generic.thoth.imprint"
+msgstr "Kolofon"
+
+msgid "plugins.generic.thoth.register"
+msgstr "Register"
+
+msgid "plugins.generic.thoth.field.mainContribution.label"
+msgstr "Glavni korespondenčni avtor za Thoth."
+
+msgid "plugins.generic.thoth.register.confirmation"
+msgstr "Ali želite v Thoth registrirati metapodatke, povezane s to oddajo?"
+
+msgid "plugins.generic.thoth.register.label"
+msgstr "Registracija Thoth"
+
+msgid "publication.publish.confirmation"
+msgstr "Vse zahteve za objavo so izpolnjene. Ali ste prepričani, da želite ta vnos v katalog objaviti?"
+
+msgid "plugins.generic.thoth.workStatus"
+msgstr "Status Thoth"
