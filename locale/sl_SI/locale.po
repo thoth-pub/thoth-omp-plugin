@@ -1,0 +1,307 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Thoth OMP Plugin\n"
+"PO-Revision-Date: 2026-07-17 11:57-0400\n"
+"Last-Translator: Jan Perša (University of Maribor)\n"
+"Language-Team: Slovenian\n"
+"Language: sl_SI\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "plugins.generic.thoth.name"
+msgstr "Vtičnik Thoth"
+
+msgid "plugins.generic.thoth.description"
+msgstr "Povezuje OMP s Thothom za komunikacijo in sinhronizacijo podatkov o knjigah med platformama."
+
+msgid "plugins.generic.thoth.navigation.thoth"
+msgstr "Thoth"
+
+msgid "plugins.generic.thoth.settings.title"
+msgstr "Nastavitve API-ja Thoth"
+
+msgid "plugins.generic.thoth.settings.customThothApi"
+msgstr "API Thoth po meri"
+
+msgid "plugins.generic.thoth.settings.customThothApi.description"
+msgstr "Uporabite API Thoth po meri namesto uradnega API-ja Thoth."
+
+msgid "plugins.generic.thoth.settings.customThothApiUrl"
+msgstr "URL API-ja Thoth"
+
+msgid "plugins.generic.thoth.settings.customThothApiUrl.required"
+msgstr "URL API-ja Thoth po meri je obvezen, ko je omogočena možnost API-ja po meri."
+
+msgid "plugins.generic.thoth.settings.customThothApiUrl.invalid"
+msgstr "Navedeni URL API-ja Thoth po meri ni veljaven URL."
+
+msgid "plugins.generic.thoth.settings.customThothApiUrl.unreachable"
+msgstr "Povezava z URL-jem API-ja Thoth po meri ni uspela. Preverite, ali je URL pravilen in ali je storitev na voljo."
+
+msgid "plugins.generic.thoth.settings.token"
+msgstr "Osebni dostopni žeton"
+
+msgid "plugins.generic.thoth.settings.invalidCredentials"
+msgstr "Neveljaven osebni dostopni žeton"
+
+msgid "plugins.generic.thoth.settings.secretKeyEmpty"
+msgstr "Skrbnik spletnega mesta mora v konfiguracijski datoteki nastaviti skrivnost ('api_key_secret')."
+
+msgid "plugins.generic.thoth.credentialsMissing"
+msgstr "Osebni dostopni žeton za Thoth ni nastavljen."
+
+msgid "plugins.generic.thoth.field.place.label"
+msgstr "Kraj objave"
+
+msgid "plugins.generic.thoth.field.pageCount.label"
+msgstr "Število strani"
+
+msgid "plugins.generic.thoth.field.imageCount.label"
+msgstr "Število slik"
+
+msgid "plugins.generic.thoth.field.mainContribution.label"
+msgstr "Označite tega sodelavca kot glavnega sodelavca v Thothu."
+
+msgid "plugins.generic.thoth.workType"
+msgstr "Vrsta dela"
+
+msgid "plugins.generic.thoth.workType.monograph"
+msgstr "Monografija"
+
+msgid "plugins.generic.thoth.workType.textbook"
+msgstr "Učbenik"
+
+msgid "plugins.generic.thoth.thothBook"
+msgstr "Knjiga v Thothu: "
+
+msgid "plugins.generic.thoth.imprint"
+msgstr "Kolofon"
+
+msgid "plugins.generic.thoth.imprint.required"
+msgstr "Izberite kolofon."
+
+msgid "plugins.generic.thoth.connectionError"
+msgstr "Pri povezovanju s Thothom je prišlo do težave. Poskusite znova pozneje ali se obrnite na skrbnika sistema."
+
+msgid "plugins.generic.thoth.status.registered"
+msgstr "Registrirano"
+
+msgid "plugins.generic.thoth.status.unregistered"
+msgstr "Neregistrirano"
+
+msgid "plugins.generic.thoth.register"
+msgstr "Registriraj"
+
+msgid "plugins.generic.thoth.register.label"
+msgstr "Registracija v Thothu"
+
+msgid "plugins.generic.thoth.register.warning"
+msgstr "Metapodatkov prispevka ni mogoče poslati v Thoth zaradi naslednjih napak:"
+
+msgid "plugins.generic.thoth.validation.isbn"
+msgstr "\"{$isbn}\" formata publikacije \"{$formatName}\" ni veljaven ISBN-13."
+
+msgid "plugins.generic.thoth.validation.doiExists"
+msgstr "Delo z DOI-jem \"{$doi}\" že obstaja."
+
+msgid "plugins.generic.thoth.validation.doiNotFound"
+msgstr "Dela z DOI-jem \"{$doi}\" ni bilo mogoče najti."
+
+msgid "plugins.generic.thoth.validation.landingPageExists"
+msgstr "Delo s pristajalno stranjo \"{$landingPage}\" že obstaja."
+
+msgid "plugins.generic.thoth.validation.isbnExists"
+msgstr "Publikacija z ISBN-jem \"{$isbn}\" že obstaja."
+
+msgid "plugins.generic.thoth.register.confirmation"
+msgstr "Ali želite v Thothu registrirati metapodatke, povezane s tem prispevkom?"
+
+msgid "publication.publish.confirmation"
+msgstr "Vse zahteve za objavo so izpolnjene. Ali ste prepričani, da želite ta vnos v katalog objaviti?"
+
+msgid "plugins.generic.thoth.register.success"
+msgstr "Metapodatki prispevka so bili uspešno poslani v Thoth."
+
+msgid "plugins.generic.thoth.register.success.log"
+msgstr "Metapodatki prispevka so bili registrirani v Thothu."
+
+msgid "plugins.generic.thoth.register.error"
+msgstr "Pri pošiljanju metapodatkov prispevka v Thoth je prišlo do težave. Poskusite znova pozneje ali se obrnite na skrbnika sistema."
+
+msgid "plugins.generic.thoth.publicationFormat.accessibility"
+msgstr "Metapodatki o dostopnosti"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityHelp"
+msgstr "Prikaži navodila za metapodatke o dostopnosti"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityHelp.description"
+msgstr "<p>Standardi dostopnosti veljajo samo za združljive digitalne formate publikacij.</p><p>Za publikacije v mehki ali trdi vezavi ter formata MP3 in WAV pustite vsa polja dostopnosti prazna: standard dostopnosti, dodatni standard dostopnosti in izjema dostopnosti.</p><p>Za publikacije PDF mora biti glavni standard dostopnosti standard WCAG, dodatni standard, če je naveden, pa mora biti PDF/UA.</p><p>Za publikacije EPUB mora biti glavni standard dostopnosti standard WCAG, dodatni standard, če je naveden, pa mora biti standard EPUB Accessibility.</p><p>Za druge digitalne formate so sprejeti samo standardi WCAG, dodatnega standarda dostopnosti pa ne smete navesti.</p><p>Če publikacija ne uveljavlja standarda dostopnosti, pustite polja dostopnosti prazna ali uporabite izjemo dostopnosti le, kadar je to primerno.</p>"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityStandard"
+msgstr "Standard dostopnosti"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityAdditionalStandard"
+msgstr "Dodatni standard dostopnosti"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityException"
+msgstr "Izjema dostopnosti"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityReportUrl"
+msgstr "URL do poročila o dostopnosti"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityReportUrl.invalid"
+msgstr "Navedeni URL poročila o dostopnosti ni veljaven URL."
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityStandard.wcag21aa"
+msgstr "WCAG 2.1 AA"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityStandard.wcag21aaa"
+msgstr "WCAG 2.1 AAA"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityStandard.wcag22aa"
+msgstr "WCAG 2.2 AA"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityStandard.wcag22aaa"
+msgstr "WCAG 2.2 AAA"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityStandard.epubA11y10aa"
+msgstr "Specifikacija dostopnosti EPUB 1.0 AA"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityStandard.epubA11y10aaa"
+msgstr "Specifikacija dostopnosti EPUB 1.0 AAA"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityStandard.epubA11y11aa"
+msgstr "Specifikacija dostopnosti EPUB 1.1 AA"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityStandard.epubA11y11aaa"
+msgstr "Specifikacija dostopnosti EPUB 1.1 AAA"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityStandard.pdfUa1"
+msgstr "PDF/UA-1"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityStandard.pdfUa2"
+msgstr "PDF/UA-2"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityException.microEnterprises"
+msgstr "Založnik je mikropodjetje"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityException.disproportionateBurden"
+msgstr "Nesorazmerno breme"
+
+msgid "plugins.generic.thoth.publicationFormat.accessibilityException.fundamentalAlteration"
+msgstr "Temeljna sprememba"
+
+msgid "plugins.generic.thoth.register.error.log"
+msgstr "Napaka pri registraciji metapodatkov v Thothu: {$reason}"
+
+msgid "plugins.generic.thoth.update"
+msgstr "Posodobi metapodatke"
+
+msgid "plugins.generic.thoth.update.success"
+msgstr "Metapodatki so bili uspešno posodobljeni v Thothu."
+
+msgid "plugins.generic.thoth.update.success.log"
+msgstr "Metapodatki prispevka so bili posodobljeni v Thothu."
+
+msgid "plugins.generic.thoth.update.error"
+msgstr "Pri posodabljanju metapodatkov v Thothu je prišlo do težave. Poskusite znova pozneje ali se obrnite na skrbnika sistema."
+
+msgid "plugins.generic.thoth.update.error.log"
+msgstr "Napaka pri posodabljanju metapodatkov v Thothu: {$reason}"
+
+msgid "plugins.generic.thoth.actions.register.label"
+msgstr "Registriraj prispevke"
+
+msgid "plugins.generic.thoth.actions.register.prompt"
+msgstr "V Thoth boste poslali metapodatke za {$count} elementov. Ali ste prepričani, da želite registrirati te zapise?"
+
+msgid "plugins.generic.thoth.api.403.alreadyRegistered"
+msgstr "Prispevek je že registriran v Thothu."
+
+msgid "plugins.generic.thoth.grid.action.thothFileUpload"
+msgstr "Naloži v Thoth"
+
+msgid "plugins.generic.thoth.submissionComponent.title"
+msgstr "Komponenta prispevka, povezana z datoteko"
+
+msgid "plugins.generic.thoth.submissionComponent.description"
+msgstr "Izberite monografijo ali poglavje, povezano z datoteko. Monografije in poglavja morajo imeti DOI za nalaganje datotek v Thoth."
+
+msgid "plugins.generic.thoth.fileUpload.success"
+msgstr "Datoteka je bila uspešno naložena v Thoth."
+
+msgid "plugins.generic.thoth.fileUpload.error.invalidPublication"
+msgstr "Publikacije, izbrane za nalaganje datoteke v Thoth, ni bilo mogoče najti."
+
+msgid "plugins.generic.thoth.fileUpload.error.publicationContextMismatch"
+msgstr "Publikacija, izbrana za nalaganje datoteke v Thoth, ne pripada trenutnemu kontekstu."
+
+msgid "plugins.generic.thoth.fileUpload.error.thothWorkMismatch"
+msgstr "Delo v Thothu, povezano s tem nalaganjem, se ne ujema z izbrano publikacijo."
+
+msgid "plugins.generic.thoth.fileUpload.error.invalidPublicationFormat"
+msgstr "Formata publikacije, izbranega za nalaganje datoteke v Thoth, ni bilo mogoče najti."
+
+msgid "plugins.generic.thoth.fileUpload.error.invalidSubmissionComponent"
+msgstr "Komponente prispevka, izbrane za nalaganje datoteke v Thoth, ni bilo mogoče najti v tej publikaciji."
+
+msgid "plugins.generic.thoth.fileUpload.error.missingDoi"
+msgstr "Za nalaganje datotek v Thoth je DOI obvezen v publikaciji ali vsaj enem poglavju."
+
+msgid "plugins.generic.thoth.fileUpload.error.missingCdnWritePermission"
+msgstr "Uporabnik Thotha potrebuje dovoljenje cdnWrite za nalaganje datotek."
+
+msgid "plugins.generic.thoth.fileUpload.error.chapterNotFoundInThoth"
+msgstr "V Thothu ni bilo mogoče najti poglavja z DOI-jem \"{$doi}\"."
+
+msgid "plugins.generic.thoth.fileUpload.error.chapterLookupFailed"
+msgstr "Pri preverjanju izbranega poglavja v Thothu pred nalaganjem datoteke je prišlo do težave."
+
+msgid "plugins.generic.thoth.grid.column.thothFiles"
+msgstr "Datoteke v Thothu"
+
+msgid "plugins.generic.thoth.grid.action.viewThothFiles"
+msgstr "Datoteke v Thothu"
+
+msgid "plugins.generic.thoth.grid.action.viewThothFilesLabel"
+msgstr "Prikaži"
+
+msgid "plugins.generic.thoth.publicationFormat.thothFiles.empty"
+msgstr "V Thothu ni bilo najdenih datotek za ta format publikacije."
+
+msgid "plugins.generic.thoth.publicationFormat.thothFiles.component"
+msgstr "Element"
+
+msgid "plugins.generic.thoth.publicationFormat.thothFiles.component.publication"
+msgstr "Publikacija: {$title}"
+
+msgid "plugins.generic.thoth.publicationFormat.thothFiles.component.chapter"
+msgstr "Poglavje: {$title}"
+
+msgid "plugins.generic.thoth.publicationFormat.thothFiles.file"
+msgstr "Datoteka"
+
+msgid "plugins.generic.thoth.field.frontcover"
+msgstr "Gostovanje datoteke naslovnice v Thothu"
+
+msgid "plugins.generic.thoth.field.frontcover.label"
+msgstr "Gostite to datoteko slike naslovnice na platformi Thoth (samo datoteke JPG / JPEG)."
+
+msgid "plugins.generic.thoth.field.frontcover.missingCdnWritePermission"
+msgstr "Nastavljeni uporabnik Thotha potrebuje dovoljenje cdnWrite za gostovanje datoteke slike naslovnice v Thothu."
+
+msgid "plugins.generic.thoth.featureVideo"
+msgstr "Predstavljeni videoposnetek"
+
+msgid "plugins.generic.thoth.featureVideo.file"
+msgstr "Videodatoteka"
+
+msgid "plugins.generic.thoth.featureVideo.invalidFile"
+msgstr "Izberite veljavno videodatoteko MP4, WebM ali MOV."
+
+msgid "plugins.generic.thoth.featureVideo.exists"
+msgstr "To delo že ima predstavljeni videoposnetek v Thothu."
+
+msgid "plugins.generic.thoth.frontcover.unsupportedFormat"
+msgstr "Naslovnica ni bila gostovana v Thothu, ker format datoteke ni podprt. Uporabite datoteko JPG ali JPEG."
