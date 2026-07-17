@@ -286,7 +286,7 @@ msgid "plugins.generic.thoth.field.frontcover"
 msgstr "Gostovanje datoteke naslovnice v Thothu"
 
 msgid "plugins.generic.thoth.field.frontcover.label"
-msgstr "Gostite to datoteko slike naslovnice v Thothu."
+msgstr "Gostite to datoteko slike naslovnice na platformi Thoth (samo datoteke JPG / JPEG)."
 
 msgid "plugins.generic.thoth.field.frontcover.missingCdnWritePermission"
 msgstr "Nastavljeni uporabnik Thotha potrebuje dovoljenje cdnWrite za gostovanje datoteke slike naslovnice v Thothu."
