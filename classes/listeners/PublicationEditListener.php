@@ -23,6 +23,19 @@ use ThothApi\Exception\QueryException;
 
 class PublicationEditListener
 {
+    private const CATALOG_ENTRY_FIELDS = [
+        'datePublished',
+        'seriesId',
+        'seriesPosition',
+        'categoryIds',
+        'urlPath',
+        'coverImage',
+        'place',
+        'pageCount',
+        'imageCount',
+        'thothUploadFrontcover',
+    ];
+
     private $submissionRepository;
     private $bookService;
     private $notification;
@@ -38,6 +51,10 @@ class PublicationEditListener
     {
         $publication = $args[0];
         $params = $args[2];
+        if (!$this->isMetadataEdit($params)) {
+            return false;
+        }
+
         $request = $args[3];
         $submissionRepository = $this->submissionRepository ?: Repo::submission();
         $submission = $submissionRepository->get($publication->getData('submissionId'));
@@ -70,11 +87,19 @@ class PublicationEditListener
 
     private function isDoiAssignment($params): bool
     {
+        unset($params['id']);
         return count($params) === 1 && array_key_exists('doiId', $params);
     }
 
     private function isTitleAbstractEdit($params): bool
     {
         return (bool) array_intersect(['prefix', 'title', 'subtitle', 'abstract'], array_keys($params));
+    }
+
+    private function isMetadataEdit($params): bool
+    {
+        return $this->isDoiAssignment($params)
+            || $this->isTitleAbstractEdit($params)
+            || (bool) array_intersect(self::CATALOG_ENTRY_FIELDS, array_keys($params));
     }
 }
