@@ -67,6 +67,20 @@ class ThothEndpoint implements HasAuthorizationPolicy
         );
 
         $apiHandler->addRoute(
+            'PUT',
+            '{submissionId}/publications/{publicationId}/synchronize',
+            $this->synchronize(...),
+            'thoth.synchronize',
+            [
+                Role::ROLE_ID_SITE_ADMIN,
+                Role::ROLE_ID_MANAGER,
+                Role::ROLE_ID_SUB_EDITOR,
+                Role::ROLE_ID_ASSISTANT,
+            ],
+            $this
+        );
+
+        $apiHandler->addRoute(
             'GET',
             '{submissionId}/featureVideo',
             $this->getFeatureVideoForm(...),
@@ -243,6 +257,53 @@ class ThothEndpoint implements HasAuthorizationPolicy
                 Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
+    }
+
+    public function synchronize(IlluminateRequest $illuminateRequest): JsonResponse
+    {
+        $request = Application::get()->getRequest();
+        $context = $request->getContext();
+        $submission = Repo::submission()->get((int) $illuminateRequest->route('submissionId'));
+        $publication = Repo::publication()->get((int) $illuminateRequest->route('publicationId'));
+
+        if (
+            !$submission
+            || !$publication
+            || (int) $publication->getData('submissionId') !== (int) $submission->getId()
+        ) {
+            return response()->json(
+                ['errorMessage' => __('api.404.resourceNotFound')],
+                Response::HTTP_NOT_FOUND
+            );
+        }
+
+        if (!$context || (int) $submission->getData('contextId') !== (int) $context->getId()) {
+            return response()->json(
+                ['errorMessage' => __('api.submissions.403.contextRequired')],
+                Response::HTTP_FORBIDDEN
+            );
+        }
+
+        $thothWorkId = $submission->getData('thothWorkId');
+        if (!$thothWorkId) {
+            return response()->json(
+                ['errorMessage' => __('plugins.generic.thoth.status.unregistered')],
+                Response::HTTP_FORBIDDEN
+            );
+        }
+
+        try {
+            $warning = ThothService::metadataSynchronization()->synchronize($publication, $thothWorkId);
+            $this->handleNotification($request, $submission, true, false, null, $warning);
+        } catch (QueryException $exception) {
+            $this->handleNotification($request, $submission, false, false, $exception);
+            return response()->json(
+                ['errorMessage' => __('plugins.generic.thoth.connectionError')],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+
+        return response()->json(['status' => true], Response::HTTP_OK);
     }
 
     public function getFeatureVideoForm(IlluminateRequest $illuminateRequest): JsonResponse

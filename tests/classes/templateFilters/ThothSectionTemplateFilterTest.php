@@ -33,6 +33,23 @@ class ThothSectionTemplateFilterTest extends PKPTestCase
             $templateManager->script
         );
     }
+
+    public function testProvidesDedicatedSynchronizationUrlToWorkflow(): void
+    {
+        $templateManager = new ThothWorkflowTemplateManagerStub();
+        $filter = new ThothSectionTemplateFilter();
+
+        $filter->addJavaScriptData(
+            new ThothWorkflowRequestStub(),
+            $templateManager,
+            'dashboard/editors.tpl'
+        );
+
+        $this->assertStringContainsString(
+            '"synchronizeUrl":"api\/_submissions\/__submissionId__\/publications\/__publicationId__\/synchronize"',
+            $templateManager->script
+        );
+    }
 }
 
 class ThothWorkflowTemplateManagerStub
