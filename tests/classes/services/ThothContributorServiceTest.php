@@ -26,6 +26,8 @@ use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Inputs\PatchContributor as ThothContributor;
 
+require_once __DIR__ . '/../../../vendor/autoload.php';
+
 class ThothContributorServiceTest extends PKPTestCase
 {
     public function testRegisterContributor()
@@ -51,5 +53,33 @@ class ThothContributorServiceTest extends PKPTestCase
         $thothContributorId = $service->register($mockAuthor);
 
         $this->assertSame('1a1f6581-9c66-4292-9afc-176060dc3e8a', $thothContributorId);
+    }
+
+    public function testUpdateContributor(): void
+    {
+        $thothContributor = new ThothContributor(['fullName' => 'Updated Name']);
+        $mockFactory = $this->getMockBuilder(ThothContributorFactory::class)
+            ->onlyMethods(['createFromAuthor'])
+            ->getMock();
+        $mockFactory->expects($this->once())
+            ->method('createFromAuthor')
+            ->willReturn($thothContributor);
+
+        $mockRepository = $this->getMockBuilder(ThothContributorRepository::class)
+            ->setConstructorArgs([$this->createMock(ThothClient::class)])
+            ->onlyMethods(['edit'])
+            ->getMock();
+        $mockRepository->expects($this->once())
+            ->method('edit')
+            ->with($this->callback(function (ThothContributor $contributor): bool {
+                return $contributor->getContributorId() === 'contributor-id'
+                    && $contributor->getFullName() === 'Updated Name';
+            }))
+            ->willReturn('contributor-id');
+
+        $service = new ThothContributorService($mockFactory, $mockRepository);
+        $result = $service->update($this->createMock(Author::class), 'contributor-id');
+
+        $this->assertSame('contributor-id', $result);
     }
 }

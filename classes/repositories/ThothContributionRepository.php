@@ -30,7 +30,27 @@ class ThothContributionRepository
             'firstName',
             'lastName',
             'fullName',
-            'contributor' => ['contributorId', 'orcid', 'fullName'],
+            'contributor' => [
+                'contributorId',
+                'firstName',
+                'lastName',
+                'fullName',
+                'orcid',
+                'website',
+            ],
+            'biographies' => [
+                'biographyId',
+                'contributionId',
+                'localeCode',
+                'content',
+                'canonical',
+            ],
+            'affiliations' => [
+                'affiliationId',
+                'contributionId',
+                'institutionId',
+                'affiliationOrdinal',
+            ],
         ],
     ];
     protected $thothClient;

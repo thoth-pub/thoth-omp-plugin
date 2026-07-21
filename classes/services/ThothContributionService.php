@@ -61,7 +61,11 @@ class ThothContributionService
             $thothContributorId = $this->contributorService->register($author);
             $thothContribution->setContributorId($thothContributorId);
         } else {
-            $thothContribution->setContributorId($thothContributor->getContributorId());
+            $thothContributorId = $thothContributor->getContributorId();
+            $thothContribution->setContributorId($thothContributorId);
+            if ($thothContributorId) {
+                $this->contributorService->update($author, $thothContributorId);
+            }
         }
 
         $thothContributionId = $this->repository->add($thothContribution);
@@ -71,11 +75,7 @@ class ThothContributionService
             $author->getData('locale')
         );
 
-        $affiliationOrdinal = 1;
-        foreach ($author->getAffiliations() as $affiliation) {
-            $this->affiliationService->register($affiliation, $thothContributionId, $affiliationOrdinal);
-            $affiliationOrdinal++;
-        }
+        $this->affiliationService->registerByAuthor($author, $thothContributionId);
 
         return $thothContributionId;
     }
@@ -133,13 +133,26 @@ class ThothContributionService
             }
 
             $existingContribution = $remainingContributions[$existingKey];
+            $thothContributionId = $existingContribution['contributionId'];
             $thothContribution->setWorkId($thothWorkId);
-            $thothContribution->setContributionId($existingContribution['contributionId']);
+            $thothContribution->setContributionId($thothContributionId);
             if ($contributorId = $this->getExistingContributorId($existingContribution)) {
                 $thothContribution->setContributorId($contributorId);
+                $this->contributorService->update($author, $contributorId);
             }
 
             $this->repository->edit($thothContribution);
+            $this->biographyService->updateByAuthor(
+                $author,
+                $thothContributionId,
+                $existingContribution['biographies'] ?? [],
+                $author->getData('locale')
+            );
+            $this->affiliationService->updateByAuthor(
+                $author,
+                $thothContributionId,
+                $existingContribution['affiliations'] ?? []
+            );
             unset($remainingContributions[$existingKey]);
         }
 
