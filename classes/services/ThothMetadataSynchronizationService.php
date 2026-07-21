@@ -19,14 +19,20 @@ namespace APP\plugins\generic\thoth\classes\services;
 class ThothMetadataSynchronizationService
 {
     private ThothBookService $bookService;
+    private ThothContributionService $contributionService;
 
-    public function __construct(ThothBookService $bookService)
-    {
+    public function __construct(
+        ThothBookService $bookService,
+        ThothContributionService $contributionService
+    ) {
         $this->bookService = $bookService;
+        $this->contributionService = $contributionService;
     }
 
     public function synchronize($publication, string $thothWorkId): ?string
     {
-        return $this->bookService->update($publication, $thothWorkId, true);
+        $warning = $this->bookService->update($publication, $thothWorkId, true);
+        $this->contributionService->synchronizeByPublication($publication, $thothWorkId);
+        return $warning;
     }
 }
