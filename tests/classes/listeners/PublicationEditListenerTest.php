@@ -22,6 +22,7 @@ class PublicationEditListenerTest extends PKPTestCase
         ]);
 
         $this->assertSame(1, $bookService->updates);
+        $this->assertFalse($bookService->includedTitlesAndAbstracts);
         $this->assertSame(0, $notification->successes);
     }
 
@@ -37,7 +38,23 @@ class PublicationEditListenerTest extends PKPTestCase
         ]);
 
         $this->assertSame(1, $bookService->updates);
+        $this->assertTrue($bookService->includedTitlesAndAbstracts);
         $this->assertSame(1, $notification->successes);
+    }
+
+    public function testCatalogEntryEditOnlySynchronizesWorkMetadata(): void
+    {
+        [$listener, $bookService] = $this->createListener();
+
+        $listener->updateThothBook('Publication::edit', [
+            $this->createPublication(),
+            null,
+            ['place' => 'Manaus'],
+            new stdClass(),
+        ]);
+
+        $this->assertSame(1, $bookService->updates);
+        $this->assertFalse($bookService->includedTitlesAndAbstracts);
     }
 
     public function testUnsupportedFrontcoverShowsWarningAndSuccess(): void
@@ -80,6 +97,7 @@ class PublicationEditListenerTest extends PKPTestCase
         };
         $bookService = new class ($warning) {
             public int $updates = 0;
+            public bool $includedTitlesAndAbstracts = false;
             private ?string $warning;
 
             public function __construct(?string $warning)
@@ -87,9 +105,10 @@ class PublicationEditListenerTest extends PKPTestCase
                 $this->warning = $warning;
             }
 
-            public function update($publication, $workId): ?string
+            public function update($publication, $workId, bool $includeTitlesAndAbstracts = false): ?string
             {
                 $this->updates++;
+                $this->includedTitlesAndAbstracts = $includeTitlesAndAbstracts;
                 return $this->warning;
             }
         };

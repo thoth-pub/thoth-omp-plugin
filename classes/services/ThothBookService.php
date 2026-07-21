@@ -88,7 +88,7 @@ class ThothBookService
         return $thothBookId;
     }
 
-    public function update($publication, $thothBookId)
+    public function update($publication, $thothBookId, bool $includeTitlesAndAbstracts = false)
     {
         $oldThothBook = $this->repository->get($thothBookId);
         $newThothBook = $this->factory->createFromPublication($publication);
@@ -99,12 +99,34 @@ class ThothBookService
         ));
 
         $this->repository->edit($thothBook);
+        if ($includeTitlesAndAbstracts) {
+            $this->updateTitlesAndAbstracts($publication, $thothBookId, $oldThothBook);
+        }
         return $this->frontcoverService?->sync($publication, $thothBookId);
     }
 
     private function getPatchWorkData($thothBook): array
     {
         return array_intersect_key($thothBook->toArray(), self::PATCH_WORK_FIELDS);
+    }
+
+    private function updateTitlesAndAbstracts($publication, string $thothBookId, $oldThothBook): void
+    {
+        $oldThothBookData = $oldThothBook->toArray();
+        $locale = $publication->getData('locale');
+
+        $this->titleService->updateByPublication(
+            $publication,
+            $thothBookId,
+            $oldThothBookData['titles'] ?? [],
+            $locale
+        );
+        $this->abstractService->updateByPublication(
+            $publication,
+            $thothBookId,
+            $oldThothBookData['abstracts'] ?? [],
+            $locale
+        );
     }
 
     public function validate($publication)

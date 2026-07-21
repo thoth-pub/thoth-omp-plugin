@@ -17,13 +17,13 @@ use PKP\tests\PKPTestCase;
 
 class ThothMetadataSynchronizationServiceTest extends PKPTestCase
 {
-    public function testSynchronizeUpdatesWorkMetadata(): void
+    public function testSynchronizeUpdatesWorkTitlesAndAbstractsMetadata(): void
     {
         $publication = $this->createMock(Publication::class);
         $bookService = $this->createMock(ThothBookService::class);
         $bookService->expects($this->once())
             ->method('update')
-            ->with($publication, 'work-id')
+            ->with($publication, 'work-id', true)
             ->willReturn('warning-key');
 
         $service = new ThothMetadataSynchronizationService($bookService);
