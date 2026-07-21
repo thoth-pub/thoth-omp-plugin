@@ -182,26 +182,14 @@ class ThothBookServiceTest extends PKPTestCase
         $this->assertSame('d8fa2e63-5513-45e5-84c1-e9c2d89f99d3', $thothBookId);
     }
 
-    public function testUpdateBookIgnoresSchemaOnlyFields()
+    public function testUpdateOnlySynchronizesWorkMetadata()
     {
         $mockTitleService = $this->createMock(ThothTitleService::class);
-        $mockTitleService->expects($this->once())
-            ->method('updateByPublication')
-            ->with(
-                $this->isInstanceOf(Publication::class),
-                '9f65f147-1d9d-4dd1-9f78-89b58d088a2c',
-                [['titleId' => 'title-id']],
-                'en_US'
-            );
+        $mockTitleService->expects($this->never())
+            ->method('updateByPublication');
         $mockAbstractService = $this->createMock(ThothAbstractService::class);
-        $mockAbstractService->expects($this->once())
-            ->method('updateByPublication')
-            ->with(
-                $this->isInstanceOf(Publication::class),
-                '9f65f147-1d9d-4dd1-9f78-89b58d088a2c',
-                [['abstractId' => 'abstract-id']],
-                'en_US'
-            );
+        $mockAbstractService->expects($this->never())
+            ->method('updateByPublication');
         $oldThothBook = new class () {
             public function toArray()
             {
