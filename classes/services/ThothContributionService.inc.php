@@ -121,6 +121,7 @@ class ThothContributionService
             $existingKey = $this->findMatchingContributionKey(
                 $author,
                 $thothContribution->getContributionType(),
+                $thothContribution->getContributionOrdinal(),
                 $remainingContributions
             );
             if ($existingKey === null) {
@@ -197,12 +198,22 @@ class ThothContributionService
     private function findMatchingContributionKey(
         $author,
         string $contributionType,
+        int $contributionOrdinal,
         array $existingContributions
     ): ?int {
         foreach ($existingContributions as $key => $existingContribution) {
             if (
                 ($existingContribution['contributionType'] ?? null) === $contributionType
                 && $this->isSameAuthor($author, $existingContribution)
+            ) {
+                return $key;
+            }
+        }
+
+        foreach ($existingContributions as $key => $existingContribution) {
+            if (
+                ($existingContribution['contributionType'] ?? null) === $contributionType
+                && ($existingContribution['contributionOrdinal'] ?? null) === $contributionOrdinal
             ) {
                 return $key;
             }
