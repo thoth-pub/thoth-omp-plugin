@@ -18,6 +18,7 @@ require_once(__DIR__ . '/../../../vendor/autoload.php');
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Enums\ContributionType;
 use ThothApi\GraphQL\Inputs\PatchContribution as ThothContribution;
+use ThothApi\GraphQL\Schemas\Work as ThothWork;
 
 import('lib.pkp.tests.PKPTestCase');
 import('plugins.generic.thoth.classes.repositories.ThothContributionRepository');
@@ -63,6 +64,46 @@ class ThothContributionRepositoryTest extends PKPTestCase
         $thothContribution = $repository->get('8d19d277-c42d-4bc4-b992-73174c7415e0');
 
         $this->assertEquals($expectedThothContribution, $thothContribution);
+    }
+
+    public function testGetContributionsByWorkIdUsesDomainSelection()
+    {
+        $expectedContributions = [[
+            'contributionId' => 'contribution-id',
+            'contributorId' => 'contributor-id',
+            'contributionType' => ContributionType::AUTHOR,
+            'fullName' => 'Jane Doe',
+            'contributor' => [
+                'contributorId' => 'contributor-id',
+                'orcid' => 'https://orcid.org/0000-0001-2345-6789',
+                'fullName' => 'Jane Doe',
+            ],
+        ]];
+        $work = new ThothWork(['contributions' => $expectedContributions]);
+
+        $mockThothClient = $this->getMockBuilder(ThothClient::class)
+            ->setMethods(['work'])
+            ->getMock();
+        $mockThothClient->expects($this->once())
+            ->method('work')
+            ->with('work-id', [
+                'contributions' => [
+                    'contributionId',
+                    'contributorId',
+                    'contributionType',
+                    'mainContribution',
+                    'contributionOrdinal',
+                    'firstName',
+                    'lastName',
+                    'fullName',
+                    'contributor' => ['contributorId', 'orcid', 'fullName'],
+                ],
+            ])
+            ->willReturn($work);
+
+        $repository = new ThothContributionRepository($mockThothClient);
+
+        $this->assertSame($expectedContributions, $repository->getByWorkId('work-id'));
     }
 
     public function testAddContribution()
