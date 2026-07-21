@@ -75,9 +75,25 @@ class ThothContributionRepositoryTest extends PKPTestCase
             'fullName' => 'Jane Doe',
             'contributor' => [
                 'contributorId' => 'contributor-id',
+                'firstName' => 'Jane',
+                'lastName' => 'Doe',
                 'orcid' => 'https://orcid.org/0000-0001-2345-6789',
                 'fullName' => 'Jane Doe',
+                'website' => 'https://example.com/jane',
             ],
+            'biographies' => [[
+                'biographyId' => 'biography-id',
+                'contributionId' => 'contribution-id',
+                'localeCode' => 'EN_US',
+                'content' => '<p>Biography</p>',
+                'canonical' => true,
+            ]],
+            'affiliations' => [[
+                'affiliationId' => 'affiliation-id',
+                'contributionId' => 'contribution-id',
+                'institutionId' => 'institution-id',
+                'affiliationOrdinal' => 1,
+            ]],
         ]];
         $work = new ThothWork(['contributions' => $expectedContributions]);
 
@@ -96,7 +112,27 @@ class ThothContributionRepositoryTest extends PKPTestCase
                     'firstName',
                     'lastName',
                     'fullName',
-                    'contributor' => ['contributorId', 'orcid', 'fullName'],
+                    'contributor' => [
+                        'contributorId',
+                        'firstName',
+                        'lastName',
+                        'fullName',
+                        'orcid',
+                        'website',
+                    ],
+                    'biographies' => [
+                        'biographyId',
+                        'contributionId',
+                        'localeCode',
+                        'content',
+                        'canonical',
+                    ],
+                    'affiliations' => [
+                        'affiliationId',
+                        'contributionId',
+                        'institutionId',
+                        'affiliationOrdinal',
+                    ],
                 ],
             ])
             ->willReturn($work);

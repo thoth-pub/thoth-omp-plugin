@@ -26,18 +26,67 @@ class ThothAffiliationService
 
     public function register($rorId, $thothContributionId)
     {
-        $thothInstitution = $this->institutionRepository->find($rorId);
+        $thothAffiliation = $this->createFromRor($rorId, $thothContributionId);
+        if ($thothAffiliation === null) {
+            return null;
+        }
 
+        return $this->repository->add($thothAffiliation);
+    }
+
+    public function update($rorId, string $thothContributionId, array $existingAffiliations = []): void
+    {
+        $remainingAffiliations = $existingAffiliations;
+        $thothAffiliation = $this->createFromRor($rorId, $thothContributionId);
+
+        if ($thothAffiliation !== null) {
+            $existingKey = $this->findMatchingAffiliationKey(
+                $thothAffiliation->getInstitutionId(),
+                $remainingAffiliations
+            );
+
+            if ($existingKey === null) {
+                $this->repository->add($thothAffiliation);
+            } else {
+                $thothAffiliation->setAffiliationId($remainingAffiliations[$existingKey]['affiliationId']);
+                $this->repository->edit($thothAffiliation);
+                unset($remainingAffiliations[$existingKey]);
+            }
+        }
+
+        foreach ($remainingAffiliations as $existingAffiliation) {
+            if (isset($existingAffiliation['affiliationId'])) {
+                $this->repository->delete($existingAffiliation['affiliationId']);
+            }
+        }
+    }
+
+    private function createFromRor($rorId, string $thothContributionId)
+    {
+        if (empty($rorId)) {
+            return null;
+        }
+
+        $thothInstitution = $this->institutionRepository->find($rorId);
         if ($thothInstitution === null) {
             return null;
         }
 
-        $thothAffiliation = $this->repository->new([
+        return $this->repository->new([
             'contributionId' => $thothContributionId,
             'institutionId' => $thothInstitution->getInstitutionId(),
-            'affiliationOrdinal' => 1
+            'affiliationOrdinal' => 1,
         ]);
+    }
 
-        return $this->repository->add($thothAffiliation);
+    private function findMatchingAffiliationKey(string $institutionId, array $existingAffiliations): ?int
+    {
+        foreach ($existingAffiliations as $key => $existingAffiliation) {
+            if (($existingAffiliation['institutionId'] ?? null) === $institutionId) {
+                return $key;
+            }
+        }
+
+        return null;
     }
 }
