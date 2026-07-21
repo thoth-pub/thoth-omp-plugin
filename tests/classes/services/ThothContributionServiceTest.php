@@ -136,14 +136,17 @@ class ThothContributionServiceTest extends PKPTestCase
                 ]]
             );
 
+        $contributionOrdinal = 0;
         $mockFactory = $this->getMockBuilder(ThothContributionFactory::class)
             ->onlyMethods(['createFromAuthor'])
             ->getMock();
         $mockFactory->expects($this->exactly(2))
             ->method('createFromAuthor')
-            ->willReturnCallback(function ($author) {
+            ->willReturnCallback(function ($author) use (&$contributionOrdinal) {
+                $contributionOrdinal++;
                 return $this->createThothContribution([
                     'contributionType' => ContributionType::AUTHOR,
+                    'contributionOrdinal' => $contributionOrdinal,
                     'fullName' => $author->getFullName(false),
                 ]);
             });
@@ -198,6 +201,76 @@ class ThothContributionServiceTest extends PKPTestCase
                 'contributor' => ['orcid' => '0000-0001-2345-6789'],
             ],
         ]);
+    }
+
+    public function testUpdateMatchesRenamedContributionByTypeAndOrdinal(): void
+    {
+        $author = $this->createAuthor('Juliana Castanheiras');
+        $mockFactory = $this->getMockBuilder(ThothContributionFactory::class)
+            ->onlyMethods(['createFromAuthor'])
+            ->getMock();
+        $mockFactory->expects($this->once())
+            ->method('createFromAuthor')
+            ->with($author)
+            ->willReturn($this->createThothContribution([
+                'contributionType' => ContributionType::AUTHOR,
+                'contributionOrdinal' => 4,
+                'fullName' => 'Juliana Castanheiras',
+            ]));
+
+        $mockRepository = $this->getMockBuilder(ThothContributionRepository::class)
+            ->setConstructorArgs([$this->createMock(ThothClient::class)])
+            ->onlyMethods(['add', 'edit', 'delete'])
+            ->getMock();
+        $mockRepository->expects($this->never())->method('add');
+        $mockRepository->expects($this->once())
+            ->method('edit')
+            ->with($this->callback(function ($contribution): bool {
+                return $contribution->getContributionId() === 'contribution-id'
+                    && $contribution->getContributorId() === 'contributor-id'
+                    && $contribution->getFullName() === 'Juliana Castanheiras';
+            }));
+        $mockRepository->expects($this->never())->method('delete');
+
+        $mockContributorRepository = $this->getMockBuilder(ThothContributorRepository::class)
+            ->setConstructorArgs([$this->createMock(ThothClient::class)])
+            ->onlyMethods(['find'])
+            ->getMock();
+        $mockContributorRepository->expects($this->never())->method('find');
+
+        $mockContributorService = $this->createMock(ThothContributorService::class);
+        $mockContributorService->expects($this->never())->method('register');
+        $mockContributorService->expects($this->once())
+            ->method('update')
+            ->with($author, 'contributor-id');
+
+        $mockBiographyService = $this->createMock(ThothBiographyService::class);
+        $mockBiographyService->expects($this->once())
+            ->method('updateByAuthor')
+            ->with($author, 'contribution-id', [], 'en_US');
+        $mockAffiliationService = $this->createMock(ThothAffiliationService::class);
+        $mockAffiliationService->expects($this->once())
+            ->method('updateByAuthor')
+            ->with($author, 'contribution-id', []);
+
+        $service = new ThothContributionService(
+            $mockFactory,
+            $mockRepository,
+            $mockContributorRepository,
+            $mockContributorService,
+            $mockBiographyService,
+            $mockAffiliationService
+        );
+        $service->update([$author], 'work-id', [[
+            'contributionId' => 'contribution-id',
+            'contributorId' => 'contributor-id',
+            'contributionType' => ContributionType::AUTHOR,
+            'contributionOrdinal' => 4,
+            'fullName' => 'Iris Castanheiras',
+            'contributor' => ['orcid' => null],
+            'biographies' => [],
+            'affiliations' => [],
+        ]]);
     }
 
     private function createAuthor(string $fullName, ?string $orcid = null): Author
