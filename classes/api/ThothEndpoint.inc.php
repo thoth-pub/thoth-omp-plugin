@@ -44,6 +44,18 @@ class ThothEndpoint
 
         $handler->requiresSubmissionAccess[] = 'register';
 
+        array_unshift(
+            $endpoints['PUT'],
+            [
+                'pattern' => $rootPattern
+                    . '/{submissionId}/publications/{publicationId}/synchronize',
+                'handler' => [$this, 'synchronize'],
+                'roles' => [ROLE_ID_MANAGER, ROLE_ID_SUB_EDITOR, ROLE_ID_ASSISTANT],
+            ]
+        );
+
+        $handler->requiresSubmissionAccess[] = 'synchronize';
+
         $endpoints['POST'][] = [
             'pattern' => "{$rootPattern}/{submissionId:\d+}/featureVideo",
             'handler' => [$this, 'uploadFeatureVideo'],
@@ -204,6 +216,41 @@ class ThothEndpoint
             error_log($exception->getMessage());
             return $response->withStatus(500)->withJsonError('plugins.generic.thoth.connectionError');
         }
+    }
+
+    public function synchronize($slimRequest, $response, $args)
+    {
+        $request = Application::get()->getRequest();
+        $context = $request->getContext();
+        $submission = Services::get('submission')->get((int) $args['submissionId']);
+        $publication = Services::get('publication')->get((int) $args['publicationId']);
+
+        if (
+            !$submission
+            || !$publication
+            || (int) $publication->getData('submissionId') !== (int) $submission->getId()
+        ) {
+            return $response->withStatus(404)->withJsonError('api.404.resourceNotFound');
+        }
+
+        if (!$context || (int) $submission->getData('contextId') !== (int) $context->getId()) {
+            return $response->withStatus(403)->withJsonError('api.submissions.403.contextRequired');
+        }
+
+        $thothWorkId = $submission->getData('thothWorkId');
+        if (!$thothWorkId) {
+            return $response->withStatus(403)->withJsonError('plugins.generic.thoth.status.unregistered');
+        }
+
+        try {
+            $warning = ThothService::metadataSynchronization()->synchronize($publication, $thothWorkId);
+            $this->handleNotification($request, $submission, true, false, null, $warning);
+        } catch (QueryException $exception) {
+            $this->handleNotification($request, $submission, false, false, $exception);
+            return $response->withStatus(500)->withJsonError('plugins.generic.thoth.connectionError');
+        }
+
+        return $response->withJson(['status' => true], 200);
     }
 
 

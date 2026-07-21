@@ -24,6 +24,7 @@ import('plugins.generic.thoth.classes.services.ThothFeatureVideoService');
 import('plugins.generic.thoth.classes.services.ThothFrontcoverService');
 import('plugins.generic.thoth.classes.services.ThothLanguageService');
 import('plugins.generic.thoth.classes.services.ThothLocationService');
+import('plugins.generic.thoth.classes.services.ThothMetadataSynchronizationService');
 import('plugins.generic.thoth.classes.services.ThothPublicationService');
 import('plugins.generic.thoth.classes.services.ThothReferenceService');
 import('plugins.generic.thoth.classes.services.ThothSubjectService');
@@ -120,6 +121,10 @@ class ThothServiceProvider implements ContainerProvider
         $container->singletonClass('locationService', ThothLocationService::class, [
             new ThothLocationFactory(),
             'locationRepository',
+        ]);
+
+        $container->singletonClass('metadataSynchronizationService', ThothMetadataSynchronizationService::class, [
+            'bookService',
         ]);
 
         $container->singletonClass('publicationService', ThothPublicationService::class, [

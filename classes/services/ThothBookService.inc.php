@@ -100,7 +100,6 @@ class ThothBookService
         ));
 
         $this->repository->edit($thothBook);
-        $this->updateMetadata($publication, $thothBookId, $oldThothBook);
         if ($this->frontcoverService) {
             return $this->frontcoverService->sync($publication, $thothBookId);
         }
@@ -144,19 +143,4 @@ class ThothBookService
         return $errors;
     }
 
-    private function updateMetadata($publication, $thothBookId, $oldThothBook)
-    {
-        $this->titleService->updateByPublication(
-            $publication,
-            $thothBookId,
-            $oldThothBook->toArray()['titles'] ?? [],
-            $publication->getData('locale')
-        );
-        $this->abstractService->updateByPublication(
-            $publication,
-            $thothBookId,
-            $oldThothBook->toArray()['abstracts'] ?? [],
-            $publication->getData('locale')
-        );
-    }
 }
