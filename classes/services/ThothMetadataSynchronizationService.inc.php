@@ -17,14 +17,18 @@
 class ThothMetadataSynchronizationService
 {
     private $bookService;
+    private $contributionService;
 
-    public function __construct($bookService)
+    public function __construct($bookService, $contributionService)
     {
         $this->bookService = $bookService;
+        $this->contributionService = $contributionService;
     }
 
     public function synchronize($publication, $thothWorkId)
     {
-        return $this->bookService->update($publication, $thothWorkId, true);
+        $warning = $this->bookService->update($publication, $thothWorkId, true);
+        $this->contributionService->synchronizeByPublication($publication, $thothWorkId);
+        return $warning;
     }
 }
