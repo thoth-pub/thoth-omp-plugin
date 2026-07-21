@@ -10,13 +10,13 @@ import('plugins.generic.thoth.classes.services.ThothMetadataSynchronizationServi
 
 class ThothMetadataSynchronizationServiceTest extends PKPTestCase
 {
-    public function testSynchronizeUpdatesWorkMetadata()
+    public function testSynchronizeUpdatesWorkTitlesAndAbstractsMetadata()
     {
         $publication = $this->createMock(Publication::class);
         $bookService = $this->createMock(ThothBookService::class);
         $bookService->expects($this->once())
             ->method('update')
-            ->with($publication, 'work-id')
+            ->with($publication, 'work-id', true)
             ->willReturn('warning-key');
 
         $service = new ThothMetadataSynchronizationService($bookService);

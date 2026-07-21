@@ -25,6 +25,6 @@ class ThothMetadataSynchronizationService
 
     public function synchronize($publication, $thothWorkId)
     {
-        return $this->bookService->update($publication, $thothWorkId);
+        return $this->bookService->update($publication, $thothWorkId, true);
     }
 }

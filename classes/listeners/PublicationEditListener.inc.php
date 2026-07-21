@@ -49,7 +49,11 @@ class PublicationEditListener
         $bookService = $this->bookService ?: ThothService::book();
         $notification = $this->notification ?: new ThothNotification();
         try {
-            $warning = $bookService->update($publication, $thothBookId);
+            $warning = $bookService->update(
+                $publication,
+                $thothBookId,
+                $this->isTitleAbstractEdit($params)
+            );
             if (!$this->isDoiAssignment($params)) {
                 $notification->notifySuccess($request, $submission);
             }
@@ -66,5 +70,10 @@ class PublicationEditListener
     private function isDoiAssignment($params)
     {
         return count($params) === 1 && array_key_exists('doiId', $params);
+    }
+
+    private function isTitleAbstractEdit($params)
+    {
+        return (bool) array_intersect(['prefix', 'title', 'subtitle', 'abstract'], array_keys($params));
     }
 }

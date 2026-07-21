@@ -33,6 +33,7 @@ class ThothTitleFactory
     private function create($entity, string $workId, ?string $preferredLocale = null): array
     {
         $canonicalLocale = $this->getCanonicalLocale($entity, $preferredLocale);
+        $prefixes = $this->getLocalizedValues($entity, 'prefix');
         $titles = $this->getLocalizedValues($entity, 'title', $canonicalLocale);
         $subtitles = $this->getLocalizedValues($entity, 'subtitle');
         $thothTitles = [];
@@ -44,6 +45,7 @@ class ThothTitleFactory
                 continue;
             }
 
+            $title = $this->composeTitle($prefixes[$locale] ?? null, $title);
             $thothTitles[$this->getLocaleKey($localeCode)] = new ThothTitle([
                 'workId' => $workId,
                 'localeCode' => $localeCode,
@@ -98,6 +100,11 @@ class ThothTitleFactory
     private function composeFullTitle(string $title, ?string $subtitle): string
     {
         return $subtitle ? "{$title}: {$subtitle}" : $title;
+    }
+
+    private function composeTitle(?string $prefix, string $title): string
+    {
+        return $prefix ? "{$prefix} {$title}" : $title;
     }
 
     private function getSupportedLocales(array $localizedValues): array
