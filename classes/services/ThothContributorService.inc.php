@@ -31,4 +31,12 @@ class ThothContributorService
         $thothContributor = $this->factory->createFromAuthor($author);
         return $this->repository->add($thothContributor);
     }
+
+    public function update($author, string $thothContributorId)
+    {
+        $thothContributor = $this->factory->createFromAuthor($author);
+        $thothContributor->setContributorId($thothContributorId);
+
+        return $this->repository->edit($thothContributor);
+    }
 }

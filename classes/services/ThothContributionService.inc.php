@@ -59,7 +59,11 @@ class ThothContributionService
             $thothContributorId = $this->contributorService->register($author);
             $thothContribution->setContributorId($thothContributorId);
         } else {
-            $thothContribution->setContributorId($thothContributor->getContributorId());
+            $thothContributorId = $thothContributor->getContributorId();
+            $thothContribution->setContributorId($thothContributorId);
+            if ($thothContributorId) {
+                $this->contributorService->update($author, $thothContributorId);
+            }
         }
 
         $thothContributionId = $this->repository->add($thothContribution);
@@ -129,9 +133,21 @@ class ThothContributionService
             $thothContribution->setContributionId($existingContribution['contributionId']);
             if ($contributorId = $this->getExistingContributorId($existingContribution)) {
                 $thothContribution->setContributorId($contributorId);
+                $this->contributorService->update($author, $contributorId);
             }
 
             $this->repository->edit($thothContribution);
+            $this->biographyService->updateByAuthor(
+                $author,
+                $existingContribution['contributionId'],
+                $existingContribution['biographies'] ?? [],
+                $author->getData('locale')
+            );
+            $this->affiliationService->update(
+                $author->getData('rorId'),
+                $existingContribution['contributionId'],
+                $existingContribution['affiliations'] ?? []
+            );
             unset($remainingContributions[$existingKey]);
         }
 

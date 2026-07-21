@@ -44,10 +44,13 @@ class ThothContributionServiceTest extends PKPTestCase
             ->getMock();
         $mockContributorRepository->expects($this->once())
             ->method('find')
-            ->will($this->returnValue(new ThothContributor()));
+            ->will($this->returnValue(new ThothContributor(['contributorId' => 'existing-contributor-id'])));
 
         $mockContributorService = $this->createMock(ThothContributorService::class);
         $mockContributorService->expects($this->never())->method('register');
+        $mockContributorService->expects($this->once())
+            ->method('update')
+            ->with($this->anything(), 'existing-contributor-id');
 
         $mockAffiliationService = $this->createMock(ThothAffiliationService::class);
         $mockAffiliationService->expects($this->never())->method('register');
@@ -67,30 +70,10 @@ class ThothContributionServiceTest extends PKPTestCase
             ->method('add')
             ->will($this->returnValue('e2d8dc3b-a5d9-4941-8ebd-52f0a70515bd'));
 
-        $mockAuthor = new class () {
-            public function getData($key)
-            {
-                $values = [
-                    'locale' => 'en_US',
-                    'biography' => [
-                        'en_US' => 'English biography',
-                        'pt_BR' => 'Biografia em portugues',
-                    ],
-                ];
-
-                return $values[$key] ?? null;
-            }
-
-            public function getOrcid()
-            {
-                return null;
-            }
-
-            public function getFullName($usePrefix = false)
-            {
-                return 'John Doe';
-            }
-        };
+        $mockAuthor = $this->createAuthor('John Doe', null, null, [
+            'en_US' => 'English biography',
+            'pt_BR' => 'Biografia em portugues',
+        ]);
         $thothWorkId = '97fcc25c-361b-46f9-8c4b-016bfa36fb6d';
 
         $service = new ThothContributionService(
@@ -110,6 +93,14 @@ class ThothContributionServiceTest extends PKPTestCase
     {
         $mockBiographyService = $this->createMock(ThothBiographyService::class);
         $mockBiographyService->expects($this->once())->method('registerByAuthor');
+        $mockBiographyService->expects($this->once())
+            ->method('updateByAuthor')
+            ->with(
+                $this->anything(),
+                'jane-contribution-id',
+                [['biographyId' => 'jane-biography-id', 'localeCode' => 'EN_US', 'canonical' => true]],
+                'en_US'
+            );
 
         $mockContributorRepository = $this->getMockBuilder(ThothContributorRepository::class)
             ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
@@ -122,8 +113,20 @@ class ThothContributionServiceTest extends PKPTestCase
 
         $mockContributorService = $this->createMock(ThothContributorService::class);
         $mockContributorService->expects($this->never())->method('register');
+        $mockContributorService->expects($this->exactly(2))->method('update');
         $mockAffiliationService = $this->createMock(ThothAffiliationService::class);
         $mockAffiliationService->expects($this->never())->method('register');
+        $mockAffiliationService->expects($this->once())
+            ->method('update')
+            ->with(
+                'https://ror.org/00101234',
+                'jane-contribution-id',
+                [[
+                    'affiliationId' => 'jane-affiliation-id',
+                    'institutionId' => 'jane-institution-id',
+                    'affiliationOrdinal' => 1,
+                ]]
+            );
 
         $mockFactory = $this->getMockBuilder(ThothContributionFactory::class)
             ->setMethods(['createFromAuthor'])
@@ -161,7 +164,11 @@ class ThothContributionServiceTest extends PKPTestCase
             $mockAffiliationService
         );
         $service->update([
-            $this->createAuthor('Jane Doe', 'https://orcid.org/0000-0001-2345-6789'),
+            $this->createAuthor(
+                'Jane Doe',
+                'https://orcid.org/0000-0001-2345-6789',
+                'https://ror.org/00101234'
+            ),
             $this->createAuthor('John Doe'),
         ], 'work-id', [
             [
@@ -170,6 +177,14 @@ class ThothContributionServiceTest extends PKPTestCase
                 'contributionType' => ContributionType::AUTHOR,
                 'fullName' => 'Jane Doe',
                 'contributor' => ['orcid' => '0000-0001-2345-6789'],
+                'biographies' => [
+                    ['biographyId' => 'jane-biography-id', 'localeCode' => 'EN_US', 'canonical' => true],
+                ],
+                'affiliations' => [[
+                    'affiliationId' => 'jane-affiliation-id',
+                    'institutionId' => 'jane-institution-id',
+                    'affiliationOrdinal' => 1,
+                ]],
             ],
             [
                 'contributionId' => 'removed-contribution-id',
@@ -181,33 +196,19 @@ class ThothContributionServiceTest extends PKPTestCase
         ]);
     }
 
-    private function createAuthor($fullName, $orcid = null)
+    private function createAuthor($fullName, $orcid = null, $rorId = null, $biography = null)
     {
-        return new class ($fullName, $orcid) {
-            private $fullName;
-            private $orcid;
+        $author = $this->getMockBuilder(Author::class)
+            ->setMethods(['getData', 'getOrcid', 'getFullName'])
+            ->getMock();
+        $author->method('getData')->willReturnCallback(function ($key) use ($rorId, $biography) {
+            $values = ['locale' => 'en_US', 'rorId' => $rorId, 'biography' => $biography];
+            return $values[$key] ?? null;
+        });
+        $author->method('getOrcid')->willReturn($orcid);
+        $author->method('getFullName')->willReturn($fullName);
 
-            public function __construct($fullName, $orcid)
-            {
-                $this->fullName = $fullName;
-                $this->orcid = $orcid;
-            }
-
-            public function getData($key)
-            {
-                return $key === 'locale' ? 'en_US' : null;
-            }
-
-            public function getOrcid()
-            {
-                return $this->orcid;
-            }
-
-            public function getFullName($usePrefix = false)
-            {
-                return $this->fullName;
-            }
-        };
+        return $author;
     }
 
     private function createThothContributor($contributorId = null)
