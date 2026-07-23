@@ -178,9 +178,25 @@ On the Thoth management page, you can submit a selection of titles from OMP into
 | Keyword           |                    |   | Subject(Type: Keyword) |                     |             |
 | Citation          |                    |   | Reference              |                     |             |
 
-OMP subjects are validated as LCC, BISAC, BIC, or Thema when they include a supported ONIX List 27 scheme
-identifier (`03`, `10`, `12`, or `93`) or an equivalent prefix. Values that cannot be confirmed or that match
-more than one scheme are synchronized as `Keyword`.
+### Subjects and keywords
+
+| OMP metadata | Thoth subject type | Rule |
+| --- | --- | --- |
+| `keywords` | `Keyword` | Always. Keywords are never reclassified or sent as `Custom`. |
+| `subjects` with a confirmed scheme | `LCC`, `BISAC`, `BIC`, or `Thema` | Uses the detected scheme. |
+| `subjects` with an explicit non-ONIX source and identifier | `Custom` | Plain subject text never becomes `Custom`. |
+| Other `subjects` | `Keyword` | Used when the scheme is invalid, ambiguous, or unavailable for validation. |
+
+The supported schemes follow [ONIX List 27](https://ns.editeur.org/onix/en/27):
+
+- `03` or `LCC`: requires an explicit scheme and a code in the expected LCC format;
+- `10` or `BISAC`: requires an explicit scheme and a code in the expected BISAC format;
+- `12` or `BIC`: validates the code against the BIC 2.1 list included with OMP;
+- `93` or `THEMA`: validates the code against the official [Thema registry](https://ns.editeur.org/thema/en).
+
+OMP subject values can include a scheme prefix, such as `THEMA:MFGV` or `93:MFGV`. Without an explicit scheme,
+the plugin only classifies a value as BIC or Thema when exactly one validation succeeds. Subjects are synchronized
+before keywords, duplicate type-and-code pairs are sent only once, and their Thoth ordinals follow that order.
 
 </details>
 

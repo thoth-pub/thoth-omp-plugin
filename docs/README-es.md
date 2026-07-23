@@ -182,9 +182,26 @@ En la página de gestión de Thoth, puede enviar en masa una selección de títu
 | Keyword           |                    |   | Subject(Type: Keyword) |                     |             |
 | Citation          |                    |   | Reference              |                     |             |
 
-Los temas de OMP se validan como LCC, BISAC, BIC o Thema cuando incluyen un identificador de esquema compatible
-de la Lista 27 de ONIX (`03`, `10`, `12` o `93`) o un prefijo equivalente. Los valores que no se pueden confirmar
-o que corresponden a más de un esquema se sincronizan como `Keyword`.
+### Temas y palabras clave
+
+| Metadato de OMP | Tipo de tema en Thoth | Regla |
+| --- | --- | --- |
+| `keywords` | `Keyword` | Siempre. Las palabras clave nunca se reclasifican ni se envían como `Custom`. |
+| `subjects` con esquema confirmado | `LCC`, `BISAC`, `BIC` o `Thema` | Utiliza el esquema detectado. |
+| `subjects` con fuente no ONIX e identificador explícitos | `Custom` | El texto simple nunca se vuelve `Custom`. |
+| Otros valores de `subjects` | `Keyword` | Cuando el esquema es inválido, ambiguo o no se puede validar. |
+
+Los esquemas admitidos siguen la [Lista 27 de ONIX](https://ns.editeur.org/onix/en/27):
+
+- `03` o `LCC`: requiere un esquema explícito y un código con el formato esperado de LCC;
+- `10` o `BISAC`: requiere un esquema explícito y un código con el formato esperado de BISAC;
+- `12` o `BIC`: valida el código con la lista BIC 2.1 incluida en OMP;
+- `93` o `THEMA`: valida el código con el [registro oficial de Thema](https://ns.editeur.org/thema/en).
+
+El valor de un tema puede incluir un prefijo de esquema, como `THEMA:MFGV` o `93:MFGV`. Sin un esquema explícito,
+el plugin solo clasifica el valor como BIC o Thema cuando exactamente una validación tiene éxito. Los temas se
+sincronizan antes de las palabras clave, los pares duplicados de tipo y código se envían una sola vez y sus
+ordinales en Thoth siguen ese orden.
 
 </details>
 
