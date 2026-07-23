@@ -56,8 +56,8 @@ class ThothSubjectClassifierTest extends PKPTestCase
     public function testClassifiesOnlyUnambiguousCodesWithoutAnExplicitSource()
     {
         $classifier = new ThothSubjectClassifier(
-            fn ($code) => in_array($code, ['JNF', 'ABA'], true),
-            fn ($code) => in_array($code, ['MFGV', 'ABA'], true)
+            fn ($code) => $code === 'JNF',
+            fn ($code) => $code === 'MFGV'
         );
 
         $this->assertSame([
@@ -68,10 +68,32 @@ class ThothSubjectClassifierTest extends PKPTestCase
             'subjectType' => SubjectType::THEMA,
             'subjectCode' => 'MFGV',
         ], $classifier->classify('mfgv'));
+    }
+
+    public function testPrefersAVerifiedThemaCodeWithoutAnExplicitSource()
+    {
+        $classifier = new ThothSubjectClassifier(
+            fn ($code) => $code === 'MFGV',
+            fn ($code) => $code === 'MFGV'
+        );
+
         $this->assertSame([
-            'subjectType' => SubjectType::KEYWORD,
-            'subjectCode' => 'ABA',
-        ], $classifier->classify('ABA'));
+            'subjectType' => SubjectType::THEMA,
+            'subjectCode' => 'MFGV',
+        ], $classifier->classify('MFGV'));
+    }
+
+    public function testClassifiesABisacCodeWithoutAnExplicitSource()
+    {
+        $classifier = new ThothSubjectClassifier(
+            fn ($code) => false,
+            fn ($code) => false
+        );
+
+        $this->assertSame([
+            'subjectType' => SubjectType::BISAC,
+            'subjectCode' => 'EDU000000',
+        ], $classifier->classify('EDU000000'));
     }
 
     public function testClassifiesAnOnixPrefixedTextValue()
