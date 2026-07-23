@@ -173,10 +173,27 @@ Na página de gestão do Thoth, você pode enviar em massa uma seleção de tít
 | Keyword           |                    |   | Subject(Type: Keyword) |                     |             |
 | Citation          |                    |   | Reference              |                     |             |
 
-Os assuntos do OMP são validados como LCC, BISAC, BIC ou Thema quando incluem um identificador de esquema
-compatível da Lista 27 do ONIX (`03`, `10`, `12` ou `93`) ou um prefixo equivalente. Os valores estruturados de
-`source` e `identifier` do OMP também são compatíveis. Valores que não podem ser confirmados ou que correspondem
-a mais de um esquema são sincronizados como `Keyword`.
+### Assuntos e palavras-chave
+
+| Metadado do OMP | Tipo de assunto na Thoth | Regra |
+| --- | --- | --- |
+| `keywords` | `Keyword` | Sempre. Palavras-chave nunca são reclassificadas nem enviadas como `Custom`. |
+| `subjects` com esquema confirmado | `LCC`, `BISAC`, `BIC` ou `Thema` | Usa o esquema detectado. |
+| `subjects` com fonte não ONIX e identificador explícitos | `Custom` | Texto simples nunca se torna `Custom`. |
+| Demais valores de `subjects` | `Keyword` | Quando o esquema é inválido, ambíguo ou não pode ser validado. |
+
+Os esquemas aceitos seguem a [Lista 27 do ONIX](https://ns.editeur.org/onix/en/27):
+
+- `03` ou `LCC`: exige esquema explícito e código no formato esperado do LCC;
+- `10` ou `BISAC`: exige esquema explícito e código no formato esperado do BISAC;
+- `12` ou `BIC`: valida o código na lista BIC 2.1 incluída no OMP;
+- `93` ou `THEMA`: valida o código no [registro oficial do Thema](https://ns.editeur.org/thema/en).
+
+Os valores estruturados de assuntos no OMP 3.5 usam `name`, `source` e `identifier`. Valores simples também podem
+incluir um prefixo de esquema, como `THEMA:MFGV` ou `93:MFGV`. Sem esquema explícito, o plugin somente classifica
+o valor como BIC ou Thema quando exatamente uma validação é bem-sucedida. Os assuntos são sincronizados antes das
+palavras-chave, pares duplicados de tipo e código são enviados uma única vez e seus ordinais na Thoth seguem essa
+ordem.
 
 </details>
 
