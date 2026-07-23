@@ -19,6 +19,7 @@ namespace APP\plugins\generic\thoth\classes\api;
 use APP\core\Application;
 use APP\facades\Repo;
 use APP\plugins\generic\thoth\classes\components\forms\FeatureVideoForm;
+use APP\plugins\generic\thoth\classes\exceptions\MetadataSynchronizationException;
 use APP\plugins\generic\thoth\classes\facades\ThothRepository;
 use APP\plugins\generic\thoth\classes\facades\ThothService;
 use APP\plugins\generic\thoth\classes\notification\ThothNotification;
@@ -295,6 +296,11 @@ class ThothEndpoint implements HasAuthorizationPolicy
         try {
             $warning = ThothService::metadataSynchronization()->synchronize($publication, $thothWorkId);
             $this->handleNotification($request, $submission, true, false, null, $warning);
+        } catch (MetadataSynchronizationException $exception) {
+            return response()->json(
+                ['errorMessage' => __('plugins.generic.thoth.synchronize.ambiguousMetadata')],
+                Response::HTTP_CONFLICT
+            );
         } catch (QueryException $exception) {
             $this->handleNotification($request, $submission, false, false, $exception);
             return response()->json(
@@ -437,8 +443,8 @@ class ThothEndpoint implements HasAuthorizationPolicy
         $success
             ? $thothNotification->notifySuccess($request, $submission)
             : $thothNotification->notifyError($request, $submission, $errorMessage);
-        if ($warning) {
-            $thothNotification->notifyWarning($request, $submission, $warning);
+        foreach ((array) $warning as $warningMessage) {
+            $thothNotification->notifyWarning($request, $submission, $warningMessage);
         }
     }
 }

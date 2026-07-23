@@ -148,6 +148,7 @@ class ThothServiceProvider implements ContainerProvider
         $container->singletonClass('metadataSynchronizationService', ThothMetadataSynchronizationService::class, [
             'bookService',
             'contributionService',
+            'publicationService',
         ]);
 
         $container->singletonClass('publicationService', ThothPublicationService::class, [

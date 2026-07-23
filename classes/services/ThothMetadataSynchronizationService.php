@@ -20,19 +20,29 @@ class ThothMetadataSynchronizationService
 {
     private ThothBookService $bookService;
     private ThothContributionService $contributionService;
+    private ThothPublicationService $publicationService;
 
     public function __construct(
         ThothBookService $bookService,
-        ThothContributionService $contributionService
+        ThothContributionService $contributionService,
+        ThothPublicationService $publicationService
     ) {
         $this->bookService = $bookService;
         $this->contributionService = $contributionService;
+        $this->publicationService = $publicationService;
     }
 
-    public function synchronize($publication, string $thothWorkId): ?string
+    public function synchronize($publication, string $thothWorkId): array
     {
+        $warnings = [];
         $warning = $this->bookService->update($publication, $thothWorkId, true);
+        if ($warning) {
+            $warnings[] = $warning;
+        }
         $this->contributionService->synchronizeByPublication($publication, $thothWorkId);
-        return $warning;
+        if ($this->publicationService->synchronizeByPublication($publication, $thothWorkId)) {
+            $warnings[] = 'plugins.generic.thoth.synchronize.activeWorkPublicationDeletionsSkipped';
+        }
+        return $warnings;
     }
 }

@@ -13,12 +13,13 @@ namespace APP\plugins\generic\thoth\tests\classes\services;
 use APP\plugins\generic\thoth\classes\services\ThothBookService;
 use APP\plugins\generic\thoth\classes\services\ThothContributionService;
 use APP\plugins\generic\thoth\classes\services\ThothMetadataSynchronizationService;
+use APP\plugins\generic\thoth\classes\services\ThothPublicationService;
 use APP\publication\Publication;
 use PKP\tests\PKPTestCase;
 
 class ThothMetadataSynchronizationServiceTest extends PKPTestCase
 {
-    public function testSynchronizeUpdatesWorkTitlesAbstractsAndContributionsMetadata(): void
+    public function testSynchronizeUpdatesImplementedMetadataDomains(): void
     {
         $publication = $this->createMock(Publication::class);
         $bookService = $this->createMock(ThothBookService::class);
@@ -30,9 +31,57 @@ class ThothMetadataSynchronizationServiceTest extends PKPTestCase
         $contributionService->expects($this->once())
             ->method('synchronizeByPublication')
             ->with($publication, 'work-id');
+        $publicationService = $this->createMock(ThothPublicationService::class);
+        $publicationService->expects($this->once())
+            ->method('synchronizeByPublication')
+            ->with($publication, 'work-id')
+            ->willReturn(false);
 
-        $service = new ThothMetadataSynchronizationService($bookService, $contributionService);
+        $service = new ThothMetadataSynchronizationService(
+            $bookService,
+            $contributionService,
+            $publicationService
+        );
 
-        $this->assertSame('warning-key', $service->synchronize($publication, 'work-id'));
+        $this->assertSame(['warning-key'], $service->synchronize($publication, 'work-id'));
+    }
+
+    public function testSynchronizeDoesNotWarnAfterAutomaticDeletions(): void
+    {
+        $publication = $this->createMock(Publication::class);
+        $bookService = $this->createMock(ThothBookService::class);
+        $bookService->method('update')->willReturn(null);
+        $contributionService = $this->createMock(ThothContributionService::class);
+        $publicationService = $this->createMock(ThothPublicationService::class);
+        $publicationService->method('synchronizeByPublication')->willReturn(false);
+
+        $service = new ThothMetadataSynchronizationService(
+            $bookService,
+            $contributionService,
+            $publicationService
+        );
+
+        $this->assertSame([], $service->synchronize($publication, 'work-id'));
+    }
+
+    public function testSynchronizeCombinesBookWarningWithSkippedPublicationDeletionWarning(): void
+    {
+        $publication = $this->createMock(Publication::class);
+        $bookService = $this->createMock(ThothBookService::class);
+        $bookService->method('update')->willReturn('book-warning-key');
+        $contributionService = $this->createMock(ThothContributionService::class);
+        $publicationService = $this->createMock(ThothPublicationService::class);
+        $publicationService->method('synchronizeByPublication')->willReturn(true);
+
+        $service = new ThothMetadataSynchronizationService(
+            $bookService,
+            $contributionService,
+            $publicationService
+        );
+
+        $this->assertSame([
+            'book-warning-key',
+            'plugins.generic.thoth.synchronize.activeWorkPublicationDeletionsSkipped',
+        ], $service->synchronize($publication, 'work-id'));
     }
 }

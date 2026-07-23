@@ -18,10 +18,12 @@ namespace APP\plugins\generic\thoth\classes\services;
 
 use APP\core\Application;
 use APP\facades\Repo;
+use APP\plugins\generic\thoth\classes\exceptions\MetadataSynchronizationException;
 use Biblys\Isbn\Isbn;
 use Biblys\Isbn\IsbnParsingException;
 use Biblys\Isbn\IsbnValidationException;
 use PKP\db\DAORegistry;
+use ThothApi\GraphQL\Enums\WorkStatus;
 
 class ThothPublicationService
 {
@@ -64,22 +66,15 @@ class ThothPublicationService
     public function registerByPublication($publication)
     {
         $thothBookId = $publication->getData('thothBookId');
-        $submissionFiles = array_filter(
-            iterator_to_array(Repo::submissionFile()
-                ->getCollector()
-                ->filterBySubmissionIds([$publication->getData('submissionId')])
-                ->filterByAssoc(Application::ASSOC_TYPE_PUBLICATION_FORMAT)
-                ->getMany()),
-            function ($submissionFile) {
-                return $submissionFile->getData('chapterId') == null;
-            }
-        );
+        $submissionFiles = $this->getBookSubmissionFiles($publication);
         $submissionFilesByPublicationFormat = $this->getSubmissionFilesByPublicationFormat($submissionFiles);
 
         $publicationFormats = DAORegistry::getDAO('PublicationFormatDAO')
             ->getByPublicationId($publication->getId());
         foreach ($publicationFormats as $publicationFormat) {
-            if (!$this->canRegister($publicationFormat)) {
+            $publicationFormatFiles = $submissionFilesByPublicationFormat[$publicationFormat->getId()] ?? [];
+            $submissionFile = $publicationFormatFiles[0] ?? null;
+            if (!$this->canRegister($publicationFormat, $submissionFile)) {
                 continue;
             }
 
@@ -87,9 +82,85 @@ class ThothPublicationService
                 $publicationFormat,
                 $thothBookId,
                 null,
-                $submissionFilesByPublicationFormat[$publicationFormat->getId()] ?? null
+                $submissionFile
             );
         }
+    }
+
+    public function synchronizeByPublication($publication, string $thothWorkId): bool
+    {
+        $submissionFiles = $this->getBookSubmissionFiles($publication);
+        $publicationFormats = DAORegistry::getDAO('PublicationFormatDAO')
+            ->getByPublicationId($publication->getId());
+        $thothWork = $this->repository->getByWorkId($thothWorkId);
+
+        return $this->update(
+            $publicationFormats,
+            $thothWorkId,
+            $thothWork['publications'] ?? [],
+            $this->getSubmissionFilesByPublicationFormat($submissionFiles),
+            $thothWork['workStatus'] ?? null
+        );
+    }
+
+    public function update(
+        iterable $publicationFormats,
+        string $thothWorkId,
+        array $existingPublications,
+        array $submissionFilesByPublicationFormat = [],
+        ?string $workStatus = null
+    ): bool {
+        $remainingPublications = $existingPublications;
+
+        foreach ($publicationFormats as $publicationFormat) {
+            $publicationFormatFiles = $submissionFilesByPublicationFormat[$publicationFormat->getId()] ?? [];
+            $submissionFile = $publicationFormatFiles[0] ?? null;
+            if (!$this->canRegister($publicationFormat, $submissionFile)) {
+                continue;
+            }
+
+            $thothPublication = $this->factory->createFromPublicationFormat($publicationFormat, $submissionFile);
+            $thothPublication->setWorkId($thothWorkId);
+            $desiredLocations = $this->locationService->getDesiredByPublicationFormat(
+                $publicationFormat,
+                $publicationFormatFiles
+            );
+            $existingKey = $this->findMatchingPublicationKey(
+                $thothPublication,
+                $desiredLocations,
+                $remainingPublications
+            );
+
+            if ($existingKey === null) {
+                $thothPublicationId = $this->repository->add($thothPublication);
+                $existingLocations = [];
+            } else {
+                $thothPublicationId = $remainingPublications[$existingKey]['publicationId'];
+                $existingLocations = $remainingPublications[$existingKey]['locations'] ?? [];
+                $thothPublication->setPublicationId($thothPublicationId);
+                $this->repository->edit($thothPublication);
+                unset($remainingPublications[$existingKey]);
+            }
+
+            $publicationFormat->setData('thothPublicationId', $thothPublicationId);
+            $this->locationService->update(
+                $thothPublicationId,
+                $desiredLocations,
+                $existingLocations
+            );
+        }
+
+        if ($workStatus === WorkStatus::ACTIVE) {
+            return !empty($remainingPublications);
+        }
+
+        foreach ($remainingPublications as $existingPublication) {
+            if (isset($existingPublication['publicationId'])) {
+                $this->repository->delete($existingPublication['publicationId']);
+            }
+        }
+
+        return false;
     }
 
     public function registerByChapter($chapter)
@@ -123,11 +194,12 @@ class ThothPublicationService
         }
 
         foreach ($publicationFormats as $publicationFormat) {
+            $publicationFormatFiles = $submissionFilesByPublicationFormat[$publicationFormat->getId()] ?? [];
             $this->register(
                 $publicationFormat,
                 $thothChapterId,
                 $chapter->getId(),
-                $submissionFilesByPublicationFormat[$publicationFormat->getId()] ?? null
+                $publicationFormatFiles[0] ?? null
             );
         }
     }
@@ -162,9 +234,13 @@ class ThothPublicationService
         return $errors;
     }
 
-    public function canRegister($publicationFormat)
+    public function canRegister($publicationFormat, $submissionFile = null)
     {
         if ($publicationFormat->getPhysicalFormat()) {
+            return true;
+        }
+
+        if ($submissionFile !== null) {
             return true;
         }
 
@@ -184,14 +260,137 @@ class ThothPublicationService
         return count($submissionFiles) > 0 || !empty($publicationFormat->getData('urlRemote'));
     }
 
+    private function findMatchingPublicationKey(
+        $thothPublication,
+        array $desiredLocations,
+        array $existingPublications
+    ): ?int {
+        $typeMatches = array_filter(
+            $existingPublications,
+            function ($existingPublication) use ($thothPublication): bool {
+                return ($existingPublication['publicationType'] ?? null) === $thothPublication->getPublicationType();
+            }
+        );
+        if (empty($typeMatches)) {
+            return null;
+        }
+
+        $exactMatches = array_filter(
+            $typeMatches,
+            function ($existingPublication) use ($thothPublication, $desiredLocations): bool {
+                return $this->normalizePublication($thothPublication->getAllData(), $desiredLocations)
+                    === $this->normalizePublication(
+                        $existingPublication,
+                        $existingPublication['locations'] ?? []
+                    );
+            }
+        );
+        if (count($exactMatches) === 1) {
+            return array_key_first($exactMatches);
+        }
+
+        $isbn = $this->normalizeIsbn($thothPublication->getIsbn());
+        if ($isbn !== null) {
+            $isbnMatches = array_filter(
+                $typeMatches,
+                function ($existingPublication) use ($isbn): bool {
+                    return $this->normalizeIsbn($existingPublication['isbn'] ?? null) === $isbn;
+                }
+            );
+            if (count($isbnMatches) === 1) {
+                return array_key_first($isbnMatches);
+            }
+        }
+
+        $normalizedLocations = $this->normalizeLocations($desiredLocations);
+        if (!empty($normalizedLocations)) {
+            $locationMatches = array_filter(
+                $typeMatches,
+                function ($existingPublication) use ($normalizedLocations): bool {
+                    return $this->normalizeLocations($existingPublication['locations'] ?? []) === $normalizedLocations;
+                }
+            );
+            if (count($locationMatches) === 1) {
+                return array_key_first($locationMatches);
+            }
+        }
+
+        if (count($typeMatches) === 1) {
+            return array_key_first($typeMatches);
+        }
+
+        throw new MetadataSynchronizationException('Ambiguous Thoth publications for the same publication type');
+    }
+
+    private function normalizePublication(array $publication, array $locations): array
+    {
+        $normalized = [
+            'publicationType' => $publication['publicationType'] ?? null,
+            'isbn' => $this->normalizeIsbn($publication['isbn'] ?? null),
+            'accessibilityStandard' => $this->normalizeOptionalValue($publication['accessibilityStandard'] ?? null),
+            'accessibilityAdditionalStandard' => $this->normalizeOptionalValue(
+                $publication['accessibilityAdditionalStandard'] ?? null
+            ),
+            'accessibilityException' => $this->normalizeOptionalValue(
+                $publication['accessibilityException'] ?? null
+            ),
+            'accessibilityReportUrl' => $this->normalizeOptionalValue(
+                $publication['accessibilityReportUrl'] ?? null
+            ),
+            'locations' => $this->normalizeLocations($locations),
+        ];
+
+        return $normalized;
+    }
+
+    private function normalizeLocations(array $locations): array
+    {
+        $normalized = array_map(function ($location): array {
+            $location = is_object($location) ? $location->getAllData() : $location;
+            return [
+                'landingPage' => $this->normalizeOptionalValue($location['landingPage'] ?? null),
+                'fullTextUrl' => $this->normalizeOptionalValue($location['fullTextUrl'] ?? null),
+                'locationPlatform' => $this->normalizeOptionalValue($location['locationPlatform'] ?? null),
+            ];
+        }, $locations);
+        usort($normalized, function (array $first, array $second): int {
+            return strcmp(json_encode($first), json_encode($second));
+        });
+        return $normalized;
+    }
+
+    private function normalizeIsbn(?string $isbn): ?string
+    {
+        $isbn = strtoupper(preg_replace('/[^0-9X]/i', '', (string) $isbn));
+        return $isbn === '' ? null : $isbn;
+    }
+
+    private function normalizeOptionalValue($value): ?string
+    {
+        $value = trim((string) $value);
+        return $value === '' ? null : $value;
+    }
+
+    private function getBookSubmissionFiles($publication): array
+    {
+        return array_filter(
+            iterator_to_array(Repo::submissionFile()
+                ->getCollector()
+                ->filterBySubmissionIds([$publication->getData('submissionId')])
+                ->filterByAssoc(Application::ASSOC_TYPE_PUBLICATION_FORMAT)
+                ->getMany()),
+            function ($submissionFile) {
+                return $submissionFile->getData('chapterId') == null;
+            }
+        );
+    }
+
     private function getSubmissionFilesByPublicationFormat(array $submissionFiles): array
     {
         $submissionFilesByPublicationFormat = [];
         foreach ($submissionFiles as $submissionFile) {
             $publicationFormatId = $submissionFile->getData('assocId');
-            if (!isset($submissionFilesByPublicationFormat[$publicationFormatId])) {
-                $submissionFilesByPublicationFormat[$publicationFormatId] = $submissionFile;
-            }
+            $submissionFilesByPublicationFormat[$publicationFormatId][] = $submissionFile;
         }
 
         return $submissionFilesByPublicationFormat;
