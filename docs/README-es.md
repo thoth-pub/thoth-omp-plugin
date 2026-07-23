@@ -2,7 +2,7 @@
 
 # Plugin Thoth OMP
 
-[![Versión Actual](https://img.shields.io/badge/versión-v0.3.4.2-blue)](https://github.com/thoth-pub/thoth-omp-plugin/releases)
+[![Versión Actual](https://img.shields.io/github/v/release/thoth-pub/thoth-omp-plugin?filter=v0.3.%2A&sort=semver&label=versi%C3%B3n&color=blue)](https://github.com/thoth-pub/thoth-omp-plugin/releases)
 [![Licencia: GPL v3](https://img.shields.io/badge/Licencia-GPLv3-green.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Compatibilidad OMP](https://img.shields.io/badge/OMP-3.3_%7C_3.4_%7C_3.5-blue)](https://pkp.sfu.ca/software/omp/)
 
@@ -12,9 +12,9 @@ Integra [OMP (Open Monograph Press)](https://pkp.sfu.ca/software/omp/) con [Thot
 
 Este plugin es compatible con las siguientes aplicaciones PKP:
 
-- OMP 3.3.0-x
-- OMP 3.4.0-x
-- OMP 3.5.0-x
+- OMP 3.3.0-x [![Versión más reciente del plugin](https://img.shields.io/github/v/release/thoth-pub/thoth-omp-plugin?filter=v0.1.%2A&sort=semver&label=plugin&color=blue)](https://github.com/thoth-pub/thoth-omp-plugin/releases)
+- OMP 3.4.0-x [![Versión más reciente del plugin](https://img.shields.io/github/v/release/thoth-pub/thoth-omp-plugin?filter=v0.2.%2A&sort=semver&label=plugin&color=blue)](https://github.com/thoth-pub/thoth-omp-plugin/releases)
+- OMP 3.5.0-x [![Versión más reciente del plugin](https://img.shields.io/github/v/release/thoth-pub/thoth-omp-plugin?filter=v0.3.%2A&sort=semver&label=plugin&color=blue)](https://github.com/thoth-pub/thoth-omp-plugin/releases)
 
 ## Instalación
 
