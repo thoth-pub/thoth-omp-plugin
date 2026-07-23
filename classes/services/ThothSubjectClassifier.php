@@ -17,9 +17,6 @@
 namespace APP\plugins\generic\thoth\classes\services;
 
 use APP\codelist\SubjectDAO;
-use APP\core\Application;
-use DOMDocument;
-use DOMXPath;
 use PKP\db\XMLDAO;
 use PKP\i18n\interfaces\LocaleInterface;
 use ThothApi\GraphQL\Enums\SubjectType;
@@ -33,18 +30,19 @@ class ThothSubjectClassifier
         '12' => SubjectType::BIC,
         '93' => SubjectType::THEMA,
     ];
+    private const THEMA_CODES_FILE = __DIR__ . '/../../resources/thema-v1.6-codes.json';
 
     private $bicValidator;
     private $themaValidator;
-    private $httpClient;
+    private string $themaCodesFile;
     private ?array $bicCodes = null;
-    private array $themaCodes = [];
+    private ?array $themaCodes = null;
 
-    public function __construct($bicValidator = null, $themaValidator = null, $httpClient = null)
+    public function __construct($bicValidator = null, $themaValidator = null, ?string $themaCodesFile = null)
     {
         $this->bicValidator = $bicValidator;
         $this->themaValidator = $themaValidator;
-        $this->httpClient = $httpClient;
+        $this->themaCodesFile = $themaCodesFile ?? self::THEMA_CODES_FILE;
     }
 
     public function classify($subject): array
@@ -205,52 +203,31 @@ class ThothSubjectClassifier
         if (!preg_match('/^[A-Y][A-Z0-9]{0,5}$/', $code)) {
             return false;
         }
-        if (array_key_exists($code, $this->themaCodes)) {
-            return $this->themaCodes[$code];
+
+        if ($this->themaCodes === null && !$this->loadThemaCodes()) {
+            return null;
         }
 
-        try {
-            $response = $this->getHttpClient()->request(
-                'GET',
-                'https://ns.editeur.org/thema/en/' . rawurlencode($code),
-                [
-                    'allow_redirects' => false,
-                    'connect_timeout' => 3,
-                    'http_errors' => false,
-                    'timeout' => 5,
-                ]
-            );
-            if ($response->getStatusCode() !== 200) {
-                return $this->themaCodes[$code] = null;
-            }
-
-            $document = new DOMDocument();
-            $loaded = $document->loadHTML(
-                (string) $response->getBody(),
-                LIBXML_NONET | LIBXML_NOERROR | LIBXML_NOWARNING
-            );
-            if (!$loaded) {
-                return $this->themaCodes[$code] = null;
-            }
-            $xpath = new DOMXPath($document);
-            $notationNodes = $xpath->query(
-                '//td[contains(concat(" ", normalize-space(@class), " "), " notation ")]'
-            );
-            foreach ($notationNodes as $node) {
-                if (trim($node->textContent) === $code) {
-                    return $this->themaCodes[$code] = true;
-                }
-            }
-        } catch (Throwable $exception) {
-            return $this->themaCodes[$code] = null;
-        }
-
-        return $this->themaCodes[$code] = false;
+        return isset($this->themaCodes[$code]);
     }
 
-    private function getHttpClient()
+    private function loadThemaCodes(): bool
     {
-        return $this->httpClient ?? Application::get()->getHttpClient();
+        if (!is_readable($this->themaCodesFile)) {
+            return false;
+        }
+
+        $contents = file_get_contents($this->themaCodesFile);
+        if ($contents === false) {
+            return false;
+        }
+        $data = json_decode($contents, true);
+        if (!is_array($data['codes'] ?? null)) {
+            return false;
+        }
+
+        $this->themaCodes = array_fill_keys($data['codes'], true);
+        return true;
     }
 
     private function asKeyword(string $subject): array
