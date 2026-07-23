@@ -75,23 +75,29 @@ class ThothSubjectClassifier
         }
 
         $code = strtoupper($name);
-        $bicMatch = $this->isBicCode($code);
+        if ($this->isValidCode($code, SubjectType::BISAC)) {
+            return [
+                'subjectType' => SubjectType::BISAC,
+                'subjectCode' => $code,
+            ];
+        }
+
         $themaMatch = $this->isThemaCode($code);
+        if ($themaMatch === true) {
+            return [
+                'subjectType' => SubjectType::THEMA,
+                'subjectCode' => $code,
+            ];
+        }
+
+        $bicMatch = $this->isBicCode($code);
         if ($bicMatch === null || $themaMatch === null) {
             return $this->asKeyword($name);
         }
 
-        $matchingTypes = [];
         if ($bicMatch) {
-            $matchingTypes[] = SubjectType::BIC;
-        }
-        if ($themaMatch) {
-            $matchingTypes[] = SubjectType::THEMA;
-        }
-
-        if (count($matchingTypes) === 1) {
             return [
-                'subjectType' => $matchingTypes[0],
+                'subjectType' => SubjectType::BIC,
                 'subjectCode' => $code,
             ];
         }
