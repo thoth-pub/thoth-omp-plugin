@@ -18,11 +18,15 @@
 
 namespace APP\plugins\generic\thoth\tests\classes\repositories;
 
+require_once(__DIR__ . '/../../../vendor/autoload.php');
+
 use APP\plugins\generic\thoth\classes\repositories\ThothReferenceRepository;
 use Mockery;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Inputs\PatchReference as ThothReference;
+use ThothApi\GraphQL\Schemas\Reference as ThothReferenceSchema;
+use ThothApi\GraphQL\Schemas\Work as ThothWork;
 
 class ThothReferenceRepositoryTest extends PKPTestCase
 {
@@ -61,6 +65,43 @@ class ThothReferenceRepositoryTest extends PKPTestCase
         $thothReference = $repository->get('071ace7c-b65b-4bb8-b883-fb2d695d1ad9');
 
         $this->assertEquals($expectedThothReference, $thothReference);
+    }
+
+    public function testGetReferencesByWorkId(): void
+    {
+        $expectedReferences = [
+            new ThothReferenceSchema([
+                'referenceId' => '071ace7c-b65b-4bb8-b883-fb2d695d1ad9',
+                'workId' => '6569997e-ac11-4070-994e-3393641f12a8',
+                'referenceOrdinal' => 1,
+                'doi' => '10.1234/example',
+                'unstructuredCitation' => 'Roe, Richard. A reference.',
+            ]),
+        ];
+        $expectedThothWork = new ThothWork(['references' => $expectedReferences]);
+        $mockThothClient = Mockery::mock(ThothClient::class);
+        $mockThothClient->shouldReceive('work')
+            ->once()
+            ->with(
+                '6569997e-ac11-4070-994e-3393641f12a8',
+                [
+                    'references' => [
+                        'referenceId',
+                        'workId',
+                        'referenceOrdinal',
+                        'doi',
+                        'unstructuredCitation',
+                    ],
+                ]
+            )
+            ->andReturn($expectedThothWork);
+
+        $repository = new ThothReferenceRepository($mockThothClient);
+
+        $this->assertSame(
+            array_map(fn ($reference) => $reference->toArray(), $expectedReferences),
+            $repository->getByWorkId('6569997e-ac11-4070-994e-3393641f12a8')
+        );
     }
 
     public function testAddReference()

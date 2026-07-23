@@ -20,6 +20,26 @@ use ThothApi\GraphQL\Inputs\PatchPublication as ThothPublication;
 
 class ThothPublicationRepository
 {
+    private const WORK_PUBLICATIONS_SELECTION = [
+        'workStatus',
+        'publications' => [
+            'publicationId',
+            'publicationType',
+            'workId',
+            'isbn',
+            'accessibilityStandard',
+            'accessibilityAdditionalStandard',
+            'accessibilityException',
+            'accessibilityReportUrl',
+            'locations' => [
+                'locationId',
+                'landingPage',
+                'fullTextUrl',
+                'locationPlatform',
+                'canonical',
+            ],
+        ],
+    ];
     protected $thothClient;
 
     public function __construct($thothClient)
@@ -87,6 +107,13 @@ class ThothPublicationRepository
         }
 
         return $files;
+    }
+
+    public function getByWorkId(string $thothWorkId): array
+    {
+        $thothWork = $this->thothClient->work($thothWorkId, self::WORK_PUBLICATIONS_SELECTION);
+
+        return $thothWork->toArray();
     }
 
     public function find($filter)

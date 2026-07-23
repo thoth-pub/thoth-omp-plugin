@@ -91,9 +91,7 @@ class ThothPublicationFactory
 
         foreach (self::ACCESSIBILITY_FIELDS as $fieldName) {
             $fieldValue = $publicationFormat->getData($fieldName);
-            if ($fieldValue !== null && $fieldValue !== '') {
-                $publicationData[$fieldName] = $fieldValue;
-            }
+            $publicationData[$fieldName] = $fieldValue === '' ? null : $fieldValue;
         }
 
         return new ThothPublication($publicationData);

@@ -26,6 +26,8 @@ use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Enums\LanguageRelation;
 use ThothApi\GraphQL\Inputs\PatchLanguage as ThothLanguage;
+use ThothApi\GraphQL\Schemas\Language as ThothLanguageSchema;
+use ThothApi\GraphQL\Schemas\Work as ThothWork;
 
 class ThothLanguageRepositoryTest extends PKPTestCase
 {
@@ -59,6 +61,41 @@ class ThothLanguageRepositoryTest extends PKPTestCase
         $thothLanguage = $repository->get('8a3a7422-e5fb-4d2d-810d-513987735b4e');
 
         $this->assertEquals($expectedThothLanguage, $thothLanguage);
+    }
+
+    public function testGetLanguagesByWorkId(): void
+    {
+        $expectedLanguages = [
+            new ThothLanguageSchema([
+                'languageId' => '01ff14a6-da2d-466b-a49f-ec1061fce8da',
+                'workId' => 'fdd9321f-84e3-4d19-a914-24289e8aec09',
+                'languageCode' => 'ENG',
+                'languageRelation' => LanguageRelation::ORIGINAL,
+            ]),
+        ];
+        $expectedThothWork = new ThothWork(['languages' => $expectedLanguages]);
+        $mockThothClient = Mockery::mock(ThothClient::class);
+        $mockThothClient->shouldReceive('work')
+            ->once()
+            ->with(
+                'fdd9321f-84e3-4d19-a914-24289e8aec09',
+                [
+                    'languages' => [
+                        'languageId',
+                        'workId',
+                        'languageCode',
+                        'languageRelation',
+                    ],
+                ]
+            )
+            ->andReturn($expectedThothWork);
+
+        $repository = new ThothLanguageRepository($mockThothClient);
+
+        $this->assertSame(
+            array_map(fn ($language) => $language->toArray(), $expectedLanguages),
+            $repository->getByWorkId('fdd9321f-84e3-4d19-a914-24289e8aec09')
+        );
     }
 
     public function testAddLanguage()

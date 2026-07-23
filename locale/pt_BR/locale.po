@@ -324,3 +324,9 @@ msgid "plugins.generic.thoth.featureVideo.exists"
 msgstr "Esta obra já possui um vídeo em destaque no Thoth."
 msgid "plugins.generic.thoth.frontcover.unsupportedFormat"
 msgstr "A capa não foi hospedada na Thoth porque o formato do arquivo não é compatível. Use um arquivo JPG ou JPEG."
+
+msgid "plugins.generic.thoth.synchronize.activeWorkPublicationDeletionsSkipped"
+msgstr "Alguns formatos de publicação existem apenas na Thoth e não puderam ser removidos porque a obra está ativa."
+
+msgid "plugins.generic.thoth.synchronize.ambiguousMetadata"
+msgstr "Os metadados não puderam ser sincronizados porque correspondem a mais de um registro na Thoth. Revise os registros na Thoth e tente novamente."

@@ -20,6 +20,16 @@ use ThothApi\GraphQL\Inputs\PatchSubject as ThothSubject;
 
 class ThothSubjectRepository
 {
+    private const WORK_SUBJECTS_SELECTION = [
+        'subjects' => [
+            'subjectId',
+            'workId',
+            'subjectType',
+            'subjectCode',
+            'subjectOrdinal',
+        ],
+    ];
+
     protected $thothClient;
 
     public function __construct($thothClient)
@@ -35,6 +45,16 @@ class ThothSubjectRepository
     public function get($thothSubjectId)
     {
         return $this->thothClient->subject($thothSubjectId);
+    }
+
+    public function getByWorkId(string $thothWorkId): array
+    {
+        $thothWork = $this->thothClient->work($thothWorkId, self::WORK_SUBJECTS_SELECTION);
+
+        return array_map(
+            fn ($subject) => $subject->toArray(),
+            $thothWork->getSubjects() ?? []
+        );
     }
 
     public function add($thothSubject)

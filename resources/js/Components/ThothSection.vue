@@ -52,7 +52,7 @@ const props = defineProps({
 	selectedPublicationId: {type: Number, required: true},
 	workStatusUrl: {type: String, required: true},
 	registerUrl: {type: String, required: true},
-	publicationUrl: {type: String, required: true},
+	synchronizeUrl: {type: String, required: true},
 	registerTitle: {type: String, required: true},
 });
 
@@ -171,7 +171,7 @@ function openRegister() {
 function updateMetadata() {
 	isLoading.value = true;
 
-	const url = props.publicationUrl.replace(
+	const url = props.synchronizeUrl.replace(
 		'__publicationId__',
 		props.selectedPublicationId,
 	);

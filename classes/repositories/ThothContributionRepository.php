@@ -20,6 +20,39 @@ use ThothApi\GraphQL\Inputs\PatchContribution as ThothContribution;
 
 class ThothContributionRepository
 {
+    private const WORK_CONTRIBUTIONS_SELECTION = [
+        'contributions' => [
+            'contributionId',
+            'contributorId',
+            'contributionType',
+            'mainContribution',
+            'contributionOrdinal',
+            'firstName',
+            'lastName',
+            'fullName',
+            'contributor' => [
+                'contributorId',
+                'firstName',
+                'lastName',
+                'fullName',
+                'orcid',
+                'website',
+            ],
+            'biographies' => [
+                'biographyId',
+                'contributionId',
+                'localeCode',
+                'content',
+                'canonical',
+            ],
+            'affiliations' => [
+                'affiliationId',
+                'contributionId',
+                'institutionId',
+                'affiliationOrdinal',
+            ],
+        ],
+    ];
     protected $thothClient;
 
     public function __construct($thothClient)
@@ -35,6 +68,16 @@ class ThothContributionRepository
     public function get($thothContributionId)
     {
         return $this->thothClient->contribution($thothContributionId);
+    }
+
+    public function getByWorkId(string $thothWorkId): array
+    {
+        $thothWork = $this->thothClient->work($thothWorkId, self::WORK_CONTRIBUTIONS_SELECTION);
+
+        return array_map(
+            fn ($contribution): array => $contribution->toArray(),
+            $thothWork->getContributions() ?? []
+        );
     }
 
     public function add($thothContribution)

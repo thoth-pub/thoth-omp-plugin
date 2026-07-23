@@ -25,8 +25,10 @@ use Mockery;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Enums\PublicationType;
+use ThothApi\GraphQL\Enums\WorkStatus;
 use ThothApi\GraphQL\Inputs\PatchPublication as ThothPublication;
 use ThothApi\GraphQL\Schemas\File as ThothFile;
+use ThothApi\GraphQL\Schemas\Location as ThothLocationSchema;
 use ThothApi\GraphQL\Schemas\Publication as ThothPublicationSchema;
 use ThothApi\GraphQL\Schemas\Work as ThothWork;
 
@@ -156,6 +158,70 @@ class ThothPublicationRepositoryTest extends PKPTestCase
                 'file' => $expectedThothFile,
             ],
         ], $thothFiles);
+    }
+
+    public function testGetWorkAndPublicationsByWorkId(): void
+    {
+        $expectedPublications = [
+            new ThothPublicationSchema([
+                'publicationId' => 'efac5d7a-2284-4432-ad50-02b70aadec49',
+                'publicationType' => PublicationType::PDF,
+                'workId' => 'a2c032c6-b09b-4911-a67b-17f97cb57cc1',
+                'isbn' => '978-3-16-148410-0',
+                'accessibilityStandard' => 'WCAG21AA',
+                'accessibilityAdditionalStandard' => 'PDF_UA1',
+                'accessibilityException' => 'MICRO_ENTERPRISES',
+                'accessibilityReportUrl' => 'https://example.com/accessibility-report',
+                'locations' => [
+                    new ThothLocationSchema([
+                        'locationId' => '08d48697-e1df-42a8-bff8-780b990f4b5d',
+                        'landingPage' => 'https://publisher.example/book',
+                        'fullTextUrl' => 'https://publisher.example/book.pdf',
+                        'locationPlatform' => 'OTHER',
+                        'canonical' => true,
+                    ]),
+                ],
+            ]),
+        ];
+        $expectedThothWork = new ThothWork([
+            'workStatus' => WorkStatus::ACTIVE,
+            'publications' => $expectedPublications,
+        ]);
+
+        $mockThothClient = Mockery::mock(ThothClient::class);
+        $mockThothClient->shouldReceive('work')
+            ->once()
+            ->with(
+                'a2c032c6-b09b-4911-a67b-17f97cb57cc1',
+                [
+                    'workStatus',
+                    'publications' => [
+                        'publicationId',
+                        'publicationType',
+                        'workId',
+                        'isbn',
+                        'accessibilityStandard',
+                        'accessibilityAdditionalStandard',
+                        'accessibilityException',
+                        'accessibilityReportUrl',
+                        'locations' => [
+                            'locationId',
+                            'landingPage',
+                            'fullTextUrl',
+                            'locationPlatform',
+                            'canonical',
+                        ],
+                    ],
+                ]
+            )
+            ->andReturn($expectedThothWork);
+
+        $repository = new ThothPublicationRepository($mockThothClient);
+
+        $this->assertSame(
+            $expectedThothWork->toArray(),
+            $repository->getByWorkId('a2c032c6-b09b-4911-a67b-17f97cb57cc1')
+        );
     }
 
     public function testFindPublication()

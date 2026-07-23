@@ -153,4 +153,91 @@ class ThothChapterServiceTest extends PKPTestCase
 
         $this->assertSame('fed8b9ee-2537-4a66-a1a1-eeadf4001c59', $thothChapterId);
     }
+
+    public function testUpdateChapterAndItsMetadata(): void
+    {
+        $publicationRepoMock = Mockery::mock(app(PublicationRepository::class))
+            ->makePartial()
+            ->shouldReceive('get')
+            ->with(99)
+            ->andReturn(
+                Mockery::mock(\APP\publication\Publication::class)
+                    ->shouldReceive('getData')
+                    ->with('locale')
+                    ->andReturn('en_US')
+                    ->getMock()
+            )
+            ->getMock();
+        app()->instance(PublicationRepository::class, $publicationRepoMock);
+
+        $authors = [Mockery::mock(\APP\author\Author::class)];
+        $chapter = $this->getMockBuilder(\APP\monograph\Chapter::class)
+            ->onlyMethods(['getAuthors', 'getData', 'setData'])
+            ->getMock();
+        $chapter->method('getAuthors')->willReturn(LazyCollection::make($authors));
+        $chapter->method('getData')->willReturnMap([
+            ['publicationId', null, 99],
+        ]);
+        $chapter->expects($this->once())
+            ->method('setData')
+            ->with('thothChapterId', 'chapter-id');
+
+        $desiredWork = new ThothWork();
+        $factory = $this->createMock(ThothChapterFactory::class);
+        $factory->expects($this->once())
+            ->method('createFromChapter')
+            ->with($chapter)
+            ->willReturn($desiredWork);
+        $repository = $this->getMockBuilder(ThothChapterRepository::class)
+            ->setConstructorArgs([$this->createMock(ThothClient::class)])
+            ->onlyMethods(['edit'])
+            ->getMock();
+        $repository->expects($this->once())
+            ->method('edit')
+            ->with($this->callback(function (ThothWork $work): bool {
+                return $work->getWorkId() === 'chapter-id'
+                    && $work->getImprintId() === 'imprint-id';
+            }));
+
+        $titleService = $this->createMock(ThothTitleService::class);
+        $titleService->expects($this->once())
+            ->method('updateByChapter')
+            ->with($chapter, 'chapter-id', [['titleId' => 'title-id']], 'en_US');
+        $abstractService = $this->createMock(ThothAbstractService::class);
+        $abstractService->expects($this->once())
+            ->method('updateByChapter')
+            ->with($chapter, 'chapter-id', [['abstractId' => 'abstract-id']], 'en_US');
+        $contributionService = $this->createMock(ThothContributionService::class);
+        $contributionService->expects($this->once())
+            ->method('update')
+            ->with($authors, 'chapter-id', [['contributionId' => 'contribution-id']]);
+        $publicationService = $this->createMock(ThothPublicationService::class);
+        $publicationService->expects($this->once())
+            ->method('updateByChapter')
+            ->with(
+                $chapter,
+                'chapter-id',
+                [['publicationId' => 'publication-id']],
+                'FORTHCOMING'
+            )
+            ->willReturn(true);
+
+        $service = new ThothChapterService(
+            $factory,
+            $repository,
+            $contributionService,
+            $publicationService,
+            $titleService,
+            $abstractService
+        );
+
+        $this->assertTrue($service->update($chapter, [
+            'workId' => 'chapter-id',
+            'workStatus' => 'FORTHCOMING',
+            'titles' => [['titleId' => 'title-id']],
+            'abstracts' => [['abstractId' => 'abstract-id']],
+            'contributions' => [['contributionId' => 'contribution-id']],
+            'publications' => [['publicationId' => 'publication-id']],
+        ], 'imprint-id'));
+    }
 }

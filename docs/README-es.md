@@ -2,7 +2,7 @@
 
 # Plugin Thoth OMP
 
-[![Versión Actual](https://img.shields.io/badge/versión-v0.3.0.0-blue)](https://github.com/thoth-pub/thoth-omp-plugin/releases)
+[![Versión Actual](https://img.shields.io/github/v/release/thoth-pub/thoth-omp-plugin?filter=v0.3.%2A&sort=semver&label=versi%C3%B3n&color=blue)](https://github.com/thoth-pub/thoth-omp-plugin/releases)
 [![Licencia: GPL v3](https://img.shields.io/badge/Licencia-GPLv3-green.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Compatibilidad OMP](https://img.shields.io/badge/OMP-3.3_%7C_3.4_%7C_3.5-blue)](https://pkp.sfu.ca/software/omp/)
 
@@ -12,13 +12,14 @@ Integra [OMP (Open Monograph Press)](https://pkp.sfu.ca/software/omp/) con [Thot
 
 Este plugin es compatible con las siguientes aplicaciones PKP:
 
-- OMP 3.3.0-x
-- OMP 3.4.0-x
-- OMP 3.5.0-x
+- OMP 3.3.0-x [![Versión más reciente del plugin](https://img.shields.io/github/v/release/thoth-pub/thoth-omp-plugin?filter=v0.1.%2A&sort=semver&label=plugin&color=blue)](https://github.com/thoth-pub/thoth-omp-plugin/releases)
+- OMP 3.4.0-x [![Versión más reciente del plugin](https://img.shields.io/github/v/release/thoth-pub/thoth-omp-plugin?filter=v0.2.%2A&sort=semver&label=plugin&color=blue)](https://github.com/thoth-pub/thoth-omp-plugin/releases)
+- OMP 3.5.0-x [![Versión más reciente del plugin](https://img.shields.io/github/v/release/thoth-pub/thoth-omp-plugin?filter=v0.3.%2A&sort=semver&label=plugin&color=blue)](https://github.com/thoth-pub/thoth-omp-plugin/releases)
 
 ## Instalación
 
-1. Descargue la última versión del paquete de instalación (`thoth.tar.gz`) desde la [página de lanzamientos](https://github.com/thoth-pub/thoth-omp-plugin/releases).
+1. En la [página de lanzamientos](https://github.com/thoth-pub/thoth-omp-plugin/releases), descargue el paquete de
+   instalación (`thoth.tar.gz`) compatible con su versión de OMP.
 
 2. Acceda al área de administración de su sitio OMP a través del Dashboard. Navegue a `Configuración` > `Sitio web` > `Plugins` > `Subir un nuevo plugin` y seleccione el archivo `thoth.tar.gz`.
 
@@ -53,9 +54,20 @@ Registre metadatos para monografías ya publicadas utilizando el botón 'Registr
 
 ### Actualización de Metadatos
 
-Una vez que una monografía está registrada, las actualizaciones de metadatos son **automáticas**. Despublique la monografía, edite los datos y los cambios se sincronizarán con Thoth al republicar.
+Después del registro, algunos cambios en la entrada de catálogo, los títulos y los resúmenes del libro se envían
+automáticamente a Thoth cuando se guardan.
 
-También es posible actualizar manualmente los metadatos en Thoth haciendo clic en el botón 'Actualizar metadatos' junto al estado de publicación.
+Para conciliar el registro completo, haga clic en **Actualizar metadatos** junto al estado de publicación. Esta
+acción sincroniza el libro y sus capítulos, incluidos los colaboradores, los formatos y enlaces de publicación,
+el idioma, los temas, las palabras clave, las referencias y el orden de los capítulos.
+
+OMP es la fuente de los metadatos administrados por esta sincronización. La información añadida o modificada en
+OMP se refleja en Thoth, y la información eliminada de OMP también se elimina de Thoth cuando es posible. Las
+ubicaciones administradas por la propia Thoth se conservan.
+
+Si el plugin no puede identificar con seguridad el registro correspondiente en Thoth, detiene la sincronización
+en lugar de crear una asociación incierta. También puede mostrarse una advertencia cuando un formato de
+publicación no puede eliminarse de una obra activa en Thoth.
 
 <img src="/docs/images/update_button.png" alt="Botón de actualización de metadatos en el flujo de trabajo de publicación" width="700">
 
@@ -171,8 +183,31 @@ En la página de gestión de Thoth, puede enviar en masa una selección de títu
 |                   |                    |   |                        | Location            |             |
 |                   | RemoteUrl/FileUrl  |   |                        |                     | FullTextUrl |
 | SubmissionUrl     |                    |   |                        |                     | LandingPage |
+| Subject           |                    |   | Subject(Type: esquema detectado o Keyword) |          |             |
 | Keyword           |                    |   | Subject(Type: Keyword) |                     |             |
 | Citation          |                    |   | Reference              |                     |             |
+
+### Temas y palabras clave
+
+OMP ofrece dos formas complementarias de describir una publicación:
+
+- **Las palabras clave** son términos libres que ayudan a los lectores a encontrar la publicación. Cada palabra
+  clave se envía a Thoth como palabra clave y nunca se trata como una clasificación personalizada.
+- **Los temas** pueden ser términos descriptivos o códigos de sistemas de clasificación reconocidos, como LCC,
+  BISAC, BIC y Thema. Cuando la clasificación se puede confirmar, Thoth registra el tema con el sistema
+  correspondiente.
+- Cuando un tema no se puede asociar de forma segura con un sistema de clasificación, se mantiene como palabra
+  clave, en lugar de descartarlo o asignarle una clasificación incierta.
+- Los temas asociados con otro vocabulario claramente identificado se registran como una clasificación
+  personalizada.
+
+Para habilitar el campo **Asuntos**, vaya a **Ajustes > Flujo de trabajo > Envío > Metadatos**, seleccione
+**Habilitar los metadatos de materia** y guarde los cambios. En la misma configuración, elija si el campo estará
+disponible solo para el equipo editorial, se solicitará a los autores o será obligatorio durante el envío.
+
+El editor puede introducir únicamente el código, como `GTK` o `EDU000000`. También puede identificar el sistema
+de clasificación mediante un prefijo, como `THEMA:GTK` o `BISAC:EDU000000`. La información de clasificación
+presente en los metadatos importados en OMP 3.5 también se reconoce automáticamente.
 
 </details>
 
@@ -180,7 +215,7 @@ En la página de gestión de Thoth, puede enviar en masa una selección de títu
 
 ### Requisitos
 
-- PHP 8.1+
+- PHP 8.2+
 - [Composer](https://getcomposer.org/)
 - [Node.js](https://nodejs.org/) (para compilar los recursos del frontend)
 
@@ -191,7 +226,7 @@ En la página de gestión de Thoth, puede enviar en masa una selección de títu
 composer install
 
 # Instalar dependencias de Node.js y compilar recursos del frontend
-npm install
+npm ci
 npm run build
 ```
 
@@ -199,7 +234,7 @@ npm run build
 
 ```bash
 # Desde el directorio raíz de OMP
-php lib/pkp/lib/vendor/phpunit/phpunit/phpunit --configuration lib/pkp/tests/phpunit.xml -v plugins/generic/thoth/tests
+php lib/pkp/lib/vendor/bin/phpunit -c lib/pkp/tests/phpunit.xml --no-coverage plugins/generic/thoth/tests
 ```
 
 ## Créditos
