@@ -2,7 +2,7 @@
 
 # Plugin Thoth OMP
 
-[![Versão Atual](https://img.shields.io/badge/versão-v0.3.0.0-blue)](https://github.com/thoth-pub/thoth-omp-plugin/releases)
+[![Versão Atual](https://img.shields.io/badge/versão-v0.3.4.2-blue)](https://github.com/thoth-pub/thoth-omp-plugin/releases)
 [![Licença: GPL v3](https://img.shields.io/badge/Licença-GPLv3-green.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Compatibilidade OMP](https://img.shields.io/badge/OMP-3.3_%7C_3.4_%7C_3.5-blue)](https://pkp.sfu.ca/software/omp/)
 
@@ -18,7 +18,8 @@ Este plugin é compatível com as seguintes aplicações PKP:
 
 ## Instalação
 
-1. Baixe a versão mais recente do pacote de instalação (`thoth.tar.gz`) na [página de lançamentos](https://github.com/thoth-pub/thoth-omp-plugin/releases).
+1. Na [página de lançamentos](https://github.com/thoth-pub/thoth-omp-plugin/releases), baixe o pacote de instalação
+   (`thoth.tar.gz`) compatível com sua versão do OMP.
 
 2. Acesse a área de administração do seu site OMP através do Dashboard. Navegue até `Configurações` > `Site` > `Plugins` > `Enviar um novo plugin` e selecione o arquivo `thoth.tar.gz`.
 
@@ -53,9 +54,20 @@ Registre os metadados para monografias já publicadas usando o botão 'Registrar
 
 ### Atualização de Metadados
 
-Uma vez que uma monografia está registrada, as atualizações de metadados são **automáticas**. Despublique a monografia, edite os dados e as alterações serão sincronizadas com o Thoth ao republicar.
+Após o registro, algumas alterações na entrada de catálogo, nos títulos e nos resumos do livro são enviadas
+automaticamente à Thoth quando são salvas.
 
-Também é possível atualizar manualmente os metadados no Thoth clicando no botão 'Atualizar metadados' ao lado do status de publicação.
+Para conciliar o registro completo, clique em **Atualizar metadados** ao lado do status da publicação. Essa ação
+sincroniza o livro e seus capítulos, incluindo colaboradores, formatos e links de publicação, idioma, assuntos,
+palavras-chave, referências e a ordem dos capítulos.
+
+O OMP é a fonte dos metadados administrados por essa sincronização. As informações incluídas ou alteradas no OMP
+são refletidas na Thoth, e as informações removidas do OMP também são removidas da Thoth quando possível. As
+localizações administradas pela própria Thoth são preservadas.
+
+Se o plugin não conseguir identificar com segurança o registro correspondente na Thoth, ele interromperá a
+sincronização em vez de criar uma associação incerta. Um aviso também poderá ser exibido quando um formato de
+publicação não puder ser removido de uma obra ativa na Thoth.
 
 <img src="/docs/images/update_button.png" alt="Botão de atualização de metadados no fluxo de trabalho de publicação" width="700">
 
@@ -202,7 +214,7 @@ em metadados importados no OMP 3.5 também são reconhecidas automaticamente.
 
 ### Requisitos
 
-- PHP 8.1+
+- PHP 8.2+
 - [Composer](https://getcomposer.org/)
 - [Node.js](https://nodejs.org/) (para compilar os recursos do frontend)
 
@@ -213,7 +225,7 @@ em metadados importados no OMP 3.5 também são reconhecidas automaticamente.
 composer install
 
 # Instalar dependências do Node.js e compilar recursos do frontend
-npm install
+npm ci
 npm run build
 ```
 
@@ -221,7 +233,7 @@ npm run build
 
 ```bash
 # A partir do diretório raiz do OMP
-php lib/pkp/lib/vendor/phpunit/phpunit/phpunit --configuration lib/pkp/tests/phpunit.xml -v plugins/generic/thoth/tests
+php lib/pkp/lib/vendor/bin/phpunit -c lib/pkp/tests/phpunit.xml --no-coverage plugins/generic/thoth/tests
 ```
 
 ## Créditos
