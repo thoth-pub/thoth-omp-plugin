@@ -241,6 +241,53 @@ class ThothPublicationServiceTest extends PKPTestCase
         ));
     }
 
+    public function testUpdateChapterPublicationOmitsBookIsbn()
+    {
+        $publicationFormat = $this->getMockBuilder(PublicationFormat::class)
+            ->setMethods(['getId', 'getPhysicalFormat', 'setData'])
+            ->getMock();
+        $publicationFormat->method('getId')->willReturn(1);
+        $publicationFormat->method('getPhysicalFormat')->willReturn(false);
+        $publicationFormat->expects($this->once())
+            ->method('setData')
+            ->with('thothPublicationId', 'chapter-publication-id');
+        $submissionFile = new SubmissionFile();
+
+        $factory = $this->createMock(ThothPublicationFactory::class);
+        $factory->method('createFromPublicationFormat')
+            ->willReturn(new ThothPublication([
+                'publicationType' => PublicationType::PDF,
+                'isbn' => '978-1-23456-789-7',
+            ]));
+        $repository = $this->getMockBuilder(ThothPublicationRepository::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['add'])
+            ->getMock();
+        $repository->expects($this->once())
+            ->method('add')
+            ->with($this->callback(function (ThothPublication $publication) {
+                return $publication->getWorkId() === 'chapter-id'
+                    && $publication->getIsbn() === null;
+            }))
+            ->willReturn('chapter-publication-id');
+        $locationService = $this->createMock(ThothLocationService::class);
+        $locationService->method('getDesiredByPublicationFormat')->willReturn([]);
+        $locationService->expects($this->once())
+            ->method('update')
+            ->with('chapter-publication-id', [], []);
+
+        $service = new ThothPublicationService($factory, $repository, $locationService);
+
+        $service->update(
+            [$publicationFormat],
+            'chapter-id',
+            [],
+            [1 => [$submissionFile]],
+            WorkStatus::FORTHCOMING,
+            10
+        );
+    }
+
     public function testUpdateMatchesSameTypePublicationByNormalizedIsbn()
     {
         $publicationFormat = $this->getMockBuilder(PublicationFormat::class)

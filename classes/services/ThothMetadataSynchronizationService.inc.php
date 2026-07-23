@@ -22,6 +22,7 @@ class ThothMetadataSynchronizationService
     private $languageService;
     private $subjectService;
     private $referenceService;
+    private $workRelationService;
 
     public function __construct(
         $bookService,
@@ -29,7 +30,8 @@ class ThothMetadataSynchronizationService
         $publicationService,
         $languageService,
         $subjectService,
-        $referenceService
+        $referenceService,
+        $workRelationService
     ) {
         $this->bookService = $bookService;
         $this->contributionService = $contributionService;
@@ -37,6 +39,7 @@ class ThothMetadataSynchronizationService
         $this->languageService = $languageService;
         $this->subjectService = $subjectService;
         $this->referenceService = $referenceService;
+        $this->workRelationService = $workRelationService;
     }
 
     public function synchronize($publication, $thothWorkId)
@@ -53,6 +56,12 @@ class ThothMetadataSynchronizationService
         $this->languageService->synchronizeByPublication($publication, $thothWorkId);
         $this->subjectService->synchronizeByPublication($publication, $thothWorkId);
         $this->referenceService->synchronizeByPublication($publication, $thothWorkId);
+        if (
+            $this->workRelationService->synchronizeByPublication($publication, $thothWorkId)
+            && !in_array('plugins.generic.thoth.synchronize.activeWorkPublicationDeletionsSkipped', $warnings, true)
+        ) {
+            $warnings[] = 'plugins.generic.thoth.synchronize.activeWorkPublicationDeletionsSkipped';
+        }
         return $warnings;
     }
 }
