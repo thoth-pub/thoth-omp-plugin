@@ -65,26 +65,51 @@ class ThothSubjectService
     public function update(array $subjects, $thothWorkId, array $existingSubjects)
     {
         $remainingSubjects = $existingSubjects;
+        $matchedSubjects = [];
+        $newSubjects = [];
 
         foreach ($subjects as $subject) {
             $existingKey = $this->findMatchingSubjectKey($subject, $remainingSubjects);
             if ($existingKey === null) {
-                $this->repository->add($this->createSubject($subject, $thothWorkId));
+                $newSubjects[] = $subject;
                 continue;
             }
 
-            $existingSubject = $remainingSubjects[$existingKey];
-            if ($this->subjectNeedsUpdate($subject, $existingSubject)) {
-                $thothSubject = $this->createSubject($subject, $thothWorkId);
-                $thothSubject->setSubjectId($existingSubject['subjectId']);
-                $this->repository->edit($thothSubject);
-            }
+            $matchedSubjects[] = [
+                'subject' => $subject,
+                'existingSubject' => $remainingSubjects[$existingKey],
+            ];
             unset($remainingSubjects[$existingKey]);
         }
 
         foreach ($remainingSubjects as $existingSubject) {
             if (isset($existingSubject['subjectId'])) {
                 $this->repository->delete($existingSubject['subjectId']);
+            }
+        }
+
+        $subjectTypesWithCollisions = $this->getSubjectTypesWithOrdinalCollisions($subjects, $matchedSubjects);
+        $temporaryOrdinal = $this->getNextAvailableOrdinal($subjects, $existingSubjects);
+        foreach ($matchedSubjects as $matchedSubject) {
+            $subject = $matchedSubject['subject'];
+            $existingSubject = $matchedSubject['existingSubject'];
+            if (
+                $this->subjectNeedsUpdate($subject, $existingSubject)
+                && isset($subjectTypesWithCollisions[$subject['subjectType']])
+            ) {
+                $this->editSubject($subject, $existingSubject, $thothWorkId, $temporaryOrdinal++);
+            }
+        }
+
+        foreach ($newSubjects as $subject) {
+            $this->repository->add($this->createSubject($subject, $thothWorkId));
+        }
+
+        foreach ($matchedSubjects as $matchedSubject) {
+            $subject = $matchedSubject['subject'];
+            $existingSubject = $matchedSubject['existingSubject'];
+            if ($this->subjectNeedsUpdate($subject, $existingSubject)) {
+                $this->editSubject($subject, $existingSubject, $thothWorkId);
             }
         }
     }
@@ -153,5 +178,58 @@ class ThothSubjectService
     private function subjectNeedsUpdate(array $subject, array $existingSubject)
     {
         return ($existingSubject['subjectOrdinal'] ?? null) !== $subject['subjectOrdinal'];
+    }
+
+    private function getSubjectTypesWithOrdinalCollisions(array $subjects, array $matchedSubjects)
+    {
+        $occupiedOrdinals = [];
+        $matchedSubjectIds = [];
+        foreach ($matchedSubjects as $matchedSubject) {
+            $subject = $matchedSubject['subject'];
+            $existingSubject = $matchedSubject['existingSubject'];
+            $occupiedOrdinals[$existingSubject['subjectType']][$existingSubject['subjectOrdinal']] =
+                $existingSubject['subjectId'];
+            $matchedSubjectIds[$this->getSubjectKey($subject)] = $existingSubject['subjectId'];
+        }
+
+        $subjectTypesWithCollisions = [];
+        foreach ($subjects as $subject) {
+            $occupyingSubjectId = $occupiedOrdinals[$subject['subjectType']][$subject['subjectOrdinal']] ?? null;
+            $matchedSubjectId = $matchedSubjectIds[$this->getSubjectKey($subject)] ?? null;
+            if ($occupyingSubjectId !== null && $occupyingSubjectId !== $matchedSubjectId) {
+                $subjectTypesWithCollisions[$subject['subjectType']] = true;
+            }
+        }
+
+        return $subjectTypesWithCollisions;
+    }
+
+    private function getNextAvailableOrdinal(array $subjects, array $existingSubjects)
+    {
+        $highestOrdinal = 0;
+        foreach (array_merge($subjects, $existingSubjects) as $subject) {
+            $highestOrdinal = max($highestOrdinal, (int) ($subject['subjectOrdinal'] ?? 0));
+        }
+
+        return $highestOrdinal + 1;
+    }
+
+    private function getSubjectKey(array $subject)
+    {
+        return $subject['subjectType'] . "\0" . $subject['subjectCode'];
+    }
+
+    private function editSubject(
+        array $subject,
+        array $existingSubject,
+        $thothWorkId,
+        $subjectOrdinal = null
+    ) {
+        if ($subjectOrdinal !== null) {
+            $subject['subjectOrdinal'] = $subjectOrdinal;
+        }
+        $thothSubject = $this->createSubject($subject, $thothWorkId);
+        $thothSubject->setSubjectId($existingSubject['subjectId']);
+        $this->repository->edit($thothSubject);
     }
 }

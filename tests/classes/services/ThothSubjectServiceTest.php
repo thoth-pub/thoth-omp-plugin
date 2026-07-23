@@ -135,4 +135,90 @@ class ThothSubjectServiceTest extends PKPTestCase
 
         $service->synchronizeByPublication($publication, 'work-id');
     }
+
+    public function testUpdateReordersSubjectsWithoutOrdinalCollisions()
+    {
+        $currentSubjects = [
+            'first-keyword-id' => [
+                'subjectId' => 'first-keyword-id',
+                'workId' => 'work-id',
+                'subjectType' => SubjectType::KEYWORD,
+                'subjectCode' => 'First keyword',
+                'subjectOrdinal' => 1,
+            ],
+            'second-keyword-id' => [
+                'subjectId' => 'second-keyword-id',
+                'workId' => 'work-id',
+                'subjectType' => SubjectType::KEYWORD,
+                'subjectCode' => 'Second keyword',
+                'subjectOrdinal' => 2,
+            ],
+        ];
+        $assertAvailableOrdinal = function (array $subject, $subjectId = null) use (&$currentSubjects) {
+            foreach ($currentSubjects as $currentSubjectId => $currentSubject) {
+                if (
+                    $currentSubjectId !== $subjectId
+                    && $currentSubject['subjectType'] === $subject['subjectType']
+                    && $currentSubject['subjectOrdinal'] === $subject['subjectOrdinal']
+                ) {
+                    throw new RuntimeException('A subject with this ordinal number and type already exists.');
+                }
+            }
+        };
+
+        $repository = $this->getMockBuilder(ThothSubjectRepository::class)
+            ->setConstructorArgs([$this->createMock(ThothClient::class)])
+            ->setMethods(['add', 'edit', 'delete'])
+            ->getMock();
+        $repository->method('add')
+            ->willReturnCallback(
+                function ($subject) use (&$currentSubjects, $assertAvailableOrdinal) {
+                    $subjectData = $subject->getAllData();
+                    $assertAvailableOrdinal($subjectData);
+                    $subjectData['subjectId'] = 'new-subject-id';
+                    $currentSubjects['new-subject-id'] = $subjectData;
+                    return 'new-subject-id';
+                }
+            );
+        $repository->method('edit')
+            ->willReturnCallback(
+                function ($subject) use (&$currentSubjects, $assertAvailableOrdinal) {
+                    $subjectData = $subject->getAllData();
+                    $subjectId = $subjectData['subjectId'];
+                    $assertAvailableOrdinal($subjectData, $subjectId);
+                    $currentSubjects[$subjectId] = $subjectData;
+                    return $subjectId;
+                }
+            );
+        $repository->expects($this->never())->method('delete');
+
+        $service = new ThothSubjectService($repository);
+        $service->update(
+            [
+                [
+                    'subjectType' => SubjectType::KEYWORD,
+                    'subjectCode' => 'New subject',
+                    'subjectOrdinal' => 1,
+                ],
+                [
+                    'subjectType' => SubjectType::KEYWORD,
+                    'subjectCode' => 'First keyword',
+                    'subjectOrdinal' => 2,
+                ],
+                [
+                    'subjectType' => SubjectType::KEYWORD,
+                    'subjectCode' => 'Second keyword',
+                    'subjectOrdinal' => 3,
+                ],
+            ],
+            'work-id',
+            array_values($currentSubjects)
+        );
+
+        $this->assertSame([
+            'First keyword' => 2,
+            'Second keyword' => 3,
+            'New subject' => 1,
+        ], array_column($currentSubjects, 'subjectOrdinal', 'subjectCode'));
+    }
 }
