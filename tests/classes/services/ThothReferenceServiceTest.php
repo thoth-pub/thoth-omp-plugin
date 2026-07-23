@@ -87,7 +87,7 @@ class ThothReferenceServiceTest extends PKPTestCase
             ->with($this->callback(function (ThothReference $reference) {
                 return $reference->getWorkId() === 'work-id'
                     && $reference->getReferenceOrdinal() === 1
-                    && $reference->getDoi() === '10.1234/example'
+                    && $reference->getDoi() === 'https://doi.org/10.1234/example'
                     && $reference->getUnstructuredCitation()
                         === 'Roe, Richard. A reference. https://doi.org/10.1234/EXAMPLE.';
             }));
@@ -108,7 +108,7 @@ class ThothReferenceServiceTest extends PKPTestCase
                 return $reference->getReferenceId() === 'doi-reference-id'
                     && $reference->getWorkId() === 'work-id'
                     && $reference->getReferenceOrdinal() === 1
-                    && $reference->getDoi() === '10.1234/example'
+                    && $reference->getDoi() === 'https://doi.org/10.1234/example'
                     && $reference->getUnstructuredCitation() === 'Updated citation. doi:10.1234/example';
             }));
         $repository->expects($this->once())
