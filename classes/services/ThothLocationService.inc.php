@@ -66,6 +66,12 @@ class ThothLocationService
             $thothLocation->setCanonical($index === 0);
 
             $existingKey = $this->findMatchingLocationKey($thothLocation, $remainingLocations);
+            if ($index === 0 && !($remainingLocations[$existingKey]['canonical'] ?? false)) {
+                $canonicalKey = $this->findCanonicalLocationKey($remainingLocations);
+                if ($canonicalKey !== null) {
+                    $existingKey = $canonicalKey;
+                }
+            }
             if ($existingKey === null) {
                 $this->repository->add($thothLocation);
                 continue;
@@ -119,6 +125,17 @@ class ThothLocationService
             }
         ));
         return $this->getUniqueMatchingKey($matchingKeys);
+    }
+
+    private function findCanonicalLocationKey(array $existingLocations)
+    {
+        foreach ($existingLocations as $key => $existingLocation) {
+            if ($existingLocation['canonical'] ?? false) {
+                return $key;
+            }
+        }
+
+        return null;
     }
 
     private function getUniqueMatchingKey(array $matchingKeys)

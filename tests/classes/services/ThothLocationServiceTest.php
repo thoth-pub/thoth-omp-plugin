@@ -124,6 +124,38 @@ class ThothLocationServiceTest extends PKPTestCase
         ]);
     }
 
+    public function testUpdateReusesCanonicalLocationWhenUrlChanges()
+    {
+        $repository = $this->createMock(ThothLocationRepository::class);
+        $repository->expects($this->never())->method('add');
+        $repository->expects($this->once())
+            ->method('edit')
+            ->with($this->callback(function (ThothLocation $location) {
+                return $location->getLocationId() === 'canonical-location-id'
+                    && $location->getPublicationId() === 'publication-id'
+                    && $location->getFullTextUrl() === 'https://publisher.example/new-book.pdf'
+                    && $location->getCanonical() === true;
+            }));
+        $repository->expects($this->never())->method('delete');
+
+        $service = new ThothLocationService(new ThothLocationFactory(), $repository);
+        $service->update('publication-id', [
+            new ThothLocation([
+                'landingPage' => 'https://publisher.example/book',
+                'fullTextUrl' => 'https://publisher.example/new-book.pdf',
+                'locationPlatform' => LocationPlatform::OTHER,
+            ]),
+        ], [
+            [
+                'locationId' => 'canonical-location-id',
+                'landingPage' => 'https://publisher.example/book',
+                'fullTextUrl' => 'https://publisher.example/old-book.pdf',
+                'locationPlatform' => LocationPlatform::OTHER,
+                'canonical' => true,
+            ],
+        ]);
+    }
+
     public function testGetDesiredLocationsCreatesOneLocationPerSubmissionFile()
     {
         $publicationFormat = $this->setUpLocationFactoryEnvironment();
