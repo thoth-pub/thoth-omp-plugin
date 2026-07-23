@@ -65,8 +65,8 @@ class ThothSubjectClassifierTest extends PKPTestCase
     public function testClassifiesOnlyUnambiguousCodesWithoutAnExplicitSource(): void
     {
         $classifier = new ThothSubjectClassifier(
-            fn (string $code): bool => in_array($code, ['JNF', 'ABA'], true),
-            fn (string $code): bool => in_array($code, ['MFGV', 'ABA'], true)
+            fn (string $code): bool => $code === 'JNF',
+            fn (string $code): bool => $code === 'MFGV'
         );
 
         $this->assertSame([
@@ -77,10 +77,32 @@ class ThothSubjectClassifierTest extends PKPTestCase
             'subjectType' => SubjectType::THEMA,
             'subjectCode' => 'MFGV',
         ], $classifier->classify('mfgv'));
+    }
+
+    public function testPrefersAVerifiedThemaCodeWithoutAnExplicitSource(): void
+    {
+        $classifier = new ThothSubjectClassifier(
+            fn (string $code): bool => $code === 'MFGV',
+            fn (string $code): bool => $code === 'MFGV'
+        );
+
         $this->assertSame([
-            'subjectType' => SubjectType::KEYWORD,
-            'subjectCode' => 'ABA',
-        ], $classifier->classify('ABA'));
+            'subjectType' => SubjectType::THEMA,
+            'subjectCode' => 'MFGV',
+        ], $classifier->classify('MFGV'));
+    }
+
+    public function testClassifiesABisacCodeWithoutAnExplicitSource(): void
+    {
+        $classifier = new ThothSubjectClassifier(
+            fn (string $code): bool => false,
+            fn (string $code): bool => false
+        );
+
+        $this->assertSame([
+            'subjectType' => SubjectType::BISAC,
+            'subjectCode' => 'EDU000000',
+        ], $classifier->classify('EDU000000'));
     }
 
     public function testClassifiesAnOnixPrefixedTextValue(): void
