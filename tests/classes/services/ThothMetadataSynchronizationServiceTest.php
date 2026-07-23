@@ -11,6 +11,7 @@ import('plugins.generic.thoth.classes.services.ThothMetadataSynchronizationServi
 import('plugins.generic.thoth.classes.services.ThothPublicationService');
 import('plugins.generic.thoth.classes.services.ThothReferenceService');
 import('plugins.generic.thoth.classes.services.ThothSubjectService');
+import('plugins.generic.thoth.classes.services.ThothWorkRelationService');
 
 class ThothMetadataSynchronizationServiceTest extends PKPTestCase
 {
@@ -43,6 +44,11 @@ class ThothMetadataSynchronizationServiceTest extends PKPTestCase
         $referenceService->expects($this->once())
             ->method('synchronizeByPublication')
             ->with($publication, 'work-id');
+        $workRelationService = $this->createMock(ThothWorkRelationService::class);
+        $workRelationService->expects($this->once())
+            ->method('synchronizeByPublication')
+            ->with($publication, 'work-id')
+            ->willReturn(false);
 
         $service = new ThothMetadataSynchronizationService(
             $bookService,
@@ -50,7 +56,8 @@ class ThothMetadataSynchronizationServiceTest extends PKPTestCase
             $publicationService,
             $languageService,
             $subjectService,
-            $referenceService
+            $referenceService,
+            $workRelationService
         );
 
         $this->assertSame(['warning-key'], $service->synchronize($publication, 'work-id'));
@@ -67,6 +74,8 @@ class ThothMetadataSynchronizationServiceTest extends PKPTestCase
         $languageService = $this->createMock(ThothLanguageService::class);
         $subjectService = $this->createMock(ThothSubjectService::class);
         $referenceService = $this->createMock(ThothReferenceService::class);
+        $workRelationService = $this->createMock(ThothWorkRelationService::class);
+        $workRelationService->method('synchronizeByPublication')->willReturn(false);
 
         $service = new ThothMetadataSynchronizationService(
             $bookService,
@@ -74,7 +83,8 @@ class ThothMetadataSynchronizationServiceTest extends PKPTestCase
             $publicationService,
             $languageService,
             $subjectService,
-            $referenceService
+            $referenceService,
+            $workRelationService
         );
 
         $this->assertSame([], $service->synchronize($publication, 'work-id'));
@@ -91,6 +101,8 @@ class ThothMetadataSynchronizationServiceTest extends PKPTestCase
         $languageService = $this->createMock(ThothLanguageService::class);
         $subjectService = $this->createMock(ThothSubjectService::class);
         $referenceService = $this->createMock(ThothReferenceService::class);
+        $workRelationService = $this->createMock(ThothWorkRelationService::class);
+        $workRelationService->method('synchronizeByPublication')->willReturn(true);
 
         $service = new ThothMetadataSynchronizationService(
             $bookService,
@@ -98,7 +110,8 @@ class ThothMetadataSynchronizationServiceTest extends PKPTestCase
             $publicationService,
             $languageService,
             $subjectService,
-            $referenceService
+            $referenceService,
+            $workRelationService
         );
 
         $this->assertSame([

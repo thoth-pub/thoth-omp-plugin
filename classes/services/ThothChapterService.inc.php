@@ -39,11 +39,17 @@ class ThothChapterService
         $this->abstractService = $abstractService;
     }
 
-    public function register($chapter, $thothImprintId)
+    public function getDesiredWork($chapter, $thothImprintId)
     {
         $thothChapter = $this->factory->createFromChapter($chapter);
         $thothChapter->setImprintId($thothImprintId);
 
+        return $thothChapter;
+    }
+
+    public function register($chapter, $thothImprintId, $thothChapter = null)
+    {
+        $thothChapter = $thothChapter ?? $this->getDesiredWork($chapter, $thothImprintId);
         $thothChapterId = $this->repository->add($thothChapter);
         $chapter->setData('thothChapterId', $thothChapterId);
         $this->registerMetadata($chapter, $thothChapterId);
@@ -52,6 +58,47 @@ class ThothChapterService
         $this->publicationService->registerByChapter($chapter);
 
         return $thothChapterId;
+    }
+
+    public function update($chapter, array $existingChapter, $thothImprintId, $thothChapter = null)
+    {
+        $thothChapter = $thothChapter ?? $this->getDesiredWork($chapter, $thothImprintId);
+        $thothChapterId = $existingChapter['workId'];
+        $thothChapter->setWorkId($thothChapterId);
+        $this->repository->edit($thothChapter);
+        $chapter->setData('thothChapterId', $thothChapterId);
+
+        $publication = DAORegistry::getDAO('PublicationDAO')->getById($chapter->getData('publicationId'));
+        $locale = $publication->getData('locale');
+        $this->titleService->updateByChapter(
+            $chapter,
+            $thothChapterId,
+            $existingChapter['titles'] ?? [],
+            $locale
+        );
+        $this->abstractService->updateByChapter(
+            $chapter,
+            $thothChapterId,
+            $existingChapter['abstracts'] ?? [],
+            $locale
+        );
+        $this->contributionService->update(
+            $chapter->getAuthors()->toArray(),
+            $thothChapterId,
+            $existingChapter['contributions'] ?? []
+        );
+
+        return $this->publicationService->updateByChapter(
+            $chapter,
+            $thothChapterId,
+            $existingChapter['publications'] ?? [],
+            $existingChapter['workStatus'] ?? null
+        );
+    }
+
+    public function delete($thothChapterId)
+    {
+        $this->repository->delete($thothChapterId);
     }
 
     private function registerMetadata($chapter, $thothChapterId)

@@ -158,4 +158,99 @@ class ThothChapterServiceTest extends PKPTestCase
 
         $this->assertSame('fed8b9ee-2537-4a66-a1a1-eeadf4001c59', $thothChapterId);
     }
+
+    public function testUpdateChapterAndItsMetadata()
+    {
+        $publication = $this->getMockBuilder(Publication::class)
+            ->setMethods(['getData'])
+            ->getMock();
+        $publication->method('getData')->willReturnMap([
+            ['locale', null, 'en_US'],
+        ]);
+        $publicationDao = $this->getMockBuilder(PublicationDAO::class)
+            ->setMethods(['getById'])
+            ->getMock();
+        $publicationDao->expects($this->once())
+            ->method('getById')
+            ->with(99)
+            ->willReturn($publication);
+        DAORegistry::registerDAO('PublicationDAO', $publicationDao);
+
+        $authors = [new stdClass()];
+        $authorResult = $this->getMockBuilder(DAOResultFactory::class)
+            ->setMethods(['toArray'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $authorResult->method('toArray')->willReturn($authors);
+        $chapter = $this->getMockBuilder(Chapter::class)
+            ->setMethods(['getAuthors', 'getData', 'setData'])
+            ->getMock();
+        $chapter->method('getAuthors')->willReturn($authorResult);
+        $chapter->method('getData')->willReturnMap([
+            ['publicationId', null, 99],
+        ]);
+        $chapter->expects($this->once())
+            ->method('setData')
+            ->with('thothChapterId', 'chapter-id');
+
+        $desiredWork = new ThothWork();
+        $factory = $this->getMockBuilder(ThothChapterFactory::class)
+            ->setMethods(['createFromChapter'])
+            ->getMock();
+        $factory->expects($this->once())
+            ->method('createFromChapter')
+            ->with($chapter)
+            ->willReturn($desiredWork);
+        $repository = $this->getMockBuilder(ThothChapterRepository::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['edit'])
+            ->getMock();
+        $repository->expects($this->once())
+            ->method('edit')
+            ->with($this->callback(function (ThothWork $work) {
+                return $work->getWorkId() === 'chapter-id'
+                    && $work->getImprintId() === 'imprint-id';
+            }));
+
+        $titleService = $this->createMock(ThothTitleService::class);
+        $titleService->expects($this->once())
+            ->method('updateByChapter')
+            ->with($chapter, 'chapter-id', [['titleId' => 'title-id']], 'en_US');
+        $abstractService = $this->createMock(ThothAbstractService::class);
+        $abstractService->expects($this->once())
+            ->method('updateByChapter')
+            ->with($chapter, 'chapter-id', [['abstractId' => 'abstract-id']], 'en_US');
+        $contributionService = $this->createMock(ThothContributionService::class);
+        $contributionService->expects($this->once())
+            ->method('update')
+            ->with($authors, 'chapter-id', [['contributionId' => 'contribution-id']]);
+        $publicationService = $this->createMock(ThothPublicationService::class);
+        $publicationService->expects($this->once())
+            ->method('updateByChapter')
+            ->with(
+                $chapter,
+                'chapter-id',
+                [['publicationId' => 'publication-id']],
+                'FORTHCOMING'
+            )
+            ->willReturn(true);
+
+        $service = new ThothChapterService(
+            $factory,
+            $repository,
+            $contributionService,
+            $publicationService,
+            $titleService,
+            $abstractService
+        );
+
+        $this->assertTrue($service->update($chapter, [
+            'workId' => 'chapter-id',
+            'workStatus' => 'FORTHCOMING',
+            'titles' => [['titleId' => 'title-id']],
+            'abstracts' => [['abstractId' => 'abstract-id']],
+            'contributions' => [['contributionId' => 'contribution-id']],
+            'publications' => [['publicationId' => 'publication-id']],
+        ], 'imprint-id'));
+    }
 }
