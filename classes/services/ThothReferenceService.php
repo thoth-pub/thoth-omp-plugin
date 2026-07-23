@@ -132,7 +132,7 @@ class ThothReferenceService
         ];
         $doi = $this->getReferenceDoi($reference);
         if ($doi !== null) {
-            $data['doi'] = $doi;
+            $data['doi'] = 'https://doi.org/' . $doi;
         }
 
         return $this->repository->new($data);
