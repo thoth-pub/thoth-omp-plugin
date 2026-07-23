@@ -175,25 +175,21 @@ Na página de gestão do Thoth, você pode enviar em massa uma seleção de tít
 
 ### Assuntos e palavras-chave
 
-| Metadado do OMP | Tipo de assunto na Thoth | Regra |
-| --- | --- | --- |
-| `keywords` | `Keyword` | Sempre. Palavras-chave nunca são reclassificadas nem enviadas como `Custom`. |
-| `subjects` com esquema confirmado | `LCC`, `BISAC`, `BIC` ou `Thema` | Usa o esquema detectado. |
-| `subjects` com fonte não ONIX e identificador explícitos | `Custom` | Texto simples nunca se torna `Custom`. |
-| Demais valores de `subjects` | `Keyword` | Quando o esquema é inválido, ambíguo ou não pode ser validado. |
+O OMP oferece duas formas complementares de descrever uma publicação:
 
-Os esquemas aceitos seguem a [Lista 27 do ONIX](https://ns.editeur.org/onix/en/27):
+- **Palavras-chave** são termos livres que ajudam os leitores a encontrar a publicação. Toda palavra-chave é
+  enviada à Thoth como palavra-chave e nunca é tratada como uma classificação personalizada.
+- **Assuntos** podem ser termos descritivos ou códigos de sistemas de classificação reconhecidos, como LCC,
+  BISAC, BIC e Thema. Quando a classificação pode ser confirmada, a Thoth registra o assunto com o sistema
+  correspondente.
+- Quando um assunto não pode ser associado com segurança a um sistema de classificação, ele é mantido como
+  palavra-chave, em vez de ser descartado ou receber uma classificação incerta.
+- Assuntos associados a outro vocabulário claramente identificado são registrados como uma classificação
+  personalizada.
 
-- `03` ou `LCC`: exige esquema explícito e código no formato esperado do LCC;
-- `10` ou `BISAC`: exige esquema explícito e código no formato esperado do BISAC;
-- `12` ou `BIC`: valida o código na lista BIC 2.1 incluída no OMP;
-- `93` ou `THEMA`: valida o código no [registro oficial do Thema](https://ns.editeur.org/thema/en).
-
-Os valores estruturados de assuntos no OMP 3.5 usam `name`, `source` e `identifier`. Valores simples também podem
-incluir um prefixo de esquema, como `THEMA:MFGV` ou `93:MFGV`. Sem esquema explícito, o plugin somente classifica
-o valor como BIC ou Thema quando exatamente uma validação é bem-sucedida. Os assuntos são sincronizados antes das
-palavras-chave, pares duplicados de tipo e código são enviados uma única vez e seus ordinais na Thoth seguem essa
-ordem.
+O editor pode identificar uma classificação diretamente no campo de assuntos usando um prefixo, por exemplo
+`THEMA:MFGV` ou `BISAC:EDU000000`. As informações de classificação presentes em metadados importados no OMP 3.5
+também são reconhecidas automaticamente.
 
 </details>
 
