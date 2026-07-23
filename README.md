@@ -183,9 +183,13 @@ OMP offers two complementary ways to describe a publication:
   of being discarded or assigned an uncertain classification.
 - Subjects associated with another clearly identified vocabulary are recorded as a custom classification.
 
-Editors can identify a classification directly in the subject field with a prefix, for example `THEMA:MFGV` or
-`BISAC:EDU000000`. Classification information included in metadata imported into OMP 3.5 is also recognized
-automatically.
+To make the Subjects field available, go to **Settings > Workflow > Submission > Metadata**, select **Enable
+subject metadata**, and save the changes. In the same settings, choose whether the field should be available only
+to the editorial team, requested from authors, or required during submission.
+
+Editors can enter the code alone, such as `GTK` or `EDU000000`. They can also identify the classification system
+with a prefix, such as `THEMA:GTK` or `BISAC:EDU000000`. Classification information included in metadata imported
+into OMP 3.5 is also recognized automatically.
 
 </details>
 
