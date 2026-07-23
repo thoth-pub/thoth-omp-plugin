@@ -17,6 +17,8 @@ require_once(__DIR__ . '/../../../vendor/autoload.php');
 
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Inputs\PatchReference as ThothReference;
+use ThothApi\GraphQL\Schemas\Reference as ThothReferenceSchema;
+use ThothApi\GraphQL\Schemas\Work as ThothWork;
 
 import('lib.pkp.tests.PKPTestCase');
 import('plugins.generic.thoth.classes.repositories.ThothReferenceRepository');
@@ -61,6 +63,47 @@ class ThothReferenceRepositoryTest extends PKPTestCase
         $thothReference = $repository->get('071ace7c-b65b-4bb8-b883-fb2d695d1ad9');
 
         $this->assertEquals($expectedThothReference, $thothReference);
+    }
+
+    public function testGetReferencesByWorkId()
+    {
+        $expectedReferences = [
+            new ThothReferenceSchema([
+                'referenceId' => '071ace7c-b65b-4bb8-b883-fb2d695d1ad9',
+                'workId' => '6569997e-ac11-4070-994e-3393641f12a8',
+                'referenceOrdinal' => 1,
+                'doi' => '10.1234/example',
+                'unstructuredCitation' => 'Roe, Richard. A reference.',
+            ]),
+        ];
+        $expectedThothWork = new ThothWork(['references' => $expectedReferences]);
+        $mockThothClient = $this->getMockBuilder(ThothClient::class)
+            ->setMethods(['work'])
+            ->getMock();
+        $mockThothClient->expects($this->once())
+            ->method('work')
+            ->with(
+                '6569997e-ac11-4070-994e-3393641f12a8',
+                [
+                    'references' => [
+                        'referenceId',
+                        'workId',
+                        'referenceOrdinal',
+                        'doi',
+                        'unstructuredCitation',
+                    ],
+                ]
+            )
+            ->willReturn($expectedThothWork);
+
+        $repository = new ThothReferenceRepository($mockThothClient);
+
+        $this->assertSame(
+            array_map(function ($reference) {
+                return $reference->toArray();
+            }, $expectedReferences),
+            $repository->getByWorkId('6569997e-ac11-4070-994e-3393641f12a8')
+        );
     }
 
     public function testAddReference()

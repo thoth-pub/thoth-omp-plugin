@@ -17,6 +17,16 @@ use ThothApi\GraphQL\Inputs\PatchReference as ThothReference;
 
 class ThothReferenceRepository
 {
+    private const WORK_REFERENCES_SELECTION = [
+        'references' => [
+            'referenceId',
+            'workId',
+            'referenceOrdinal',
+            'doi',
+            'unstructuredCitation',
+        ],
+    ];
+
     protected $thothClient;
 
     public function __construct($thothClient)
@@ -32,6 +42,16 @@ class ThothReferenceRepository
     public function get($thothReferenceId)
     {
         return $this->thothClient->reference($thothReferenceId);
+    }
+
+    public function getByWorkId($thothWorkId)
+    {
+        $thothWork = $this->thothClient->work($thothWorkId, self::WORK_REFERENCES_SELECTION);
+
+        return array_map(
+            fn ($reference) => $reference->toArray(),
+            $thothWork->getReferences() ?? []
+        );
     }
 
     public function add($thothReference)
