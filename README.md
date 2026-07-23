@@ -180,23 +180,18 @@ On the Thoth management page, you can submit a selection of titles from OMP into
 
 ### Subjects and keywords
 
-| OMP metadata | Thoth subject type | Rule |
-| --- | --- | --- |
-| `keywords` | `Keyword` | Always. Keywords are never reclassified or sent as `Custom`. |
-| `subjects` with a confirmed scheme | `LCC`, `BISAC`, `BIC`, or `Thema` | Uses the detected scheme. |
-| `subjects` with an explicit non-ONIX source and identifier | `Custom` | Plain subject text never becomes `Custom`. |
-| Other `subjects` | `Keyword` | Used when the scheme is invalid, ambiguous, or unavailable for validation. |
+OMP offers two complementary ways to describe a publication:
 
-The supported schemes follow [ONIX List 27](https://ns.editeur.org/onix/en/27):
+- **Keywords** are free terms that help readers discover the publication. Every keyword is sent to Thoth as a
+  keyword and is never treated as a custom classification.
+- **Subjects** can be descriptive terms or codes from recognized classification systems, such as LCC, BISAC, BIC,
+  and Thema. When the classification can be confirmed, Thoth records the subject using the corresponding system.
+- When a subject cannot be confidently associated with a classification system, it is kept as a keyword instead
+  of being discarded or assigned an uncertain classification.
+- Subjects associated with another clearly identified vocabulary are recorded as a custom classification.
 
-- `03` or `LCC`: requires an explicit scheme and a code in the expected LCC format;
-- `10` or `BISAC`: requires an explicit scheme and a code in the expected BISAC format;
-- `12` or `BIC`: validates the code against the BIC 2.1 list included with OMP;
-- `93` or `THEMA`: validates the code against the official [Thema registry](https://ns.editeur.org/thema/en).
-
-OMP subject values can include a scheme prefix, such as `THEMA:MFGV` or `93:MFGV`. Without an explicit scheme,
-the plugin only classifies a value as BIC or Thema when exactly one validation succeeds. Subjects are synchronized
-before keywords, duplicate type-and-code pairs are sent only once, and their Thoth ordinals follow that order.
+Editors can identify a classification directly in the subject field with a prefix, for example `THEMA:MFGV` or
+`BISAC:EDU000000`.
 
 </details>
 
