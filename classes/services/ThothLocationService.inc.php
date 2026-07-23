@@ -17,6 +17,8 @@
 use APP\core\Application;
 use APP\facades\Repo;
 
+import('plugins.generic.thoth.classes.exceptions.MetadataSynchronizationException');
+
 class ThothLocationService
 {
     public $factory;
@@ -60,5 +62,84 @@ class ThothLocationService
         foreach ($submissionFiles as $submissionFile) {
             $this->register($publicationFormat, $thothPublicationId, $submissionFile->getId());
         }
+    }
+
+    public function update($thothPublicationId, array $desiredLocations, array $existingLocations)
+    {
+        $remainingLocations = $existingLocations;
+
+        foreach (array_values($desiredLocations) as $index => $thothLocation) {
+            $thothLocation->setPublicationId($thothPublicationId);
+            $thothLocation->setCanonical($index === 0);
+
+            $existingKey = $this->findMatchingLocationKey($thothLocation, $remainingLocations);
+            if ($existingKey === null) {
+                $this->repository->add($thothLocation);
+                continue;
+            }
+
+            $thothLocation->setLocationId($remainingLocations[$existingKey]['locationId']);
+            $this->repository->edit($thothLocation);
+            unset($remainingLocations[$existingKey]);
+        }
+
+        foreach ($remainingLocations as $remainingLocation) {
+            $this->repository->delete($remainingLocation['locationId']);
+        }
+    }
+
+    public function getDesiredByPublicationFormat($publicationFormat, array $submissionFiles)
+    {
+        if (empty($submissionFiles)) {
+            return $publicationFormat->getRemoteUrl()
+                ? [$this->factory->createFromPublicationFormat($publicationFormat)]
+                : [];
+        }
+
+        return array_map(function ($submissionFile) use ($publicationFormat) {
+            return $this->factory->createFromPublicationFormat($publicationFormat, $submissionFile->getId());
+        }, array_values($submissionFiles));
+    }
+
+    private function findMatchingLocationKey($thothLocation, array $existingLocations)
+    {
+        $fullTextUrl = $this->normalizeUrl($thothLocation->getFullTextUrl());
+        $matchingKeys = array_keys(array_filter(
+            $existingLocations,
+            function ($existingLocation) use ($fullTextUrl) {
+                return $fullTextUrl !== null
+                    && $fullTextUrl === $this->normalizeUrl($existingLocation['fullTextUrl'] ?? null);
+            }
+        ));
+        if (!empty($matchingKeys)) {
+            return $this->getUniqueMatchingKey($matchingKeys);
+        }
+
+        $landingPage = $this->normalizeUrl($thothLocation->getLandingPage());
+        $matchingKeys = array_keys(array_filter(
+            $existingLocations,
+            function ($existingLocation) use ($fullTextUrl, $landingPage, $thothLocation) {
+                return $fullTextUrl === null
+                    && $this->normalizeUrl($existingLocation['fullTextUrl'] ?? null) === null
+                    && $landingPage === $this->normalizeUrl($existingLocation['landingPage'] ?? null)
+                    && $thothLocation->getLocationPlatform() === ($existingLocation['locationPlatform'] ?? null);
+            }
+        ));
+        return $this->getUniqueMatchingKey($matchingKeys);
+    }
+
+    private function getUniqueMatchingKey(array $matchingKeys)
+    {
+        if (count($matchingKeys) > 1) {
+            throw new MetadataSynchronizationException('Ambiguous Thoth locations with the same semantic URL');
+        }
+
+        return $matchingKeys[0] ?? null;
+    }
+
+    private function normalizeUrl($url)
+    {
+        $url = trim((string) $url);
+        return $url === '' ? null : $url;
     }
 }

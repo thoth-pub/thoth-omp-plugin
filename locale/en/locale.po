@@ -306,3 +306,9 @@ msgid "plugins.generic.thoth.featureVideo.exists"
 msgstr "This work already has a featured video in Thoth."
 msgid "plugins.generic.thoth.frontcover.unsupportedFormat"
 msgstr "The cover was not hosted by Thoth because the file format is not supported. Use a JPG or JPEG file."
+
+msgid "plugins.generic.thoth.synchronize.ambiguousMetadata"
+msgstr "The metadata could not be synchronized because more than one Thoth record matches it. Review the records in Thoth and try again."
+
+msgid "plugins.generic.thoth.synchronize.activeWorkPublicationDeletionsSkipped"
+msgstr "Some publications were not removed from Thoth because the work is active."

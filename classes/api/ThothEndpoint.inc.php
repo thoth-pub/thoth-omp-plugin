@@ -23,6 +23,7 @@ use ThothApi\Exception\QueryException;
 
 import('plugins.generic.thoth.classes.facades.ThothService');
 import('plugins.generic.thoth.classes.facades.ThothRepo');
+import('plugins.generic.thoth.classes.exceptions.MetadataSynchronizationException');
 import('plugins.generic.thoth.classes.notification.ThothNotification');
 import('plugins.generic.thoth.classes.services.ThothMeCacheService');
 
@@ -250,6 +251,10 @@ class ThothEndpoint
         try {
             $warning = ThothService::metadataSynchronization()->synchronize($publication, $thothWorkId);
             $this->handleNotification($request, $submission, true, false, null, $warning);
+        } catch (MetadataSynchronizationException $exception) {
+            return $response->withStatus(409)->withJsonError(
+                'plugins.generic.thoth.synchronize.ambiguousMetadata'
+            );
         } catch (QueryException $exception) {
             $this->handleNotification($request, $submission, false, false, $exception);
             return $response->withStatus(500)->withJsonError('plugins.generic.thoth.connectionError');
@@ -289,8 +294,8 @@ class ThothEndpoint
         $success
             ? $thothNotification->notifySuccess($request, $submission)
             : $thothNotification->notifyError($request, $submission, $errorMessage);
-        if ($warning) {
-            $thothNotification->notifyWarning($request, $submission, $warning);
+        foreach ((array) $warning as $warningMessage) {
+            $thothNotification->notifyWarning($request, $submission, $warningMessage);
         }
     }
 }
