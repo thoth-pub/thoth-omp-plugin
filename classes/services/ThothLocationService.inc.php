@@ -16,6 +16,7 @@
 
 use APP\core\Application;
 use APP\facades\Repo;
+use ThothApi\GraphQL\Enums\LocationPlatform;
 
 import('plugins.generic.thoth.classes.exceptions.MetadataSynchronizationException');
 
@@ -66,14 +67,24 @@ class ThothLocationService
 
     public function update($thothPublicationId, array $desiredLocations, array $existingLocations)
     {
-        $remainingLocations = $existingLocations;
+        $hasCanonicalThothLocation = false;
+        $remainingLocations = [];
+        foreach ($existingLocations as $key => $existingLocation) {
+            if (($existingLocation['locationPlatform'] ?? null) === LocationPlatform::THOTH) {
+                $hasCanonicalThothLocation = $hasCanonicalThothLocation
+                    || ($existingLocation['canonical'] ?? false);
+                continue;
+            }
+
+            $remainingLocations[$key] = $existingLocation;
+        }
 
         foreach (array_values($desiredLocations) as $index => $thothLocation) {
             $thothLocation->setPublicationId($thothPublicationId);
-            $thothLocation->setCanonical($index === 0);
+            $thothLocation->setCanonical($index === 0 && !$hasCanonicalThothLocation);
 
             $existingKey = $this->findMatchingLocationKey($thothLocation, $remainingLocations);
-            if ($index === 0 && !($remainingLocations[$existingKey]['canonical'] ?? false)) {
+            if ($thothLocation->getCanonical() && !($remainingLocations[$existingKey]['canonical'] ?? false)) {
                 $canonicalKey = $this->findCanonicalLocationKey($remainingLocations);
                 if ($canonicalKey !== null) {
                     $existingKey = $canonicalKey;

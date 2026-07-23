@@ -164,6 +164,45 @@ class ThothLocationServiceTest extends PKPTestCase
         ]);
     }
 
+    public function testUpdatePreservesThothPlatformLocations()
+    {
+        $repository = $this->createMock(ThothLocationRepository::class);
+        $repository->expects($this->never())->method('add');
+        $repository->expects($this->once())
+            ->method('edit')
+            ->with($this->callback(function (ThothLocation $location) {
+                return $location->getLocationId() === 'publisher-location-id'
+                    && $location->getPublicationId() === 'publication-id'
+                    && $location->getFullTextUrl() === 'https://publisher.example/book.pdf'
+                    && $location->getCanonical() === false;
+            }));
+        $repository->expects($this->never())->method('delete');
+
+        $service = new ThothLocationService(new ThothLocationFactory(), $repository);
+        $service->update('publication-id', [
+            new ThothLocation([
+                'landingPage' => 'https://publisher.example/book',
+                'fullTextUrl' => 'https://publisher.example/book.pdf',
+                'locationPlatform' => LocationPlatform::OTHER,
+            ]),
+        ], [
+            [
+                'locationId' => 'thoth-location-id',
+                'landingPage' => 'https://thoth.pub/books/book-id',
+                'fullTextUrl' => null,
+                'locationPlatform' => LocationPlatform::THOTH,
+                'canonical' => true,
+            ],
+            [
+                'locationId' => 'publisher-location-id',
+                'landingPage' => 'https://publisher.example/old-book',
+                'fullTextUrl' => 'https://publisher.example/book.pdf',
+                'locationPlatform' => LocationPlatform::OTHER,
+                'canonical' => false,
+            ],
+        ]);
+    }
+
     public function testGetDesiredLocationsCreatesOneLocationPerSubmissionFile()
     {
         $publicationFormat = $this->getMockBuilder(PublicationFormat::class)
