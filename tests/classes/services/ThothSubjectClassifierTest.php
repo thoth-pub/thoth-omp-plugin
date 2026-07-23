@@ -2,8 +2,6 @@
 
 require_once(__DIR__ . '/../../../vendor/autoload.php');
 
-use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Psr7\Response;
 use ThothApi\GraphQL\Enums\SubjectType;
 
 import('lib.pkp.tests.PKPTestCase');
@@ -141,31 +139,19 @@ class ThothSubjectClassifierTest extends PKPTestCase
         ]));
     }
 
-    public function testValidatesThemaCodesAgainstTheOfficialRegistryResponse()
+    public function testValidatesThemaCodesWithoutExternalRequests()
     {
-        $httpClient = $this->createMock(ClientInterface::class);
-        $httpClient->expects($this->once())
-            ->method('request')
-            ->with('GET', 'https://ns.editeur.org/thema/en/MFGV', $this->isType('array'))
-            ->willReturn(new Response(200, [], '<td class="notation">MFGV</td>'));
-
-        $classifier = new ThothSubjectClassifier(fn ($code) => false, null, $httpClient);
+        $classifier = new ThothSubjectClassifier(fn ($code) => false);
 
         $this->assertSame([
             'subjectType' => SubjectType::THEMA,
-            'subjectCode' => 'MFGV',
-        ], $classifier->classify('MFGV'));
+            'subjectCode' => 'GTK',
+        ], $classifier->classify('GTK'));
     }
 
     public function testAcceptsSixCharacterThemaSubjectCodes()
     {
-        $httpClient = $this->createMock(ClientInterface::class);
-        $httpClient->expects($this->once())
-            ->method('request')
-            ->with('GET', 'https://ns.editeur.org/thema/en/YPCA21', $this->isType('array'))
-            ->willReturn(new Response(200, [], '<td class="notation">YPCA21</td>'));
-
-        $classifier = new ThothSubjectClassifier(fn ($code) => false, null, $httpClient);
+        $classifier = new ThothSubjectClassifier(fn ($code) => false);
 
         $this->assertSame([
             'subjectType' => SubjectType::THEMA,
@@ -175,9 +161,11 @@ class ThothSubjectClassifierTest extends PKPTestCase
 
     public function testDoesNotAssumeABicCodeWhenThemaValidationIsUnavailable()
     {
-        $httpClient = $this->createMock(ClientInterface::class);
-        $httpClient->method('request')->willThrowException(new RuntimeException('Registry unavailable'));
-        $classifier = new ThothSubjectClassifier(fn ($code) => $code === 'ABA', null, $httpClient);
+        $classifier = new ThothSubjectClassifier(
+            fn ($code) => $code === 'ABA',
+            null,
+            __DIR__ . '/missing-thema-codes.json'
+        );
 
         $this->assertSame([
             'subjectType' => SubjectType::KEYWORD,
