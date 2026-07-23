@@ -20,7 +20,9 @@ use ThothApi\GraphQL\Enums\SubjectType;
 use ThothApi\GraphQL\Inputs\PatchSubject as ThothSubject;
 
 import('lib.pkp.tests.PKPTestCase');
+import('classes.publication.Publication');
 import('plugins.generic.thoth.classes.repositories.ThothSubjectRepository');
+import('plugins.generic.thoth.classes.services.ThothSubjectClassifier');
 import('plugins.generic.thoth.classes.services.ThothSubjectService');
 
 class ThothSubjectServiceTest extends PKPTestCase
@@ -43,5 +45,94 @@ class ThothSubjectServiceTest extends PKPTestCase
         $thothSubjectId = $service->register($keyword, $sequence, $thothWorkId);
 
         $this->assertSame('ebad8694-0dbe-48cf-a704-5d7e1f54b63d', $thothSubjectId);
+    }
+
+    public function testRegisterByPublicationIncludesCodedSubjectsBeforeKeywords()
+    {
+        $registeredSubjects = [];
+        $repository = $this->getMockBuilder(ThothSubjectRepository::class)
+            ->setConstructorArgs([$this->createMock(ThothClient::class)])
+            ->setMethods(['add'])
+            ->getMock();
+        $repository->expects($this->exactly(2))
+            ->method('add')
+            ->willReturnCallback(function ($subject) use (&$registeredSubjects) {
+                $registeredSubjects[] = $subject->getAllData();
+                return 'subject-id';
+            });
+
+        $publication = $this->createMock(Publication::class);
+        $publication->method('getData')->willReturnMap([
+            ['thothBookId', null, 'work-id'],
+            ['locale', null, 'en_US'],
+            ['subjects', null, ['en_US' => ['10:EDU000000']]],
+            ['keywords', null, ['en_US' => ['Open access']]],
+        ]);
+
+        $service = new ThothSubjectService($repository);
+        $service->registerByPublication($publication);
+
+        $this->assertSame([
+            [
+                'workId' => 'work-id',
+                'subjectType' => SubjectType::BISAC,
+                'subjectCode' => 'EDU000000',
+                'subjectOrdinal' => 1,
+            ],
+            [
+                'workId' => 'work-id',
+                'subjectType' => SubjectType::KEYWORD,
+                'subjectCode' => 'Open access',
+                'subjectOrdinal' => 2,
+            ],
+        ], $registeredSubjects);
+    }
+
+    public function testSynchronizeReconcilesSubjectsAndKeywords()
+    {
+        $repository = $this->getMockBuilder(ThothSubjectRepository::class)
+            ->setConstructorArgs([$this->createMock(ThothClient::class)])
+            ->setMethods(['getByWorkId', 'add', 'edit', 'delete'])
+            ->getMock();
+        $repository->method('getByWorkId')->with('work-id')->willReturn([
+            [
+                'subjectId' => 'thema-id',
+                'workId' => 'work-id',
+                'subjectType' => SubjectType::THEMA,
+                'subjectCode' => 'MFGV',
+                'subjectOrdinal' => 2,
+            ],
+            [
+                'subjectId' => 'old-keyword-id',
+                'workId' => 'work-id',
+                'subjectType' => SubjectType::KEYWORD,
+                'subjectCode' => 'Old keyword',
+                'subjectOrdinal' => 1,
+            ],
+        ]);
+        $repository->expects($this->once())
+            ->method('edit')
+            ->with($this->callback(function ($subject) {
+                return $subject->getAllData() === [
+                    'workId' => 'work-id',
+                    'subjectType' => SubjectType::THEMA,
+                    'subjectCode' => 'MFGV',
+                    'subjectOrdinal' => 1,
+                    'subjectId' => 'thema-id',
+                ];
+            }));
+        $repository->expects($this->once())->method('add');
+        $repository->expects($this->once())->method('delete')->with('old-keyword-id');
+
+        $publication = $this->createMock(Publication::class);
+        $publication->method('getData')->willReturnMap([
+            ['locale', null, 'en_US'],
+            ['subjects', null, ['en_US' => ['MFGV']]],
+            ['keywords', null, ['en_US' => ['Open access']]],
+        ]);
+        $classifier = new ThothSubjectClassifier(fn ($code) => false, fn ($code) => $code === 'MFGV');
+        $service = new ThothSubjectService($repository, $classifier);
+
+        $service->synchronizeByPublication($publication, 'work-id');
     }
 }
