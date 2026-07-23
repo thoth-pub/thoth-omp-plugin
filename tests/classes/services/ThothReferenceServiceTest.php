@@ -18,11 +18,18 @@
 
 namespace APP\plugins\generic\thoth\tests\classes\services;
 
+require_once(__DIR__ . '/../../../vendor/autoload.php');
+
 use APP\plugins\generic\thoth\classes\repositories\ThothReferenceRepository;
 use APP\plugins\generic\thoth\classes\services\ThothReferenceService;
+use APP\publication\Publication;
+use Illuminate\Support\LazyCollection;
 use PKP\citation\Citation;
+use PKP\citation\CitationDAO;
+use PKP\db\DAORegistry;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
+use ThothApi\GraphQL\Inputs\PatchReference as ThothReference;
 
 class ThothReferenceServiceTest extends PKPTestCase
 {
@@ -52,5 +59,155 @@ class ThothReferenceServiceTest extends PKPTestCase
         $thothReferenceId = $service->register($mockCitation, $thothWorkId);
 
         $this->assertSame('d667cd9c-27a8-44f8-b976-a0e867c0f607', $thothReferenceId);
+    }
+
+    public function testSynchronizeByPublicationUsesOmpReferences(): void
+    {
+        $citation = new Citation('Roe, Richard. A reference. https://doi.org/10.1234/EXAMPLE.');
+        $citation->setSequence(1);
+        $citationDao = $this->createMock(CitationDAO::class);
+        $citationDao->expects($this->once())
+            ->method('getByPublicationId')
+            ->with(99)
+            ->willReturn(LazyCollection::make([$citation]));
+        DAORegistry::registerDAO('CitationDAO', $citationDao);
+
+        $publication = $this->createMock(Publication::class);
+        $publication->method('getId')->willReturn(99);
+        $repository = $this->createMock(ThothReferenceRepository::class);
+        $repository->method('new')->willReturnCallback(function ($data) {
+            return new ThothReference($data);
+        });
+        $repository->expects($this->once())
+            ->method('getByWorkId')
+            ->with('work-id')
+            ->willReturn([]);
+        $repository->expects($this->once())
+            ->method('add')
+            ->with($this->callback(function (ThothReference $reference): bool {
+                return $reference->getWorkId() === 'work-id'
+                    && $reference->getReferenceOrdinal() === 1
+                    && $reference->getDoi() === '10.1234/example'
+                    && $reference->getUnstructuredCitation()
+                        === 'Roe, Richard. A reference. https://doi.org/10.1234/EXAMPLE.';
+            }));
+
+        $service = new ThothReferenceService($repository);
+        $service->synchronizeByPublication($publication, 'work-id');
+    }
+
+    public function testUpdateReconcilesReferences(): void
+    {
+        $repository = $this->createMock(ThothReferenceRepository::class);
+        $repository->method('new')->willReturnCallback(function ($data) {
+            return new ThothReference($data);
+        });
+        $repository->expects($this->once())
+            ->method('edit')
+            ->with($this->callback(function (ThothReference $reference): bool {
+                return $reference->getReferenceId() === 'doi-reference-id'
+                    && $reference->getWorkId() === 'work-id'
+                    && $reference->getReferenceOrdinal() === 1
+                    && $reference->getDoi() === '10.1234/example'
+                    && $reference->getUnstructuredCitation() === 'Updated citation. doi:10.1234/example';
+            }));
+        $repository->expects($this->once())
+            ->method('add')
+            ->with($this->callback(function (ThothReference $reference): bool {
+                return $reference->getWorkId() === 'work-id'
+                    && $reference->getReferenceOrdinal() === 2
+                    && $reference->getUnstructuredCitation() === 'A new reference.';
+            }));
+        $repository->expects($this->once())
+            ->method('delete')
+            ->with('removed-reference-id');
+
+        $service = new ThothReferenceService($repository);
+        $service->update([
+            [
+                'referenceOrdinal' => 1,
+                'doi' => '10.1234/example',
+                'unstructuredCitation' => 'Updated citation. doi:10.1234/example',
+            ],
+            [
+                'referenceOrdinal' => 2,
+                'unstructuredCitation' => 'A new reference.',
+            ],
+        ], 'work-id', [
+            [
+                'referenceId' => 'doi-reference-id',
+                'referenceOrdinal' => 1,
+                'doi' => 'https://doi.org/10.1234/EXAMPLE',
+                'unstructuredCitation' => 'Previous citation. https://doi.org/10.1234/EXAMPLE',
+            ],
+            [
+                'referenceId' => 'removed-reference-id',
+                'referenceOrdinal' => 2,
+                'unstructuredCitation' => 'A removed reference.',
+            ],
+        ]);
+    }
+
+    public function testUpdateSkipsEquivalentNormalizedCitation(): void
+    {
+        $repository = $this->createMock(ThothReferenceRepository::class);
+        $repository->expects($this->never())->method('add');
+        $repository->expects($this->never())->method('edit');
+        $repository->expects($this->never())->method('delete');
+
+        $service = new ThothReferenceService($repository);
+        $service->update([
+            [
+                'referenceOrdinal' => 1,
+                'unstructuredCitation' => 'Roe,  Richard. A Book.',
+            ],
+        ], 'work-id', [
+            [
+                'referenceId' => 'reference-id',
+                'referenceOrdinal' => 1,
+                'doi' => '10.1234/remote-metadata',
+                'unstructuredCitation' => 'roe, richard. a book.',
+            ],
+        ]);
+    }
+
+    public function testUpdateReordersReferencesWithoutOrdinalCollisions(): void
+    {
+        $repository = $this->createMock(ThothReferenceRepository::class);
+        $repository->method('new')->willReturnCallback(function ($data) {
+            return new ThothReference($data);
+        });
+        $edits = [];
+        $repository->expects($this->exactly(4))
+            ->method('edit')
+            ->willReturnCallback(function (ThothReference $reference) use (&$edits): void {
+                $edits[] = [$reference->getReferenceId(), $reference->getReferenceOrdinal()];
+            });
+        $repository->expects($this->never())->method('add');
+        $repository->expects($this->never())->method('delete');
+
+        $service = new ThothReferenceService($repository);
+        $service->update([
+            ['referenceOrdinal' => 1, 'unstructuredCitation' => 'Reference B.'],
+            ['referenceOrdinal' => 2, 'unstructuredCitation' => 'Reference A.'],
+        ], 'work-id', [
+            [
+                'referenceId' => 'reference-a-id',
+                'referenceOrdinal' => 1,
+                'unstructuredCitation' => 'Reference A.',
+            ],
+            [
+                'referenceId' => 'reference-b-id',
+                'referenceOrdinal' => 2,
+                'unstructuredCitation' => 'Reference B.',
+            ],
+        ]);
+
+        $this->assertSame([
+            ['reference-b-id', 3],
+            ['reference-a-id', 4],
+            ['reference-b-id', 1],
+            ['reference-a-id', 2],
+        ], $edits);
     }
 }

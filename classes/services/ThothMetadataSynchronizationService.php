@@ -23,19 +23,22 @@ class ThothMetadataSynchronizationService
     private ThothPublicationService $publicationService;
     private ThothLanguageService $languageService;
     private ThothSubjectService $subjectService;
+    private ThothReferenceService $referenceService;
 
     public function __construct(
         ThothBookService $bookService,
         ThothContributionService $contributionService,
         ThothPublicationService $publicationService,
         ThothLanguageService $languageService,
-        ThothSubjectService $subjectService
+        ThothSubjectService $subjectService,
+        ThothReferenceService $referenceService
     ) {
         $this->bookService = $bookService;
         $this->contributionService = $contributionService;
         $this->publicationService = $publicationService;
         $this->languageService = $languageService;
         $this->subjectService = $subjectService;
+        $this->referenceService = $referenceService;
     }
 
     public function synchronize($publication, string $thothWorkId): array
@@ -51,6 +54,7 @@ class ThothMetadataSynchronizationService
         }
         $this->languageService->synchronizeByPublication($publication, $thothWorkId);
         $this->subjectService->synchronizeByPublication($publication, $thothWorkId);
+        $this->referenceService->synchronizeByPublication($publication, $thothWorkId);
         return $warnings;
     }
 }
