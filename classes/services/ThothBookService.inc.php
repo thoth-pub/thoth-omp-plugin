@@ -89,7 +89,7 @@ class ThothBookService
         return $thothBookId;
     }
 
-    public function update($publication, $thothBookId)
+    public function update($publication, $thothBookId, $includeTitlesAndAbstracts = false)
     {
         $oldThothBook = $this->repository->get($thothBookId);
         $newThothBook = $this->factory->createFromPublication($publication);
@@ -100,7 +100,9 @@ class ThothBookService
         ));
 
         $this->repository->edit($thothBook);
-        $this->updateMetadata($publication, $thothBookId, $oldThothBook);
+        if ($includeTitlesAndAbstracts) {
+            $this->updateTitlesAndAbstracts($publication, $thothBookId, $oldThothBook);
+        }
         if ($this->frontcoverService) {
             return $this->frontcoverService->sync($publication, $thothBookId);
         }
@@ -111,6 +113,25 @@ class ThothBookService
     private function getPatchWorkData($thothBook): array
     {
         return array_intersect_key($thothBook->toArray(), self::PATCH_WORK_FIELDS);
+    }
+
+    private function updateTitlesAndAbstracts($publication, $thothBookId, $oldThothBook)
+    {
+        $oldThothBookData = $oldThothBook->toArray();
+        $locale = $publication->getData('locale');
+
+        $this->titleService->updateByPublication(
+            $publication,
+            $thothBookId,
+            $oldThothBookData['titles'] ?? [],
+            $locale
+        );
+        $this->abstractService->updateByPublication(
+            $publication,
+            $thothBookId,
+            $oldThothBookData['abstracts'] ?? [],
+            $locale
+        );
     }
 
     public function validate($publication)
@@ -144,19 +165,4 @@ class ThothBookService
         return $errors;
     }
 
-    private function updateMetadata($publication, $thothBookId, $oldThothBook)
-    {
-        $this->titleService->updateByPublication(
-            $publication,
-            $thothBookId,
-            $oldThothBook->toArray()['titles'] ?? [],
-            $publication->getData('locale')
-        );
-        $this->abstractService->updateByPublication(
-            $publication,
-            $thothBookId,
-            $oldThothBook->toArray()['abstracts'] ?? [],
-            $publication->getData('locale')
-        );
-    }
 }

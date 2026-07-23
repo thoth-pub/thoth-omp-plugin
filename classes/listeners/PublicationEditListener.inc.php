@@ -19,6 +19,19 @@ import('plugins.generic.thoth.classes.facades.ThothService');
 
 class PublicationEditListener
 {
+    private const CATALOG_ENTRY_FIELDS = [
+        'datePublished',
+        'seriesId',
+        'seriesPosition',
+        'categoryIds',
+        'urlPath',
+        'coverImage',
+        'place',
+        'pageCount',
+        'imageCount',
+        'thothUploadFrontcover',
+    ];
+
     private $submissionService;
     private $bookService;
     private $notification;
@@ -34,6 +47,10 @@ class PublicationEditListener
     {
         $publication = $args[0];
         $params = $args[2];
+        if (!$this->isMetadataEdit($params)) {
+            return false;
+        }
+
         $request = $args[3];
         $submissionService = $this->submissionService ?: Services::get('submission');
         $submission = $submissionService->get($publication->getData('submissionId'));
@@ -46,7 +63,11 @@ class PublicationEditListener
         $bookService = $this->bookService ?: ThothService::book();
         $notification = $this->notification ?: new ThothNotification();
         try {
-            $warning = $bookService->update($publication, $thothBookId);
+            $warning = $bookService->update(
+                $publication,
+                $thothBookId,
+                $this->isTitleAbstractEdit($params)
+            );
             if (!$this->isDoiAssignment($params)) {
                 $notification->notifySuccess($request, $submission);
             }
@@ -62,6 +83,19 @@ class PublicationEditListener
 
     private function isDoiAssignment($params)
     {
+        unset($params['id']);
         return count($params) === 1 && array_key_exists('doiId', $params);
+    }
+
+    private function isTitleAbstractEdit($params)
+    {
+        return (bool) array_intersect(['prefix', 'title', 'subtitle', 'abstract'], array_keys($params));
+    }
+
+    private function isMetadataEdit($params)
+    {
+        return $this->isDoiAssignment($params)
+            || $this->isTitleAbstractEdit($params)
+            || (bool) array_intersect(self::CATALOG_ENTRY_FIELDS, array_keys($params));
     }
 }

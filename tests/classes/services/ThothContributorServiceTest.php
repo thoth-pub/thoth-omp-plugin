@@ -50,4 +50,32 @@ class ThothContributorServiceTest extends PKPTestCase
 
         $this->assertSame('1a1f6581-9c66-4292-9afc-176060dc3e8a', $thothContributorId);
     }
+
+    public function testUpdateContributor()
+    {
+        $thothContributor = new ThothContributor(['fullName' => 'Updated Name']);
+        $mockFactory = $this->getMockBuilder(ThothContributorFactory::class)
+            ->setMethods(['createFromAuthor'])
+            ->getMock();
+        $mockFactory->expects($this->once())
+            ->method('createFromAuthor')
+            ->willReturn($thothContributor);
+
+        $mockRepository = $this->getMockBuilder(ThothContributorRepository::class)
+            ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
+            ->setMethods(['edit'])
+            ->getMock();
+        $mockRepository->expects($this->once())
+            ->method('edit')
+            ->with($this->callback(function ($contributor) {
+                return $contributor->getContributorId() === 'contributor-id'
+                    && $contributor->getFullName() === 'Updated Name';
+            }))
+            ->willReturn('contributor-id');
+
+        $service = new ThothContributorService($mockFactory, $mockRepository);
+        $result = $service->update($this->getMockBuilder(Author::class)->getMock(), 'contributor-id');
+
+        $this->assertSame('contributor-id', $result);
+    }
 }

@@ -2,7 +2,7 @@
 
 # Thoth OMP Plugin
 
-[![Current Version](https://img.shields.io/badge/version-v0.3.0.0-blue)](https://github.com/thoth-pub/thoth-omp-plugin/releases)
+[![Current Version](https://img.shields.io/github/v/release/thoth-pub/thoth-omp-plugin?filter=v0.1.%2A&sort=semver&label=version&color=blue)](https://github.com/thoth-pub/thoth-omp-plugin/releases)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-green.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![OMP compatibility](https://img.shields.io/badge/OMP-3.3-blue)](https://pkp.sfu.ca/software/omp/)
 
@@ -12,7 +12,7 @@ Integrates [OMP (Open Monograph Press)](https://pkp.sfu.ca/software/omp/) with [
 
 This plugin is compatible with the following PKP applications:
 
-- OMP 3.3.0-x
+- OMP 3.3.0-x [![Latest plugin version](https://img.shields.io/github/v/release/thoth-pub/thoth-omp-plugin?filter=v0.1.%2A&sort=semver&label=plugin&color=blue)](https://github.com/thoth-pub/thoth-omp-plugin/releases)
 
 ## Requirements
 
@@ -26,7 +26,8 @@ This is required to store the Thoth personal access token encrypted in the OMP d
 
 ## Installation
 
-1. Download the latest version of the installation package (`thoth.tar.gz`) from the [Release page](https://github.com/thoth-pub/thoth-omp-plugin/releases).
+1. From the [Release page](https://github.com/thoth-pub/thoth-omp-plugin/releases), download the installation
+   package (`thoth.tar.gz`) that is compatible with your OMP version.
 
 2. Access the administration area of your OMP website through the Dashboard. Navigate to `Settings` > `Website` > `Plugins` > `Upload a new plugin`, and select the `thoth.tar.gz` file.
 
@@ -61,9 +62,20 @@ Register metadata for already-published monographs by using the 'Register' butto
 
 ### Updating Metadata
 
-Once a monograph is registered, metadata updates are **automatic**. Unpublish the monograph, edit the data, and the changes will be synchronized with Thoth upon republication.
+After registration, some changes to the book's catalog entry, titles, and abstracts are sent to Thoth automatically
+when they are saved.
 
-It is also possible to manually update the metadata in Thoth by clicking the 'Update Metadata' button next to the publication status.
+To reconcile the complete record, click **Update Metadata** next to the publication status. This action synchronizes
+the book and its chapters, including contributors, publication formats and links, language, subjects, keywords,
+references, and chapter order.
+
+OMP is the source for the metadata managed by this synchronization. Information added or changed in OMP is reflected
+in Thoth, and information removed from OMP is also removed from Thoth when possible. Locations managed by Thoth
+itself are preserved.
+
+If the plugin cannot safely identify the corresponding record in Thoth, it stops the synchronization instead of
+making an uncertain association. A warning may also be shown when a publication format cannot be removed from an
+active work in Thoth.
 
 ### Accessing Thoth Book Records
 
@@ -174,8 +186,28 @@ On the Thoth management page, you can submit a selection of titles from OMP into
 |                   |                    |   |                        | Location            |             |
 |                   | RemoteUrl/FileUrl  |   |                        |                     | FullTextUrl |
 | SubmissionUrl     |                    |   |                        |                     | LandingPage |
+| Subject           |                    |   | Subject(Type: detected scheme or Keyword) |         |             |
 | Keyword           |                    |   | Subject(Type: Keyword) |                     |             |
 | Citation          |                    |   | Reference              |                     |             |
+
+### Subjects and keywords
+
+OMP offers two complementary ways to describe a publication:
+
+- **Keywords** are free terms that help readers discover the publication. Every keyword is sent to Thoth as a
+  keyword and is never treated as a custom classification.
+- **Subjects** can be descriptive terms or codes from recognized classification systems, such as LCC, BISAC, BIC,
+  and Thema. When the classification can be confirmed, Thoth records the subject using the corresponding system.
+- When a subject cannot be confidently associated with a classification system, it is kept as a keyword instead
+  of being discarded or assigned an uncertain classification.
+- Subjects associated with another clearly identified vocabulary are recorded as a custom classification.
+
+To make the Subjects field available, go to **Settings > Workflow > Submission > Metadata**, select **Enable
+subject metadata**, and save the changes. In the same settings, choose whether the field should be available only
+to the editorial team, requested from authors, or required during submission.
+
+Editors can enter the code alone, such as `GTK` or `EDU000000`. They can also identify the classification system
+with a prefix, such as `THEMA:GTK` or `BISAC:EDU000000`.
 
 </details>
 

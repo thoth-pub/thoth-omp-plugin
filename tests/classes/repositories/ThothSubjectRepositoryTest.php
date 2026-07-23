@@ -18,6 +18,8 @@ require_once(__DIR__ . '/../../../vendor/autoload.php');
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Enums\SubjectType;
 use ThothApi\GraphQL\Inputs\PatchSubject as ThothSubject;
+use ThothApi\GraphQL\Schemas\Subject as ThothSubjectSchema;
+use ThothApi\GraphQL\Schemas\Work as ThothWork;
 
 import('lib.pkp.tests.PKPTestCase');
 import('plugins.generic.thoth.classes.repositories.ThothSubjectRepository');
@@ -64,6 +66,43 @@ class ThothSubjectRepositoryTest extends PKPTestCase
         $thothSubject = $repository->get('7250f980-3a2b-4922-b2a9-559c946ffc29');
 
         $this->assertEquals($expectedThothSubject, $thothSubject);
+    }
+
+    public function testGetSubjectsByWorkId()
+    {
+        $expectedSubjects = [
+            new ThothSubjectSchema([
+                'subjectId' => '7250f980-3a2b-4922-b2a9-559c946ffc29',
+                'workId' => '114b96c3-6a51-45e6-a18a-f925128cb597',
+                'subjectType' => SubjectType::THEMA,
+                'subjectCode' => 'MFGV',
+                'subjectOrdinal' => 1,
+            ]),
+        ];
+        $expectedThothWork = new ThothWork(['subjects' => $expectedSubjects]);
+        $mockThothClient = $this->getMockBuilder(ThothClient::class)
+            ->disableOriginalConstructor()
+            ->addMethods(['work'])
+            ->getMock();
+        $mockThothClient->expects($this->once())
+            ->method('work')
+            ->with('114b96c3-6a51-45e6-a18a-f925128cb597', [
+                'subjects' => [
+                    'subjectId',
+                    'workId',
+                    'subjectType',
+                    'subjectCode',
+                    'subjectOrdinal',
+                ],
+            ])
+            ->willReturn($expectedThothWork);
+
+        $repository = new ThothSubjectRepository($mockThothClient);
+
+        $this->assertSame(
+            array_map(fn ($subject) => $subject->toArray(), $expectedSubjects),
+            $repository->getByWorkId('114b96c3-6a51-45e6-a18a-f925128cb597')
+        );
     }
 
     public function testAddSubject()
