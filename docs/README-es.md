@@ -2,7 +2,7 @@
 
 # Plugin Thoth OMP
 
-[![Versión Actual](https://img.shields.io/badge/versión-v0.3.0.0-blue)](https://github.com/thoth-pub/thoth-omp-plugin/releases)
+[![Versión Actual](https://img.shields.io/badge/versión-v0.2.13.2-blue)](https://github.com/thoth-pub/thoth-omp-plugin/releases)
 [![Licencia: GPL v3](https://img.shields.io/badge/Licencia-GPLv3-green.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Compatibilidad OMP](https://img.shields.io/badge/OMP-3.3_%7C_3.4-blue)](https://pkp.sfu.ca/software/omp/)
 
@@ -27,7 +27,8 @@ Esto es necesario para almacenar el token de acceso personal de Thoth cifrado en
 
 ## Instalación
 
-1. Descargue la última versión del paquete de instalación (`thoth.tar.gz`) desde la [página de lanzamientos](https://github.com/thoth-pub/thoth-omp-plugin/releases).
+1. En la [página de lanzamientos](https://github.com/thoth-pub/thoth-omp-plugin/releases), descargue el paquete de
+   instalación (`thoth.tar.gz`) compatible con su versión de OMP.
 
 2. Acceda al área de administración de su sitio OMP a través del Dashboard. Navegue a `Configuración` > `Sitio web` > `Plugins` > `Subir un nuevo plugin` y seleccione el archivo `thoth.tar.gz`.
 
@@ -62,9 +63,20 @@ Registre metadatos para monografías ya publicadas utilizando el botón 'Registr
 
 ### Actualización de Metadatos
 
-Una vez que una monografía está registrada, las actualizaciones de metadatos son **automáticas**. Despublique la monografía, edite los datos y los cambios se sincronizarán con Thoth al republicar.
+Después del registro, algunos cambios en la entrada de catálogo, los títulos y los resúmenes del libro se envían
+automáticamente a Thoth cuando se guardan.
 
-También es posible actualizar manualmente los metadatos en Thoth haciendo clic en el botón 'Actualizar metadatos' junto al estado de publicación.
+Para conciliar el registro completo, haga clic en **Actualizar metadatos** junto al estado de publicación. Esta
+acción sincroniza el libro y sus capítulos, incluidos los colaboradores, los formatos y enlaces de publicación,
+el idioma, los temas, las palabras clave, las referencias y el orden de los capítulos.
+
+OMP es la fuente de los metadatos administrados por esta sincronización. La información añadida o modificada en
+OMP se refleja en Thoth, y la información eliminada de OMP también se elimina de Thoth cuando es posible. Las
+ubicaciones administradas por la propia Thoth se conservan.
+
+Si el plugin no puede identificar con seguridad el registro correspondiente en Thoth, detiene la sincronización
+en lugar de crear una asociación incierta. También puede mostrarse una advertencia cuando un formato de
+publicación no puede eliminarse de una obra activa en Thoth.
 
 ### Acceso a Registros de Libros en Thoth
 
