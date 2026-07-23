@@ -23,6 +23,7 @@ use ThothApi\Exception\QueryException;
 
 import('plugins.generic.thoth.classes.facades.ThothService');
 import('plugins.generic.thoth.classes.facades.ThothRepo');
+import('plugins.generic.thoth.classes.exceptions.MetadataSynchronizationException');
 import('plugins.generic.thoth.classes.notification.ThothNotification');
 import('plugins.generic.thoth.classes.services.ThothMeCacheService');
 
@@ -45,6 +46,17 @@ class ThothEndpoint
             'roles' => [
                 Role::ROLE_ID_SITE_ADMIN,
                 Role::ROLE_ID_MANAGER,
+            ],
+        ];
+
+        $endpoints['PUT'][] = [
+            'pattern' => "{$rootPattern}/{submissionId:\d+}/publications/{publicationId:\d+}/synchronize",
+            'handler' => [$this, 'synchronize'],
+            'roles' => [
+                Role::ROLE_ID_SITE_ADMIN,
+                Role::ROLE_ID_MANAGER,
+                Role::ROLE_ID_SUB_EDITOR,
+                Role::ROLE_ID_ASSISTANT,
             ],
         ];
 
@@ -212,6 +224,45 @@ class ThothEndpoint
         }
     }
 
+    public function synchronize($slimRequest, $response, $args)
+    {
+        $request = Application::get()->getRequest();
+        $context = $request->getContext();
+        $submission = Repo::submission()->get((int) $args['submissionId']);
+        $publication = Repo::publication()->get((int) $args['publicationId']);
+
+        if (
+            !$submission
+            || !$publication
+            || (int) $publication->getData('submissionId') !== (int) $submission->getId()
+        ) {
+            return $response->withStatus(404)->withJsonError('api.404.resourceNotFound');
+        }
+
+        if (!$this->isSubmissionInContext($submission, $context)) {
+            return $response->withStatus(403)->withJsonError('api.submissions.403.contextRequired');
+        }
+
+        $thothWorkId = $submission->getData('thothWorkId');
+        if (!$thothWorkId) {
+            return $response->withStatus(403)->withJsonError('plugins.generic.thoth.status.unregistered');
+        }
+
+        try {
+            $warning = ThothService::metadataSynchronization()->synchronize($publication, $thothWorkId);
+            $this->handleNotification($request, $submission, true, false, null, $warning);
+        } catch (MetadataSynchronizationException $exception) {
+            return $response->withStatus(409)->withJsonError(
+                'plugins.generic.thoth.synchronize.ambiguousMetadata'
+            );
+        } catch (QueryException $exception) {
+            $this->handleNotification($request, $submission, false, false, $exception);
+            return $response->withStatus(500)->withJsonError('plugins.generic.thoth.connectionError');
+        }
+
+        return $response->withJson(['status' => true], 200);
+    }
+
     protected function isSubmissionInContext($submission, $context)
     {
         return $submission
@@ -243,8 +294,8 @@ class ThothEndpoint
         $success
             ? $thothNotification->notifySuccess($request, $submission)
             : $thothNotification->notifyError($request, $submission, $errorMessage);
-        if ($warning) {
-            $thothNotification->notifyWarning($request, $submission, $warning);
+        foreach ((array) $warning as $warningMessage) {
+            $thothNotification->notifyWarning($request, $submission, $warningMessage);
         }
     }
 }
