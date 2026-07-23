@@ -175,8 +175,13 @@ On the Thoth management page, you can submit a selection of titles from OMP into
 |                   |                    |   |                        | Location            |             |
 |                   | RemoteUrl/FileUrl  |   |                        |                     | FullTextUrl |
 | SubmissionUrl     |                    |   |                        |                     | LandingPage |
+| Subject           |                    |   | Subject(Type: detected scheme or Keyword) |         |             |
 | Keyword           |                    |   | Subject(Type: Keyword) |                     |             |
 | Citation          |                    |   | Reference              |                     |             |
+
+OMP subjects are validated as LCC, BISAC, BIC, or Thema when they include a supported ONIX List 27 scheme
+identifier (`03`, `10`, `12`, or `93`) or an equivalent prefix. Values that cannot be confirmed or that match
+more than one scheme are synchronized as `Keyword`.
 
 </details>
 

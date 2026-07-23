@@ -128,6 +128,7 @@ class ThothServiceProvider implements ContainerProvider
             'contributionService',
             'publicationService',
             'languageService',
+            'subjectService',
         ]);
 
         $container->singletonClass('publicationService', ThothPublicationService::class, [

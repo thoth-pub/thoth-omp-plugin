@@ -179,8 +179,13 @@ En la página de gestión de Thoth, puede enviar en masa una selección de títu
 |                   |                    |   |                        | Location            |             |
 |                   | RemoteUrl/FileUrl  |   |                        |                     | FullTextUrl |
 | SubmissionUrl     |                    |   |                        |                     | LandingPage |
+| Subject           |                    |   | Subject(Type: esquema detectado o Keyword) |          |             |
 | Keyword           |                    |   | Subject(Type: Keyword) |                     |             |
 | Citation          |                    |   | Reference              |                     |             |
+
+Los temas de OMP se validan como LCC, BISAC, BIC o Thema cuando incluyen un identificador de esquema compatible
+de la Lista 27 de ONIX (`03`, `10`, `12` o `93`) o un prefijo equivalente. Los valores que no se pueden confirmar
+o que corresponden a más de un esquema se sincronizan como `Keyword`.
 
 </details>
 
