@@ -197,8 +197,12 @@ OMP ofrece dos formas complementarias de describir una publicación:
 - Los temas asociados con otro vocabulario claramente identificado se registran como una clasificación
   personalizada.
 
-El editor puede identificar una clasificación directamente en el campo de temas mediante un prefijo, por ejemplo
-`THEMA:MFGV` o `BISAC:EDU000000`.
+Para habilitar el campo **Asuntos**, vaya a **Ajustes > Flujo de trabajo > Envío > Metadatos**, seleccione
+**Habilitar los metadatos de materia** y guarde los cambios. En la misma configuración, elija si el campo estará
+disponible solo para el equipo editorial, se solicitará a los autores o será obligatorio durante el envío.
+
+El editor puede introducir únicamente el código, como `GTK` o `EDU000000`. También puede identificar el sistema
+de clasificación mediante un prefijo, como `THEMA:GTK` o `BISAC:EDU000000`.
 
 </details>
 
