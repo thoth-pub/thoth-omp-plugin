@@ -1,6 +1,6 @@
 {
     "require": {
         "biblys/isbn": "~3.0",
-        "thoth-pub/thoth-client-php": "2.0.1"
+        "thoth-pub/thoth-client-php": "2.0.2"
     }
 }
