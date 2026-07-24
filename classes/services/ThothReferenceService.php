@@ -29,13 +29,9 @@ class ThothReferenceService
 
     public function register($citation, $thothWorkId)
     {
-        $thothReference = $this->repository->new([
-            'workId' => $thothWorkId,
-            'referenceOrdinal' => $citation->getSequence(),
-            'unstructuredCitation' => $citation->getRawCitation()
-        ]);
-
-        return $this->repository->add($thothReference);
+        return $this->repository->add(
+            $this->createReference($this->getCitationReference($citation), $thothWorkId)
+        );
     }
 
     public function registerByPublication($publication)
@@ -47,5 +43,228 @@ class ThothReferenceService
         foreach ($citations as $citation) {
             $this->register($citation, $thothBookId);
         }
+    }
+
+    public function synchronizeByPublication($publication, string $thothWorkId): void
+    {
+        $citations = DAORegistry::getDAO('CitationDAO')
+            ->getByPublicationId($publication->getId())
+            ->toArray();
+        $references = [];
+        foreach ($citations as $citation) {
+            $reference = $this->getCitationReference($citation);
+            if ($reference['unstructuredCitation'] !== '') {
+                $references[] = $reference;
+            }
+        }
+
+        $this->update($references, $thothWorkId, $this->repository->getByWorkId($thothWorkId));
+    }
+
+    public function update(array $references, string $thothWorkId, array $existingReferences): void
+    {
+        $remainingReferences = $existingReferences;
+        $matchedReferences = [];
+        $newReferences = [];
+
+        foreach ($references as $reference) {
+            $existingKey = $this->findMatchingReferenceKey($reference, $remainingReferences);
+            if ($existingKey === null) {
+                $newReferences[] = $reference;
+                continue;
+            }
+
+            $matchedReferences[] = [
+                'reference' => $reference,
+                'existingReference' => $remainingReferences[$existingKey],
+            ];
+            unset($remainingReferences[$existingKey]);
+        }
+
+        foreach ($remainingReferences as $existingReference) {
+            if (isset($existingReference['referenceId'])) {
+                $this->repository->delete($existingReference['referenceId']);
+            }
+        }
+
+        $hasOrdinalCollisions = $this->hasOrdinalCollisions($references, $matchedReferences);
+        $temporaryOrdinal = $this->getNextAvailableOrdinal($references, $existingReferences);
+        if ($hasOrdinalCollisions) {
+            foreach ($matchedReferences as $matchedReference) {
+                if ($this->referenceNeedsUpdate(
+                    $matchedReference['reference'],
+                    $matchedReference['existingReference']
+                )) {
+                    $this->editReference(
+                        $matchedReference['reference'],
+                        $matchedReference['existingReference'],
+                        $thothWorkId,
+                        $temporaryOrdinal++
+                    );
+                }
+            }
+        }
+
+        foreach ($newReferences as $reference) {
+            $this->repository->add($this->createReference($reference, $thothWorkId));
+        }
+
+        foreach ($matchedReferences as $matchedReference) {
+            if ($this->referenceNeedsUpdate(
+                $matchedReference['reference'],
+                $matchedReference['existingReference']
+            )) {
+                $this->editReference(
+                    $matchedReference['reference'],
+                    $matchedReference['existingReference'],
+                    $thothWorkId
+                );
+            }
+        }
+    }
+
+    private function createReference(array $reference, string $thothWorkId)
+    {
+        $data = [
+            'workId' => $thothWorkId,
+            'referenceOrdinal' => $reference['referenceOrdinal'],
+            'unstructuredCitation' => $reference['unstructuredCitation'],
+        ];
+        $doi = $this->getReferenceDoi($reference);
+        if ($doi !== null) {
+            $data['doi'] = 'https://doi.org/' . $doi;
+        }
+
+        return $this->repository->new($data);
+    }
+
+    private function getCitationReference($citation): array
+    {
+        return [
+            'referenceOrdinal' => (int) $citation->getSequence(),
+            'unstructuredCitation' => trim((string) $citation->getRawCitation()),
+        ];
+    }
+
+    private function editReference(
+        array $reference,
+        array $existingReference,
+        string $thothWorkId,
+        ?int $referenceOrdinal = null
+    ): void {
+        if ($referenceOrdinal !== null) {
+            $reference['referenceOrdinal'] = $referenceOrdinal;
+        }
+        $thothReference = $this->createReference($reference, $thothWorkId);
+        $thothReference->setReferenceId($existingReference['referenceId']);
+        $this->repository->edit($thothReference);
+    }
+
+    private function findMatchingReferenceKey(array $reference, array $existingReferences): ?int
+    {
+        $doi = $this->getReferenceDoi($reference);
+        if ($doi !== null) {
+            foreach ($existingReferences as $key => $existingReference) {
+                if ($this->getReferenceDoi($existingReference) === $doi) {
+                    return $key;
+                }
+            }
+        }
+
+        $citation = $this->normalizeCitation($reference['unstructuredCitation'] ?? '');
+        foreach ($existingReferences as $key => $existingReference) {
+            if ($this->normalizeCitation($existingReference['unstructuredCitation'] ?? '') === $citation) {
+                return $key;
+            }
+        }
+
+        return null;
+    }
+
+    private function referenceNeedsUpdate(array $reference, array $existingReference): bool
+    {
+        if ((int) ($existingReference['referenceOrdinal'] ?? 0) !== (int) $reference['referenceOrdinal']) {
+            return true;
+        }
+
+        if (
+            $this->normalizeCitation($existingReference['unstructuredCitation'] ?? '')
+            !== $this->normalizeCitation($reference['unstructuredCitation'] ?? '')
+        ) {
+            return true;
+        }
+
+        $doi = $this->getReferenceDoi($reference);
+        return $doi !== null && $doi !== $this->normalizeDoi($existingReference['doi'] ?? null);
+    }
+
+    private function hasOrdinalCollisions(array $references, array $matchedReferences): bool
+    {
+        $occupiedOrdinals = [];
+        $matchedReferenceIds = [];
+        foreach ($matchedReferences as $matchedReference) {
+            $reference = $matchedReference['reference'];
+            $existingReference = $matchedReference['existingReference'];
+            $occupiedOrdinals[$existingReference['referenceOrdinal']] = $existingReference['referenceId'];
+            $matchedReferenceIds[$reference['referenceOrdinal']] = $existingReference['referenceId'];
+        }
+
+        foreach ($references as $reference) {
+            $ordinal = $reference['referenceOrdinal'];
+            $occupyingReferenceId = $occupiedOrdinals[$ordinal] ?? null;
+            $matchedReferenceId = $matchedReferenceIds[$ordinal] ?? null;
+            if ($occupyingReferenceId !== null && $occupyingReferenceId !== $matchedReferenceId) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function getNextAvailableOrdinal(array $references, array $existingReferences): int
+    {
+        $highestOrdinal = 0;
+        foreach (array_merge($references, $existingReferences) as $reference) {
+            $highestOrdinal = max($highestOrdinal, (int) ($reference['referenceOrdinal'] ?? 0));
+        }
+
+        return $highestOrdinal + 1;
+    }
+
+    private function getReferenceDoi(array $reference): ?string
+    {
+        $doi = $this->normalizeDoi($reference['doi'] ?? null);
+        if ($doi !== null) {
+            return $doi;
+        }
+
+        $citation = (string) ($reference['unstructuredCitation'] ?? '');
+        if (!preg_match('~10\.\d{4,9}/[-._;()/:a-z0-9]+~i', $citation, $matches)) {
+            return null;
+        }
+
+        return $this->normalizeDoi($matches[0]);
+    }
+
+    private function normalizeDoi(?string $doi): ?string
+    {
+        $doi = trim((string) $doi);
+        if ($doi === '') {
+            return null;
+        }
+
+        $doi = preg_replace('~^(?:https?://(?:dx\.)?doi\.org/|doi:\s*)~i', '', $doi);
+        $doi = rtrim($doi, " \t\n\r\0\x0B.,;:");
+        while (substr($doi, -1) === ')' && substr_count($doi, '(') < substr_count($doi, ')')) {
+            $doi = substr($doi, 0, -1);
+        }
+
+        return $doi === '' ? null : strtolower($doi);
+    }
+
+    private function normalizeCitation(?string $citation): string
+    {
+        $citation = preg_replace('/\s+/u', ' ', trim((string) $citation));
+        return mb_strtolower($citation, 'UTF-8');
     }
 }

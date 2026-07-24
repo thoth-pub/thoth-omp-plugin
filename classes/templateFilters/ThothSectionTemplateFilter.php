@@ -41,11 +41,11 @@ class ThothSectionTemplateFilter
             null,
             ['submissionId' => '__submissionId__', 'publicationId' => '__publicationId__']
         );
-        $publicationUrl = $request->getDispatcher()->url(
+        $synchronizeUrl = $request->getDispatcher()->url(
             $request,
             ROUTE_API,
             $request->getContext()->getData('urlPath'),
-            'submissions/__submissionId__/publications/__publicationId__'
+            '_submissions/__submissionId__/publications/__publicationId__/synchronize'
         );
         $workStatusUrl = $request->getDispatcher()->url(
             $request,
@@ -63,7 +63,7 @@ class ThothSectionTemplateFilter
         $data = [
             'registerTitle' => $registerTitle,
             'registerUrl' => $registerUrl,
-            'publicationUrl' => $publicationUrl,
+            'synchronizeUrl' => $synchronizeUrl,
             'workStatusUrl' => $workStatusUrl,
             'featureVideoUrl' => $featureVideoUrl,
         ];

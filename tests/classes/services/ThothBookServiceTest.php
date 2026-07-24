@@ -121,6 +121,115 @@ class ThothBookServiceTest extends PKPTestCase
         $this->assertSame('d8fa2e63-5513-45e5-84c1-e9c2d89f99d3', $thothBookId);
     }
 
+    public function testUpdateOnlySynchronizesWorkMetadata(): void
+    {
+        $oldThothBook = new class () {
+            public function toArray(): array
+            {
+                return [
+                    'workId' => '9f65f147-1d9d-4dd1-9f78-89b58d088a2c',
+                ];
+            }
+        };
+        $newThothBook = new ThothWork([
+            'doi' => 'https://doi.org/10.12345/updated',
+        ]);
+
+        $mockFactory = $this->getMockBuilder(ThothBookFactory::class)
+            ->onlyMethods(['createFromPublication'])
+            ->getMock();
+        $mockFactory->expects($this->once())
+            ->method('createFromPublication')
+            ->willReturn($newThothBook);
+
+        $mockRepository = $this->getMockBuilder(ThothBookRepository::class)
+            ->setConstructorArgs([$this->createMock(ThothClient::class)])
+            ->onlyMethods(['get', 'new', 'edit'])
+            ->getMock();
+        $mockRepository->expects($this->once())
+            ->method('get')
+            ->with('9f65f147-1d9d-4dd1-9f78-89b58d088a2c')
+            ->willReturn($oldThothBook);
+        $mockRepository->expects($this->once())
+            ->method('new')
+            ->with([
+                'workId' => '9f65f147-1d9d-4dd1-9f78-89b58d088a2c',
+                'doi' => 'https://doi.org/10.12345/updated',
+            ])
+            ->willReturn($newThothBook);
+        $mockRepository->expects($this->once())
+            ->method('edit')
+            ->with($newThothBook);
+
+        $mockTitleService = $this->createMock(ThothTitleService::class);
+        $mockTitleService->expects($this->never())->method('updateByPublication');
+        $mockAbstractService = $this->createMock(ThothAbstractService::class);
+        $mockAbstractService->expects($this->never())->method('updateByPublication');
+        $mockFrontcoverService = $this->createMock(ThothFrontcoverService::class);
+        $mockFrontcoverService->expects($this->once())
+            ->method('sync')
+            ->willReturn(null);
+
+        $publication = $this->createMock(\APP\publication\Publication::class);
+        $service = new ThothBookService(
+            $mockFactory,
+            $mockRepository,
+            $this->createMock(ThothPublicationService::class),
+            $mockTitleService,
+            $mockAbstractService,
+            $mockFrontcoverService
+        );
+
+        $service->update($publication, '9f65f147-1d9d-4dd1-9f78-89b58d088a2c');
+    }
+
+    public function testUpdateIncludesTitlesAndAbstractsWhenRequested(): void
+    {
+        $oldThothBook = new class () {
+            public function toArray(): array
+            {
+                return [
+                    'workId' => 'work-id',
+                    'titles' => [['titleId' => 'title-id']],
+                    'abstracts' => [['abstractId' => 'abstract-id']],
+                ];
+            }
+        };
+        $newThothBook = new ThothWork();
+        $publication = $this->createMock(\APP\publication\Publication::class);
+        $publication->method('getData')
+            ->with('locale')
+            ->willReturn('en_US');
+
+        $mockFactory = $this->createMock(ThothBookFactory::class);
+        $mockFactory->method('createFromPublication')->willReturn($newThothBook);
+        $mockRepository = $this->getMockBuilder(ThothBookRepository::class)
+            ->setConstructorArgs([$this->createMock(ThothClient::class)])
+            ->onlyMethods(['get', 'new', 'edit'])
+            ->getMock();
+        $mockRepository->method('get')->willReturn($oldThothBook);
+        $mockRepository->method('new')->willReturn($newThothBook);
+
+        $mockTitleService = $this->createMock(ThothTitleService::class);
+        $mockTitleService->expects($this->once())
+            ->method('updateByPublication')
+            ->with($publication, 'work-id', [['titleId' => 'title-id']], 'en_US');
+        $mockAbstractService = $this->createMock(ThothAbstractService::class);
+        $mockAbstractService->expects($this->once())
+            ->method('updateByPublication')
+            ->with($publication, 'work-id', [['abstractId' => 'abstract-id']], 'en_US');
+
+        $service = new ThothBookService(
+            $mockFactory,
+            $mockRepository,
+            $this->createMock(ThothPublicationService::class),
+            $mockTitleService,
+            $mockAbstractService
+        );
+
+        $service->update($publication, 'work-id', true);
+    }
+
     public function testDoiExistsBookValidationFails()
     {
         $mockFactory = $this->getMockBuilder(ThothBookFactory::class)

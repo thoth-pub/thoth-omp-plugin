@@ -50,6 +50,43 @@ class ThothTitleServiceTest extends PKPTestCase
         ], 'en_US');
     }
 
+    public function testUpdateByPublicationIncludesPrefixInTitle(): void
+    {
+        $sentTitle = null;
+        $mockRepository = $this->getMockBuilder(ThothTitleRepository::class)
+            ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
+            ->onlyMethods(['add', 'edit', 'delete'])
+            ->getMock();
+        $mockRepository->expects($this->once())
+            ->method('add')
+            ->willReturnCallback(function ($title) use (&$sentTitle): void {
+                $sentTitle = $title;
+            });
+        $mockRepository->expects($this->never())->method('edit');
+        $mockRepository->expects($this->never())->method('delete');
+
+        $publication = new class () {
+            public function getData($key)
+            {
+                $values = [
+                    'locale' => 'en_US',
+                    'prefix' => ['en_US' => 'The'],
+                    'title' => ['en_US' => 'English title'],
+                    'subtitle' => ['en_US' => 'English subtitle'],
+                ];
+
+                return $values[$key] ?? null;
+            }
+        };
+
+        $service = new ThothTitleService(new ThothTitleFactory(), $mockRepository);
+        $service->updateByPublication($publication, 'work-id', [], 'en_US');
+
+        $this->assertSame('The English title', $sentTitle->getTitle());
+        $this->assertSame('English subtitle', $sentTitle->getSubtitle());
+        $this->assertSame('The English title: English subtitle', $sentTitle->getFullTitle());
+    }
+
     public function testDemotesExistingCanonicalTitleBeforePromotingAnotherTitle()
     {
         $editedTitles = [];

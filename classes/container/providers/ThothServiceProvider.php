@@ -41,6 +41,7 @@ use APP\plugins\generic\thoth\classes\services\ThothFrontcoverService;
 use APP\plugins\generic\thoth\classes\services\ThothLanguageService;
 use APP\plugins\generic\thoth\classes\services\ThothLocationService;
 use APP\plugins\generic\thoth\classes\services\ThothMeService;
+use APP\plugins\generic\thoth\classes\services\ThothMetadataSynchronizationService;
 use APP\plugins\generic\thoth\classes\services\ThothPublicationService;
 use APP\plugins\generic\thoth\classes\services\ThothReferenceService;
 use APP\plugins\generic\thoth\classes\services\ThothSubjectService;
@@ -142,6 +143,16 @@ class ThothServiceProvider implements ContainerProvider
 
         $container->singletonClass('meService', ThothMeService::class, [
             'meRepository',
+        ]);
+
+        $container->singletonClass('metadataSynchronizationService', ThothMetadataSynchronizationService::class, [
+            'bookService',
+            'contributionService',
+            'publicationService',
+            'languageService',
+            'subjectService',
+            'referenceService',
+            'workRelationService',
         ]);
 
         $container->singletonClass('publicationService', ThothPublicationService::class, [
