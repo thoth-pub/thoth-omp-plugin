@@ -17,6 +17,14 @@ use ThothApi\GraphQL\Inputs\PatchLanguage as ThothLanguage;
 
 class ThothLanguageRepository
 {
+    private const WORK_LANGUAGES_SELECTION = [
+        'languages' => [
+            'languageId',
+            'workId',
+            'languageCode',
+            'languageRelation',
+        ],
+    ];
     protected $thothClient;
 
     public function __construct($thothClient)
@@ -32,6 +40,15 @@ class ThothLanguageRepository
     public function get($thothLanguageId)
     {
         return $this->thothClient->language($thothLanguageId);
+    }
+
+    public function getByWorkId($thothWorkId)
+    {
+        $thothWork = $this->thothClient->work($thothWorkId, self::WORK_LANGUAGES_SELECTION);
+
+        return array_map(function ($language) {
+            return $language->toArray();
+        }, $thothWork->getLanguages() ?? []);
     }
 
     public function add($thothLanguage)

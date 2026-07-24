@@ -18,6 +18,8 @@ require_once(__DIR__ . '/../../../vendor/autoload.php');
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Enums\LanguageRelation;
 use ThothApi\GraphQL\Inputs\PatchLanguage as ThothLanguage;
+use ThothApi\GraphQL\Schemas\Language as ThothLanguageSchema;
+use ThothApi\GraphQL\Schemas\Work as ThothWork;
 
 import('lib.pkp.tests.PKPTestCase');
 import('plugins.generic.thoth.classes.repositories.ThothLanguageRepository');
@@ -57,6 +59,45 @@ class ThothLanguageRepositoryTest extends PKPTestCase
         $thothLanguage = $repository->get('8a3a7422-e5fb-4d2d-810d-513987735b4e');
 
         $this->assertEquals($expectedThothLanguage, $thothLanguage);
+    }
+
+    public function testGetLanguagesByWorkId()
+    {
+        $expectedLanguages = [
+            new ThothLanguageSchema([
+                'languageId' => '01ff14a6-da2d-466b-a49f-ec1061fce8da',
+                'workId' => 'fdd9321f-84e3-4d19-a914-24289e8aec09',
+                'languageCode' => 'ENG',
+                'languageRelation' => LanguageRelation::ORIGINAL,
+            ]),
+        ];
+        $expectedThothWork = new ThothWork(['languages' => $expectedLanguages]);
+        $mockThothClient = $this->getMockBuilder(ThothClient::class)
+            ->setMethods(['work'])
+            ->getMock();
+        $mockThothClient->expects($this->once())
+            ->method('work')
+            ->with(
+                'fdd9321f-84e3-4d19-a914-24289e8aec09',
+                [
+                    'languages' => [
+                        'languageId',
+                        'workId',
+                        'languageCode',
+                        'languageRelation',
+                    ],
+                ]
+            )
+            ->willReturn($expectedThothWork);
+
+        $repository = new ThothLanguageRepository($mockThothClient);
+
+        $this->assertSame(
+            array_map(function ($language) {
+                return $language->toArray();
+            }, $expectedLanguages),
+            $repository->getByWorkId('fdd9321f-84e3-4d19-a914-24289e8aec09')
+        );
     }
 
     public function testAddLanguage()

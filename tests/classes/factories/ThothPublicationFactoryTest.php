@@ -21,6 +21,7 @@ use ThothApi\GraphQL\Inputs\PatchPublication as ThothPublication;
 import('classes.publicationFormat.IdentificationCode');
 import('classes.publicationFormat.PublicationFormat');
 import('lib.pkp.classes.db.DAOResultFactory');
+import('lib.pkp.classes.submission.SubmissionFile');
 import('lib.pkp.tests.PKPTestCase');
 import('plugins.generic.thoth.classes.factories.ThothPublicationFactory');
 
@@ -88,6 +89,10 @@ class ThothPublicationFactoryTest extends PKPTestCase
         $this->assertEquals(new ThothPublication([
             'publicationType' => PublicationType::PDF,
             'isbn' => '978-3-16-148410-0',
+            'accessibilityStandard' => null,
+            'accessibilityAdditionalStandard' => null,
+            'accessibilityException' => null,
+            'accessibilityReportUrl' => null,
         ]), $thothPublication);
     }
 
@@ -96,30 +101,15 @@ class ThothPublicationFactoryTest extends PKPTestCase
         $this->setUpMockEnvironment('DA', 'Digital');
         $mockPubFormat = $this->mocks['publicationFormat'];
 
-        $mockSubmissionFile = new class () {
-            public function getOriginalFileName()
-            {
-                return 'book.docx';
-            }
-
-            public function getServerFileName()
-            {
-                return null;
-            }
-
-            public function getFileType()
-            {
-                return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-            }
-
-            public function getData($key)
-            {
-                return null;
-            }
-        };
+        $submissionFile = new SubmissionFile();
+        $submissionFile->setData('originalFileName', 'book.docx');
+        $submissionFile->setData(
+            'filetype',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        );
 
         $factory = new ThothPublicationFactory();
-        $thothPublication = $factory->createFromPublicationFormat($mockPubFormat, $mockSubmissionFile);
+        $thothPublication = $factory->createFromPublicationFormat($mockPubFormat, $submissionFile);
 
         $this->assertSame(PublicationType::DOCX, $thothPublication->getPublicationType());
     }

@@ -63,17 +63,17 @@ class ThothSectionTemplateFilter
             null,
             ['submissionId' => $submission->getId(), 'publicationId' => '__publicationId__']
         );
-        $publicationUrl = $request->getDispatcher()->url(
+        $synchronizeUrl = $request->getDispatcher()->url(
             $request,
             ROUTE_API,
             $request->getContext()->getData('urlPath'),
-            'submissions/' . $submission->getId() . '/publications/__publicationId__'
+            'submissions/' . $submission->getId() . '/publications/__publicationId__/synchronize'
         );
 
         $data = [
             'registerTitle' => $registerTitle,
             'registerUrl' => $registerUrl,
-            'publicationUrl' => $publicationUrl
+            'synchronizeUrl' => $synchronizeUrl
         ];
 
         $output = '$.pkp.plugins.generic = $.pkp.plugins.generic || {};';
