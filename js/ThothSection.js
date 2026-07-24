@@ -48,7 +48,7 @@
     $.pkp.plugins.generic.thothplugin.workflow.updateMetadata = function (publicationId) {
         $.pkp.plugins.generic.thothplugin.workflow.loading = true;
 
-        const url = $.pkp.plugins.generic.thothplugin.workflow.publicationUrl.replace(
+        const url = $.pkp.plugins.generic.thothplugin.workflow.synchronizeUrl.replace(
             '__publicationId__',
             publicationId
         );

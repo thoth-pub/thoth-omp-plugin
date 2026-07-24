@@ -182,26 +182,14 @@ class ThothBookServiceTest extends PKPTestCase
         $this->assertSame('d8fa2e63-5513-45e5-84c1-e9c2d89f99d3', $thothBookId);
     }
 
-    public function testUpdateBookIgnoresSchemaOnlyFields()
+    public function testUpdateOnlySynchronizesWorkMetadata()
     {
         $mockTitleService = $this->createMock(ThothTitleService::class);
-        $mockTitleService->expects($this->once())
-            ->method('updateByPublication')
-            ->with(
-                $this->isInstanceOf(Publication::class),
-                '9f65f147-1d9d-4dd1-9f78-89b58d088a2c',
-                [['titleId' => 'title-id']],
-                'en_US'
-            );
+        $mockTitleService->expects($this->never())
+            ->method('updateByPublication');
         $mockAbstractService = $this->createMock(ThothAbstractService::class);
-        $mockAbstractService->expects($this->once())
-            ->method('updateByPublication')
-            ->with(
-                $this->isInstanceOf(Publication::class),
-                '9f65f147-1d9d-4dd1-9f78-89b58d088a2c',
-                [['abstractId' => 'abstract-id']],
-                'en_US'
-            );
+        $mockAbstractService->expects($this->never())
+            ->method('updateByPublication');
         $oldThothBook = new class () {
             public function toArray()
             {
@@ -264,6 +252,55 @@ class ThothBookServiceTest extends PKPTestCase
             $mockAbstractService
         );
         $service->update($mockPublication, '9f65f147-1d9d-4dd1-9f78-89b58d088a2c');
+    }
+
+    public function testUpdateIncludesTitlesAndAbstractsWhenRequested()
+    {
+        $oldThothBook = new class () {
+            public function toArray()
+            {
+                return [
+                    'workId' => 'work-id',
+                    'titles' => [['titleId' => 'title-id']],
+                    'abstracts' => [['abstractId' => 'abstract-id']],
+                ];
+            }
+        };
+        $newThothBook = new ThothWork();
+        $publication = $this->getMockBuilder(Publication::class)
+            ->setMethods(['getData'])
+            ->getMock();
+        $publication->method('getData')->with('locale')->willReturn('en_US');
+
+        $mockFactory = $this->getMockBuilder(ThothBookFactory::class)
+            ->setMethods(['createFromPublication'])
+            ->getMock();
+        $mockFactory->method('createFromPublication')->willReturn($newThothBook);
+        $mockRepository = $this->getMockBuilder(ThothBookRepository::class)
+            ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
+            ->setMethods(['get', 'new', 'edit'])
+            ->getMock();
+        $mockRepository->method('get')->willReturn($oldThothBook);
+        $mockRepository->method('new')->willReturn($newThothBook);
+
+        $mockTitleService = $this->createMock(ThothTitleService::class);
+        $mockTitleService->expects($this->once())
+            ->method('updateByPublication')
+            ->with($publication, 'work-id', [['titleId' => 'title-id']], 'en_US');
+        $mockAbstractService = $this->createMock(ThothAbstractService::class);
+        $mockAbstractService->expects($this->once())
+            ->method('updateByPublication')
+            ->with($publication, 'work-id', [['abstractId' => 'abstract-id']], 'en_US');
+
+        $service = $this->createBookService(
+            $mockFactory,
+            $mockRepository,
+            null,
+            $mockTitleService,
+            $mockAbstractService
+        );
+
+        $service->update($publication, 'work-id', true);
     }
 
     public function testDoiExistsBookValidationFails()

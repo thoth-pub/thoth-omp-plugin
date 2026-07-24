@@ -308,3 +308,9 @@ msgstr "To delo že ima predstavljeni videoposnetek v Thothu."
 
 msgid "plugins.generic.thoth.frontcover.unsupportedFormat"
 msgstr "Naslovnica ni bila gostovana v Thothu, ker format datoteke ni podprt. Uporabite datoteko JPG ali JPEG."
+
+msgid "plugins.generic.thoth.synchronize.ambiguousMetadata"
+msgstr "Metapodatkov ni bilo mogoče sinhronizirati, ker se ujemajo z več kot enim zapisom v Thothu. Preglejte zapise v Thothu in poskusite znova."
+
+msgid "plugins.generic.thoth.synchronize.activeWorkPublicationDeletionsSkipped"
+msgstr "Nekatere publikacije niso bile odstranjene iz Thotha, ker je delo aktivno."

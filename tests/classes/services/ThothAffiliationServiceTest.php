@@ -19,6 +19,7 @@ require_once(__DIR__ . '/../../../vendor/autoload.php');
 
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
+use ThothApi\GraphQL\Inputs\PatchAffiliation as ThothAffiliation;
 use ThothApi\GraphQL\Inputs\PatchInstitution as ThothInstitution;
 
 import('plugins.generic.thoth.classes.container.ThothContainer');
@@ -65,5 +66,37 @@ class ThothAffiliationServiceTest extends PKPTestCase
         $thothAffiliationId = $service->register($rorId, $thothContributionId);
 
         $this->assertSame('43f98edb-ac8c-45b4-9faa-2941a05c133c', $thothAffiliationId);
+    }
+
+    public function testUpdateReconcilesAffiliation()
+    {
+        $mockInstitutionRepository = $this->getMockBuilder(ThothInstitutionRepository::class)
+            ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
+            ->setMethods(['find'])
+            ->getMock();
+        $mockInstitutionRepository->expects($this->once())
+            ->method('find')
+            ->with('https://ror.org/00101234')
+            ->willReturn(new ThothInstitution(['institutionId' => 'institution-id']));
+
+        $mockRepository = $this->getMockBuilder(ThothAffiliationRepository::class)
+            ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
+            ->setMethods(['edit', 'delete'])
+            ->getMock();
+        $mockRepository->expects($this->once())
+            ->method('edit')
+            ->with($this->callback(function (ThothAffiliation $affiliation) {
+                return $affiliation->getAffiliationId() === 'existing-affiliation-id'
+                    && $affiliation->getInstitutionId() === 'institution-id';
+            }));
+        $mockRepository->expects($this->once())
+            ->method('delete')
+            ->with('removed-affiliation-id');
+
+        $service = new ThothAffiliationService($mockRepository, $mockInstitutionRepository);
+        $service->update('https://ror.org/00101234', 'contribution-id', [
+            ['affiliationId' => 'existing-affiliation-id', 'institutionId' => 'institution-id'],
+            ['affiliationId' => 'removed-affiliation-id', 'institutionId' => 'removed-institution-id'],
+        ]);
     }
 }

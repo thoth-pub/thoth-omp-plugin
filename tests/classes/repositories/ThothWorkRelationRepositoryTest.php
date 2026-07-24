@@ -21,6 +21,7 @@ use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Enums\RelationType;
 use ThothApi\GraphQL\Inputs\PatchWorkRelation as ThothWorkRelation;
+use ThothApi\GraphQL\Schemas\Work as ThothWork;
 
 import('plugins.generic.thoth.classes.repositories.ThothWorkRelationRepository');
 
@@ -42,6 +43,35 @@ class ThothWorkRelationRepositoryTest extends PKPTestCase
 
         $this->assertInstanceOf(ThothWorkRelation::class, $thothWorkRelation);
         $this->assertSame($data, $thothWorkRelation->getAllData());
+    }
+
+    public function testGetChaptersByWorkId()
+    {
+        $expectedWork = new ThothWork([
+            'imprintId' => 'imprint-id',
+            'relations' => [],
+        ]);
+        $mockThothClient = $this->getMockBuilder(ThothClient::class)
+            ->setMethods(['work'])
+            ->getMock();
+        $mockThothClient->expects($this->once())
+            ->method('work')
+            ->with('book-id', $this->callback(function (array $selection) {
+                $chapterSelection = $selection['relations']['relatedWork'] ?? [];
+
+                return in_array('imprintId', $selection, true)
+                    && in_array('workRelationId', $selection['relations'], true)
+                    && in_array('doi', $chapterSelection, true)
+                    && isset($chapterSelection['titles'])
+                    && isset($chapterSelection['abstracts'])
+                    && isset($chapterSelection['contributions'])
+                    && isset($chapterSelection['publications']);
+            }))
+            ->willReturn($expectedWork);
+
+        $repository = new ThothWorkRelationRepository($mockThothClient);
+
+        $this->assertSame($expectedWork->toArray(), $repository->getByWorkId('book-id'));
     }
 
     public function testAddWorkRelation()

@@ -45,6 +45,11 @@ class ThothContributionService
     public function register($author, $seq, $thothWorkId, $primaryContactId = null)
     {
         $thothContribution = $this->factory->createFromAuthor($author, $seq, $primaryContactId);
+        return $this->registerContribution($author, $thothContribution, $thothWorkId);
+    }
+
+    private function registerContribution($author, $thothContribution, string $thothWorkId)
+    {
         $thothContribution->setWorkId($thothWorkId);
 
         $filter = empty($author->getOrcid()) ? $author->getFullName(false) : $author->getOrcid();
@@ -54,7 +59,11 @@ class ThothContributionService
             $thothContributorId = $this->contributorService->register($author);
             $thothContribution->setContributorId($thothContributorId);
         } else {
-            $thothContribution->setContributorId($thothContributor->getContributorId());
+            $thothContributorId = $thothContributor->getContributorId();
+            $thothContribution->setContributorId($thothContributorId);
+            if ($thothContributorId) {
+                $this->contributorService->update($author, $thothContributorId);
+            }
         }
 
         $thothContributionId = $this->repository->add($thothContribution);
@@ -69,11 +78,93 @@ class ThothContributionService
 
     public function registerByPublication($publication)
     {
+        $primaryContactId = $publication->getData('primaryContactId');
+        $authors = $this->getPublicationAuthors($publication, $primaryContactId);
+
+        $seq = 0;
+        $thothBookId = $publication->getData('thothBookId');
+        foreach ($authors as $author) {
+            $this->register($author, $seq, $thothBookId, $primaryContactId);
+            $seq++;
+        }
+    }
+
+    public function synchronizeByPublication($publication, string $thothWorkId): void
+    {
+        $this->updateByPublication($publication, $thothWorkId, $this->repository->getByWorkId($thothWorkId));
+    }
+
+    public function updateByPublication(
+        $publication,
+        string $thothWorkId,
+        array $existingContributions = []
+    ): void {
+        $primaryContactId = $publication->getData('primaryContactId');
+        $this->update(
+            $this->getPublicationAuthors($publication, $primaryContactId),
+            $thothWorkId,
+            $existingContributions,
+            $primaryContactId
+        );
+    }
+
+    public function update(
+        array $authors,
+        string $thothWorkId,
+        array $existingContributions,
+        $primaryContactId = null
+    ): void {
+        $remainingContributions = $existingContributions;
+
+        foreach (array_values($authors) as $seq => $author) {
+            $thothContribution = $this->factory->createFromAuthor($author, $seq, $primaryContactId);
+            $existingKey = $this->findMatchingContributionKey(
+                $author,
+                $thothContribution->getContributionType(),
+                $thothContribution->getContributionOrdinal(),
+                $remainingContributions
+            );
+            if ($existingKey === null) {
+                $this->registerContribution($author, $thothContribution, $thothWorkId);
+                continue;
+            }
+
+            $existingContribution = $remainingContributions[$existingKey];
+            $thothContribution->setWorkId($thothWorkId);
+            $thothContribution->setContributionId($existingContribution['contributionId']);
+            if ($contributorId = $this->getExistingContributorId($existingContribution)) {
+                $thothContribution->setContributorId($contributorId);
+                $this->contributorService->update($author, $contributorId);
+            }
+
+            $this->repository->edit($thothContribution);
+            $this->biographyService->updateByAuthor(
+                $author,
+                $existingContribution['contributionId'],
+                $existingContribution['biographies'] ?? [],
+                $author->getData('locale')
+            );
+            $this->affiliationService->update(
+                $author->getData('rorId'),
+                $existingContribution['contributionId'],
+                $existingContribution['affiliations'] ?? []
+            );
+            unset($remainingContributions[$existingKey]);
+        }
+
+        foreach ($remainingContributions as $existingContribution) {
+            if (isset($existingContribution['contributionId'])) {
+                $this->repository->delete($existingContribution['contributionId']);
+            }
+        }
+    }
+
+    private function getPublicationAuthors($publication, $primaryContactId): array
+    {
         $authors = Repo::author()->getCollector()
             ->filterByPublicationIds([$publication->getId()])
             ->getMany()
             ->toArray();
-        $primaryContactId = $publication->getData('primaryContactId');
 
         $chapterDao = DAORegistry::getDAO('ChapterDAO');
         $chapters = $chapterDao->getByPublicationId($publication->getId())->toArray();
@@ -88,16 +179,9 @@ class ThothContributionService
         }
         $chapterAuthorIds = array_unique($chapterAuthorIds);
 
-        $authors = array_filter($authors, function ($author) use ($chapterAuthorIds, $primaryContactId) {
+        return array_filter($authors, function ($author) use ($chapterAuthorIds, $primaryContactId) {
             return $author->getId() === $primaryContactId || !in_array($author->getId(), $chapterAuthorIds);
         });
-
-        $seq = 0;
-        $thothBookId = $publication->getData('thothBookId');
-        foreach ($authors as $author) {
-            $this->register($author, $seq, $thothBookId, $primaryContactId);
-            $seq++;
-        }
     }
 
     public function registerByChapter($chapter)
@@ -109,5 +193,77 @@ class ThothContributionService
             $this->register($author, $seq, $thothChapterId);
             $seq++;
         }
+    }
+
+    private function findMatchingContributionKey(
+        $author,
+        string $contributionType,
+        int $contributionOrdinal,
+        array $existingContributions
+    ): ?int {
+        foreach ($existingContributions as $key => $existingContribution) {
+            if (
+                ($existingContribution['contributionType'] ?? null) === $contributionType
+                && $this->isSameAuthor($author, $existingContribution)
+            ) {
+                return $key;
+            }
+        }
+
+        foreach ($existingContributions as $key => $existingContribution) {
+            if (
+                ($existingContribution['contributionType'] ?? null) === $contributionType
+                && ($existingContribution['contributionOrdinal'] ?? null) === $contributionOrdinal
+            ) {
+                return $key;
+            }
+        }
+
+        return null;
+    }
+
+    private function isSameAuthor($author, array $existingContribution): bool
+    {
+        $authorOrcid = $this->normalizeOrcid($author->getOrcid());
+        $existingOrcid = $this->normalizeOrcid($this->getExistingContributorData($existingContribution, 'orcid'));
+
+        if ($authorOrcid !== null && $existingOrcid !== null) {
+            return $authorOrcid === $existingOrcid;
+        }
+
+        return $this->normalizeName($author->getFullName(false)) === $this->normalizeName(
+            $this->getExistingFullName($existingContribution)
+        );
+    }
+
+    private function getExistingContributorId(array $existingContribution): ?string
+    {
+        return $existingContribution['contributorId']
+            ?? $this->getExistingContributorData($existingContribution, 'contributorId');
+    }
+
+    private function getExistingFullName(array $existingContribution): ?string
+    {
+        return $this->getExistingContributorData($existingContribution, 'fullName')
+            ?? ($existingContribution['fullName'] ?? null);
+    }
+
+    private function getExistingContributorData(array $existingContribution, string $key)
+    {
+        return $existingContribution['contributor'][$key] ?? null;
+    }
+
+    private function normalizeOrcid(?string $orcid): ?string
+    {
+        if (empty($orcid)) {
+            return null;
+        }
+
+        return strtolower(preg_replace('#^https?://(?:www\.)?orcid\.org/#i', '', trim($orcid)));
+    }
+
+    private function normalizeName(?string $name): string
+    {
+        return preg_replace('/\s+/', ' ', strtolower(trim((string) $name)));
     }
 }
