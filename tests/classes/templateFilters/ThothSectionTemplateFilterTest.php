@@ -50,6 +50,23 @@ class ThothSectionTemplateFilterTest extends PKPTestCase
             $templateManager->script
         );
     }
+
+    public function testProvidesUnlinkUrlToWorkflow(): void
+    {
+        $templateManager = new ThothWorkflowTemplateManagerStub();
+        $filter = new ThothSectionTemplateFilter();
+
+        $filter->addJavaScriptData(
+            new ThothWorkflowRequestStub(),
+            $templateManager,
+            'dashboard/editors.tpl'
+        );
+
+        $this->assertStringContainsString(
+            '"unlinkUrl":"api\/_submissions\/__submissionId__\/thothWork"',
+            $templateManager->script
+        );
+    }
 }
 
 class ThothWorkflowTemplateManagerStub

@@ -53,6 +53,12 @@ class ThothSectionTemplateFilter
             $request->getContext()->getData('urlPath'),
             '_submissions/__submissionId__/thothWorkStatus'
         );
+        $unlinkUrl = $request->getDispatcher()->url(
+            $request,
+            ROUTE_API,
+            $request->getContext()->getData('urlPath'),
+            '_submissions/__submissionId__/thothWork'
+        );
         $featureVideoUrl = $request->getDispatcher()->url(
             $request,
             ROUTE_API,
@@ -65,6 +71,7 @@ class ThothSectionTemplateFilter
             'registerUrl' => $registerUrl,
             'synchronizeUrl' => $synchronizeUrl,
             'workStatusUrl' => $workStatusUrl,
+            'unlinkUrl' => $unlinkUrl,
             'featureVideoUrl' => $featureVideoUrl,
         ];
 

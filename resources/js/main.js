@@ -56,6 +56,10 @@ pkp.registry.storeExtend('workflow', (piniaContext) => {
 
 			const workStatusUrl = (thothData.workStatusUrl || '')
 				.replace('__submissionId__', submission.id);
+			const unlinkUrl = (thothData.unlinkUrl || '').replace(
+				'__submissionId__',
+				submission.id,
+			);
 
 			const registerUrl = (thothData.registerUrl || '')
 				.replace('__submissionId__', submission.id);
@@ -70,6 +74,7 @@ pkp.registry.storeExtend('workflow', (piniaContext) => {
 						submission,
 						selectedPublicationId,
 						workStatusUrl,
+						unlinkUrl,
 						registerUrl,
 						synchronizeUrl,
 						registerTitle: thothData.registerTitle || '',

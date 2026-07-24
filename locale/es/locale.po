@@ -53,7 +53,7 @@ msgid "plugins.generic.thoth.field.mainContribution"
 msgstr "Colaboración Principal de Thoth"
 
 msgid "plugins.generic.thoth.field.mainContribution.label"
-msgstr "Identificar a este colaborador como colaboración principal en Thoth."
+msgstr "Identificar a este colaborador como colaboración principal en Thoth. Las colaboraciones principales se muestran en el campo “Contributor” del resumen de metadatos de Thoth."
 
 msgid "plugins.generic.thoth.workType"
 msgstr "Tipo de Trabajo"
@@ -83,6 +83,18 @@ msgstr "Registrado"
 
 msgid "plugins.generic.thoth.status.unregistered"
 msgstr "No Registrado"
+
+msgid "plugins.generic.thoth.status.notFound"
+msgstr "Obra no encontrada en Thoth"
+
+msgid "plugins.generic.thoth.unlink"
+msgstr "Desvincular"
+
+msgid "plugins.generic.thoth.unlink.confirm"
+msgstr "¿Está seguro de que desea continuar? Este envío se desvinculará de Thoth."
+
+msgid "plugins.generic.thoth.unlink.existingWork"
+msgstr "La obra no se puede desvincular porque todavía existe en Thoth."
 
 msgid "plugins.generic.thoth.register"
 msgstr "Registrar"

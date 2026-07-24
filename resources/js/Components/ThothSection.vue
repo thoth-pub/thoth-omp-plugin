@@ -10,17 +10,23 @@
 		/>
 		<span class="ms-1 text-lg-normal">{{ statusLabel }}</span>
 		<PkpButton
-			v-if="submission.thothWorkId"
+			v-if="actionVisibility.view"
 			is-link
-			element="a"
-			target="_blank"
-			rel="noopener noreferrer"
-			:href="thothWorkUrl"
+			@click="viewWork"
 		>
 			{{ t('common.view') }}
 		</PkpButton>
 		<PkpButton
-			v-if="submission.thothWorkId && !isPublished"
+			v-if="actionVisibility.unlink"
+			:disabled="isLoading"
+			is-link
+			@click="confirmUnlinkWork"
+		>
+			{{ t('plugins.generic.thoth.unlink') }}
+			<PkpSpinner v-if="isLoading" class="ms-1" />
+		</PkpButton>
+		<PkpButton
+			v-if="actionVisibility.update"
 			:disabled="isLoading"
 			is-link
 			@click="updateMetadata"
@@ -29,7 +35,7 @@
 			<PkpSpinner v-if="isLoading" class="ms-1" />
 		</PkpButton>
 		<PkpButton
-			v-else-if="!submission.thothWorkId"
+			v-if="actionVisibility.register"
 			is-link
 			@click="openRegister"
 		>
@@ -40,6 +46,8 @@
 
 <script setup>
 import {ref, computed, onMounted} from 'vue';
+import {getThothActionVisibility} from '../thothActionVisibility.mjs';
+import {openUnlinkWorkConfirmation} from '../unlinkWorkConfirmation.mjs';
 
 const {useLocalize} = pkp.modules.useLocalize;
 const {useModal} = pkp.modules.useModal;
@@ -51,17 +59,31 @@ const props = defineProps({
 	submission: {type: Object, required: true},
 	selectedPublicationId: {type: Number, required: true},
 	workStatusUrl: {type: String, required: true},
+	unlinkUrl: {type: String, required: true},
 	registerUrl: {type: String, required: true},
 	synchronizeUrl: {type: String, required: true},
 	registerTitle: {type: String, required: true},
 });
 
 const workStatus = ref(null);
+const statusRequestCompleted = ref(false);
 const fetchError = ref(false);
+const workNotFound = ref(false);
 const isLoading = ref(false);
 
 const isPublished = computed(
 	() => props.submission.status === pkp.const.STATUS_PUBLISHED,
+);
+
+const actionVisibility = computed(() =>
+	getThothActionVisibility({
+		hasWorkLink: Boolean(props.submission.thothWorkId),
+		workStatus: workStatus.value,
+		statusRequestCompleted: statusRequestCompleted.value,
+		workNotFound: workNotFound.value,
+		fetchError: fetchError.value,
+		isPublished: isPublished.value,
+	}),
 );
 
 const thothWorkUrl = computed(() => {
@@ -84,6 +106,9 @@ const workStatusLocaleMap = {
 const statusLabel = computed(() => {
 	if (!props.submission.thothWorkId) {
 		return t('plugins.generic.thoth.status.unregistered');
+	}
+	if (workNotFound.value) {
+		return t('plugins.generic.thoth.status.notFound');
 	}
 	if (fetchError.value) {
 		return t('common.error');
@@ -126,7 +151,9 @@ function fetchWorkStatus() {
 		return;
 	}
 
+	statusRequestCompleted.value = false;
 	fetchError.value = false;
+	workNotFound.value = false;
 
 	$.ajax({
 		method: 'GET',
@@ -137,8 +164,54 @@ function fetchWorkStatus() {
 		success(response) {
 			workStatus.value = response.workStatus;
 		},
-		error() {
-			fetchError.value = true;
+		error(response) {
+			workNotFound.value =
+				response.status === 404 &&
+				response.responseJSON?.workNotFound === true;
+			fetchError.value = !workNotFound.value;
+		},
+		complete() {
+			statusRequestCompleted.value = true;
+		},
+	});
+}
+
+function viewWork() {
+	window.open(thothWorkUrl.value, '_blank', 'noopener,noreferrer');
+}
+
+function confirmUnlinkWork() {
+	const {openDialog} = useModal();
+	openUnlinkWorkConfirmation({
+		openDialog,
+		title: t('plugins.generic.thoth.unlink'),
+		message: t('plugins.generic.thoth.unlink.confirm'),
+		cancelLabel: t('common.cancel'),
+		onConfirm: unlinkWork,
+	});
+}
+
+function unlinkWork() {
+	isLoading.value = true;
+
+	$.ajax({
+		method: 'POST',
+		url: props.unlinkUrl,
+		headers: {
+			'X-Csrf-Token': pkp.currentUser.csrfToken,
+			'X-Http-Method-Override': 'DELETE',
+		},
+		success: async function () {
+			await triggerDataChange();
+			isLoading.value = false;
+		},
+		error: function (response) {
+			const message =
+				response.responseJSON?.error ||
+				response.responseJSON?.errorMessage ||
+				t('plugins.generic.thoth.connectionError');
+			pkp.eventBus.$emit('notify', message, 'warning');
+			isLoading.value = false;
 		},
 	});
 }

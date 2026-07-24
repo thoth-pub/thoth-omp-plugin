@@ -23,6 +23,7 @@ use APP\plugins\generic\thoth\classes\exceptions\MetadataSynchronizationExceptio
 use APP\plugins\generic\thoth\classes\facades\ThothRepository;
 use APP\plugins\generic\thoth\classes\facades\ThothService;
 use APP\plugins\generic\thoth\classes\notification\ThothNotification;
+use APP\plugins\generic\thoth\classes\services\ThothWorkLinkService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request as IlluminateRequest;
 use Illuminate\Http\Response;
@@ -58,6 +59,20 @@ class ThothEndpoint implements HasAuthorizationPolicy
             '{submissionId}/thothWorkStatus',
             $this->getWorkStatus(...),
             'thoth.workStatus',
+            [
+                Role::ROLE_ID_SITE_ADMIN,
+                Role::ROLE_ID_MANAGER,
+                Role::ROLE_ID_SUB_EDITOR,
+                Role::ROLE_ID_ASSISTANT,
+            ],
+            $this
+        );
+
+        $apiHandler->addRoute(
+            'DELETE',
+            '{submissionId}/thothWork',
+            $this->unlinkWork(...),
+            'thoth.unlinkWork',
             [
                 Role::ROLE_ID_SITE_ADMIN,
                 Role::ROLE_ID_MANAGER,
@@ -247,9 +262,19 @@ class ThothEndpoint implements HasAuthorizationPolicy
         }
 
         try {
-            $thothWork = ThothRepository::work()->get($thothWorkId);
+            $workStatus = (new ThothWorkLinkService(ThothRepository::work()))->getStatus($thothWorkId);
+            if ($workStatus === null) {
+                return response()->json(
+                    [
+                        'error' => __('plugins.generic.thoth.status.notFound'),
+                        'workNotFound' => true,
+                    ],
+                    Response::HTTP_NOT_FOUND
+                );
+            }
+
             return response()->json(
-                ['workStatus' => $thothWork->getWorkStatus()],
+                ['workStatus' => $workStatus],
                 Response::HTTP_OK
             );
         } catch (\Exception $e) {
@@ -258,6 +283,46 @@ class ThothEndpoint implements HasAuthorizationPolicy
                 Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
+    }
+
+    public function unlinkWork(IlluminateRequest $illuminateRequest): JsonResponse
+    {
+        $submissionId = (int) $illuminateRequest->route('submissionId');
+        $submission = Repo::submission()->get($submissionId);
+
+        if (!$submission) {
+            return response()->json(
+                ['error' => __('api.404.resourceNotFound')],
+                Response::HTTP_NOT_FOUND
+            );
+        }
+
+        $thothWorkId = $submission->getData('thothWorkId');
+        if (!$thothWorkId) {
+            return response()->json(
+                ['error' => __('plugins.generic.thoth.status.unregistered')],
+                Response::HTTP_NOT_FOUND
+            );
+        }
+
+        try {
+            $workStatus = (new ThothWorkLinkService(ThothRepository::work()))->getStatus($thothWorkId);
+            if ($workStatus !== null) {
+                return response()->json(
+                    ['error' => __('plugins.generic.thoth.unlink.existingWork')],
+                    Response::HTTP_CONFLICT
+                );
+            }
+        } catch (\Exception $e) {
+            return response()->json(
+                ['error' => __('plugins.generic.thoth.connectionError')],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+
+        Repo::submission()->edit($submission, ['thothWorkId' => null]);
+
+        return response()->json(['status' => true], Response::HTTP_OK);
     }
 
     public function synchronize(IlluminateRequest $illuminateRequest): JsonResponse
@@ -345,15 +410,23 @@ class ThothEndpoint implements HasAuthorizationPolicy
             $context->getData('urlPath'),
             'temporaryFiles'
         );
-        $existingVideo = $submission->getData('thothWorkId')
-            ? ThothRepository::work()->getFeatureVideo($submission->getData('thothWorkId'))
-            : null;
-        $form = new FeatureVideoForm(
-            $featureVideoUrl,
-            $temporaryFilesUrl,
-            ThothService::me()->hasCdnWritePermission(),
-            (bool) $existingVideo
-        );
+        try {
+            $existingVideo = $submission->getData('thothWorkId')
+                ? ThothRepository::work()->getFeatureVideo($submission->getData('thothWorkId'))
+                : null;
+            $form = new FeatureVideoForm(
+                $featureVideoUrl,
+                $temporaryFilesUrl,
+                ThothService::me()->hasCdnWritePermission(),
+                (bool) $existingVideo
+            );
+        } catch (\Throwable $exception) {
+            error_log($exception->getMessage());
+            return response()->json(
+                ['error' => __('plugins.generic.thoth.connectionError')],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
 
         return response()->json($form->getConfig(), Response::HTTP_OK);
     }
