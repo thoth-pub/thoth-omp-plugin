@@ -50,7 +50,7 @@ msgid "plugins.generic.thoth.field.imageCount.label"
 msgstr "Image Count"
 
 msgid "plugins.generic.thoth.field.mainContribution.label"
-msgstr "Identify this contributor as main contribution in Thoth."
+msgstr "Identify this contributor as main contribution in Thoth. Main contributions are displayed in the “Contributor” field in the Thoth metadata summary."
 
 msgid "plugins.generic.thoth.workType"
 msgstr "Work Type"
@@ -80,6 +80,18 @@ msgstr "Registered"
 
 msgid "plugins.generic.thoth.status.unregistered"
 msgstr "Unregistered"
+
+msgid "plugins.generic.thoth.status.notFound"
+msgstr "Not found"
+
+msgid "plugins.generic.thoth.unlink"
+msgstr "Unlink"
+
+msgid "plugins.generic.thoth.unlink.confirm"
+msgstr "Are you sure you want to continue? This submission will be unlinked from Thoth."
+
+msgid "plugins.generic.thoth.unlink.existingWork"
+msgstr "The Work can not be unlinked because it still exists in Thoth."
 
 msgid "plugins.generic.thoth.register"
 msgstr "Register"
@@ -309,3 +321,24 @@ msgstr "The metadata could not be synchronized because more than one Thoth recor
 
 msgid "plugins.generic.thoth.synchronize.activeWorkPublicationDeletionsSkipped"
 msgstr "Some publications exist only in Thoth and were kept because publications cannot be deleted from an active work."
+
+msgid "plugins.generic.thoth.workStatus"
+msgstr "Thoth Status"
+
+msgid "plugins.generic.thoth.workStatus.active"
+msgstr "Active"
+
+msgid "plugins.generic.thoth.workStatus.forthcoming"
+msgstr "Forthcoming"
+
+msgid "plugins.generic.thoth.workStatus.withdrawn"
+msgstr "Withdrawn"
+
+msgid "plugins.generic.thoth.workStatus.superseded"
+msgstr "Superseded"
+
+msgid "plugins.generic.thoth.workStatus.postponedIndefinitely"
+msgstr "Postponed Indefinitely"
+
+msgid "plugins.generic.thoth.workStatus.cancelled"
+msgstr "Cancelled"

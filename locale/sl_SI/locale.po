@@ -61,7 +61,7 @@ msgid "plugins.generic.thoth.field.imageCount.label"
 msgstr "Število slik"
 
 msgid "plugins.generic.thoth.field.mainContribution.label"
-msgstr "Označite tega sodelavca kot glavnega sodelavca v Thothu."
+msgstr "Označite tega sodelavca kot glavnega sodelavca v Thothu. Glavni prispevki so prikazani v polju »Contributor« v povzetku metapodatkov v Thothu."
 
 msgid "plugins.generic.thoth.workType"
 msgstr "Vrsta dela"
@@ -89,6 +89,18 @@ msgstr "Registrirano"
 
 msgid "plugins.generic.thoth.status.unregistered"
 msgstr "Neregistrirano"
+
+msgid "plugins.generic.thoth.status.notFound"
+msgstr "Delo ni bilo najdeno v Thoth"
+
+msgid "plugins.generic.thoth.unlink"
+msgstr "Prekini povezavo"
+
+msgid "plugins.generic.thoth.unlink.confirm"
+msgstr "Ali ste prepričani, da želite nadaljevati? Povezava te oddaje s Thoth bo prekinjena."
+
+msgid "plugins.generic.thoth.unlink.existingWork"
+msgstr "Povezave z delom ni mogoče prekiniti, ker delo še vedno obstaja v Thoth."
 
 msgid "plugins.generic.thoth.register"
 msgstr "Registriraj"
@@ -311,3 +323,24 @@ msgstr "Metapodatkov ni bilo mogoče sinhronizirati, ker se ujemajo z več kot e
 
 msgid "plugins.generic.thoth.synchronize.activeWorkPublicationDeletionsSkipped"
 msgstr "Nekatere publikacije obstajajo samo v Thothu in so bile ohranjene, ker jih ni mogoče izbrisati iz aktivnega dela."
+
+msgid "plugins.generic.thoth.workStatus"
+msgstr "Stanje v Thothu"
+
+msgid "plugins.generic.thoth.workStatus.active"
+msgstr "Aktivno"
+
+msgid "plugins.generic.thoth.workStatus.forthcoming"
+msgstr "Prihajajoče"
+
+msgid "plugins.generic.thoth.workStatus.withdrawn"
+msgstr "Umaknjeno"
+
+msgid "plugins.generic.thoth.workStatus.superseded"
+msgstr "Nadomeščeno"
+
+msgid "plugins.generic.thoth.workStatus.postponedIndefinitely"
+msgstr "Odloženo za nedoločen čas"
+
+msgid "plugins.generic.thoth.workStatus.cancelled"
+msgstr "Preklicano"

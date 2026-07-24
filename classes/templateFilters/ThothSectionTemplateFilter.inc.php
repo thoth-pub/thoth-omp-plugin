@@ -69,11 +69,40 @@ class ThothSectionTemplateFilter
             $request->getContext()->getData('urlPath'),
             'submissions/' . $submission->getId() . '/publications/__publicationId__/synchronize'
         );
+        $workStatusUrl = $request->getDispatcher()->url(
+            $request,
+            ROUTE_API,
+            $request->getContext()->getData('urlPath'),
+            'submissions/' . $submission->getId() . '/thothWorkStatus'
+        );
+        $unlinkUrl = $request->getDispatcher()->url(
+            $request,
+            ROUTE_API,
+            $request->getContext()->getData('urlPath'),
+            'submissions/' . $submission->getId() . '/thothWork'
+        );
 
         $data = [
+            'hasLinkedWork' => (bool) $submission->getData('thothWorkId'),
             'registerTitle' => $registerTitle,
+            'unlinkTitle' => __('plugins.generic.thoth.unlink'),
+            'unlinkConfirm' => __('plugins.generic.thoth.unlink.confirm'),
+            'unlinkCancel' => __('common.cancel'),
+            'unlinkError' => __('plugins.generic.thoth.connectionError'),
             'registerUrl' => $registerUrl,
-            'synchronizeUrl' => $synchronizeUrl
+            'synchronizeUrl' => $synchronizeUrl,
+            'workStatusUrl' => $workStatusUrl,
+            'workStatusError' => __('common.error'),
+            'workStatusNotFound' => __('plugins.generic.thoth.status.notFound'),
+            'workStatusLabels' => [
+                'ACTIVE' => __('plugins.generic.thoth.workStatus.active'),
+                'FORTHCOMING' => __('plugins.generic.thoth.workStatus.forthcoming'),
+                'WITHDRAWN' => __('plugins.generic.thoth.workStatus.withdrawn'),
+                'SUPERSEDED' => __('plugins.generic.thoth.workStatus.superseded'),
+                'POSTPONED_INDEFINITELY' => __('plugins.generic.thoth.workStatus.postponedIndefinitely'),
+                'CANCELLED' => __('plugins.generic.thoth.workStatus.cancelled'),
+            ],
+            'unlinkUrl' => $unlinkUrl,
         ];
 
         $output = '$.pkp.plugins.generic = $.pkp.plugins.generic || {};';

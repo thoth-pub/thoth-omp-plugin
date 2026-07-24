@@ -11,6 +11,8 @@
 import('lib.pkp.tests.PKPTestCase');
 import('plugins.generic.thoth.classes.templateFilters.ThothFeatureVideoWorkflowTemplateFilter');
 
+use ThothApi\Exception\QueryException;
+
 class ThothFeatureVideoWorkflowTemplateFilterTest extends PKPTestCase
 {
     public function testAddsFeatureVideoTabAfterPublicationDates(): void
@@ -48,6 +50,36 @@ class ThothFeatureVideoWorkflowTemplateFilterTest extends PKPTestCase
         $this->assertSame('api/submissions/12/featureVideo', $form['action']);
     }
 
+    public function testKeepsWorkflowAvailableWhenFeatureVideoLookupFails(): void
+    {
+        $filter = new FeatureVideoLookupFailureWorkflowTemplateFilterStub();
+        $templateManager = new FeatureVideoWorkflowTemplateManagerStub();
+
+        $filter->addFormConfig(
+            new FeatureVideoWorkflowRequestStub(),
+            $templateManager,
+            'workflow/workflow.tpl'
+        );
+
+        $form = $templateManager->state['components']['featureVideo'];
+        $this->assertContains('video', array_column($form['fields'], 'name'));
+    }
+
+    public function testKeepsWorkflowAvailableWhenPermissionLookupFails(): void
+    {
+        $filter = new FeatureVideoPermissionFailureWorkflowTemplateFilterStub();
+        $templateManager = new FeatureVideoWorkflowTemplateManagerStub();
+
+        $filter->addFormConfig(
+            new FeatureVideoWorkflowRequestStub(),
+            $templateManager,
+            'workflow/workflow.tpl'
+        );
+
+        $form = $templateManager->state['components']['featureVideo'];
+        $this->assertSame(['permissionNotice'], array_column($form['fields'], 'name'));
+    }
+
     private function getTabIds(string $output): array
     {
         preg_match_all('/<tab id="([^"]+)"/', $output, $matches);
@@ -65,6 +97,38 @@ class FeatureVideoWorkflowTemplateFilterStub extends ThothFeatureVideoWorkflowTe
     protected function canUpload($request)
     {
         return true;
+    }
+}
+
+class FeatureVideoLookupFailureWorkflowTemplateFilterStub extends ThothFeatureVideoWorkflowTemplateFilter
+{
+    protected function hasExistingVideo($submission)
+    {
+        throw new QueryException(
+            ['message' => 'No record was found for the given ID.'],
+            null,
+            null,
+            null,
+            200
+        );
+    }
+
+    protected function canUpload($request)
+    {
+        return true;
+    }
+}
+
+class FeatureVideoPermissionFailureWorkflowTemplateFilterStub extends ThothFeatureVideoWorkflowTemplateFilter
+{
+    protected function hasExistingVideo($submission)
+    {
+        return false;
+    }
+
+    protected function canUpload($request)
+    {
+        throw new RuntimeException('Thoth is unavailable');
     }
 }
 

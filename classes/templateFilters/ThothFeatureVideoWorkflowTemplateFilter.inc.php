@@ -69,12 +69,21 @@ class ThothFeatureVideoWorkflowTemplateFilter
         $components[FeatureVideoForm::FORM_FEATURE_VIDEO] = (new FeatureVideoForm(
             $action,
             $temporaryFilesUrl,
-            $this->canUpload($request),
-            $this->hasExistingVideo($submission)
+            $this->canUploadSafely($request),
+            $this->hasExistingVideoSafely($submission)
         ))->getConfig();
         $templateMgr->setState(['components' => $components]);
 
         return false;
+    }
+
+    private function hasExistingVideoSafely($submission)
+    {
+        try {
+            return $this->hasExistingVideo($submission);
+        } catch (Throwable $exception) {
+            return false;
+        }
     }
 
     protected function hasExistingVideo($submission)
@@ -82,6 +91,15 @@ class ThothFeatureVideoWorkflowTemplateFilter
         return (bool) ($submission->getData('thothWorkId')
             ? ThothRepo::work()->getFeatureVideo($submission->getData('thothWorkId'))
             : null);
+    }
+
+    private function canUploadSafely($request)
+    {
+        try {
+            return $this->canUpload($request);
+        } catch (Throwable $exception) {
+            return false;
+        }
     }
 
     protected function canUpload($request)

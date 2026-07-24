@@ -20,6 +20,7 @@ import('plugins.generic.thoth.classes.facades.ThothRepo');
 import('plugins.generic.thoth.classes.exceptions.MetadataSynchronizationException');
 import('plugins.generic.thoth.classes.notification.ThothNotification');
 import('plugins.generic.thoth.classes.services.ThothMeCacheService');
+import('plugins.generic.thoth.classes.services.ThothWorkLinkService');
 
 class ThothEndpoint
 {
@@ -44,6 +45,28 @@ class ThothEndpoint
         );
 
         $handler->requiresSubmissionAccess[] = 'register';
+
+        array_unshift(
+            $endpoints['GET'],
+            [
+                'pattern' => $rootPattern . '/{submissionId}/thothWorkStatus',
+                'handler' => [$this, 'getWorkStatus'],
+                'roles' => [ROLE_ID_MANAGER, ROLE_ID_SUB_EDITOR, ROLE_ID_ASSISTANT],
+            ]
+        );
+
+        $handler->requiresSubmissionAccess[] = 'getWorkStatus';
+
+        array_unshift(
+            $endpoints['DELETE'],
+            [
+                'pattern' => $rootPattern . '/{submissionId}/thothWork',
+                'handler' => [$this, 'unlinkWork'],
+                'roles' => [ROLE_ID_MANAGER, ROLE_ID_SUB_EDITOR, ROLE_ID_ASSISTANT],
+            ]
+        );
+
+        $handler->requiresSubmissionAccess[] = 'unlinkWork';
 
         array_unshift(
             $endpoints['PUT'],
@@ -217,6 +240,65 @@ class ThothEndpoint
             error_log($exception->getMessage());
             return $response->withStatus(500)->withJsonError('plugins.generic.thoth.connectionError');
         }
+    }
+
+    public function getWorkStatus($slimRequest, $response, $args)
+    {
+        $request = Application::get()->getRequest();
+        $handler = $request->getRouter()->getHandler();
+        $submission = $handler->getAuthorizedContextObject(ASSOC_TYPE_SUBMISSION);
+
+        if (!$submission) {
+            return $response->withStatus(404)->withJsonError('api.404.resourceNotFound');
+        }
+
+        $thothWorkId = $submission->getData('thothWorkId');
+        if (!$thothWorkId) {
+            return $response->withStatus(404)->withJsonError('plugins.generic.thoth.status.unregistered');
+        }
+
+        try {
+            $workStatus = (new ThothWorkLinkService(ThothRepo::work()))->getStatus($thothWorkId);
+            if ($workStatus === null) {
+                return $response->withStatus(404)->withJson([
+                    'error' => __('plugins.generic.thoth.status.notFound'),
+                    'workNotFound' => true,
+                ]);
+            }
+
+            return $response->withJson(['workStatus' => $workStatus], 200);
+        } catch (QueryException $exception) {
+            return $response->withStatus(500)->withJsonError('plugins.generic.thoth.connectionError');
+        }
+    }
+
+    public function unlinkWork($slimRequest, $response, $args)
+    {
+        $request = Application::get()->getRequest();
+        $handler = $request->getRouter()->getHandler();
+        $submission = $handler->getAuthorizedContextObject(ASSOC_TYPE_SUBMISSION);
+
+        if (!$submission) {
+            return $response->withStatus(404)->withJsonError('api.404.resourceNotFound');
+        }
+
+        $thothWorkId = $submission->getData('thothWorkId');
+        if (!$thothWorkId) {
+            return $response->withStatus(404)->withJsonError('plugins.generic.thoth.status.unregistered');
+        }
+
+        try {
+            $workStatus = (new ThothWorkLinkService(ThothRepo::work()))->getStatus($thothWorkId);
+            if ($workStatus !== null) {
+                return $response->withStatus(409)->withJsonError('plugins.generic.thoth.unlink.existingWork');
+            }
+        } catch (QueryException $exception) {
+            return $response->withStatus(500)->withJsonError('plugins.generic.thoth.connectionError');
+        }
+
+        Services::get('submission')->edit($submission, ['thothWorkId' => null], $request);
+
+        return $response->withJson(['status' => true], 200);
     }
 
     public function synchronize($slimRequest, $response, $args)
