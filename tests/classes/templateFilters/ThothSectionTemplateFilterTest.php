@@ -20,6 +20,30 @@ class ThothSectionTemplateFilterTest extends PKPTestCase
             $templateManager->script
         );
     }
+
+    public function testProvidesWorkLinkUrlsToWorkflow(): void
+    {
+        $templateManager = new ThothSectionTemplateManagerStub();
+        $filter = new ThothSectionTemplateFilter();
+
+        $filter->addJavaScriptData(new ThothSectionRequestStub(), $templateManager, 'workflow/workflow.tpl');
+
+        $this->assertStringContainsString(
+            '"workStatusUrl":"api\/_submissions\/13\/thothWorkStatus"',
+            $templateManager->script
+        );
+        $this->assertStringContainsString(
+            '"unlinkUrl":"api\/_submissions\/13\/thothWork"',
+            $templateManager->script
+        );
+        $this->assertStringContainsString('"unlinkConfirm":', $templateManager->script);
+        $this->assertStringContainsString('"unlinkTitle":', $templateManager->script);
+        $this->assertStringContainsString('"unlinkCancel":', $templateManager->script);
+        $this->assertStringContainsString('"hasLinkedWork":true', $templateManager->script);
+        $this->assertStringContainsString('"workStatusLabels":{"ACTIVE":', $templateManager->script);
+        $this->assertStringContainsString('"workStatusNotFound":', $templateManager->script);
+        $this->assertStringContainsString('"workStatusError":', $templateManager->script);
+    }
 }
 
 class ThothSectionTemplateManagerStub
@@ -42,6 +66,11 @@ class ThothSectionSubmissionStub
     public function getId()
     {
         return 13;
+    }
+
+    public function getData($name)
+    {
+        return $name === 'thothWorkId' ? 'work-id' : null;
     }
 }
 

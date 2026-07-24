@@ -53,7 +53,7 @@ msgid "plugins.generic.thoth.field.mainContribution"
 msgstr "Colaboración Principal de Thoth"
 
 msgid "plugins.generic.thoth.field.mainContribution.label"
-msgstr "Identificar a este colaborador como colaboración principal en Thoth."
+msgstr "Identificar a este colaborador como colaboración principal en Thoth. Las colaboraciones principales se muestran en el campo “Contributor” del resumen de metadatos de Thoth."
 
 msgid "plugins.generic.thoth.workType"
 msgstr "Tipo de Trabajo"
@@ -83,6 +83,18 @@ msgstr "Registrado"
 
 msgid "plugins.generic.thoth.status.unregistered"
 msgstr "No Registrado"
+
+msgid "plugins.generic.thoth.status.notFound"
+msgstr "Obra no encontrada en Thoth"
+
+msgid "plugins.generic.thoth.unlink"
+msgstr "Desvincular"
+
+msgid "plugins.generic.thoth.unlink.confirm"
+msgstr "¿Está seguro de que desea continuar? Este envío se desvinculará de Thoth."
+
+msgid "plugins.generic.thoth.unlink.existingWork"
+msgstr "La obra no se puede desvincular porque todavía existe en Thoth."
 
 msgid "plugins.generic.thoth.register"
 msgstr "Registrar"
@@ -312,3 +324,24 @@ msgstr "Los metadatos no se pudieron sincronizar porque coinciden con más de un
 
 msgid "plugins.generic.thoth.synchronize.activeWorkPublicationDeletionsSkipped"
 msgstr "Algunas publicaciones no se eliminaron de Thoth porque la obra está activa."
+
+msgid "plugins.generic.thoth.workStatus"
+msgstr "Estado en Thoth"
+
+msgid "plugins.generic.thoth.workStatus.active"
+msgstr "Activo"
+
+msgid "plugins.generic.thoth.workStatus.forthcoming"
+msgstr "Próximamente"
+
+msgid "plugins.generic.thoth.workStatus.withdrawn"
+msgstr "Retirado"
+
+msgid "plugins.generic.thoth.workStatus.superseded"
+msgstr "Reemplazado"
+
+msgid "plugins.generic.thoth.workStatus.postponedIndefinitely"
+msgstr "Pospuesto Indefinidamente"
+
+msgid "plugins.generic.thoth.workStatus.cancelled"
+msgstr "Cancelado"

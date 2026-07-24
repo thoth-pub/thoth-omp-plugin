@@ -2,8 +2,42 @@
     margin: 0 1.5rem;
 }
 
+.pkpPublication__thoth a,
+.pkpPublication__thoth button {
+    padding: 0.5rem;
+}
+
 .pkpPublication__thoth a {
     text-decoration: none;
+}
+
+.thothWorkStatus__indicator {
+    border-radius: 50%;
+    display: inline-block;
+    height: 0.75rem;
+    margin-left: 0.25rem;
+    vertical-align: middle;
+    width: 0.75rem;
+}
+
+.thothWorkStatus__indicator--active {
+    background: #00b24e;
+}
+
+.thothWorkStatus__indicator--forthcoming {
+    background: #ded15d;
+}
+
+.thothWorkStatus__indicator--declined {
+    background: #d00a0a;
+}
+
+.thothWorkStatus__indicator--superseded {
+    background: #777;
+}
+
+.thothWorkStatus__indicator--postponed {
+    background: #e08914;
 }
 
 .pkp_linkaction_viewThothFiles {
