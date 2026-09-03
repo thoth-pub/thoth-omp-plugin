@@ -171,11 +171,9 @@ class ThothContributionService
 
         $chapterAuthorIds = [];
         foreach ($chapters as $chapter) {
-            $chapterAuthorIds = array_merge($chapterAuthorIds, (array) Repo::author()->getCollector()
-                ->filterByChapterId($chapter->getId())
-                ->filterByPublicationIds([$publication->getId()])
-                ->getIds()
-                ->toArray());
+            foreach ($chapter->getAuthors() as $author) {
+                $chapterAuthorIds[] = $author->getId();
+            }
         }
         $chapterAuthorIds = array_unique($chapterAuthorIds);
 

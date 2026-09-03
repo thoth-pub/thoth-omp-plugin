@@ -17,6 +17,7 @@ require_once(__DIR__ . '/../../../vendor/autoload.php');
  * @brief Test class for the ThothContributionService class
  */
 
+use PKP\db\DAORegistry;
 use PKP\tests\PKPTestCase;
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Enums\ContributionType;
@@ -33,6 +34,79 @@ import('plugins.generic.thoth.classes.services.ThothContributorService');
 
 class ThothContributionServiceTest extends PKPTestCase
 {
+    protected function getMockedDAOs(): array
+    {
+        return [...parent::getMockedDAOs(), 'ChapterDAO'];
+    }
+
+    protected function getMockedContainerKeys(): array
+    {
+        return [...parent::getMockedContainerKeys(), \APP\author\DAO::class];
+    }
+
+    public function testRegisterByPublicationExcludesChapterAuthorsOnOmp3407()
+    {
+        $publication = new \APP\publication\Publication();
+        $publication->setId(987654321);
+        $publication->setData('primaryContactId', 1);
+        $publication->setData('thothBookId', 'book-id');
+
+        $primaryAuthor = new \APP\author\Author();
+        $primaryAuthor->setId(1);
+        $chapterAuthor = new \APP\author\Author();
+        $chapterAuthor->setId(2);
+        $bookAuthor = new \APP\author\Author();
+        $bookAuthor->setId(3);
+
+        $chapter = new \APP\monograph\Chapter();
+        $chapter->setId(987654321);
+        $chapter->setData('publicationId', $publication->getId());
+
+        $chapters = $this->getMockBuilder(\PKP\db\DAOResultFactory::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['toArray'])
+            ->getMock();
+        $chapters->method('toArray')->willReturn([$chapter]);
+
+        $chapterDao = $this->getMockBuilder(\APP\monograph\ChapterDAO::class)
+            ->onlyMethods(['getByPublicationId'])
+            ->getMock();
+        $chapterDao->method('getByPublicationId')
+            ->with($publication->getId())
+            ->willReturn($chapters);
+        DAORegistry::registerDAO('ChapterDAO', $chapterDao);
+
+        $authorDao = $this->getMockBuilder(\APP\author\DAO::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getMany'])
+            ->getMock();
+        $authorDao->expects($this->exactly(2))
+            ->method('getMany')
+            ->willReturnOnConsecutiveCalls(
+                \Illuminate\Support\LazyCollection::make([$primaryAuthor, $chapterAuthor, $bookAuthor]),
+                \Illuminate\Support\LazyCollection::make([$chapterAuthor])
+            );
+        app()->instance(\APP\author\DAO::class, $authorDao);
+
+        $registered = [];
+        $service = $this->getMockBuilder(ThothContributionService::class)
+            ->setConstructorArgs([null, null, null, null, null, null])
+            ->onlyMethods(['register'])
+            ->getMock();
+        $service->expects($this->exactly(2))
+            ->method('register')
+            ->willReturnCallback(function ($author, $seq, $thothWorkId, $primaryContactId) use (&$registered) {
+                $registered[] = [$author->getId(), $seq, $thothWorkId, $primaryContactId];
+            });
+
+        $service->registerByPublication($publication);
+
+        $this->assertSame([
+            [1, 0, 'book-id', 1],
+            [3, 1, 'book-id', 1],
+        ], $registered);
+    }
+
     public function testRegisterContribution()
     {
         $mockBiographyService = $this->createMock(ThothBiographyService::class);
