@@ -27,6 +27,8 @@ import('plugins.generic.thoth.classes.facades.ThothService');
 import('plugins.generic.thoth.classes.facades.ThothRepo');
 import('plugins.generic.thoth.classes.services.ThothMeCacheService');
 
+require_once __DIR__ . '/../../classes/notification/ThothErrorFormatter.inc.php';
+
 class RegisterHandler extends Handler
 {
     public $submission;
@@ -105,8 +107,8 @@ class RegisterHandler extends Handler
                 ]);
             }
         } catch (Exception $e) {
-            error_log($e->getMessage());
-            $errors = [__('plugins.generic.thoth.connectionError')];
+            ThothErrorFormatter::log($e, ['action' => __METHOD__]);
+            $errors = [ThothErrorFormatter::message(__('plugins.generic.thoth.connectionError'), $e)];
         }
 
         $plugin->import('classes.components.forms.RegisterForm');
