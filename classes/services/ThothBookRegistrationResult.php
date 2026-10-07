@@ -18,14 +18,8 @@ namespace APP\plugins\generic\thoth\classes\services;
 
 class ThothBookRegistrationResult
 {
-    private string $workId;
-    private $bookToActivate;
-    private ?string $warning = null;
-
-    public function __construct(string $workId, $bookToActivate = null)
+    public function __construct(private string $workId, private array $warnings = [])
     {
-        $this->workId = $workId;
-        $this->bookToActivate = $bookToActivate;
     }
 
     public function getWorkId(): string
@@ -33,23 +27,8 @@ class ThothBookRegistrationResult
         return $this->workId;
     }
 
-    public function getBookToActivate()
+    public function getWarnings(): array
     {
-        return $this->bookToActivate;
-    }
-
-    public function shouldActivate(): bool
-    {
-        return $this->bookToActivate !== null;
-    }
-
-    public function setWarning(?string $warning): void
-    {
-        $this->warning = $warning;
-    }
-
-    public function getWarning(): ?string
-    {
-        return $this->warning;
+        return $this->warnings;
     }
 }

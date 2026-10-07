@@ -1,0 +1,51 @@
+# Keep the shared OMP job, rules, dependency validation and artifact contract.
+plugin_integration_tests_omp:
+  interruptible: true
+  extends: [.integration_tests_template, .thoth_environment]
+  image: !reference [.thoth_environment, image]
+  needs: [build_thoth_environment]
+  services:
+    - !reference [.thoth_environment, services]
+    - name: mysql:8.4@sha256:b3b90af2a6552ae30c266fdb7d5dd55f3afb72404bb78d37fe8a23eb857fd3fb
+      alias: omp-db
+      variables:
+        MYSQL_ROOT_PASSWORD: disposable-root-only
+        MYSQL_DATABASE: thoth_cypress
+        MYSQL_USER: omp
+        MYSQL_PASSWORD: disposable-omp-only
+        HEALTHCHECK_TCP_PORT: "3306"
+  script:
+    - python3 tests/environment/ci_probe.py
+    - install -d -m 700 /thoth-state
+    - install -m 600 "$THOTH_CLIENT_DIR/client.json" /thoth-state/client.json
+    - composer install --no-dev --no-interaction --prefer-dist --no-progress
+    - cp -r "$CI_PROJECT_DIR" /var/www/omp/plugins/generic/thoth
+    - cd /var/www/omp
+    - export CYPRESS_baseUrl=http://127.0.0.1:8001
+    - export CYPRESS_screenshotsFolder="$CI_PROJECT_DIR/cypress/screenshots"
+    - |
+      bash plugins/generic/thoth/tests/environment/cypress-entrypoint.sh prepare --image-dataset &
+      omp_pid=$!
+      trap 'kill "$omp_pid" 2>/dev/null || true' EXIT
+      ready=0
+      for attempt in $(seq 1 180); do
+        kill -0 "$omp_pid" || exit 1
+        if curl -fsS -o /dev/null http://127.0.0.1:8001/index.php/publicknowledge/en/login; then
+          ready=1
+          break
+        fi
+        sleep 1
+      done
+      test "$ready" = 1
+      bash plugins/generic/thoth/tests/environment/cypress-entrypoint.sh run
+      bash plugins/generic/thoth/tests/environment/cypress-entrypoint.sh run
+  after_script:
+    - cp /tmp/thoth-omp-server.log "$CI_PROJECT_DIR/integration_tests_php_error.log" 2>/dev/null || true
+    - cp -r /var/www/omp/cypress/logs "$CI_PROJECT_DIR/cypress/" 2>/dev/null || true
+    - rm -f /thoth-state/client.json
+    - !reference [.thoth_environment, after_script]
+
+# Only the plugin scenario is in scope, not OMP's full application suite.
+omp_integration_tests:
+  rules:
+    - when: never

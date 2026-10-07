@@ -1,5 +1,19 @@
 <?php
 
+/**
+ * @file plugins/generic/thoth/tests/classes/listeners/PublicationEditListenerTest.php
+ *
+ * Copyright (c) 2024-2026 Lepidus Tecnologia
+ * Copyright (c) 2024-2026 Thoth
+ * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ *
+ * @class PublicationEditListenerTest
+ *
+ * @ingroup plugins_generic_thoth_tests
+ *
+ * @brief Test class for the PublicationEditListener class
+ */
+
 namespace APP\plugins\generic\thoth\tests\classes\listeners;
 
 require_once(__DIR__ . '/../../../vendor/autoload.php');
@@ -119,11 +133,11 @@ class PublicationEditListenerTest extends PKPTestCase
                 $this->warning = $warning;
             }
 
-            public function update($publication, $workId, bool $includeTitlesAndAbstracts = false): ?string
+            public function update($publication, $workId, bool $includeTitlesAndAbstracts = false): array
             {
                 $this->updates++;
                 $this->includedTitlesAndAbstracts = $includeTitlesAndAbstracts;
-                return $this->warning;
+                return $this->warning === null ? [] : [$this->warning];
             }
         };
         $notification = new class () {
@@ -146,7 +160,7 @@ class PublicationEditListenerTest extends PKPTestCase
         };
 
         return [
-            new PublicationEditListener($submissionRepository, $bookService, $notification),
+            new PublicationEditListener($submissionRepository, fn () => $bookService, $notification),
             $bookService,
             $notification,
         ];

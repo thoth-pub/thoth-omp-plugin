@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @file plugins/generic/thoth/classes/listeners/PublicationEditListener.inc.php
+ * @file plugins/generic/thoth/classes/listeners/PublicationEditListener.php
  *
  * Copyright (c) 2024-2026 Lepidus Tecnologia
  * Copyright (c) 2024-2026 Thoth
@@ -16,9 +16,6 @@
 
 namespace APP\plugins\generic\thoth\classes\listeners;
 
-use APP\facades\Repo;
-use APP\plugins\generic\thoth\classes\facades\ThothService;
-use APP\plugins\generic\thoth\classes\notification\ThothNotification;
 use ThothApi\Exception\QueryException;
 
 class PublicationEditListener
@@ -37,10 +34,12 @@ class PublicationEditListener
     ];
 
     private $submissionRepository;
-    private $bookService;
+
+    private \Closure $bookService;
+
     private $notification;
 
-    public function __construct($submissionRepository = null, $bookService = null, $notification = null)
+    public function __construct($submissionRepository, \Closure $bookService, $notification)
     {
         $this->submissionRepository = $submissionRepository;
         $this->bookService = $bookService;
@@ -56,30 +55,27 @@ class PublicationEditListener
         }
 
         $request = $args[3];
-        $submissionRepository = $this->submissionRepository ?: Repo::submission();
-        $submission = $submissionRepository->get($publication->getData('submissionId'));
+        $submission = $this->submissionRepository->get($publication->getData('submissionId'));
 
         $thothBookId = $submission->getData('thothWorkId');
         if ($thothBookId === null) {
             return false;
         }
 
-        $bookService = $this->bookService ?: ThothService::book();
-        $notification = $this->notification ?: new ThothNotification();
         try {
-            $warning = $bookService->update(
+            $warnings = ($this->bookService)()->update(
                 $publication,
                 $thothBookId,
                 $this->isTitleAbstractEdit($params)
             );
             if (!$this->isDoiAssignment($params)) {
-                $notification->notifySuccess($request, $submission);
+                $this->notification->notifySuccess($request, $submission);
             }
-            if ($warning) {
-                $notification->notifyWarning($request, $submission, $warning);
+            foreach ($warnings as $warning) {
+                $this->notification->notifyWarning($request, $submission, $warning);
             }
         } catch (QueryException $e) {
-            $notification->notifyError($request, $submission, $e);
+            $this->notification->notifyError($request, $submission, $e);
         }
 
         return false;

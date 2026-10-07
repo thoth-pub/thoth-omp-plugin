@@ -11,8 +11,6 @@
  *
  * @ingroup plugins_generic_thoth_tests
  *
- * @see ThothAffiliationService
- *
  * @brief Test class for the ThothAffiliationService class
  */
 
@@ -35,12 +33,12 @@ class ThothAffiliationServiceTest extends PKPTestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->backup = ThothContainer::getInstance()->backup('institutionRepository');
+        $this->backup = ThothContainer::getInstance(0)->backup('institutionRepository');
     }
 
     protected function tearDown(): void
     {
-        ThothContainer::getInstance()->set('institutionRepository', $this->backup);
+        ThothContainer::getInstance(0)->set('institutionRepository', $this->backup);
         parent::tearDown();
     }
 

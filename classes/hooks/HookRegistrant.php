@@ -17,13 +17,11 @@
 namespace APP\plugins\generic\thoth\classes\hooks;
 
 use APP\core\Application;
-use APP\plugins\generic\thoth\classes\api\ThothEndpoint;
 use APP\plugins\generic\thoth\classes\components\forms\config\CatalogEntryFormConfig;
 use APP\plugins\generic\thoth\classes\components\forms\config\ContributorFormConfig;
 use APP\plugins\generic\thoth\classes\components\forms\config\PublishFormConfig;
+use APP\plugins\generic\thoth\classes\container\ThothContainer;
 use APP\plugins\generic\thoth\classes\gridModifier\PublicationFormatGridModifier;
-use APP\plugins\generic\thoth\classes\listeners\PublicationEditListener;
-use APP\plugins\generic\thoth\classes\listeners\PublicationPublishListener;
 use APP\plugins\generic\thoth\classes\notification\ThothNotification;
 use APP\plugins\generic\thoth\classes\schema\ThothSchema;
 use APP\plugins\generic\thoth\classes\services\ThothCatalogFilesCacheService;
@@ -85,17 +83,24 @@ class HookRegistrant
 
     private function registerListeners(): void
     {
-        $publicationPublishListener = new PublicationPublishListener();
-        Hook::add('Publication::validatePublish', $publicationPublishListener->validate(...));
-        Hook::add('Publication::publish', $publicationPublishListener->registerThothBook(...));
-
-        $publicationEditListener = new PublicationEditListener();
-        Hook::add('Publication::edit', $publicationEditListener->updateThothBook(...));
+        Hook::add('Publication::validatePublish', function ($hookName, $args) {
+            return ThothContainer::getInstance()->get('publicationPublishListener')->validate($hookName, $args);
+        });
+        Hook::add('Publication::publish', function ($hookName, $args) {
+            $contextId = (int) $args[2]->getData('contextId');
+            return ThothContainer::getInstance($contextId)->get('publicationPublishListener')
+                ->registerThothBook($hookName, $args);
+        });
+        Hook::add('Publication::edit', function ($hookName, $args) {
+            return ThothContainer::getInstance()->get('publicationEditListener')->updateThothBook($hookName, $args);
+        });
     }
 
     private function registerEndpoints(): void
     {
-        Hook::add('APIHandler::endpoints::_submissions', (new ThothEndpoint())->addEndpoints(...));
+        Hook::add('APIHandler::endpoints::_submissions', function ($hookName, $apiController, $apiHandler) {
+            return ThothContainer::getInstance()->get('endpoint')->addEndpoints($hookName, $apiController, $apiHandler);
+        });
     }
 
     private function registerTemplateHooks(): void

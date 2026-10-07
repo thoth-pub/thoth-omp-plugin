@@ -11,8 +11,6 @@
  *
  * @ingroup plugins_generic_thoth_tests
  *
- * @see ThothChapterService
- *
  * @brief Test class for the ThothChapterService class
  */
 
@@ -39,7 +37,7 @@ class ThothChapterServiceTest extends PKPTestCase
     public function setUp(): void
     {
         parent::setUp();
-        $container = ThothContainer::getInstance();
+        $container = ThothContainer::getInstance(0);
         $this->backups = [
             'client' => $container->backup('client'),
             'abstractService' => $container->backup('abstractService'),
@@ -51,7 +49,7 @@ class ThothChapterServiceTest extends PKPTestCase
 
     protected function tearDown(): void
     {
-        $container = ThothContainer::getInstance();
+        $container = ThothContainer::getInstance(0);
         foreach ($this->backups as $key => $factory) {
             $container->set($key, $factory);
         }
@@ -65,7 +63,7 @@ class ThothChapterServiceTest extends PKPTestCase
 
     public function testRegisterChapter()
     {
-        $container = ThothContainer::getInstance();
+        $container = ThothContainer::getInstance(0);
 
         $container->set('client', function () {
             return $this->getMockBuilder(ThothClient::class)->getMock();
@@ -147,7 +145,8 @@ class ThothChapterServiceTest extends PKPTestCase
             $mockContributionService,
             $mockPublicationService,
             $mockTitleService,
-            $mockAbstractService
+            $mockAbstractService,
+            $this->createMetadataSource()
         );
         $thothChapterId = $service->register($mockChapter, $thothImprintId);
 
@@ -228,7 +227,8 @@ class ThothChapterServiceTest extends PKPTestCase
             $contributionService,
             $publicationService,
             $titleService,
-            $abstractService
+            $abstractService,
+            $this->createMetadataSource()
         );
 
         $this->assertTrue($service->update($chapter, [
@@ -240,4 +240,11 @@ class ThothChapterServiceTest extends PKPTestCase
             'publications' => [['publicationId' => 'publication-id']],
         ], 'imprint-id'));
     }
+    private function createMetadataSource(): \APP\plugins\generic\thoth\classes\pkp\OmpMetadataSource
+    {
+        $source = $this->createMock(\APP\plugins\generic\thoth\classes\pkp\OmpMetadataSource::class);
+        $source->method('getPublication')->willReturnCallback(fn ($id) => \APP\facades\Repo::publication()->get($id));
+        return $source;
+    }
+
 }

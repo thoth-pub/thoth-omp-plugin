@@ -1,0 +1,6 @@
+*
+!Dockerfile
+!common.py
+!server.py
+!smoke.py
+!zitadel.py

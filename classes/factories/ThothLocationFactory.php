@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @file plugins/generic/thoth/classes/factories/ThothLocationFactory.inc.php
+ * @file plugins/generic/thoth/classes/factories/ThothLocationFactory.php
  *
  * Copyright (c) 2024-2026 Lepidus Tecnologia
  * Copyright (c) 2024-2026 Thoth
@@ -16,37 +16,15 @@
 
 namespace APP\plugins\generic\thoth\classes\factories;
 
-use APP\core\Application;
-use APP\facades\Repo;
 use ThothApi\GraphQL\Enums\LocationPlatform;
 use ThothApi\GraphQL\Inputs\PatchLocation as ThothLocation;
 
 class ThothLocationFactory
 {
-    public function createFromPublicationFormat($publicationFormat, $fileId = null)
+    public function create(array $context): ThothLocation
     {
-        $request = Application::get()->getRequest();
-        $publication = Repo::publication()->get($publicationFormat->getData('publicationId'));
-        $submission = Repo::submission()->get($publication->getData('submissionId'));
-        $context = Application::getContextDAO()->getById($submission->getData('contextId'));
-
-        $landingPage = $request->getDispatcher()->url(
-            $request,
-            ROUTE_PAGE,
-            $context->getPath(),
-            'catalog',
-            'book',
-            [$submission->getBestId()]
-        );
-        $fullTextUrl = $fileId ?
-            $request->getDispatcher()->url(
-                $request,
-                ROUTE_PAGE,
-                $context->getPath(),
-                'catalog',
-                'view',
-                [$submission->getBestId(), $publicationFormat->getBestId(), $fileId]
-            ) : $publicationFormat->getData('urlRemote');
+        $landingPage = $context['landingPage'];
+        $fullTextUrl = $context['fullTextUrl'];
 
         $locationData = [
             'landingPage' => $landingPage,

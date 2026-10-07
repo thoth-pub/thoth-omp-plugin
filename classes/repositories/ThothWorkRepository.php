@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @file plugins/generic/thoth/tests/classes/repositories/ThothWorkRepository.inc.php
+ * @file plugins/generic/thoth/classes/repositories/ThothWorkRepository.php
  *
  * Copyright (c) 2024-2026 Lepidus Tecnologia
  * Copyright (c) 2024-2026 Thoth
@@ -16,6 +16,7 @@
 
 namespace APP\plugins\generic\thoth\classes\repositories;
 
+use ThothApi\Exception\QueryException;
 use ThothApi\GraphQL\Inputs\PatchWork as ThothWork;
 
 class ThothWorkRepository
@@ -68,6 +69,24 @@ class ThothWorkRepository
     public function get($thothWorkId)
     {
         return $this->thothClient->work($thothWorkId, self::WORK_SELECTION);
+    }
+
+    public function findById(string $workId)
+    {
+        try {
+            return $this->get($workId);
+        } catch (QueryException $exception) {
+            if ($this->isRecordNotFound($exception)) {
+                return null;
+            }
+            throw $exception;
+        }
+    }
+
+    protected function isRecordNotFound(QueryException $exception): bool
+    {
+        return $exception->getStatusCode() === 200
+            && rtrim($exception->getMessage(), '.') === 'No record was found for the given ID';
     }
 
     public function getFeatureVideo($thothWorkId)

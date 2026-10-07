@@ -24,6 +24,7 @@ use APP\handler\Handler;
 use APP\i18n\AppLocale;
 use APP\plugins\generic\thoth\classes\components\listPanels\ThothListPanel;
 use APP\plugins\generic\thoth\classes\facades\ThothService;
+use APP\plugins\generic\thoth\classes\notification\ThothErrorFormatter;
 use APP\template\TemplateManager;
 use PKP\db\DAORegistry;
 use PKP\plugins\PluginRegistry;
@@ -62,6 +63,7 @@ class ThothHandler extends Handler
         AppLocale::requireComponents(LOCALE_COMPONENT_APP_SUBMISSION);
         $context = $request->getContext();
         $connectionError = false;
+        $connectionErrorReason = null;
         $imprints = [];
 
         $plugin = PluginRegistry::getPlugin('generic', 'thothplugin');
@@ -70,8 +72,9 @@ class ThothHandler extends Handler
         try {
             $imprints = ThothService::me()->getImprints();
         } catch (\Exception $e) {
-            error_log($e->getMessage());
+            ThothErrorFormatter::log($e, ['action' => __METHOD__]);
             $connectionError = true;
+            $connectionErrorReason = ThothErrorFormatter::reason($e);
         }
 
         $imprintOptions = [];
@@ -133,6 +136,7 @@ class ThothHandler extends Handler
             'components' => [
                 'thoth' => $thothList->getConfig()
             ],
+            'connectionErrorReason' => $connectionErrorReason,
             'connectionError' => $connectionError
         ]);
 

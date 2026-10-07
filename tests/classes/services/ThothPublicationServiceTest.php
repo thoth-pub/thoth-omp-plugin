@@ -11,8 +11,6 @@
  *
  * @ingroup plugins_generic_thoth_tests
  *
- * @see ThothPublicationService
- *
  * @brief Test class for the ThothPublicationService class
  */
 
@@ -40,18 +38,18 @@ class ThothPublicationServiceTest extends PKPTestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->backup = ThothContainer::getInstance()->backup('client');
+        $this->backup = ThothContainer::getInstance(0)->backup('client');
     }
 
     protected function tearDown(): void
     {
-        ThothContainer::getInstance()->set('client', $this->backup);
+        ThothContainer::getInstance(0)->set('client', $this->backup);
         parent::tearDown();
     }
 
     public function testRegisterPublication()
     {
-        ThothContainer::getInstance()->set('client', function () {
+        ThothContainer::getInstance(0)->set('client', function () {
             return $this->getMockBuilder(ThothClient::class)->getMock();
         });
 

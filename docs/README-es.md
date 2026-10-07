@@ -237,6 +237,9 @@ npm run build
 php lib/pkp/lib/vendor/bin/phpunit -c lib/pkp/tests/phpunit.xml --no-coverage plugins/generic/thoth/tests
 ```
 
+Ejecute las pruebas Cypress en el [entorno desechable OMP y Thoth](../tests/environment/README-es.md).
+Las mismas pruebas también se ejecutan en GitLab CI.
+
 ## Créditos
 
 Este plugin fue idealizado y patrocinado por [Thoth](https://thoth.pub/).

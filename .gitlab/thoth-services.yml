@@ -1,0 +1,98 @@
+build_thoth_environment:
+  interruptible: true
+  stage: .pre
+  rules:
+    - if: '$THOTH_ENVIRONMENT_PROBE == "1"'
+    - if: $CI_COMMIT_TAG
+      when: never
+    - when: on_success
+  image:
+    name: moby/buildkit:rootless@sha256:80b15f0735e87bab7bf59ec4d695dfb4a7cfb25521cf56dc75d6f256285b63ef
+    entrypoint: [""]
+  tags: [buildkit-rootless]
+  variables:
+    BUILDKITD_FLAGS: --oci-worker-no-process-sandbox
+  script:
+    - umask 077
+    - mkdir -p "$HOME/.docker"
+    - printf '{"auths":{"%s":{"username":"%s","password":"%s"}}}' "$CI_REGISTRY" "$CI_REGISTRY_USER" "$CI_REGISTRY_PASSWORD" > "$HOME/.docker/config.json"
+    - >-
+      buildctl-daemonless.sh build
+      --frontend dockerfile.v0
+      --local context=tests/environment
+      --local dockerfile=tests/environment
+      --output type=image,name=$CI_REGISTRY_IMAGE/test-environment:$CI_COMMIT_SHA,push=true
+  after_script:
+    - rm -f "$HOME/.docker/config.json"
+
+.thoth_environment:
+  needs: [build_thoth_environment]
+  image: lepidustecnologia/omp:3.5.0-head-forUnitTests@sha256:03acbd822740f4bb78b56bc02a12cb385cb2d511964346a7149c2c4c3d130bc1
+  tags: [atualizacoes2]
+  timeout: 10m
+  variables:
+    FF_NETWORK_PER_BUILD: "true"
+    THOTH_DISPOSABLE: "1"
+    THOTH_STATE_DIR: /builds/thoth-environment-$CI_JOB_ID
+    THOTH_CLIENT_DIR: /builds/thoth-environment-$CI_JOB_ID/client
+    DATABASE_URL: postgres://thoth:isolated-test-only@thoth-db/thoth # gitleaks:allow -- public disposable fixture
+    ZITADEL_URL: http://zitadel:8080
+    THOTH_GRAPHQL_API: http://thoth:8000
+    GRAPHQL_API_HOST: 0.0.0.0
+    GRAPHQL_API_PORT: "8000"
+    AWS_ACCESS_KEY_ID: disposable-test-only
+    AWS_SECRET_ACCESS_KEY: disposable-test-only
+    AWS_REGION: us-east-1
+    AWS_EC2_METADATA_DISABLED: "true"
+    THOTH_MUTATION_GUARD_MODE: "OFF"
+    THOTH_DISTRIBUTION_JOB_CREATION: "OFF"
+    RUST_LOG: error
+    ZITADEL_EXTERNALDOMAIN: zitadel
+    ZITADEL_EXTERNALPORT: "8080"
+    ZITADEL_EXTERNALSECURE: "false"
+    ZITADEL_TLS_ENABLED: "false"
+    ZITADEL_DATABASE_POSTGRES_HOST: zitadel-db
+    ZITADEL_DATABASE_POSTGRES_PORT: "5432"
+    ZITADEL_DATABASE_POSTGRES_DATABASE: zitadel
+    ZITADEL_DATABASE_POSTGRES_USER_USERNAME: zitadel
+    ZITADEL_DATABASE_POSTGRES_USER_PASSWORD: isolated-test-only
+    ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE: disable
+    ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME: zitadel
+    ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD: isolated-test-only
+    ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE: disable
+    ZITADEL_FIRSTINSTANCE_ORG_NAME: Thoth E2E
+    ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_USERNAME: bootstrap
+    ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_NAME: Disposable bootstrap
+    ZITADEL_FIRSTINSTANCE_PATPATH: /builds/thoth-environment-$CI_JOB_ID/admin.pat
+    # Test-only encryption key, never used outside an isolated, empty job database.
+    ZITADEL_MASTERKEY: TestOnlyMasterKeyForThothE2E1234
+    ZITADEL_FIRSTINSTANCE_ORG_MACHINE_PAT_EXPIRATIONDATE: "2099-01-01T00:00:00Z"
+  services:
+    - name: postgres:17@sha256:67f41722b7a8cbdb868a44a4995c846eddfdc2973bccb291ce937dce88ad5675
+      alias: thoth-db
+      variables:
+        POSTGRES_DB: thoth
+        POSTGRES_USER: thoth
+        POSTGRES_PASSWORD: isolated-test-only
+    - name: postgres:17@sha256:67f41722b7a8cbdb868a44a4995c846eddfdc2973bccb291ce937dce88ad5675
+      alias: zitadel-db
+      variables:
+        POSTGRES_DB: zitadel
+        POSTGRES_USER: zitadel
+        POSTGRES_PASSWORD: isolated-test-only
+    - name: $CI_REGISTRY_IMAGE/test-environment:$CI_COMMIT_SHA
+      alias: zitadel
+      entrypoint: [python3, /environment/zitadel.py]
+      variables:
+        HEALTHCHECK_TCP_PORT: "8080"
+      docker:
+        user: "0:0"
+    - name: $CI_REGISTRY_IMAGE/test-environment:$CI_COMMIT_SHA
+      alias: thoth api
+      variables:
+        HEALTHCHECK_TCP_PORT: "8000"
+  after_script:
+    - rm -f "$THOTH_CLIENT_DIR/client.json"
+    - rmdir "$THOTH_CLIENT_DIR" 2>/dev/null || true
+    - rm -f "$THOTH_STATE_DIR/admin.pat" "$THOTH_STATE_DIR/ready" "$THOTH_STATE_DIR/bootstrap.json" "$THOTH_STATE_DIR/fixture.json" "$THOTH_STATE_DIR/refresh.lock" "$THOTH_STATE_DIR/initializing"
+    - rmdir "$THOTH_STATE_DIR" 2>/dev/null || true

@@ -16,24 +16,27 @@
 
 namespace APP\plugins\generic\thoth\classes\services;
 
-use APP\facades\Repo;
+use APP\plugins\generic\thoth\classes\factories\ThothChapterFactory;
+use APP\plugins\generic\thoth\classes\pkp\OmpMetadataSource;
+use APP\plugins\generic\thoth\classes\repositories\ThothChapterRepository;
 
 class ThothChapterService
 {
-    public $factory;
-    public $repository;
-    public $contributionService;
-    public $publicationService;
-    public $titleService;
-    public $abstractService;
+    private ThothChapterFactory $factory;
+    private ThothChapterRepository $repository;
+    private ThothContributionService $contributionService;
+    private ThothPublicationService $publicationService;
+    private ThothTitleService $titleService;
+    private ThothAbstractService $abstractService;
 
     public function __construct(
-        $factory,
-        $repository,
-        $contributionService,
-        $publicationService,
-        $titleService,
-        $abstractService
+        ThothChapterFactory $factory,
+        ThothChapterRepository $repository,
+        ThothContributionService $contributionService,
+        ThothPublicationService $publicationService,
+        ThothTitleService $titleService,
+        ThothAbstractService $abstractService,
+        private OmpMetadataSource $metadataSource
     ) {
         $this->factory = $factory;
         $this->repository = $repository;
@@ -45,7 +48,7 @@ class ThothChapterService
 
     public function getDesiredWork($chapter, string $thothImprintId)
     {
-        $thothChapter = $this->factory->createFromChapter($chapter);
+        $thothChapter = $this->factory->createFromChapter($chapter, $this->metadataSource->getChapterContext($chapter));
         $thothChapter->setImprintId($thothImprintId);
 
         return $thothChapter;
@@ -76,7 +79,7 @@ class ThothChapterService
         $this->repository->edit($thothChapter);
         $chapter->setData('thothChapterId', $thothChapterId);
 
-        $publication = Repo::publication()->get($chapter->getData('publicationId'));
+        $publication = $this->metadataSource->getPublication((int) $chapter->getData('publicationId'));
         $locale = $publication->getData('locale');
         $this->titleService->updateByChapter(
             $chapter,
@@ -111,7 +114,7 @@ class ThothChapterService
 
     private function registerMetadata($chapter, string $thothChapterId): void
     {
-        $publication = Repo::publication()->get($chapter->getData('publicationId'));
+        $publication = $this->metadataSource->getPublication((int) $chapter->getData('publicationId'));
 
         $this->titleService->registerByChapter($chapter, $thothChapterId, $publication->getData('locale'));
         $this->abstractService->registerByChapter($chapter, $thothChapterId, $publication->getData('locale'));

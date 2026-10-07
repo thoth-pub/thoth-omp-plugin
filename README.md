@@ -207,6 +207,8 @@ into OMP 3.5 is also recognized automatically.
 
 ## Development
 
+See [Architecture](docs/architecture.md) for layer responsibilities, registration failure handling, and service contracts.
+
 ### Requirements
 
 - PHP 8.2+
@@ -230,6 +232,9 @@ npm run build
 # From the OMP root directory
 php lib/pkp/lib/vendor/bin/phpunit -c lib/pkp/tests/phpunit.xml --no-coverage plugins/generic/thoth/tests
 ```
+
+Run the Cypress tests using the [disposable OMP and Thoth environment](tests/environment/README.md).
+The same tests also run in GitLab CI.
 
 ## Credits
 

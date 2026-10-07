@@ -17,7 +17,7 @@
     <tabs :track-history="true">
         <tab id="monographs" label="{translate key="navigation.catalog.allMonographs"}">
             <div v-if="connectionError">
-                <p>{translate key="plugins.generic.thoth.connectionError"}</p>
+                <p>{translate key="plugins.generic.thoth.connectionError"}<span v-if="connectionErrorReason">: {{ connectionErrorReason }}</span></p>
             </div>
             <thoth-list-panel
                 v-else

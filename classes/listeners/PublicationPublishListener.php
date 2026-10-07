@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @file plugins/generic/thoth/classes/listeners/PublicationPublishListener.inc.php
+ * @file plugins/generic/thoth/classes/listeners/PublicationPublishListener.php
  *
  * Copyright (c) 2024-2026 Lepidus Tecnologia
  * Copyright (c) 2024-2026 Thoth
@@ -16,18 +16,22 @@
 
 namespace APP\plugins\generic\thoth\classes\listeners;
 
-use APP\core\Application;
-use APP\facades\Repo;
-use APP\plugins\generic\thoth\classes\facades\ThothService;
+use APP\core\Request;
 use APP\plugins\generic\thoth\classes\notification\ThothNotification;
-use ThothApi\Exception\QueryException;
 
 class PublicationPublishListener
 {
+    public function __construct(
+        private \Closure $registrationService,
+        private ThothNotification $notification,
+        private Request $request
+    ) {
+    }
+
     public function validate($hookName, $args)
     {
         $errors = & $args[0];
-        $request = Application::get()->getRequest();
+        $request = $this->request;
 
         $confirmation = $request->getUserVar('registerConfirmation');
         if (!$confirmation || $confirmation == 'false') {
@@ -44,7 +48,7 @@ class PublicationPublishListener
     {
         $publication = $args[0];
         $submission = $args[2];
-        $request = Application::get()->getRequest();
+        $request = $this->request;
 
         if ($submission->getData('thothWorkId')) {
             return false;
@@ -56,26 +60,21 @@ class PublicationPublishListener
         }
 
         $thothImprintId = $request->getUserVar('thothImprintId');
-        $thothNotification = new ThothNotification();
-        $registrationResult = null;
         try {
-            $thothBookRegistrationService = ThothService::bookRegistration();
-            $registrationResult = $thothBookRegistrationService->register($publication, $thothImprintId);
-            $thothBookRegistrationService->setActive($registrationResult);
-            $thothBookId = $registrationResult->getWorkId();
-            Repo::submission()->edit($submission, ['thothWorkId' => $thothBookId]);
-            $thothNotification->notifySuccess($request, $submission);
-            if ($warning = $registrationResult->getWarning()) {
-                $thothNotification->notifyWarning($request, $submission, $warning);
-            }
-        } catch (QueryException $e) {
-            if ($registrationResult !== null) {
-                $thothBookRegistrationService->deleteRegisteredEntry($registrationResult);
-            }
-            $thothNotification->notifyError($request, $submission, $e);
-            if ($registrationResult && $warning = $registrationResult->getWarning()) {
-                $thothNotification->notifyWarning($request, $submission, $warning);
-            }
+            $registrationResult = ($this->registrationService)()->register(
+                $publication,
+                $thothImprintId,
+                $submission,
+                $request->getUserVar('thothWorkType')
+            );
+        } catch (\Throwable $e) {
+            $this->notification->notifyError($request, $submission, $e);
+            return false;
+        }
+
+        $this->notification->notifySuccess($request, $submission);
+        foreach ($registrationResult->getWarnings() as $warning) {
+            $this->notification->notifyWarning($request, $submission, $warning);
         }
 
         return false;

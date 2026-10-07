@@ -11,8 +11,6 @@
  *
  * @ingroup plugins_generic_thoth_tests
  *
- * @see ThothChapterRepository
- *
  * @brief Test class for the ThothChapterRepository class
  */
 
@@ -20,7 +18,9 @@ namespace APP\plugins\generic\thoth\tests\classes\repositories;
 
 use APP\plugins\generic\thoth\classes\repositories\ThothChapterRepository;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PKP\tests\PKPTestCase;
+use ThothApi\Exception\QueryException;
 use ThothApi\GraphQL\Client as ThothClient;
 use ThothApi\GraphQL\Inputs\PatchWork as ThothWork;
 
@@ -41,6 +41,32 @@ class ThothChapterRepositoryTest extends PKPTestCase
         $thothChapter = $repository->getByDoi('https://doi.org/10.12345/00001010');
 
         $this->assertEquals($expectedThothChapter, $thothChapter);
+    }
+
+    #[DataProvider('lookupErrors')]
+    public function testDoiLookupOnlyTreatsConfirmedAbsenceAsMissing(string $message, int $status, bool $missing): void
+    {
+        $exception = new QueryException(['message' => $message], null, null, null, $status);
+        $client = Mockery::mock(ThothClient::class);
+        $client->shouldReceive('chapterByDoi')->once()->andThrow($exception);
+        $repository = new ThothChapterRepository($client);
+
+        if (!$missing) {
+            $this->expectExceptionObject($exception);
+        }
+
+        $this->assertNull($repository->getByDoi('https://doi.org/10.12345/missing'));
+    }
+
+    public static function lookupErrors(): array
+    {
+        return [
+            'missing record' => ['No record was found for the given ID.', 200, true],
+            'missing without punctuation' => ['No record was found for the given ID', 200, true],
+            'unavailable' => ['Thoth API unavailable', 503, false],
+            'authorization' => ['Unauthorized', 200, false],
+            'unexpected status' => ['No record was found for the given ID.', 500, false],
+        ];
     }
 
     public function testFindChapter()

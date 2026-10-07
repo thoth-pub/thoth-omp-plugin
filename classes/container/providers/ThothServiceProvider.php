@@ -1,8 +1,7 @@
 <?php
 
-
 /**
- * @file plugins/generic/thoth/tests/classes/container/providers/ThothServiceProvider.inc.php
+ * @file plugins/generic/thoth/classes/container/providers/ThothServiceProvider.php
  *
  * Copyright (c) 2024-2026 Lepidus Tecnologia
  * Copyright (c) 2024-2026 Thoth
@@ -17,6 +16,9 @@
 
 namespace APP\plugins\generic\thoth\classes\container\providers;
 
+use APP\core\Application;
+use APP\facades\Repo;
+use APP\plugins\generic\thoth\classes\api\ThothEndpoint;
 use APP\plugins\generic\thoth\classes\factories\ThothAbstractFactory;
 use APP\plugins\generic\thoth\classes\factories\ThothBiographyFactory;
 use APP\plugins\generic\thoth\classes\factories\ThothBookFactory;
@@ -26,6 +28,10 @@ use APP\plugins\generic\thoth\classes\factories\ThothContributorFactory;
 use APP\plugins\generic\thoth\classes\factories\ThothLocationFactory;
 use APP\plugins\generic\thoth\classes\factories\ThothPublicationFactory;
 use APP\plugins\generic\thoth\classes\factories\ThothTitleFactory;
+use APP\plugins\generic\thoth\classes\listeners\PublicationEditListener;
+use APP\plugins\generic\thoth\classes\listeners\PublicationPublishListener;
+use APP\plugins\generic\thoth\classes\notification\ThothNotification;
+use APP\plugins\generic\thoth\classes\pkp\OmpMetadataSource;
 use APP\plugins\generic\thoth\classes\services\FeatureVideoSubmissionService;
 use APP\plugins\generic\thoth\classes\services\ThothAbstractService;
 use APP\plugins\generic\thoth\classes\services\ThothAffiliationService;
@@ -46,12 +52,48 @@ use APP\plugins\generic\thoth\classes\services\ThothPublicationService;
 use APP\plugins\generic\thoth\classes\services\ThothReferenceService;
 use APP\plugins\generic\thoth\classes\services\ThothSubjectService;
 use APP\plugins\generic\thoth\classes\services\ThothTitleService;
+use APP\plugins\generic\thoth\classes\services\ThothWorkLinkService;
 use APP\plugins\generic\thoth\classes\services\ThothWorkRelationService;
+use Illuminate\Support\Facades\DB;
+use PKP\db\DAORegistry;
 
 class ThothServiceProvider implements ContainerProvider
 {
     public function register($container)
     {
+        $container->singletonClass('notification', ThothNotification::class);
+        $container->singletonClass('workLinkService', ThothWorkLinkService::class, [
+            'workRepository',
+        ]);
+        $container->singletonClass('publicationEditListener', PublicationEditListener::class, [
+            fn () => Repo::submission(),
+            fn ($container) => fn () => $container->get('bookService'),
+            'notification',
+        ]);
+        $container->singletonClass('publicationPublishListener', PublicationPublishListener::class, [
+            fn ($container) => fn () => $container->get('bookRegistrationService'),
+            'notification',
+            fn () => Application::get()->getRequest(),
+        ]);
+        $container->singletonClass('endpoint', ThothEndpoint::class, [
+            fn ($container) => fn () => $container->get('bookService'),
+            fn ($container) => fn () => $container->get('bookRegistrationService'),
+            fn ($container) => fn () => $container->get('metadataSynchronizationService'),
+            fn ($container) => fn () => $container->get('workLinkService'),
+            fn ($container) => fn () => $container->get('meService'),
+            fn ($container) => fn () => $container->get('featureVideoSubmissionService'),
+            fn ($container) => fn () => $container->get('workRepository'),
+            'notification',
+        ]);
+
+        $container->singleton('metadataSource', fn () => new OmpMetadataSource(
+            Repo::submission(),
+            Repo::publication(),
+            Application::getContextDAO(),
+            DAORegistry::getDAO('PublicationFormatDAO'),
+            Application::get()->getRequest()
+        ));
+
         $container->singletonClass('affiliationService', ThothAffiliationService::class, [
             'affiliationRepository',
             'institutionRepository',
@@ -73,6 +115,7 @@ class ThothServiceProvider implements ContainerProvider
             'publicationService',
             'titleService',
             'abstractService',
+            'metadataSource',
             'frontcoverService',
         ]);
 
@@ -87,7 +130,10 @@ class ThothServiceProvider implements ContainerProvider
             'subjectService',
             'titleService',
             'workRelationService',
+            'metadataSource',
             'frontcoverService',
+            fn () => Repo::submission(),
+            fn () => DB::connection(),
         ]);
 
         $container->singletonClass('chapterService', ThothChapterService::class, [
@@ -97,6 +143,7 @@ class ThothServiceProvider implements ContainerProvider
             'publicationService',
             'titleService',
             'abstractService',
+            'metadataSource',
         ]);
 
         $container->singletonClass('contributionService', ThothContributionService::class, [
@@ -139,6 +186,7 @@ class ThothServiceProvider implements ContainerProvider
         $container->singletonClass('locationService', ThothLocationService::class, [
             new ThothLocationFactory(),
             'locationRepository',
+            'metadataSource',
         ]);
 
         $container->singletonClass('meService', ThothMeService::class, [

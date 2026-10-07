@@ -54,13 +54,14 @@ class ThothSubjectService
         }
     }
 
-    public function synchronizeByPublication($publication, string $thothWorkId): void
+    public function synchronizeByPublication($publication, string $thothWorkId): array
     {
         $this->update(
             $this->getPublicationSubjects($publication),
             $thothWorkId,
             $this->repository->getByWorkId($thothWorkId)
         );
+        return [];
     }
 
     public function update(array $subjects, string $thothWorkId, array $existingSubjects): void

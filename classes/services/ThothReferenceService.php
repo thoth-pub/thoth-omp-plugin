@@ -45,7 +45,7 @@ class ThothReferenceService
         }
     }
 
-    public function synchronizeByPublication($publication, string $thothWorkId): void
+    public function synchronizeByPublication($publication, string $thothWorkId): array
     {
         $citations = DAORegistry::getDAO('CitationDAO')
             ->getByPublicationId($publication->getId())
@@ -59,6 +59,7 @@ class ThothReferenceService
         }
 
         $this->update($references, $thothWorkId, $this->repository->getByWorkId($thothWorkId));
+        return [];
     }
 
     public function update(array $references, string $thothWorkId, array $existingReferences): void

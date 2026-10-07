@@ -41,13 +41,14 @@ class ThothLanguageService
         $this->register($locale, $thothBookId);
     }
 
-    public function synchronizeByPublication($publication, string $thothWorkId): void
+    public function synchronizeByPublication($publication, string $thothWorkId): array
     {
         $this->update(
             $publication->getData('locale'),
             $thothWorkId,
             $this->repository->getByWorkId($thothWorkId)
         );
+        return [];
     }
 
     public function update($locale, string $thothWorkId, array $existingLanguages): void

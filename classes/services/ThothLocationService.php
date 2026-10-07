@@ -19,22 +19,30 @@ namespace APP\plugins\generic\thoth\classes\services;
 use APP\core\Application;
 use APP\facades\Repo;
 use APP\plugins\generic\thoth\classes\exceptions\MetadataSynchronizationException;
+use APP\plugins\generic\thoth\classes\factories\ThothLocationFactory;
+use APP\plugins\generic\thoth\classes\pkp\OmpMetadataSource;
+use APP\plugins\generic\thoth\classes\repositories\ThothLocationRepository;
 use ThothApi\GraphQL\Enums\LocationPlatform;
 
 class ThothLocationService
 {
-    public $factory;
-    public $repository;
+    private ThothLocationFactory $factory;
+    private ThothLocationRepository $repository;
 
-    public function __construct($factory, $repository)
-    {
+    public function __construct(
+        ThothLocationFactory $factory,
+        ThothLocationRepository $repository,
+        private OmpMetadataSource $metadataSource
+    ) {
         $this->factory = $factory;
         $this->repository = $repository;
     }
 
     public function register($publicationFormat, $thothPublicationId, $fileId = null)
     {
-        $thothLocation = $this->factory->createFromPublicationFormat($publicationFormat, $fileId);
+        $thothLocation = $this->factory->create(
+            $this->metadataSource->getLocationContext($publicationFormat, $fileId)
+        );
         $thothLocation->setPublicationId($thothPublicationId);
         $thothLocation->setCanonical(!$this->repository->hasCanonical($thothPublicationId));
 
@@ -112,12 +120,16 @@ class ThothLocationService
     {
         if (empty($submissionFiles)) {
             return $publicationFormat->getData('urlRemote')
-                ? [$this->factory->createFromPublicationFormat($publicationFormat)]
+                ? [$this->factory->create(
+                    $this->metadataSource->getLocationContext($publicationFormat)
+                )]
                 : [];
         }
 
         return array_map(function ($submissionFile) use ($publicationFormat) {
-            return $this->factory->createFromPublicationFormat($publicationFormat, $submissionFile->getId());
+            return $this->factory->create(
+                $this->metadataSource->getLocationContext($publicationFormat, $submissionFile->getId())
+            );
         }, array_values($submissionFiles));
     }
 

@@ -20,10 +20,8 @@ use APP\core\Application;
 use APP\facades\Repo;
 use APP\plugins\generic\thoth\classes\components\forms\FeatureVideoForm;
 use APP\plugins\generic\thoth\classes\exceptions\MetadataSynchronizationException;
-use APP\plugins\generic\thoth\classes\facades\ThothRepository;
-use APP\plugins\generic\thoth\classes\facades\ThothService;
+use APP\plugins\generic\thoth\classes\notification\ThothErrorFormatter;
 use APP\plugins\generic\thoth\classes\notification\ThothNotification;
-use APP\plugins\generic\thoth\classes\services\ThothWorkLinkService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request as IlluminateRequest;
 use Illuminate\Http\Response;
@@ -40,6 +38,18 @@ use ThothApi\Exception\QueryException;
 
 class ThothEndpoint implements HasAuthorizationPolicy
 {
+    public function __construct(
+        private \Closure $bookService,
+        private \Closure $registrationService,
+        private \Closure $synchronizationService,
+        private \Closure $workLinkService,
+        private \Closure $meService,
+        private \Closure $featureVideoService,
+        private \Closure $workRepository,
+        private ThothNotification $notification
+    ) {
+    }
+
     public function addEndpoints(string $hookName, PKPBaseController $apiController, APIHandler $apiHandler): bool
     {
         $apiHandler->addRoute(
@@ -173,9 +183,10 @@ class ThothEndpoint implements HasAuthorizationPolicy
         ];
 
         try {
-            $failure['errors'] = ThothService::book()->validate($publication);
+            $failure['errors'] = ($this->bookService)()->validate($publication);
         } catch (\Exception $e) {
-            $failure['errors'][] = __('plugins.generic.thoth.connectionError');
+            ThothErrorFormatter::log($e, ['action' => __METHOD__]);
+            $failure['errors'][] = ThothErrorFormatter::message(__('plugins.generic.thoth.connectionError'), $e);
         }
 
         if ($failure['errors']) {
@@ -183,38 +194,41 @@ class ThothEndpoint implements HasAuthorizationPolicy
         }
 
         $disableNotification = $illuminateRequest->input('disableNotification', false);
-        $registrationResult = null;
         try {
-            $thothBookRegistrationService = ThothService::bookRegistration();
-            $registrationResult = $thothBookRegistrationService->register($publication, $thothImprintId);
-            $thothBookRegistrationService->setActive($registrationResult);
-            $thothBookId = $registrationResult->getWorkId();
-            Repo::submission()->edit($submission, ['thothWorkId' => $thothBookId]);
-            $this->handleNotification(
-                $request,
+            $registrationResult = ($this->registrationService)()->register(
+                $publication,
+                $thothImprintId,
                 $submission,
-                true,
-                $disableNotification,
-                null,
-                $registrationResult->getWarning()
+                $illuminateRequest->input('thothWorkType')
             );
-        } catch (QueryException $e) {
-            if ($registrationResult !== null) {
-                $thothBookRegistrationService->deleteRegisteredEntry($registrationResult);
-            }
+        } catch (\Throwable $e) {
             $this->handleNotification(
                 $request,
                 $submission,
                 false,
                 $disableNotification,
-                $e,
-                $registrationResult ? $registrationResult->getWarning() : null
+                $e
             );
-            $failure['errors'][] = __('plugins.generic.thoth.register.error.log', ['reason' => $e->getMessage()]);
-            return response()->json($failure, Response::HTTP_BAD_REQUEST);
+            $failure['errors'][] = $e instanceof QueryException
+                ? ThothErrorFormatter::message(__('plugins.generic.thoth.connectionError'), $e)
+                : __('plugins.generic.thoth.connectionError');
+            return response()->json(
+                $failure,
+                $e instanceof QueryException ? Response::HTTP_BAD_REQUEST : Response::HTTP_INTERNAL_SERVER_ERROR
+            );
         }
 
-        $thothWork = ThothRepository::work()->get($thothBookId);
+        $thothBookId = $registrationResult->getWorkId();
+        $this->handleNotification(
+            $request,
+            $submission,
+            true,
+            $disableNotification,
+            null,
+            $registrationResult->getWarnings()
+        );
+
+        $thothWork = ($this->workRepository)()->get($thothBookId);
         $thothWorkStatus = $thothWork->getWorkStatus();
 
         $submission = Repo::submission()->get($submission->getId());
@@ -262,7 +276,7 @@ class ThothEndpoint implements HasAuthorizationPolicy
         }
 
         try {
-            $workStatus = (new ThothWorkLinkService(ThothRepository::work()))->getStatus($thothWorkId);
+            $workStatus = ($this->workLinkService)()->getStatus($thothWorkId);
             if ($workStatus === null) {
                 return response()->json(
                     [
@@ -278,8 +292,9 @@ class ThothEndpoint implements HasAuthorizationPolicy
                 Response::HTTP_OK
             );
         } catch (\Exception $e) {
+            ThothErrorFormatter::log($e, ['action' => __METHOD__]);
             return response()->json(
-                ['error' => __('plugins.generic.thoth.connectionError')],
+                ['error' => ThothErrorFormatter::message(__('plugins.generic.thoth.connectionError'), $e)],
                 Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
@@ -306,7 +321,7 @@ class ThothEndpoint implements HasAuthorizationPolicy
         }
 
         try {
-            $workStatus = (new ThothWorkLinkService(ThothRepository::work()))->getStatus($thothWorkId);
+            $workStatus = ($this->workLinkService)()->getStatus($thothWorkId);
             if ($workStatus !== null) {
                 return response()->json(
                     ['error' => __('plugins.generic.thoth.unlink.existingWork')],
@@ -314,8 +329,9 @@ class ThothEndpoint implements HasAuthorizationPolicy
                 );
             }
         } catch (\Exception $e) {
+            ThothErrorFormatter::log($e, ['action' => __METHOD__]);
             return response()->json(
-                ['error' => __('plugins.generic.thoth.connectionError')],
+                ['error' => ThothErrorFormatter::message(__('plugins.generic.thoth.connectionError'), $e)],
                 Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
@@ -359,7 +375,7 @@ class ThothEndpoint implements HasAuthorizationPolicy
         }
 
         try {
-            $warning = ThothService::metadataSynchronization()->synchronize($publication, $thothWorkId);
+            $warning = ($this->synchronizationService)()->synchronize($publication, $thothWorkId);
             $this->handleNotification($request, $submission, true, false, null, $warning);
         } catch (MetadataSynchronizationException $exception) {
             return response()->json(
@@ -369,7 +385,7 @@ class ThothEndpoint implements HasAuthorizationPolicy
         } catch (QueryException $exception) {
             $this->handleNotification($request, $submission, false, false, $exception);
             return response()->json(
-                ['errorMessage' => __('plugins.generic.thoth.connectionError')],
+                ['errorMessage' => ThothErrorFormatter::message(__('plugins.generic.thoth.connectionError'), $exception)],
                 Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
@@ -412,18 +428,18 @@ class ThothEndpoint implements HasAuthorizationPolicy
         );
         try {
             $existingVideo = $submission->getData('thothWorkId')
-                ? ThothRepository::work()->getFeatureVideo($submission->getData('thothWorkId'))
+                ? ($this->workRepository)()->getFeatureVideo($submission->getData('thothWorkId'))
                 : null;
             $form = new FeatureVideoForm(
                 $featureVideoUrl,
                 $temporaryFilesUrl,
-                ThothService::me()->hasCdnWritePermission(),
+                ($this->meService)()->hasCdnWritePermission(),
                 (bool) $existingVideo
             );
         } catch (\Throwable $exception) {
-            error_log($exception->getMessage());
+            ThothErrorFormatter::log($exception, ['action' => __METHOD__]);
             return response()->json(
-                ['error' => __('plugins.generic.thoth.connectionError')],
+                ['error' => ThothErrorFormatter::message(__('plugins.generic.thoth.connectionError'), $exception)],
                 Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
@@ -465,14 +481,14 @@ class ThothEndpoint implements HasAuthorizationPolicy
         }
 
         try {
-            if (!ThothService::me()->hasCdnWritePermission()) {
+            if (!($this->meService)()->hasCdnWritePermission()) {
                 return response()->json(
                     ['video' => [__('plugins.generic.thoth.fileUpload.error.missingCdnWritePermission')]],
                     Response::HTTP_FORBIDDEN
                 );
             }
 
-            $metadata = ThothService::featureVideoSubmission()->upload(
+            $metadata = ($this->featureVideoService)()->upload(
                 $submission,
                 $title,
                 $temporaryFileId,
@@ -485,26 +501,24 @@ class ThothEndpoint implements HasAuthorizationPolicy
                 Response::HTTP_BAD_REQUEST
             );
         } catch (\Throwable $exception) {
-            error_log($exception->getMessage());
+            ThothErrorFormatter::log($exception, ['action' => __METHOD__]);
             return response()->json(
-                ['error' => __('plugins.generic.thoth.connectionError')],
+                ['error' => ThothErrorFormatter::message(__('plugins.generic.thoth.connectionError'), $exception)],
                 Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
     }
 
-    public function handleNotification(
+    private function handleNotification(
         $request,
         $submission,
         $success,
         $disableNotification,
         $errorMessage = null,
-        $warning = null
-    ) {
-        $thothNotification = new ThothNotification();
-
+        array $warnings = []
+    ): void {
         if ($disableNotification) {
-            $thothNotification->logInfo(
+            $this->notification->logInfo(
                 $request,
                 $submission,
                 $success ? 'plugins.generic.thoth.register.success.log' : 'plugins.generic.thoth.register.error.log',
@@ -514,10 +528,10 @@ class ThothEndpoint implements HasAuthorizationPolicy
         }
 
         $success
-            ? $thothNotification->notifySuccess($request, $submission)
-            : $thothNotification->notifyError($request, $submission, $errorMessage);
-        foreach ((array) $warning as $warningMessage) {
-            $thothNotification->notifyWarning($request, $submission, $warningMessage);
+            ? $this->notification->notifySuccess($request, $submission)
+            : $this->notification->notifyError($request, $submission, $errorMessage);
+        foreach ($warnings as $warningMessage) {
+            $this->notification->notifyWarning($request, $submission, $warningMessage);
         }
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @file plugins/generic/thoth/tests/classes/container/ThothContainer.inc.php
+ * @file plugins/generic/thoth/classes/container/ThothContainer.php
  *
  * Copyright (c) 2024-2026 Lepidus Tecnologia
  * Copyright (c) 2024-2026 Thoth
@@ -11,29 +11,28 @@
  *
  * @ingroup plugins_generic_thoth
  *
- * @brief Singleton implementation for dependency injection container
+ * @brief Dependency injection container scoped to an OMP context
  */
 
 namespace APP\plugins\generic\thoth\classes\container;
 
+use APP\core\Application;
 use APP\plugins\generic\thoth\classes\container\providers\ThothRepositoryProvider;
 use APP\plugins\generic\thoth\classes\container\providers\ThothServiceProvider;
 
 class ThothContainer extends Container
 {
-    private static $instance = null;
+    private static array $instancesByContext = [];
 
-    private function __construct()
+    private function __construct(int $contextId)
     {
-        $this->register(new ThothRepositoryProvider());
+        $this->register(new ThothRepositoryProvider($contextId));
         $this->register(new ThothServiceProvider());
     }
 
-    public static function getInstance()
+    public static function getInstance(?int $contextId = null): self
     {
-        if (self::$instance === null) {
-            self::$instance = new self();
-        }
-        return self::$instance;
+        $contextId ??= (int) Application::get()->getRequest()->getContext()?->getId();
+        return self::$instancesByContext[$contextId] ??= new self($contextId);
     }
 }

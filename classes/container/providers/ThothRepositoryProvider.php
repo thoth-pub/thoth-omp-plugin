@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @file plugins/generic/thoth/tests/classes/container/providers/ThothRepositoryProvider.inc.php
+ * @file plugins/generic/thoth/classes/container/providers/ThothRepositoryProvider.php
  *
  * Copyright (c) 2024-2026 Lepidus Tecnologia
  * Copyright (c) 2024-2026 Thoth
@@ -18,7 +18,6 @@ namespace APP\plugins\generic\thoth\classes\container\providers;
 
 require_once(__DIR__ . '/../../../vendor/autoload.php');
 
-use APP\core\Application;
 use APP\plugins\generic\thoth\classes\config\ThothSettings;
 use APP\plugins\generic\thoth\classes\repositories\ThothAbstractRepository;
 use APP\plugins\generic\thoth\classes\repositories\ThothAffiliationRepository;
@@ -48,10 +47,14 @@ use UnexpectedValueException;
 
 class ThothRepositoryProvider implements ContainerProvider
 {
+    public function __construct(private int $contextId)
+    {
+    }
+
     public function register($container)
     {
         $container->singleton('config', function ($container) {
-            return (new ThothSettings())->toArray();
+            return (new ThothSettings(contextId: $this->contextId))->toArray();
         });
 
         $container->singleton('client', function ($container) {
@@ -116,8 +119,7 @@ class ThothRepositoryProvider implements ContainerProvider
         });
 
         $container->singleton('meRepository', function ($container) {
-            $contextId = Application::get()->getRequest()->getContext()->getId();
-            return new ThothMeRepository($container->get('client'), $contextId);
+            return new ThothMeRepository($container->get('client'), $this->contextId);
         });
 
         $container->singleton('publicationRepository', function ($container) {

@@ -11,8 +11,6 @@
  *
  * @ingroup plugins_generic_thoth_tests
  *
- * @see ThothLocationService
- *
  * @brief Test class for the ThothLocationService class
  */
 
@@ -55,10 +53,10 @@ class ThothLocationServiceTest extends PKPTestCase
     public function testRegisterLocation()
     {
         $mockFactory = $this->getMockBuilder(ThothLocationFactory::class)
-            ->onlyMethods(['createFromPublicationFormat'])
+            ->onlyMethods(['create'])
             ->getMock();
         $mockFactory->expects($this->once())
-            ->method('createFromPublicationFormat')
+            ->method('create')
             ->willReturn(new ThothLocation());
 
         $mockRepository = $this->getMockBuilder(ThothLocationRepository::class)
@@ -77,7 +75,11 @@ class ThothLocationServiceTest extends PKPTestCase
         $thothPublicationId = '75ce9d60-1397-439c-90ad-80ee49630a70';
         $fileId = 1;
 
-        $service = new ThothLocationService($mockFactory, $mockRepository);
+        $service = new ThothLocationService(
+            $mockFactory,
+            $mockRepository,
+            $this->createMock(\APP\plugins\generic\thoth\classes\pkp\OmpMetadataSource::class)
+        );
         $thothLocationId = $service->register($mockPubFormat, $thothPublicationId, $fileId);
 
         $this->assertSame('6f40cf3f-c7eb-437a-9c09-08a7f6923ec0', $thothLocationId);
@@ -106,7 +108,17 @@ class ThothLocationServiceTest extends PKPTestCase
             ->method('delete')
             ->with('removed-location-id');
 
-        $service = new ThothLocationService(new ThothLocationFactory(), $repository);
+        $service = new ThothLocationService(
+            new ThothLocationFactory(),
+            $repository,
+            new \APP\plugins\generic\thoth\classes\pkp\OmpMetadataSource(
+                \APP\facades\Repo::submission(),
+                \APP\facades\Repo::publication(),
+                \APP\core\Application::getContextDAO(),
+                \PKP\db\DAORegistry::getDAO('PublicationFormatDAO'),
+                \APP\core\Application::get()->getRequest()
+            )
+        );
         $service->update('publication-id', [
             new ThothLocation([
                 'landingPage' => 'https://publisher.example/book',
@@ -151,7 +163,17 @@ class ThothLocationServiceTest extends PKPTestCase
             }));
         $repository->expects($this->never())->method('delete');
 
-        $service = new ThothLocationService(new ThothLocationFactory(), $repository);
+        $service = new ThothLocationService(
+            new ThothLocationFactory(),
+            $repository,
+            new \APP\plugins\generic\thoth\classes\pkp\OmpMetadataSource(
+                \APP\facades\Repo::submission(),
+                \APP\facades\Repo::publication(),
+                \APP\core\Application::getContextDAO(),
+                \PKP\db\DAORegistry::getDAO('PublicationFormatDAO'),
+                \APP\core\Application::get()->getRequest()
+            )
+        );
         $service->update('publication-id', [
             new ThothLocation([
                 'landingPage' => 'https://publisher.example/book',
@@ -183,7 +205,17 @@ class ThothLocationServiceTest extends PKPTestCase
             }));
         $repository->expects($this->never())->method('delete');
 
-        $service = new ThothLocationService(new ThothLocationFactory(), $repository);
+        $service = new ThothLocationService(
+            new ThothLocationFactory(),
+            $repository,
+            new \APP\plugins\generic\thoth\classes\pkp\OmpMetadataSource(
+                \APP\facades\Repo::submission(),
+                \APP\facades\Repo::publication(),
+                \APP\core\Application::getContextDAO(),
+                \PKP\db\DAORegistry::getDAO('PublicationFormatDAO'),
+                \APP\core\Application::get()->getRequest()
+            )
+        );
         $service->update('publication-id', [
             new ThothLocation([
                 'landingPage' => 'https://publisher.example/book',
@@ -225,7 +257,14 @@ class ThothLocationServiceTest extends PKPTestCase
 
         $service = new ThothLocationService(
             new ThothLocationFactory(),
-            $this->createMock(ThothLocationRepository::class)
+            $this->createMock(ThothLocationRepository::class),
+            new \APP\plugins\generic\thoth\classes\pkp\OmpMetadataSource(
+                \APP\facades\Repo::submission(),
+                \APP\facades\Repo::publication(),
+                \APP\core\Application::getContextDAO(),
+                \PKP\db\DAORegistry::getDAO('PublicationFormatDAO'),
+                \APP\core\Application::get()->getRequest()
+            )
         );
         $locations = $service->getDesiredByPublicationFormat($publicationFormat, [$firstFile, $secondFile]);
 
@@ -240,7 +279,17 @@ class ThothLocationServiceTest extends PKPTestCase
         $repository->expects($this->never())->method('add');
         $repository->expects($this->never())->method('edit');
         $repository->expects($this->never())->method('delete');
-        $service = new ThothLocationService(new ThothLocationFactory(), $repository);
+        $service = new ThothLocationService(
+            new ThothLocationFactory(),
+            $repository,
+            new \APP\plugins\generic\thoth\classes\pkp\OmpMetadataSource(
+                \APP\facades\Repo::submission(),
+                \APP\facades\Repo::publication(),
+                \APP\core\Application::getContextDAO(),
+                \PKP\db\DAORegistry::getDAO('PublicationFormatDAO'),
+                \APP\core\Application::get()->getRequest()
+            )
+        );
 
         $this->expectException(\UnexpectedValueException::class);
 

@@ -17,29 +17,15 @@
 namespace APP\plugins\generic\thoth\classes\services;
 
 use APP\plugins\generic\thoth\classes\repositories\ThothWorkRepository;
-use ThothApi\Exception\QueryException;
 
 class ThothWorkLinkService
 {
-    private const WORK_NOT_FOUND_MESSAGE = 'No record was found for the given ID';
-
     public function __construct(private ThothWorkRepository $repository)
     {
     }
 
     public function getStatus(string $thothWorkId): ?string
     {
-        try {
-            return $this->repository->get($thothWorkId)->getWorkStatus();
-        } catch (QueryException $exception) {
-            if (
-                $exception->getStatusCode() === 200
-                && rtrim($exception->getMessage(), '.') === self::WORK_NOT_FOUND_MESSAGE
-            ) {
-                return null;
-            }
-
-            throw $exception;
-        }
+        return $this->repository->findById($thothWorkId)?->getWorkStatus();
     }
 }

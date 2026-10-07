@@ -19,6 +19,8 @@ namespace APP\plugins\generic\thoth\classes\services;
 use APP\core\Application;
 use APP\facades\Repo;
 use APP\plugins\generic\thoth\classes\exceptions\MetadataSynchronizationException;
+use APP\plugins\generic\thoth\classes\factories\ThothPublicationFactory;
+use APP\plugins\generic\thoth\classes\repositories\ThothPublicationRepository;
 use Biblys\Isbn\Isbn;
 use Biblys\Isbn\IsbnParsingException;
 use Biblys\Isbn\IsbnValidationException;
@@ -27,12 +29,17 @@ use ThothApi\GraphQL\Enums\WorkStatus;
 
 class ThothPublicationService
 {
-    public $factory;
-    public $repository;
-    public $locationService;
+    public const DELETION_SKIPPED_WARNING = 'plugins.generic.thoth.synchronize.activeWorkPublicationDeletionsSkipped';
 
-    public function __construct($factory, $repository, $locationService)
-    {
+    private ThothPublicationFactory $factory;
+    private ThothPublicationRepository $repository;
+    private ThothLocationService $locationService;
+
+    public function __construct(
+        ThothPublicationFactory $factory,
+        ThothPublicationRepository $repository,
+        ThothLocationService $locationService
+    ) {
         $this->factory = $factory;
         $this->repository = $repository;
         $this->locationService = $locationService;
@@ -87,20 +94,21 @@ class ThothPublicationService
         }
     }
 
-    public function synchronizeByPublication($publication, string $thothWorkId): bool
+    public function synchronizeByPublication($publication, string $thothWorkId): array
     {
         $submissionFiles = $this->getBookSubmissionFiles($publication);
         $publicationFormats = DAORegistry::getDAO('PublicationFormatDAO')
             ->getByPublicationId($publication->getId());
         $thothWork = $this->repository->getByWorkId($thothWorkId);
 
-        return $this->update(
+        $deletionsSkipped = $this->update(
             $publicationFormats,
             $thothWorkId,
             $thothWork['publications'] ?? [],
             $this->getSubmissionFilesByPublicationFormat($submissionFiles),
             $thothWork['workStatus'] ?? null
         );
+        return $deletionsSkipped ? [ThothPublicationService::DELETION_SKIPPED_WARNING] : [];
     }
 
     public function update(

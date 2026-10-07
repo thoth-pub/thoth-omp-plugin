@@ -1,23 +1,21 @@
 <?php
 
 /**
- * @file plugins/generic/thoth/classes/factories/ThothBookFactory.inc.php
-*
-* Copyright (c) 2024-2026 Lepidus Tecnologia
-* Copyright (c) 2024-2026 Thoth
-* Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
-*
-* @class ThothBookFactory
-*
-* @ingroup plugins_generic_thoth
-*
-* @brief A factory to create Thoth books
-*/
+ * @file plugins/generic/thoth/classes/factories/ThothChapterFactory.php
+ *
+ * Copyright (c) 2024-2026 Lepidus Tecnologia
+ * Copyright (c) 2024-2026 Thoth
+ * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ *
+ * @class ThothChapterFactory
+ *
+ * @ingroup plugins_generic_thoth
+ *
+ * @brief A factory to create Thoth chapters
+ */
 
 namespace APP\plugins\generic\thoth\classes\factories;
 
-use APP\core\Application;
-use APP\facades\Repo;
 use PKP\core\Core;
 use ThothApi\GraphQL\Enums\WorkStatus;
 use ThothApi\GraphQL\Enums\WorkType;
@@ -25,27 +23,16 @@ use ThothApi\GraphQL\Inputs\PatchWork as ThothWork;
 
 class ThothChapterFactory
 {
-    public function createFromChapter($chapter)
+    public function createFromChapter($chapter, array $context): ThothWork
     {
-        $request = Application::get()->getRequest();
-        $publication = Repo::publication()->get($chapter->getData('publicationId'));
-        $submission = Repo::submission()->get($publication->getData('submissionId'));
-        $context = Application::getContextDAO()->getById($submission->getData('contextId'));
-
+        $publication = $context['publication'];
         $pages = $this->extractPages($chapter);
 
         $workData = [
             'workType' => WorkType::BOOK_CHAPTER,
             'workStatus' => $this->getWorkStatusByDatePublished($chapter, $publication),
             'publicationDate' => $chapter->getDatePublished() ?? $publication->getData('datePublished'),
-            'landingPage' => $request->getDispatcher()->url(
-                $request,
-                ROUTE_PAGE,
-                $context->getPath(),
-                'catalog',
-                'book',
-                [$submission->getBestId()]
-            ),
+            'landingPage' => $context['landingPage'],
         ];
 
         $optionalData = [

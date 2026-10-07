@@ -46,24 +46,16 @@ class ThothMetadataSynchronizationService
 
     public function synchronize($publication, string $thothWorkId): array
     {
-        $warnings = [];
-        $warning = $this->bookService->update($publication, $thothWorkId, true);
-        if ($warning) {
-            $warnings[] = $warning;
-        }
-        $this->contributionService->synchronizeByPublication($publication, $thothWorkId);
-        if ($this->publicationService->synchronizeByPublication($publication, $thothWorkId)) {
-            $warnings[] = 'plugins.generic.thoth.synchronize.activeWorkPublicationDeletionsSkipped';
-        }
-        $this->languageService->synchronizeByPublication($publication, $thothWorkId);
-        $this->subjectService->synchronizeByPublication($publication, $thothWorkId);
-        $this->referenceService->synchronizeByPublication($publication, $thothWorkId);
-        if (
+        $warnings = $this->bookService->update($publication, $thothWorkId, true);
+        $warnings = array_merge(
+            $warnings,
+            $this->contributionService->synchronizeByPublication($publication, $thothWorkId),
+            $this->publicationService->synchronizeByPublication($publication, $thothWorkId),
+            $this->languageService->synchronizeByPublication($publication, $thothWorkId),
+            $this->subjectService->synchronizeByPublication($publication, $thothWorkId),
+            $this->referenceService->synchronizeByPublication($publication, $thothWorkId),
             $this->workRelationService->synchronizeByPublication($publication, $thothWorkId)
-            && !in_array('plugins.generic.thoth.synchronize.activeWorkPublicationDeletionsSkipped', $warnings, true)
-        ) {
-            $warnings[] = 'plugins.generic.thoth.synchronize.activeWorkPublicationDeletionsSkipped';
-        }
-        return $warnings;
+        );
+        return array_values(array_unique($warnings));
     }
 }

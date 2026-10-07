@@ -17,16 +17,17 @@
 namespace APP\plugins\generic\thoth\classes\services;
 
 use APP\plugins\generic\thoth\classes\exceptions\MetadataSynchronizationException;
+use APP\plugins\generic\thoth\classes\repositories\ThothWorkRelationRepository;
 use PKP\db\DAORegistry;
 use ThothApi\GraphQL\Enums\RelationType;
 use ThothApi\GraphQL\Enums\WorkType;
 
 class ThothWorkRelationService
 {
-    public $repository;
-    public $chapterService;
+    private ThothWorkRelationRepository $repository;
+    private ThothChapterService $chapterService;
 
-    public function __construct($repository, $chapterService)
+    public function __construct(ThothWorkRelationRepository $repository, ThothChapterService $chapterService)
     {
         $this->repository = $repository;
         $this->chapterService = $chapterService;
@@ -57,19 +58,20 @@ class ThothWorkRelationService
         }
     }
 
-    public function synchronizeByPublication($publication, string $thothBookId): bool
+    public function synchronizeByPublication($publication, string $thothBookId): array
     {
         $chapters = DAORegistry::getDAO('ChapterDAO')
             ->getByPublicationId($publication->getId())
             ->toArray();
         $thothBook = $this->repository->getByWorkId($thothBookId);
 
-        return $this->update(
+        $deletionsSkipped = $this->update(
             $chapters,
             $thothBookId,
             $thothBook['imprintId'],
             $thothBook['relations'] ?? []
         );
+        return $deletionsSkipped ? [ThothPublicationService::DELETION_SKIPPED_WARNING] : [];
     }
 
     public function update(

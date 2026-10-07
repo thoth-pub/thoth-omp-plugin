@@ -22,6 +22,7 @@ use APP\core\Application;
 use APP\handler\Handler;
 use APP\plugins\generic\thoth\classes\components\forms\RegisterForm;
 use APP\plugins\generic\thoth\classes\facades\ThothService;
+use APP\plugins\generic\thoth\classes\notification\ThothErrorFormatter;
 use APP\template\TemplateManager;
 use Exception;
 use PKP\core\JSONMessage;
@@ -108,8 +109,8 @@ class RegisterHandler extends Handler
                 $imprints = ThothService::me()->getImprints();
             }
         } catch (Exception $e) {
-            error_log($e->getMessage());
-            $errors = [__('plugins.generic.thoth.connectionError')];
+            ThothErrorFormatter::log($e, ['action' => __METHOD__]);
+            $errors = [ThothErrorFormatter::message(__('plugins.generic.thoth.connectionError'), $e)];
         }
 
         $registerForm = new RegisterForm($publicationApiUrl, $imprints, $workType, $errors);

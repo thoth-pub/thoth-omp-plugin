@@ -11,306 +11,40 @@
  *
  * @ingroup plugins_generic_thoth_tests
  *
- * @see ThothBookFactory
- *
  * @brief Test class for the ThothBookFactory class
  */
 
 namespace APP\plugins\generic\thoth\tests\classes\factories;
 
-require_once(__DIR__ . '/../../../vendor/autoload.php');
+require_once __DIR__ . '/../../../vendor/autoload.php';
 
 use APP\plugins\generic\thoth\classes\factories\ThothBookFactory;
-use APP\press\Press;
-use APP\press\PressDAO;
-use APP\submission\Repository as SubmissionRepository;
+use APP\publication\Publication;
 use APP\submission\Submission;
-use Mockery;
-use PKP\core\Registry;
-use PKP\db\DAORegistry;
 use PKP\tests\PKPTestCase;
-use ThothApi\GraphQL\Enums\WorkStatus;
 use ThothApi\GraphQL\Enums\WorkType;
-use ThothApi\GraphQL\Inputs\PatchWork as ThothWork;
 
 class ThothBookFactoryTest extends PKPTestCase
 {
-    protected array $mocks = [];
-    protected function getMockedContainerKeys(): array
+    public function testCreatesBookFromExplicitMetadataWithoutRequestOrDatabase(): void
     {
-        return [...parent::getMockedContainerKeys(), SubmissionRepository::class];
-    }
+        $publication = new Publication();
+        $publication->setData('datePublished', '2020-01-01');
+        $context = [
+            'submissionWorkType' => Submission::WORK_TYPE_AUTHORED_WORK,
+            'landingPage' => 'https://publisher.example/book/1',
+            'license' => 'https://creativecommons.org/licenses/by/4.0/',
+            'copyrightHolder' => 'Publisher',
+            'coverUrl' => null,
+            'fallbackDoi' => '10.1234/book',
+        ];
 
-    protected function getMockedDAOs(): array
-    {
-        return ['PressDAO', 'PublicationFormatDAO'];
-    }
+        $book = (new ThothBookFactory())->createFromPublication($publication, $context, WorkType::TEXTBOOK);
 
-    protected function getMockedRegistryKeys(): array
-    {
-        return ['request'];
-    }
-
-    private function setUpMockEnvironment(
-        bool $uploadFrontcover = false,
-        ?string $frontcoverUrl = null,
-        bool $emptyOptionalMetadata = false
-    ) {
-        $submissionRepoMock = Mockery::mock(app(SubmissionRepository::class))
-            ->makePartial()
-            ->shouldReceive('get')
-            ->withAnyArgs()
-            ->andReturn(
-                Mockery::mock(\APP\submission\Submission::class)
-                    ->shouldReceive('getData')
-                    ->with('workType')
-                    ->andReturn(\APP\submission\Submission::WORK_TYPE_AUTHORED_WORK)
-                    ->shouldReceive('getData')
-                    ->with('contextId')
-                    ->andReturn(99)
-                    ->shouldReceive('getData')
-                    ->with('locale')
-                    ->andReturn('en')
-                    ->shouldReceive('_getContextLicenseFieldValue')
-                    ->withAnyArgs()
-                    ->andReturn('')
-                    ->shouldReceive('getBestId')
-                    ->withAnyArgs()
-                    ->andReturn(3)
-                    ->getMock()
-            )
-            ->getMock();
-        app()->instance(SubmissionRepository::class, $submissionRepoMock);
-
-        $mockContext = $this->getMockBuilder(Press::class)
-            ->onlyMethods(['getPath'])
-            ->getMock();
-        $mockContext->expects($this->any())
-            ->method('getPath')
-            ->willReturn('press');
-
-        $mockContextDao = $this->getMockBuilder(PressDAO::class)
-            ->onlyMethods(['getById'])
-            ->getMock();
-        $mockContextDao->expects($this->any())
-            ->method('getById')
-            ->willReturn($mockContext);
-        DAORegistry::registerDAO('PressDAO', $mockContextDao);
-
-        $mockRequest = Mockery::mock(\APP\core\Request::class)
-            ->shouldReceive('getDispatcher')
-            ->withAnyArgs()
-            ->andReturn(
-                Mockery::mock(\PKP\core\Dispatcher::class)
-                    ->shouldReceive('url')
-                    ->withAnyArgs()
-                    ->andReturn('https://omp.publicknowledgeproject.org/index.php/press/catalog/book/3')
-                    ->getMock()
-            )
-            ->shouldReceive('getUserVar')
-            ->with('thothWorkType')
-            ->andReturn(null)
-            ->getMock();
-        Registry::set('request', $mockRequest);
-
-        $mockPublication = Mockery::mock(\APP\publication\Publication::class)
-            ->shouldReceive('getData')
-            ->with('submissionId')
-            ->andReturn(3)
-            ->shouldReceive('getData')
-            ->with('datePublished')
-            ->andReturn('2020-01-01')
-            ->shouldReceive('getLocalizedFullTitle')
-            ->withAnyArgs()
-            ->andReturn('My book title: My book subtitle')
-            ->shouldReceive('getLocalizedTitle')
-            ->withAnyArgs()
-            ->andReturn('My book title')
-            ->shouldReceive('getLocalizedData')
-            ->with('subtitle')
-            ->andReturn('My book subtitle')
-            ->shouldReceive('getLocalizedData')
-            ->with('abstract')
-            ->andReturn('This is my book abstract')
-            ->shouldReceive('getData')
-            ->with('version')
-            ->andReturn(1)
-            ->shouldReceive('getData')
-            ->with('doiObject')
-            ->andReturn(
-                Mockery::mock(\PKP\doi\Doi::class)
-                    ->makePartial()
-                    ->shouldReceive('getResolvingUrl')
-                    ->withAnyArgs()
-                    ->andReturn($emptyOptionalMetadata ? '' : 'https://doi.org/10.12345/0101010101')
-                    ->getMock()
-            )
-            ->shouldReceive('getData')
-            ->with('licenseUrl')
-            ->andReturn($emptyOptionalMetadata ? '' : 'https://creativecommons.org/licenses/by-nc/4.0/')
-            ->shouldReceive('getLocalizedData')
-            ->with('copyrightHolder')
-            ->andReturn($emptyOptionalMetadata ? '' : 'Public Knowledge Press')
-            ->shouldReceive('getLocalizedCoverImageUrl')
-            ->withAnyArgs()
-            ->andReturn(
-                $emptyOptionalMetadata ? '' : 'https://omp.publicknowledgeproject.org/templates/images/book-default.png'
-            )
-            ->shouldReceive('getData')
-            ->with('thothUploadFrontcover')
-            ->andReturn($uploadFrontcover)
-            ->shouldReceive('getData')
-            ->with('thothFrontcoverUrl')
-            ->andReturn($frontcoverUrl)
-            ->shouldReceive('getData')
-            ->with('place')
-            ->andReturn($emptyOptionalMetadata ? '' : 'Salvador, BR')
-            ->shouldReceive('getData')
-            ->with('pageCount')
-            ->andReturn(64)
-            ->shouldReceive('getData')
-            ->with('imageCount')
-            ->andReturn(32)
-            ->getMock();
-
-        $this->mocks = [];
-        $this->mocks['publication'] = $mockPublication;
-    }
-
-    public function testCreateThothBookFromPublication()
-    {
-        $this->setUpMockEnvironment();
-        $mockPublication = $this->mocks['publication'];
-
-        $factory = new ThothBookFactory();
-        $thothWork = $factory->createFromPublication($mockPublication);
-
-        $this->assertEquals(new ThothWork([
-            'workType' => WorkType::MONOGRAPH,
-            'workStatus' => WorkStatus::ACTIVE,
-            'edition' => 1,
-            'publicationDate' => '2020-01-01',
-            'place' => 'Salvador, BR',
-            'pageCount' => 64,
-            'imageCount' => 32,
-            'doi' => 'https://doi.org/10.12345/0101010101',
-            'license' => 'https://creativecommons.org/licenses/by-nc/4.0/',
-            'copyrightHolder' => 'Public Knowledge Press',
-            'landingPage' => 'https://omp.publicknowledgeproject.org/index.php/press/catalog/book/3',
-            'coverUrl' => 'https://omp.publicknowledgeproject.org/templates/images/book-default.png',
-        ]), $thothWork);
-    }
-
-    public function testCreateThothBookPreservesHostedFrontcoverUrl()
-    {
-        $frontcoverUrl = 'https://cdn.thoth.pub/frontcover.png';
-        $this->setUpMockEnvironment(true, $frontcoverUrl);
-
-        $factory = new ThothBookFactory();
-        $thothWork = $factory->createFromPublication($this->mocks['publication']);
-
-        $this->assertSame($frontcoverUrl, $thothWork->getCoverUrl());
-    }
-
-    public function testCreateThothBookUsesOmpCoverUrlWhenFrontcoverIsNotHosted()
-    {
-        $this->setUpMockEnvironment(true);
-
-        $factory = new ThothBookFactory();
-        $thothWork = $factory->createFromPublication($this->mocks['publication']);
-
-        $this->assertSame(
-            'https://omp.publicknowledgeproject.org/templates/images/book-default.png',
-            $thothWork->getCoverUrl()
-        );
-    }
-
-    public function testCreateThothBookOmitsEmptyOptionalMetadata()
-    {
-        $this->setUpMockEnvironment(false, null, true);
-
-        $factory = new ThothBookFactory();
-        $thothWork = $factory->createFromPublication($this->mocks['publication']);
-        $data = $thothWork->getAllData();
-
-        foreach (['doi', 'place', 'license', 'copyrightHolder', 'coverUrl'] as $fieldName) {
-            $this->assertArrayNotHasKey($fieldName, $data);
-        }
-    }
-
-    public function testGetWorkTypeBySubmissionWorkType()
-    {
-        $factory = new ThothBookFactory();
-        $workType = $factory->getWorkTypeBySubmissionWorkType(Submission::WORK_TYPE_AUTHORED_WORK);
-        $this->assertEquals(WorkType::MONOGRAPH, $workType);
-
-        $workType = $factory->getWorkTypeBySubmissionWorkType(Submission::WORK_TYPE_EDITED_VOLUME);
-        $this->assertEquals(WorkType::EDITED_BOOK, $workType);
-    }
-
-    public function testGetWorkStatusByDatePublished()
-    {
-        $factory = new ThothBookFactory();
-        $workStatus = $factory->getWorkStatusByDatePublished('2020-01-01');
-        $this->assertEquals(WorkStatus::ACTIVE, $workStatus);
-
-        $workStatus = $factory->getWorkStatusByDatePublished('2050-12-12');
-        $this->assertEquals(WorkStatus::FORTHCOMING, $workStatus);
-    }
-
-    public function testGetDoiFromPublication()
-    {
-        $mockPublication = Mockery::mock(\APP\publication\Publication::class)
-            ->shouldReceive('getData')
-            ->with('doiObject')
-            ->andReturn(
-                Mockery::mock(\PKP\doi\Doi::class)
-                    ->makePartial()
-                    ->shouldReceive('getResolvingUrl')
-                    ->withAnyArgs()
-                    ->andReturn('https://doi.org/10.12345/1111122222')
-                    ->getMock()
-            )
-            ->getMock();
-
-        $factory = new ThothBookFactory();
-        $doi = $factory->getDoi($mockPublication);
-        $this->assertEquals('https://doi.org/10.12345/1111122222', $doi);
-    }
-
-    public function testGetDoiFromPublicationFormat()
-    {
-        $mockIdentificationCode = $this->createMock(\APP\publicationFormat\IdentificationCode::class);
-        $mockIdentificationCode->expects($this->once())
-            ->method('getCode')
-            ->willReturn('06');
-        $mockIdentificationCode->expects($this->once())
-            ->method('getValue')
-            ->willReturn('10.12345/123456789');
-
-        $mockIdCodeResult = $this->createMock(\PKP\db\DAOResultFactory::class);
-        $mockIdCodeResult->expects($this->once())
-            ->method('toArray')
-            ->willReturn([$mockIdentificationCode]);
-
-        $mockPubFormat = $this->createMock(\APP\publicationFormat\PublicationFormat::class);
-        $mockPubFormat->expects($this->once())
-            ->method('getIdentificationCodes')
-            ->willReturn($mockIdCodeResult);
-
-        $mockPublicationFormatDao = $this->createMock(\APP\publicationFormat\PublicationFormatDAO::class);
-        $mockPublicationFormatDao->expects($this->any())
-            ->method('getByPublicationId')
-            ->willReturn([9999 => $mockPubFormat]);
-        DAORegistry::registerDAO('PublicationFormatDAO', $mockPublicationFormatDao);
-
-        $mockPublication = $this->createMock(\APP\publication\Publication::class);
-        $mockPublication->expects($this->once())
-            ->method('getId')
-            ->willReturn(9999);
-
-        $factory = new ThothBookFactory();
-        $doi = $factory->getDoi($mockPublication);
-        $this->assertEquals('https://doi.org/10.12345/123456789', $doi);
+        self::assertSame(WorkType::TEXTBOOK, $book->getWorkType());
+        self::assertSame('https://doi.org/10.1234/book', $book->getDoi());
+        self::assertSame($context['landingPage'], $book->getLandingPage());
+        self::assertSame($context['license'], $book->getLicense());
+        self::assertArrayNotHasKey('coverUrl', $book->getAllData());
     }
 }

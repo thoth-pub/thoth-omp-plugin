@@ -93,9 +93,10 @@ class ThothContributionService
         }
     }
 
-    public function synchronizeByPublication($publication, string $thothWorkId): void
+    public function synchronizeByPublication($publication, string $thothWorkId): array
     {
         $this->updateByPublication($publication, $thothWorkId, $this->repository->getByWorkId($thothWorkId));
+        return [];
     }
 
     public function updateByPublication(

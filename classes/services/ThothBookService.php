@@ -16,15 +16,18 @@
 
 namespace APP\plugins\generic\thoth\classes\services;
 
+use APP\plugins\generic\thoth\classes\factories\ThothBookFactory;
+use APP\plugins\generic\thoth\classes\pkp\OmpMetadataSource;
+use APP\plugins\generic\thoth\classes\repositories\ThothBookRepository;
 use PKP\db\DAORegistry;
 
 class ThothBookService
 {
-    public $factory;
-    public $repository;
-    public $publicationService;
-    public $titleService;
-    public $abstractService;
+    private ThothBookFactory $factory;
+    private ThothBookRepository $repository;
+    private ThothPublicationService $publicationService;
+    private ThothTitleService $titleService;
+    private ThothAbstractService $abstractService;
     private ?ThothFrontcoverService $frontcoverService;
 
     private const PATCH_WORK_FIELDS = [
@@ -61,11 +64,12 @@ class ThothBookService
     ];
 
     public function __construct(
-        $factory,
-        $repository,
-        $publicationService,
-        $titleService,
-        $abstractService,
+        ThothBookFactory $factory,
+        ThothBookRepository $repository,
+        ThothPublicationService $publicationService,
+        ThothTitleService $titleService,
+        ThothAbstractService $abstractService,
+        private OmpMetadataSource $metadataSource,
         ?ThothFrontcoverService $frontcoverService = null
     ) {
         $this->factory = $factory;
@@ -76,22 +80,13 @@ class ThothBookService
         $this->frontcoverService = $frontcoverService;
     }
 
-    public function register($publication, $thothImprintId)
-    {
-        $thothBook = $this->factory->createFromPublication($publication);
-        $thothBook->setImprintId($thothImprintId);
-
-        $thothBookId = $this->repository->add($thothBook);
-        $publication->setData('thothBookId', $thothBookId);
-        $this->frontcoverService?->sync($publication, $thothBookId);
-
-        return $thothBookId;
-    }
-
-    public function update($publication, $thothBookId, bool $includeTitlesAndAbstracts = false)
+    public function update($publication, $thothBookId, bool $includeTitlesAndAbstracts = false): array
     {
         $oldThothBook = $this->repository->get($thothBookId);
-        $newThothBook = $this->factory->createFromPublication($publication);
+        $newThothBook = $this->factory->createFromPublication(
+            $publication,
+            $this->metadataSource->getBookContext($publication)
+        );
 
         $thothBook = $this->repository->new(array_merge(
             $this->getPatchWorkData($oldThothBook),
@@ -102,7 +97,8 @@ class ThothBookService
         if ($includeTitlesAndAbstracts) {
             $this->updateTitlesAndAbstracts($publication, $thothBookId, $oldThothBook);
         }
-        return $this->frontcoverService?->sync($publication, $thothBookId);
+        $warning = $this->frontcoverService?->sync($publication, $thothBookId);
+        return $warning === null ? [] : [$warning];
     }
 
     private function getPatchWorkData($thothBook): array
@@ -133,7 +129,10 @@ class ThothBookService
     {
         $errors = [];
 
-        $thothBook = $this->factory->createFromPublication($publication);
+        $thothBook = $this->factory->createFromPublication(
+            $publication,
+            $this->metadataSource->getBookContext($publication)
+        );
         if ($doi = $thothBook->getDoi()) {
             $retrievedThothBook = $this->repository->getByDoi($doi);
             if ($retrievedThothBook !== null) {

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @file plugins/generic/thoth/tests/classes/repositories/ThothBookRepository.inc.php
+ * @file plugins/generic/thoth/classes/repositories/ThothBookRepository.php
  *
  * Copyright (c) 2024-2026 Lepidus Tecnologia
  * Copyright (c) 2024-2026 Thoth
@@ -25,7 +25,10 @@ class ThothBookRepository extends ThothWorkRepository
         try {
             return $this->thothClient->bookByDoi($doi);
         } catch (QueryException $e) {
-            return null;
+            if ($this->isRecordNotFound($e)) {
+                return null;
+            }
+            throw $e;
         }
     }
 

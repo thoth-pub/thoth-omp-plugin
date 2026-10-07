@@ -1,0 +1,4 @@
+# Public fixture password for disposable Thoth PostgreSQL only.
+# Exact historical fingerprints; do not ignore paths or detection rules.
+458fca2742863281e19f57fa58b68336341b34c3:.gitlab/thoth-environment.yml:Password in URL:39
+cd32b283cd60e5d7f567fa28ff9437466e83b692:.gitlab/thoth-services.yml:Password in URL:36

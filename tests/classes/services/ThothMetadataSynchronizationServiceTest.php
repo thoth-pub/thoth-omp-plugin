@@ -6,6 +6,12 @@
  * Copyright (c) 2024-2026 Lepidus Tecnologia
  * Copyright (c) 2024-2026 Thoth
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ *
+ * @class ThothMetadataSynchronizationServiceTest
+ *
+ * @ingroup plugins_generic_thoth_tests
+ *
+ * @brief Test class for the ThothMetadataSynchronizationService class
  */
 
 namespace APP\plugins\generic\thoth\tests\classes\services;
@@ -32,7 +38,7 @@ class ThothMetadataSynchronizationServiceTest extends PKPTestCase
         $bookService->expects($this->once())
             ->method('update')
             ->with($publication, 'work-id', true)
-            ->willReturn('warning-key');
+            ->willReturn(['warning-key']);
         $contributionService = $this->createMock(ThothContributionService::class);
         $contributionService->expects($this->once())
             ->method('synchronizeByPublication')
@@ -41,7 +47,7 @@ class ThothMetadataSynchronizationServiceTest extends PKPTestCase
         $publicationService->expects($this->once())
             ->method('synchronizeByPublication')
             ->with($publication, 'work-id')
-            ->willReturn(false);
+            ->willReturn([]);
         $languageService = $this->createMock(ThothLanguageService::class);
         $languageService->expects($this->once())
             ->method('synchronizeByPublication')
@@ -58,7 +64,7 @@ class ThothMetadataSynchronizationServiceTest extends PKPTestCase
         $workRelationService->expects($this->once())
             ->method('synchronizeByPublication')
             ->with($publication, 'work-id')
-            ->willReturn(false);
+            ->willReturn([]);
 
         $service = new ThothMetadataSynchronizationService(
             $bookService,
@@ -77,15 +83,15 @@ class ThothMetadataSynchronizationServiceTest extends PKPTestCase
     {
         $publication = $this->createMock(Publication::class);
         $bookService = $this->createMock(ThothBookService::class);
-        $bookService->method('update')->willReturn(null);
+        $bookService->method('update')->willReturn([]);
         $contributionService = $this->createMock(ThothContributionService::class);
         $publicationService = $this->createMock(ThothPublicationService::class);
-        $publicationService->method('synchronizeByPublication')->willReturn(false);
+        $publicationService->method('synchronizeByPublication')->willReturn([]);
         $languageService = $this->createMock(ThothLanguageService::class);
         $subjectService = $this->createMock(ThothSubjectService::class);
         $referenceService = $this->createMock(ThothReferenceService::class);
         $workRelationService = $this->createMock(ThothWorkRelationService::class);
-        $workRelationService->method('synchronizeByPublication')->willReturn(false);
+        $workRelationService->method('synchronizeByPublication')->willReturn([]);
 
         $service = new ThothMetadataSynchronizationService(
             $bookService,
@@ -104,15 +110,17 @@ class ThothMetadataSynchronizationServiceTest extends PKPTestCase
     {
         $publication = $this->createMock(Publication::class);
         $bookService = $this->createMock(ThothBookService::class);
-        $bookService->method('update')->willReturn('book-warning-key');
+        $bookService->method('update')->willReturn(['book-warning-key']);
         $contributionService = $this->createMock(ThothContributionService::class);
         $publicationService = $this->createMock(ThothPublicationService::class);
-        $publicationService->method('synchronizeByPublication')->willReturn(true);
+        $publicationService->method('synchronizeByPublication')
+            ->willReturn([ThothPublicationService::DELETION_SKIPPED_WARNING]);
         $languageService = $this->createMock(ThothLanguageService::class);
         $subjectService = $this->createMock(ThothSubjectService::class);
         $referenceService = $this->createMock(ThothReferenceService::class);
         $workRelationService = $this->createMock(ThothWorkRelationService::class);
-        $workRelationService->method('synchronizeByPublication')->willReturn(true);
+        $workRelationService->method('synchronizeByPublication')
+            ->willReturn([ThothPublicationService::DELETION_SKIPPED_WARNING]);
 
         $service = new ThothMetadataSynchronizationService(
             $bookService,

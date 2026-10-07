@@ -16,13 +16,21 @@
 
 namespace APP\plugins\generic\thoth\classes\services;
 
-use ThothApi\Exception\QueryException;
+use APP\plugins\generic\thoth\classes\exceptions\ThothRegistrationException;
+use APP\plugins\generic\thoth\classes\factories\ThothBookFactory;
+use APP\plugins\generic\thoth\classes\pkp\OmpMetadataSource;
+use APP\plugins\generic\thoth\classes\repositories\ThothBookRepository;
+use APP\publication\Publication;
+use APP\submission\Repository as SubmissionRepository;
+use APP\submission\Submission;
+use Illuminate\Database\ConnectionInterface;
 use ThothApi\GraphQL\Enums\WorkStatus;
+use Throwable;
 
 class ThothBookRegistrationService
 {
-    private $factory;
-    private $repository;
+    private ThothBookFactory $factory;
+    private ThothBookRepository $repository;
     private ThothAbstractService $abstractService;
     private ThothContributionService $contributionService;
     private ThothLanguageService $languageService;
@@ -31,11 +39,11 @@ class ThothBookRegistrationService
     private ThothSubjectService $subjectService;
     private ThothTitleService $titleService;
     private ThothWorkRelationService $workRelationService;
-    private ?ThothFrontcoverService $frontcoverService;
+    private ThothFrontcoverService $frontcoverService;
 
     public function __construct(
-        $factory,
-        $repository,
+        ThothBookFactory $factory,
+        ThothBookRepository $repository,
         ThothAbstractService $abstractService,
         ThothContributionService $contributionService,
         ThothLanguageService $languageService,
@@ -44,7 +52,10 @@ class ThothBookRegistrationService
         ThothSubjectService $subjectService,
         ThothTitleService $titleService,
         ThothWorkRelationService $workRelationService,
-        ?ThothFrontcoverService $frontcoverService = null
+        private OmpMetadataSource $metadataSource,
+        ThothFrontcoverService $frontcoverService,
+        private SubmissionRepository $submissionRepository,
+        private ConnectionInterface $connection
     ) {
         $this->factory = $factory;
         $this->repository = $repository;
@@ -59,9 +70,17 @@ class ThothBookRegistrationService
         $this->frontcoverService = $frontcoverService;
     }
 
-    public function register($publication, $thothImprintId): ThothBookRegistrationResult
-    {
-        $thothBook = $this->factory->createFromPublication($publication);
+    public function register(
+        Publication $publication,
+        string $thothImprintId,
+        Submission $submission,
+        ?string $workType = null
+    ): ThothBookRegistrationResult {
+        $thothBook = $this->factory->createFromPublication(
+            $publication,
+            $this->metadataSource->getBookContext($publication),
+            $workType
+        );
         $thothBook->setImprintId($thothImprintId);
 
         $bookToActivate = null;
@@ -70,9 +89,9 @@ class ThothBookRegistrationService
             $thothBook->setWorkStatus(WorkStatus::FORTHCOMING);
         }
 
+        $previousBookId = $publication->getData('thothBookId');
         $thothBookId = $this->repository->add($thothBook);
         $publication->setData('thothBookId', $thothBookId);
-        $registrationResult = new ThothBookRegistrationResult($thothBookId, $bookToActivate);
 
         try {
             $this->registerMetadata($publication, $thothBookId);
@@ -83,30 +102,25 @@ class ThothBookRegistrationService
             $this->subjectService->registerByPublication($publication);
             $this->referenceService->registerByPublication($publication);
             $this->workRelationService->registerByPublication($publication, $thothImprintId);
-            $registrationResult->setWarning($this->frontcoverService?->sync($publication, $thothBookId));
-        } catch (QueryException $e) {
-            $this->deleteRegisteredEntry($registrationResult);
+            $warning = $this->frontcoverService->sync($publication, $thothBookId);
+            if ($bookToActivate !== null) {
+                $bookToActivate->setWorkId($thothBookId);
+                $this->repository->edit($bookToActivate);
+            }
+            $this->connection->transaction(function () use ($submission, $thothBookId): void {
+                $this->submissionRepository->edit($submission, ['thothWorkId' => $thothBookId]);
+            });
+        } catch (Throwable $e) {
+            $publication->setData('thothBookId', $previousBookId);
+            try {
+                $this->repository->delete($thothBookId);
+            } catch (Throwable $compensationFailure) {
+                throw new ThothRegistrationException($thothBookId, $e, $compensationFailure);
+            }
             throw $e;
         }
 
-        return $registrationResult;
-    }
-
-    public function deleteRegisteredEntry(ThothBookRegistrationResult $registrationResult): void
-    {
-        $this->repository->delete($registrationResult->getWorkId());
-    }
-
-    public function setActive(ThothBookRegistrationResult $registrationResult): void
-    {
-        if (!$registrationResult->shouldActivate()) {
-            return;
-        }
-
-        $thothBook = $registrationResult->getBookToActivate();
-        $thothBook->setWorkId($registrationResult->getWorkId());
-        $thothBook->setWorkStatus(WorkStatus::ACTIVE);
-        $this->repository->edit($thothBook);
+        return new ThothBookRegistrationResult($thothBookId, $warning === null ? [] : [$warning]);
     }
 
     private function registerMetadata($publication, string $thothBookId): void
