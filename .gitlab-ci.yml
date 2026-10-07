@@ -22,6 +22,9 @@ include:
   - local: /.gitlab/thoth-unit-matrix.yml
     rules:
       - if: '$THOTH_ENVIRONMENT_PROBE != "1"'
+  - local: /.gitlab/thoth-secret-detection.yml
+    rules:
+      - if: '$THOTH_ENVIRONMENT_PROBE != "1"'
   - local: /.gitlab/thoth-cypress.yml
     rules:
       - if: '$THOTH_ENVIRONMENT_PROBE != "1"'
