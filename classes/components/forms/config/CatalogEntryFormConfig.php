@@ -18,6 +18,7 @@ namespace APP\plugins\generic\thoth\classes\components\forms\config;
 
 use APP\facades\Repo;
 use APP\plugins\generic\thoth\classes\facades\ThothService;
+use APP\plugins\generic\thoth\classes\notification\ThothErrorFormatter;
 use Exception;
 use PKP\components\forms\FieldOptions;
 use PKP\components\forms\FieldText;
@@ -76,7 +77,7 @@ class CatalogEntryFormConfig
         try {
             return ThothService::me()->hasCdnWritePermission();
         } catch (Exception $e) {
-            error_log($e->getMessage());
+            ThothErrorFormatter::log($e, ['action' => __METHOD__]);
             return false;
         }
     }

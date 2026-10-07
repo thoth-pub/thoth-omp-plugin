@@ -23,6 +23,7 @@ use APP\notification\NotificationManager;
 use APP\plugins\generic\thoth\classes\facades\ThothRepository;
 use APP\plugins\generic\thoth\classes\factories\ThothPublicationFactory;
 use APP\plugins\generic\thoth\classes\formatters\DoiFormatter;
+use APP\plugins\generic\thoth\classes\notification\ThothErrorFormatter;
 use APP\plugins\generic\thoth\classes\services\ThothCatalogFilesCacheService;
 use APP\plugins\generic\thoth\classes\services\ThothFileUploadService;
 use APP\template\TemplateManager;
@@ -189,10 +190,11 @@ class UploadThothPublicationFileForm extends Form
                 ['contents' => __('plugins.generic.thoth.fileUpload.success')]
             );
         } catch (Exception $e) {
+            ThothErrorFormatter::log($e, ['action' => __METHOD__]);
             $notificationMgr->createTrivialNotification(
                 $user->getId(),
                 Notification::NOTIFICATION_TYPE_ERROR,
-                ['contents' => $e->getMessage()]
+                ['contents' => ThothErrorFormatter::message('', $e)]
             );
         } finally {
             $temporaryFileManager->deleteById($temporaryFile->getId(), $user->getId());
@@ -257,7 +259,11 @@ class UploadThothPublicationFileForm extends Form
                 );
             }
         } catch (Exception $e) {
-            $this->addError('submissionComponentId', __('plugins.generic.thoth.fileUpload.error.chapterLookupFailed'));
+            ThothErrorFormatter::log($e, ['action' => __METHOD__]);
+            $this->addError(
+                'submissionComponentId',
+                ThothErrorFormatter::message(__('plugins.generic.thoth.fileUpload.error.chapterLookupFailed'), $e, true)
+            );
         }
     }
 

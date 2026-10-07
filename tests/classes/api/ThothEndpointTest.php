@@ -36,8 +36,11 @@ class ThothEndpointTest extends PKPTestCase
         return [...parent::getMockedContainerKeys(), \APP\submission\Repository::class];
     }
 
-    public function testRegistrationDelegatesToServiceAndDoesNotExposePersistenceFailure(): void
-    {
+    #[\PHPUnit\Framework\Attributes\DataProvider('registrationFailures')]
+    public function testRegistrationReportsRemoteCauseAndProtectsInternalDiagnostics(
+        \Throwable $failure,
+        ?string $expectedCause
+    ): void {
         $publication = new \APP\publication\Publication();
         $submission = $this->createMock(\APP\submission\Submission::class);
         $submission->method('getCurrentPublication')->willReturn($publication);
@@ -60,7 +63,6 @@ class ThothEndpointTest extends PKPTestCase
         $registrationService = $this->createMock(
             \APP\plugins\generic\thoth\classes\services\ThothBookRegistrationService::class
         );
-        $failure = new \RuntimeException('Private database diagnostic');
         $registrationService->expects($this->once())->method('register')
             ->with($publication, 'imprint', $submission, 'TEXTBOOK')->willThrowException($failure);
         $notification = $this->createMock(\APP\plugins\generic\thoth\classes\notification\ThothNotification::class);
@@ -81,8 +83,25 @@ class ThothEndpointTest extends PKPTestCase
 
         $response = $endpoint->register($input);
 
-        self::assertSame(500, $response->getStatusCode());
+        self::assertSame($failure instanceof \ThothApi\Exception\QueryException ? 400 : 500, $response->getStatusCode());
         self::assertStringNotContainsString('Private database diagnostic', $response->getContent());
+        if ($expectedCause !== null) {
+            self::assertStringContainsString($expectedCause, $response->getContent());
+        }
+    }
+
+    public static function registrationFailures(): array
+    {
+        return [
+            'internal persistence failure' => [new \RuntimeException('Private database diagnostic'), null],
+            'remote GraphQL failure' => [new \ThothApi\Exception\QueryException(
+                ['message' => 'Permission denied for createWork'],
+                'mutation { createWork { workId } }',
+                null,
+                null,
+                403
+            ), 'Permission denied for createWork'],
+        ];
     }
 
     public function testEndpointProvidesSubmissionAccessPolicy(): void
