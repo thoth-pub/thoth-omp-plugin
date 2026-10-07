@@ -8,6 +8,7 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class CatalogEntryFormConfig
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief Thoth config for catalog entry form
@@ -15,6 +16,8 @@
 
 import('plugins.generic.thoth.classes.facades.ThothRepo');
 import('plugins.generic.thoth.classes.services.ThothMeCacheService');
+
+require_once __DIR__ . '/../../../notification/ThothErrorFormatter.inc.php';
 
 class CatalogEntryFormConfig
 {
@@ -73,7 +76,7 @@ class CatalogEntryFormConfig
                 $submission->getData('contextId')
             );
         } catch (Exception $e) {
-            error_log($e->getMessage());
+            ThothErrorFormatter::log($e, ['action' => __METHOD__]);
             return false;
         }
     }

@@ -10,18 +10,19 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class RegisterHandler
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief A handler to load Thoth register confirmation
  */
 
-use APP\components\forms\publication\PublishForm;
-use ThothApi\Exception\QueryException;
 
 import('classes.handler.Handler');
 import('plugins.generic.thoth.classes.facades.ThothService');
 import('plugins.generic.thoth.classes.facades.ThothRepo');
 import('plugins.generic.thoth.classes.services.ThothMeCacheService');
+
+require_once __DIR__ . '/../../classes/notification/ThothErrorFormatter.inc.php';
 
 class RegisterHandler extends Handler
 {
@@ -101,8 +102,8 @@ class RegisterHandler extends Handler
                 ]);
             }
         } catch (Exception $e) {
-            error_log($e->getMessage());
-            $errors = [__('plugins.generic.thoth.connectionError')];
+            ThothErrorFormatter::log($e, ['action' => __METHOD__]);
+            $errors = [ThothErrorFormatter::message(__('plugins.generic.thoth.connectionError'), $e)];
         }
 
         $plugin->import('classes.components.forms.RegisterForm');
