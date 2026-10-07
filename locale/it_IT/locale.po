@@ -71,9 +71,7 @@ msgid "plugins.generic.thoth.imprint.required"
 msgstr "Seleziona un imprint."
 
 msgid "plugins.generic.thoth.connectionError"
-msgstr ""
-"Si è verificato un problema durante la connessione a Thoth. Riprova più tardi o "
-"contatta l'amministratore di sistema."
+msgstr "Si è verificato un problema durante la connessione a Thoth. Riprova più tardi."
 
 msgid "plugins.generic.thoth.status.registered"
 msgstr "Registrato"
@@ -128,8 +126,8 @@ msgstr "Metadati della proposta registrati in Thoth."
 
 msgid "plugins.generic.thoth.register.error"
 msgstr ""
-"Si è verificato un problema durante l'invio dei metadati della proposta a Thoth. Riprova più tardi o "
-"contatta l'amministratore di sistema."
+"Si è verificato un problema durante l'invio dei metadati della proposta a Thoth. Riprova più "
+"tardi."
 
 msgid "plugins.generic.thoth.register.error.log"
 msgstr "Errore durante la registrazione dei metadati in Thoth: {$reason}"
@@ -144,9 +142,7 @@ msgid "plugins.generic.thoth.update.success.log"
 msgstr "Metadati della proposta aggiornati in Thoth."
 
 msgid "plugins.generic.thoth.update.error"
-msgstr ""
-"Si è verificato un problema durante l'aggiornamento dei metadati in Thoth. Riprova più tardi o "
-"contatta l'amministratore di sistema."
+msgstr "Si è verificato un problema durante l'aggiornamento dei metadati in Thoth. Riprova più tardi."
 
 msgid "plugins.generic.thoth.update.error.log"
 msgstr "Errore durante l'aggiornamento dei metadati in Thoth: {$reason}"

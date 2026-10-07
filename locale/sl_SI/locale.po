@@ -82,7 +82,7 @@ msgid "plugins.generic.thoth.imprint.required"
 msgstr "Izberite kolofon."
 
 msgid "plugins.generic.thoth.connectionError"
-msgstr "Pri povezovanju s Thothom je prišlo do težave. Poskusite znova pozneje ali se obrnite na skrbnika sistema."
+msgstr "Pri povezovanju s Thothom je prišlo do težave. Poskusite znova pozneje."
 
 msgid "plugins.generic.thoth.status.registered"
 msgstr "Registrirano"
@@ -139,7 +139,7 @@ msgid "plugins.generic.thoth.register.success.log"
 msgstr "Metapodatki prispevka so bili registrirani v Thothu."
 
 msgid "plugins.generic.thoth.register.error"
-msgstr "Pri pošiljanju metapodatkov prispevka v Thoth je prišlo do težave. Poskusite znova pozneje ali se obrnite na skrbnika sistema."
+msgstr "Pri pošiljanju metapodatkov prispevka v Thoth je prišlo do težave. Poskusite znova pozneje."
 
 msgid "plugins.generic.thoth.publicationFormat.accessibility"
 msgstr "Metapodatki o dostopnosti"
@@ -217,7 +217,7 @@ msgid "plugins.generic.thoth.update.success.log"
 msgstr "Metapodatki prispevka so bili posodobljeni v Thothu."
 
 msgid "plugins.generic.thoth.update.error"
-msgstr "Pri posodabljanju metapodatkov v Thothu je prišlo do težave. Poskusite znova pozneje ali se obrnite na skrbnika sistema."
+msgstr "Pri posodabljanju metapodatkov v Thothu je prišlo do težave. Poskusite znova pozneje."
 
 msgid "plugins.generic.thoth.update.error.log"
 msgstr "Napaka pri posodabljanju metapodatkov v Thothu: {$reason}"

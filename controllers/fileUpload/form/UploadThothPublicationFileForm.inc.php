@@ -8,6 +8,7 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class UploadThothPublicationFileForm
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief Form for uploading publication files to Thoth.
@@ -17,6 +18,8 @@ import('lib.pkp.classes.form.Form');
 import('lib.pkp.classes.plugins.PKPPubIdPluginDAO');
 import('plugins.generic.thoth.classes.services.ThothCatalogFilesCacheService');
 import('plugins.generic.thoth.classes.services.ThothFileUploadService');
+
+require_once __DIR__ . '/../../../classes/notification/ThothErrorFormatter.inc.php';
 
 class UploadThothPublicationFileForm extends Form
 {
@@ -201,13 +204,14 @@ class UploadThothPublicationFileForm extends Form
             $notificationMgr->createTrivialNotification(
                 $user->getId(),
                 NOTIFICATION_TYPE_SUCCESS,
-                array('contents' => __('plugins.generic.thoth.fileUpload.success'))
+                ['contents' => __('plugins.generic.thoth.fileUpload.success')]
             );
         } catch (Exception $e) {
+            ThothErrorFormatter::log($e, ['action' => __METHOD__]);
             $notificationMgr->createTrivialNotification(
                 $user->getId(),
                 NOTIFICATION_TYPE_ERROR,
-                ['contents' => $e->getMessage()]
+                ['contents' => ThothErrorFormatter::message('', $e)]
             );
         } finally {
             $temporaryFileManager->deleteById($temporaryFile->getId(), $user->getId());
