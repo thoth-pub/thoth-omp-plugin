@@ -19,6 +19,7 @@ namespace APP\plugins\generic\thoth\classes\components\forms\config;
 use APP\facades\Repo;
 use APP\plugins\generic\thoth\classes\components\forms\ThothValidationMessageFormatter;
 use APP\plugins\generic\thoth\classes\facades\ThothService;
+use APP\plugins\generic\thoth\classes\notification\ThothErrorFormatter;
 use APP\submission\Submission;
 use Exception;
 use ThothApi\GraphQL\Enums\WorkType;
@@ -45,8 +46,8 @@ class PublishFormConfig
                 $imprints = $this->getImprints();
             }
         } catch (Exception $e) {
-            error_log($e->getMessage());
-            $errors = [__('plugins.generic.thoth.connectionError')];
+            ThothErrorFormatter::log($e, ['action' => __METHOD__]);
+            $errors = [ThothErrorFormatter::message(__('plugins.generic.thoth.connectionError'), $e)];
         }
 
         if (!empty($errors)) {

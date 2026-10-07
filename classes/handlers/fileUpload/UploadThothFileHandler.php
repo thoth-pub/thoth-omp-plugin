@@ -24,6 +24,7 @@ use APP\plugins\generic\thoth\classes\facades\ThothService;
 use APP\plugins\generic\thoth\classes\factories\ThothPublicationFactory;
 use APP\plugins\generic\thoth\classes\formatters\DoiFormatter;
 use APP\plugins\generic\thoth\classes\handlers\fileUpload\form\UploadThothPublicationFileForm;
+use APP\plugins\generic\thoth\classes\notification\ThothErrorFormatter;
 use APP\plugins\generic\thoth\classes\services\ThothCatalogFileService;
 use APP\template\TemplateManager;
 use Exception;
@@ -288,7 +289,7 @@ class UploadThothFileHandler extends Handler
                 $publicationType
             );
         } catch (Exception $e) {
-            error_log($e->getMessage());
+            ThothErrorFormatter::log($e, ['action' => __METHOD__]);
             return null;
         }
     }
@@ -309,7 +310,7 @@ class UploadThothFileHandler extends Handler
         try {
             return ThothService::me()->hasCdnWritePermission();
         } catch (Exception $e) {
-            error_log($e->getMessage());
+            ThothErrorFormatter::log($e, ['action' => __METHOD__]);
             return false;
         }
     }

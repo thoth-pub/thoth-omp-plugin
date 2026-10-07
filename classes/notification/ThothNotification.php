@@ -37,8 +37,6 @@ class ThothNotification
 
     public function notifyError($request, $submission, $error)
     {
-        $error = $this->normalizeError($error);
-        error_log("Failed to send the request to Thoth: {$error}");
         $this->notify(
             $request,
             $submission,
@@ -60,12 +58,17 @@ class ThothNotification
 
     public function notify($request, $submission, $notificationType, $messageKey, $error = null)
     {
+        $contents = __($messageKey);
+        $reason = $this->normalizeError($error);
+        if ($reason !== null && $reason !== '') {
+            $contents .= "\n" . $reason;
+        }
         $currentUser = $request->getUser();
         $notificationMgr = new NotificationManager();
         $notificationMgr->createTrivialNotification(
             $currentUser->getId(),
             $notificationType,
-            ['contents' => __($messageKey)]
+            ['contents' => $contents]
         );
 
         $this->logInfo($request, $submission, $messageKey . '.log', $error);
@@ -73,6 +76,13 @@ class ThothNotification
 
     public function logInfo($request, $submission, $messageKey, $error = null)
     {
+        if ($error !== null) {
+            ThothErrorFormatter::log($error, [
+                'submissionId' => $submission->getId(),
+                'contextId' => $submission->getData('contextId'),
+                'action' => $messageKey,
+            ]);
+        }
         $error = $this->normalizeError($error);
         $currentUser = $request->getUser();
         $eventLog = Repo::eventLog()->newDataObject([
@@ -90,19 +100,7 @@ class ThothNotification
 
     protected function normalizeError($error)
     {
-        if ($error === null || is_scalar($error)) {
-            return $error;
-        }
-
-        if ($error instanceof \Throwable) {
-            return $error->getMessage();
-        }
-
-        if (is_object($error) && method_exists($error, 'getMessage')) {
-            return $error->getMessage();
-        }
-
-        return json_encode($error);
+        return ThothErrorFormatter::reason($error);
     }
 
     public function addJavaScriptData($request, $templateMgr)

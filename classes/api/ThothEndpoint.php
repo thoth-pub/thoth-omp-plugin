@@ -20,6 +20,7 @@ use APP\core\Application;
 use APP\facades\Repo;
 use APP\plugins\generic\thoth\classes\components\forms\FeatureVideoForm;
 use APP\plugins\generic\thoth\classes\exceptions\MetadataSynchronizationException;
+use APP\plugins\generic\thoth\classes\notification\ThothErrorFormatter;
 use APP\plugins\generic\thoth\classes\notification\ThothNotification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request as IlluminateRequest;
@@ -184,7 +185,8 @@ class ThothEndpoint implements HasAuthorizationPolicy
         try {
             $failure['errors'] = ($this->bookService)()->validate($publication);
         } catch (\Exception $e) {
-            $failure['errors'][] = __('plugins.generic.thoth.connectionError');
+            ThothErrorFormatter::log($e, ['action' => __METHOD__]);
+            $failure['errors'][] = ThothErrorFormatter::message(__('plugins.generic.thoth.connectionError'), $e);
         }
 
         if ($failure['errors']) {
@@ -207,7 +209,9 @@ class ThothEndpoint implements HasAuthorizationPolicy
                 $disableNotification,
                 $e
             );
-            $failure['errors'][] = __('plugins.generic.thoth.connectionError');
+            $failure['errors'][] = $e instanceof QueryException
+                ? ThothErrorFormatter::message(__('plugins.generic.thoth.connectionError'), $e)
+                : __('plugins.generic.thoth.connectionError');
             return response()->json(
                 $failure,
                 $e instanceof QueryException ? Response::HTTP_BAD_REQUEST : Response::HTTP_INTERNAL_SERVER_ERROR
@@ -288,8 +292,9 @@ class ThothEndpoint implements HasAuthorizationPolicy
                 Response::HTTP_OK
             );
         } catch (\Exception $e) {
+            ThothErrorFormatter::log($e, ['action' => __METHOD__]);
             return response()->json(
-                ['error' => __('plugins.generic.thoth.connectionError')],
+                ['error' => ThothErrorFormatter::message(__('plugins.generic.thoth.connectionError'), $e)],
                 Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
@@ -324,8 +329,9 @@ class ThothEndpoint implements HasAuthorizationPolicy
                 );
             }
         } catch (\Exception $e) {
+            ThothErrorFormatter::log($e, ['action' => __METHOD__]);
             return response()->json(
-                ['error' => __('plugins.generic.thoth.connectionError')],
+                ['error' => ThothErrorFormatter::message(__('plugins.generic.thoth.connectionError'), $e)],
                 Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
@@ -379,7 +385,7 @@ class ThothEndpoint implements HasAuthorizationPolicy
         } catch (QueryException $exception) {
             $this->handleNotification($request, $submission, false, false, $exception);
             return response()->json(
-                ['errorMessage' => __('plugins.generic.thoth.connectionError')],
+                ['errorMessage' => ThothErrorFormatter::message(__('plugins.generic.thoth.connectionError'), $exception)],
                 Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
@@ -431,9 +437,9 @@ class ThothEndpoint implements HasAuthorizationPolicy
                 (bool) $existingVideo
             );
         } catch (\Throwable $exception) {
-            error_log($exception->getMessage());
+            ThothErrorFormatter::log($exception, ['action' => __METHOD__]);
             return response()->json(
-                ['error' => __('plugins.generic.thoth.connectionError')],
+                ['error' => ThothErrorFormatter::message(__('plugins.generic.thoth.connectionError'), $exception)],
                 Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
@@ -495,9 +501,9 @@ class ThothEndpoint implements HasAuthorizationPolicy
                 Response::HTTP_BAD_REQUEST
             );
         } catch (\Throwable $exception) {
-            error_log($exception->getMessage());
+            ThothErrorFormatter::log($exception, ['action' => __METHOD__]);
             return response()->json(
-                ['error' => __('plugins.generic.thoth.connectionError')],
+                ['error' => ThothErrorFormatter::message(__('plugins.generic.thoth.connectionError'), $exception)],
                 Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
