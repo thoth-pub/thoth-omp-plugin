@@ -83,7 +83,7 @@ class ThothChapterService
             $locale
         );
         $this->contributionService->update(
-            $chapter->getAuthors()->toArray(),
+            $this->contributionService->getChapterAuthors($chapter),
             $thothChapterId,
             $existingChapter['contributions'] ?? []
         );

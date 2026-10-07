@@ -8,6 +8,7 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class ThothCatalogFilesHandler
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief Public handler to load Thoth catalog files asynchronously.
@@ -19,6 +20,8 @@ import('plugins.generic.thoth.classes.factories.ThothPublicationFactory');
 import('plugins.generic.thoth.classes.formatters.DoiFormatter');
 import('plugins.generic.thoth.classes.services.ThothCatalogFileService');
 import('plugins.generic.thoth.classes.services.ThothCatalogFilesCacheService');
+
+require_once __DIR__ . '/../../classes/notification/ThothErrorFormatter.inc.php';
 
 class ThothCatalogFilesHandler extends Handler
 {
@@ -73,7 +76,7 @@ class ThothCatalogFilesHandler extends Handler
                 $publication
             );
         } catch (Exception $e) {
-            error_log($e->getMessage());
+            ThothErrorFormatter::log($e, ['action' => __METHOD__]);
         }
 
         $chapters = DAORegistry::getDAO('ChapterDAO')->getByPublicationId($publication->getId())->toAssociativeArray();
@@ -116,7 +119,7 @@ class ThothCatalogFilesHandler extends Handler
 
             return $catalogFileService->getFilesByWorkId($this->getThothWorkId($thothChapter));
         } catch (Exception $e) {
-            error_log($e->getMessage());
+            ThothErrorFormatter::log($e, ['action' => __METHOD__]);
             return [];
         }
     }

@@ -8,6 +8,7 @@
  * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class PublishFormConfig
+ *
  * @ingroup plugins_generic_thoth
  *
  * @brief Thoth config for publish form
@@ -19,6 +20,8 @@ import('plugins.generic.thoth.classes.facades.ThothService');
 import('plugins.generic.thoth.classes.components.forms.ThothValidationMessageFormatter');
 import('plugins.generic.thoth.classes.facades.ThothRepo');
 import('plugins.generic.thoth.classes.services.ThothMeCacheService');
+
+require_once __DIR__ . '/../../../notification/ThothErrorFormatter.inc.php';
 
 class PublishFormConfig
 {
@@ -51,8 +54,8 @@ class PublishFormConfig
                 ]);
             }
         } catch (Exception $e) {
-            error_log($e->getMessage());
-            $errors = [__('plugins.generic.thoth.connectionError')];
+            ThothErrorFormatter::log($e, ['action' => __METHOD__]);
+            $errors = [ThothErrorFormatter::message(__('plugins.generic.thoth.connectionError'), $e)];
         }
 
         if (!empty($errors)) {
@@ -83,14 +86,14 @@ class PublishFormConfig
             'value' => false,
             'groupId' => 'default',
         ]))
-        ->addField(new \PKP\components\forms\FieldSelect('thothImprintId', [
-            'label' => __('plugins.generic.thoth.imprint'),
-            'options' => $imprintOptions,
-            'required' => true,
-            'showWhen' => 'registerConfirmation',
-            'groupId' => 'default',
-            'value' => $imprintOptions[0]['value'] ?? null
-        ]));
+            ->addField(new \PKP\components\forms\FieldSelect('thothImprintId', [
+                'label' => __('plugins.generic.thoth.imprint'),
+                'options' => $imprintOptions,
+                'required' => true,
+                'showWhen' => 'registerConfirmation',
+                'groupId' => 'default',
+                'value' => $imprintOptions[0]['value'] ?? null
+            ]));
 
         if ($workType !== WORK_TYPE_AUTHORED_WORK) {
             return;

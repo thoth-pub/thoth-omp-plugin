@@ -1,0 +1,33 @@
+query($id: Uuid!) {
+  work(workId: $id) {
+    workId workStatus workType edition doi publicationDate place pageCount imageCount
+    license copyrightHolder landingPage coverUrl
+    imprint { imprintId }
+    titles { localeCode title subtitle fullTitle canonical }
+    abstracts { localeCode content canonical abstractType }
+    languages { languageCode languageRelation }
+    subjects { subjectType subjectCode subjectOrdinal }
+    references { referenceOrdinal unstructuredCitation doi }
+    contributions { ...contributionMetadata }
+    publications {
+      publicationType isbn accessibilityStandard accessibilityAdditionalStandard
+      accessibilityException accessibilityReportUrl
+      locations { landingPage fullTextUrl locationPlatform canonical }
+    }
+    relations {
+      relationType relationOrdinal
+      relatedWork {
+        workId workType workStatus doi publicationDate landingPage pageInterval firstPage lastPage
+        titles { localeCode title subtitle fullTitle canonical }
+        abstracts { localeCode content canonical abstractType }
+        contributions { ...contributionMetadata }
+      }
+    }
+  }
+}
+fragment contributionMetadata on Contribution {
+  contributionType contributionOrdinal mainContribution firstName lastName fullName
+  contributor { firstName lastName fullName orcid website }
+  biographies { localeCode content canonical }
+  affiliations { affiliationOrdinal institution { ror } }
+}
