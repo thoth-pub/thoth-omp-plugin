@@ -222,6 +222,8 @@ class ThothChapterServiceTest extends PKPTestCase
             ->with($chapter, 'chapter-id', [['abstractId' => 'abstract-id']], 'en_US');
         $contributionService = $this->createMock(ThothContributionService::class);
         $contributionService->expects($this->once())
+            ->method('getChapterAuthors')->with($chapter)->willReturn($authors);
+        $contributionService->expects($this->once())
             ->method('update')
             ->with($authors, 'chapter-id', [['contributionId' => 'contribution-id']]);
         $publicationService = $this->createMock(ThothPublicationService::class);

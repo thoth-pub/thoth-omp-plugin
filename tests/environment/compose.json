@@ -1,0 +1,160 @@
+{
+  "services": {
+    "zitadel-db": {
+      "image": "postgres:17@sha256:67f41722b7a8cbdb868a44a4995c846eddfdc2973bccb291ce937dce88ad5675",
+      "environment": {
+        "POSTGRES_DB": "zitadel",
+        "POSTGRES_USER": "zitadel",
+        "POSTGRES_PASSWORD": "isolated-test-only"
+      },
+      "volumes": [
+        "zitadel-data:/var/lib/postgresql/data"
+      ],
+      "healthcheck": {
+        "test": [
+          "CMD-SHELL",
+          "pg_isready -U zitadel -d zitadel"
+        ],
+        "interval": "2s",
+        "timeout": "3s",
+        "retries": 30
+      }
+    },
+    "zitadel": {
+      "image": "thoth-test-environment:local",
+      "depends_on": {
+        "zitadel-db": {
+          "condition": "service_healthy"
+        }
+      },
+      "environment": {
+        "ZITADEL_EXTERNALDOMAIN": "zitadel",
+        "ZITADEL_EXTERNALPORT": "8080",
+        "ZITADEL_EXTERNALSECURE": "false",
+        "ZITADEL_TLS_ENABLED": "false",
+        "ZITADEL_DATABASE_POSTGRES_HOST": "zitadel-db",
+        "ZITADEL_DATABASE_POSTGRES_PORT": "5432",
+        "ZITADEL_DATABASE_POSTGRES_DATABASE": "zitadel",
+        "ZITADEL_DATABASE_POSTGRES_USER_USERNAME": "zitadel",
+        "ZITADEL_DATABASE_POSTGRES_USER_PASSWORD": "isolated-test-only",
+        "ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE": "disable",
+        "ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME": "zitadel",
+        "ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD": "isolated-test-only",
+        "ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE": "disable",
+        "ZITADEL_FIRSTINSTANCE_ORG_NAME": "Thoth E2E",
+        "ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_USERNAME": "bootstrap",
+        "ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_NAME": "Disposable bootstrap",
+        "ZITADEL_FIRSTINSTANCE_PATPATH": "/state/admin.pat",
+        "ZITADEL_FIRSTINSTANCE_ORG_MACHINE_PAT_EXPIRATIONDATE": "${BOOTSTRAP_PAT_EXPIRES:?Set the disposable bootstrap expiry}",
+        "THOTH_DISPOSABLE": "1",
+        "ZITADEL_MASTERKEY": "${ZITADEL_MASTERKEY:?Set an ephemeral 32-character key}"
+      },
+      "volumes": [
+        "bootstrap:/state"
+      ],
+      "user": "0:0",
+      "entrypoint": [
+        "python3",
+        "/environment/zitadel.py"
+      ],
+      "build": {
+        "context": "."
+      }
+    },
+    "api": {
+      "image": "thoth-test-environment:local",
+      "build": {
+        "context": "."
+      },
+      "depends_on": {
+        "thoth-db": {
+          "condition": "service_healthy"
+        },
+        "zitadel": {
+          "condition": "service_started"
+        }
+      },
+      "environment": {
+        "DATABASE_URL": "postgres://thoth:isolated-test-only@thoth-db/thoth",
+        "ZITADEL_URL": "http://zitadel:8080",
+        "THOTH_GRAPHQL_API": "http://127.0.0.1:${THOTH_PORT:-18000}",
+        "GRAPHQL_API_HOST": "0.0.0.0",
+        "GRAPHQL_API_PORT": "8000",
+        "AWS_ACCESS_KEY_ID": "disposable-test-only",
+        "AWS_SECRET_ACCESS_KEY": "disposable-test-only",
+        "AWS_REGION": "us-east-1",
+        "AWS_EC2_METADATA_DISABLED": "true",
+        "THOTH_MUTATION_GUARD_MODE": "OFF",
+        "THOTH_DISTRIBUTION_JOB_CREATION": "OFF",
+        "RUST_LOG": "warn",
+        "THOTH_DISPOSABLE": "1"
+      },
+      "volumes": [
+        "bootstrap:/state",
+        "client:/client"
+      ],
+      "healthcheck": {
+        "test": [
+          "CMD",
+          "python3",
+          "-c",
+          "from pathlib import Path; import urllib.request; assert Path('/state/ready').exists(); urllib.request.urlopen('http://127.0.0.1:8000/', timeout=3)"
+        ],
+        "interval": "3s",
+        "timeout": "5s",
+        "retries": 90,
+        "start_period": "10s"
+      }
+    },
+    "thoth-db": {
+      "image": "postgres:17@sha256:67f41722b7a8cbdb868a44a4995c846eddfdc2973bccb291ce937dce88ad5675",
+      "environment": {
+        "POSTGRES_DB": "thoth",
+        "POSTGRES_USER": "thoth",
+        "POSTGRES_PASSWORD": "isolated-test-only"
+      },
+      "volumes": [
+        "thoth-data:/var/lib/postgresql/data"
+      ],
+      "healthcheck": {
+        "test": [
+          "CMD-SHELL",
+          "pg_isready -U thoth -d thoth"
+        ],
+        "interval": "2s",
+        "timeout": "3s",
+        "retries": 30
+      }
+    },
+    "gateway": {
+      "image": "nginx:1.28-alpine@sha256:a8b39bd9cf0f83869a2162827a0caf6137ddf759d50a171451b335cecc87d236",
+      "ports": [
+        "127.0.0.1:${THOTH_PORT:-18000}:8080"
+      ],
+      "volumes": [
+        "./gateway.conf:/etc/nginx/nginx.conf:ro"
+      ],
+      "networks": [
+        "default",
+        "access"
+      ],
+      "depends_on": {
+        "api": {
+          "condition": "service_healthy"
+        }
+      }
+    }
+  },
+  "volumes": {
+    "thoth-data": {},
+    "zitadel-data": {},
+    "bootstrap": {},
+    "client": {}
+  },
+  "networks": {
+    "default": {
+      "internal": true
+    },
+    "access": {}
+  }
+}

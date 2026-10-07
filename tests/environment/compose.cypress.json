@@ -1,0 +1,25 @@
+{
+  "services": {
+    "omp-db": {
+      "image": "mysql:8.4@sha256:b3b90af2a6552ae30c266fdb7d5dd55f3afb72404bb78d37fe8a23eb857fd3fb",
+      "environment": {
+        "MYSQL_ROOT_PASSWORD": "disposable-root-only",
+        "MYSQL_DATABASE": "thoth_cypress",
+        "MYSQL_USER": "omp",
+        "MYSQL_PASSWORD": "disposable-omp-only"
+      },
+      "tmpfs": ["/var/lib/mysql"],
+      "healthcheck": {
+        "test": ["CMD-SHELL", "MYSQL_PWD=disposable-omp-only mysql -h 127.0.0.1 -u omp thoth_cypress -e 'SELECT 1'"],
+        "interval": "2s", "timeout": "3s", "retries": 60
+      }
+    },
+    "cypress": {
+      "build": {"context": "../..", "dockerfile": "tests/environment/Dockerfile.cypress"},
+      "environment": {"THOTH_DISPOSABLE": "1", "CYPRESS_baseUrl": "http://127.0.0.1:8001"},
+      "volumes": ["client:/thoth-state:ro", "${OMP_DATASET:?Set the OMP MySQL dataset directory}:/dataset:ro"],
+      "shm_size": "1gb",
+      "depends_on": {"omp-db": {"condition": "service_healthy"}, "api": {"condition": "service_healthy"}}
+    }
+  }
+}

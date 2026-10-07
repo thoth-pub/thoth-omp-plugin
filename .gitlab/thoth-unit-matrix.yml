@@ -1,0 +1,9 @@
+plugin_unit_tests_omp:
+  parallel:
+    matrix:
+      - PHP_VERSION: ["8.1", "7.4"]
+
+application_unit_tests_omp:
+  parallel:
+    matrix:
+      - PHP_VERSION: ["8.1", "7.4"]

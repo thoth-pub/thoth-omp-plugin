@@ -173,11 +173,28 @@ class ThothContributionService
     {
         $seq = 0;
         $thothChapterId = $chapter->getData('thothChapterId');
-        $authors = $chapter->getAuthors()->toArray();
+        $authors = $this->getChapterAuthors($chapter);
         foreach ($authors as $author) {
             $this->register($author, $seq, $thothChapterId);
             $seq++;
         }
+    }
+
+    /** Resolve complete identity metadata that OMP 3.3 omits from ChapterAuthor objects. */
+    public function getChapterAuthors($chapter): array
+    {
+        $authors = [];
+        foreach ($chapter->getAuthors()->toArray() as $chapterAuthor) {
+            $author = Services::get('author')->get($chapterAuthor->getId(), $chapter->getData('publicationId'));
+            if ($author === null) {
+                throw new UnexpectedValueException('Chapter author does not belong to its publication');
+            }
+            // Keep the chapter's role, sequence and primary-contact flag.
+            $completeChapterAuthor = clone $chapterAuthor;
+            $completeChapterAuthor->setAllData(array_merge($author->getAllData(), $chapterAuthor->getAllData()));
+            $authors[] = $completeChapterAuthor;
+        }
+        return $authors;
     }
 
     private function findMatchingContributionKey(

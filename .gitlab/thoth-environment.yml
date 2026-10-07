@@ -1,0 +1,10 @@
+# Optional standalone API probe; regular pipelines run Cypress instead.
+workflow:
+  rules:
+    - if: '$THOTH_ENVIRONMENT_PROBE == "1"'
+stages: [probe]
+probe_thoth_environment:
+  extends: .thoth_environment
+  stage: probe
+  script:
+    - python3 tests/environment/ci_probe.py
