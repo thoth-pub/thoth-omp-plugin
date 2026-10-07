@@ -1,0 +1,9 @@
+
+# Exempt only the public disposable fixture; preserve all bundled detection rules.
+[[allowlists]]
+  description = "Public PostgreSQL password used only by the disposable Thoth fixture"
+  targetRules = ["Password in URL"]
+  condition = "AND"
+  paths = ['^tests/environment/compose\.json$']
+  regexTarget = "line"
+  regexes = ['^\s*"DATABASE_URL":\s*"postgres:\/\/thoth:isolated-test-only@thoth-db\/thoth",?\s*$']

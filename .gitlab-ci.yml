@@ -19,6 +19,9 @@ include:
       - 'templates/groups/pkp_plugin.yml'
       - 'templates/groups/omp/unit_tests.yml'
       - 'templates/groups/omp/cypress_tests.yml'
+  - local: /.gitlab/thoth-secret-detection.yml
+    rules:
+      - if: '$THOTH_ENVIRONMENT_PROBE != "1"'
   - local: /.gitlab/thoth-cypress.yml
     rules:
       - if: '$THOTH_ENVIRONMENT_PROBE != "1"'
