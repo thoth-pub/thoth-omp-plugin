@@ -1,12 +1,27 @@
 variables:
     PLUGIN_NAME : 'thoth'
 
+# Keep workflow rules from the shared template (or the optional API probe).
+workflow:
+  auto_cancel:
+    on_new_commit: interruptible
+
 include:
+  - local: /.gitlab/thoth-services.yml
+  - local: /.gitlab/thoth-environment.yml
+    rules:
+      - if: '$THOTH_ENVIRONMENT_PROBE == "1"'
   - project: 'documentacao-e-tarefas/modelosparaintegracaocontinua'
+    rules:
+      - if: '$THOTH_ENVIRONMENT_PROBE != "1"'
     ref: stable-3_4_0
     file:
       - 'templates/groups/pkp_plugin.yml'
       - 'templates/groups/omp/unit_tests.yml'
+      - 'templates/groups/omp/cypress_tests.yml'
+  - local: /.gitlab/thoth-cypress.yml
+    rules:
+      - if: '$THOTH_ENVIRONMENT_PROBE != "1"'
 
 .unit_test_template:
   before_script:

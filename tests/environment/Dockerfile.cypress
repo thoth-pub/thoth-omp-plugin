@@ -1,0 +1,7 @@
+FROM lepidustecnologia/omp:3.4.0-head-forUnitTests@sha256:af234816596e4cd87e5889a319aefe7f5e1b51187d883d4118e3d1ddac60efd5
+WORKDIR /var/www/omp/plugins/generic/thoth
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --no-interaction --prefer-dist --no-progress
+COPY . .
+WORKDIR /var/www/omp
+ENTRYPOINT ["bash", "plugins/generic/thoth/tests/environment/cypress-entrypoint.sh"]
