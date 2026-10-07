@@ -1,3 +1,0 @@
-# Public fixture password for disposable Thoth PostgreSQL only.
-# Exact historical fingerprints; do not ignore paths or detection rules.
-40c75828409748f09861976b3ca233fad8a9684d:tests/environment/compose.json:Password in URL:78
