@@ -28,6 +28,8 @@ import('plugins.generic.thoth.classes.notification.ThothNotification');
 import('plugins.generic.thoth.classes.services.ThothMeCacheService');
 import('plugins.generic.thoth.classes.services.ThothWorkLinkService');
 
+require_once __DIR__ . '/../notification/ThothErrorFormatter.inc.php';
+
 class ThothEndpoint
 {
     public function addEndpoints($hookName, $args)
@@ -139,7 +141,8 @@ class ThothEndpoint
         try {
             $failure['errors'] = ThothService::book()->validate($publication);
         } catch (Exception $e) {
-            $failure['errors'][] = __('plugins.generic.thoth.connectionError');
+            ThothErrorFormatter::log($e, ['action' => __METHOD__]);
+            $failure['errors'][] = ThothErrorFormatter::message(__('plugins.generic.thoth.connectionError'), $e);
         }
 
         if ($failure['errors']) {
@@ -176,7 +179,7 @@ class ThothEndpoint
                 $e,
                 $registrationResult ? $registrationResult->getWarning() : null
             );
-            $failure['errors'][] = __('plugins.generic.thoth.register.error.log', ['reason' => $e->getMessage()]);
+            $failure['errors'][] = __('plugins.generic.thoth.register.error.log', ['reason' => ThothErrorFormatter::reason($e)]);
             return $response->withStatus(403)->withJson($failure);
         }
 
@@ -242,8 +245,11 @@ class ThothEndpoint
                 'video' => [__('plugins.generic.thoth.featureVideo.invalidFile')],
             ]);
         } catch (Throwable $exception) {
-            error_log($exception->getMessage());
-            return $response->withStatus(500)->withJsonError('plugins.generic.thoth.connectionError');
+            ThothErrorFormatter::log($exception, ['action' => __METHOD__]);
+            return $response->withStatus(500)->withJson([
+                'error' => 'plugins.generic.thoth.connectionError',
+                'errorMessage' => ThothErrorFormatter::message(__('plugins.generic.thoth.connectionError'), $exception),
+            ]);
         }
     }
 
@@ -272,7 +278,11 @@ class ThothEndpoint
 
             return $response->withJson(['workStatus' => $workStatus], 200);
         } catch (QueryException $exception) {
-            return $response->withStatus(500)->withJsonError('plugins.generic.thoth.connectionError');
+            ThothErrorFormatter::log($exception, ['action' => __METHOD__]);
+            return $response->withStatus(500)->withJson([
+                'error' => 'plugins.generic.thoth.connectionError',
+                'errorMessage' => ThothErrorFormatter::message(__('plugins.generic.thoth.connectionError'), $exception),
+            ]);
         }
     }
 
@@ -296,7 +306,11 @@ class ThothEndpoint
                 return $response->withStatus(409)->withJsonError('plugins.generic.thoth.unlink.existingWork');
             }
         } catch (QueryException $exception) {
-            return $response->withStatus(500)->withJsonError('plugins.generic.thoth.connectionError');
+            ThothErrorFormatter::log($exception, ['action' => __METHOD__]);
+            return $response->withStatus(500)->withJson([
+                'error' => 'plugins.generic.thoth.connectionError',
+                'errorMessage' => ThothErrorFormatter::message(__('plugins.generic.thoth.connectionError'), $exception),
+            ]);
         }
 
         Repo::submission()->edit($submission, ['thothWorkId' => null]);
@@ -337,7 +351,10 @@ class ThothEndpoint
             );
         } catch (QueryException $exception) {
             $this->handleNotification($request, $submission, false, false, $exception);
-            return $response->withStatus(500)->withJsonError('plugins.generic.thoth.connectionError');
+            return $response->withStatus(500)->withJson([
+                'error' => 'plugins.generic.thoth.connectionError',
+                'errorMessage' => ThothErrorFormatter::message(__('plugins.generic.thoth.connectionError'), $exception),
+            ]);
         }
 
         return $response->withJson(['status' => true], 200);

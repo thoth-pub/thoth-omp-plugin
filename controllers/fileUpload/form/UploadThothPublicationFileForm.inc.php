@@ -25,6 +25,8 @@ import('lib.pkp.classes.plugins.PKPPubIdPluginDAO');
 import('plugins.generic.thoth.classes.services.ThothCatalogFilesCacheService');
 import('plugins.generic.thoth.classes.services.ThothFileUploadService');
 
+require_once __DIR__ . '/../../../classes/notification/ThothErrorFormatter.inc.php';
+
 class UploadThothPublicationFileForm extends Form
 {
     public $contextId;
@@ -211,10 +213,11 @@ class UploadThothPublicationFileForm extends Form
                 ['contents' => __('plugins.generic.thoth.fileUpload.success')]
             );
         } catch (Exception $e) {
+            ThothErrorFormatter::log($e, ['action' => __METHOD__]);
             $notificationMgr->createTrivialNotification(
                 $user->getId(),
                 Notification::NOTIFICATION_TYPE_ERROR,
-                ['contents' => $e->getMessage()]
+                ['contents' => ThothErrorFormatter::message('', $e)]
             );
         } finally {
             $temporaryFileManager->deleteById($temporaryFile->getId(), $user->getId());

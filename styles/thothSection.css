@@ -101,3 +101,7 @@
 .thothAccessibilityHelp__popover p:last-child {
     margin-bottom: 0;
 }
+
+.app__notifications .pkpNotification {
+    white-space: pre-line;
+}
