@@ -16,6 +16,8 @@
 
 use APP\controllers\grid\catalogEntry\PublicationFormatGridHandler;
 use PKP\security\Role;
+use PKP\linkAction\LinkAction;
+use PKP\linkAction\request\AjaxModal;
 
 class PublicationFormatGridModifier
 {

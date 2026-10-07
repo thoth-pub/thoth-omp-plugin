@@ -23,6 +23,8 @@ import('plugins.generic.thoth.classes.components.forms.ThothValidationMessageFor
 import('plugins.generic.thoth.classes.facades.ThothRepo');
 import('plugins.generic.thoth.classes.services.ThothMeCacheService');
 
+require_once __DIR__ . '/../../../notification/ThothErrorFormatter.inc.php';
+
 class PublishFormConfig
 {
     public function addConfig($hookName, $form)
@@ -54,8 +56,8 @@ class PublishFormConfig
                 ]);
             }
         } catch (Exception $e) {
-            error_log($e->getMessage());
-            $errors = [__('plugins.generic.thoth.connectionError')];
+            ThothErrorFormatter::log($e, ['action' => __METHOD__]);
+            $errors = [ThothErrorFormatter::message(__('plugins.generic.thoth.connectionError'), $e)];
         }
 
         if (!empty($errors)) {

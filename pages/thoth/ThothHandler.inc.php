@@ -30,6 +30,8 @@ import('plugins.generic.thoth.classes.facades.ThothService');
 import('plugins.generic.thoth.classes.facades.ThothRepo');
 import('plugins.generic.thoth.classes.services.ThothMeCacheService');
 
+require_once __DIR__ . '/../../classes/notification/ThothErrorFormatter.inc.php';
+
 class ThothHandler extends Handler
 {
     public $_isBackendPage = true;
@@ -62,6 +64,7 @@ class ThothHandler extends Handler
         AppLocale::requireComponents(LOCALE_COMPONENT_APP_SUBMISSION);
         $context = $request->getContext();
         $connectionError = false;
+        $connectionErrorReason = null;
         $imprints = [];
 
         $plugin = PluginRegistry::getPlugin('generic', 'thothplugin');
@@ -80,8 +83,9 @@ class ThothHandler extends Handler
                 'imprintName',
             ]);
         } catch (\Exception $e) {
-            error_log($e->getMessage());
+            ThothErrorFormatter::log($e, ['action' => __METHOD__]);
             $connectionError = true;
+            $connectionErrorReason = ThothErrorFormatter::reason($e);
         }
 
         $imprintOptions = [];
@@ -144,6 +148,7 @@ class ThothHandler extends Handler
             'components' => [
                 'thoth' => $thothList->getConfig()
             ],
+            'connectionErrorReason' => $connectionErrorReason,
             'connectionError' => $connectionError
         ]);
 

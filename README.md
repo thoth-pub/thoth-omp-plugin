@@ -225,3 +225,7 @@ This plugin is licensed under the GNU General Public License v3.0 - [See the Lic
 Copyright (c) 2024-2026 Lepidus Tecnologia
 
 Copyright (c) 2024-2026 Thoth Open Metadata
+
+## Cypress test environment
+
+See [the disposable OMP and Thoth test environment](tests/environment/README.md) for setup and execution.

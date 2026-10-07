@@ -19,6 +19,8 @@ use APP\facades\Repo;
 import('plugins.generic.thoth.classes.facades.ThothRepo');
 import('plugins.generic.thoth.classes.services.ThothMeCacheService');
 
+require_once __DIR__ . '/../../../notification/ThothErrorFormatter.inc.php';
+
 class CatalogEntryFormConfig
 {
     public function addConfig($hookName, $form)
@@ -74,7 +76,7 @@ class CatalogEntryFormConfig
             $submission = $this->getSubmission($publication->getData('submissionId'));
             return $this->hasCdnWritePermission($submission->getData('contextId'));
         } catch (Exception $e) {
-            error_log($e->getMessage());
+            ThothErrorFormatter::log($e, ['action' => __METHOD__]);
             return false;
         }
     }

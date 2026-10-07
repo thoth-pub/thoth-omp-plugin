@@ -25,6 +25,8 @@ import('plugins.generic.thoth.classes.formatters.DoiFormatter');
 import('plugins.generic.thoth.classes.services.ThothCatalogFileService');
 import('plugins.generic.thoth.classes.services.ThothMeCacheService');
 
+require_once __DIR__ . '/../../classes/notification/ThothErrorFormatter.inc.php';
+
 class UploadThothFileHandler extends Handler
 {
     public $_isBackendPage = true;
@@ -283,7 +285,7 @@ class UploadThothFileHandler extends Handler
                 $publicationType
             );
         } catch (Exception $e) {
-            error_log($e->getMessage());
+            ThothErrorFormatter::log($e, ['action' => __METHOD__]);
             return null;
         }
     }
@@ -306,7 +308,7 @@ class UploadThothFileHandler extends Handler
             $contextId = $request->getContext()->getId();
             return $cacheService->hasCdnWritePermission($contextId);
         } catch (Exception $e) {
-            error_log($e->getMessage());
+            ThothErrorFormatter::log($e, ['action' => __METHOD__]);
             return false;
         }
     }

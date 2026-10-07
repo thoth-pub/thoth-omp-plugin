@@ -74,9 +74,7 @@ msgid "plugins.generic.thoth.imprint.required"
 msgstr "Seleccione una impresión."
 
 msgid "plugins.generic.thoth.connectionError"
-msgstr ""
-"Se ha producido un problema al conectar con Thoth. "
-"Vuelva a intentarlo más tarde o póngase en contacto con el administrador del sistema."
+msgstr "Se ha producido un problema al conectar con Thoth. Vuelva a intentarlo más tarde."
 
 msgid "plugins.generic.thoth.status.registered"
 msgstr "Registrado"
@@ -131,8 +129,8 @@ msgstr "Metadatos de envío registrados en Thoth."
 
 msgid "plugins.generic.thoth.register.error"
 msgstr ""
-"Se ha producido un problema al enviar los metadatos de envío a Thoth. "
-"Vuelva a intentarlo más tarde o póngase en contacto con el administrador del sistema."
+"Se ha producido un problema al enviar los metadatos de envío a Thoth. Vuelva a intentarlo más "
+"tarde."
 
 msgid "plugins.generic.thoth.register.error.log"
 msgstr "Error al registrar metadatos en Thoth: {$reason}"
@@ -147,9 +145,7 @@ msgid "plugins.generic.thoth.update.success.log"
 msgstr "Metadatos actualizados en Thoth."
 
 msgid "plugins.generic.thoth.update.error"
-msgstr ""
-"Se ha producido un problema al actualizar los metadatos en Thoth "
-"Vuelva a intentarlo más tarde o póngase en contacto con el administrador del sistema."
+msgstr "Se ha producido un problema al actualizar los metadatos en Thoth Vuelva a intentarlo más tarde."
 
 msgid "plugins.generic.thoth.update.error.log"
 msgstr "Error al actualizar metadatos en Thoth: {$reason}"

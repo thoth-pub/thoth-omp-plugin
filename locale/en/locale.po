@@ -74,9 +74,7 @@ msgid "plugins.generic.thoth.imprint.required"
 msgstr "Select a imprint."
 
 msgid "plugins.generic.thoth.connectionError"
-msgstr ""
-"There was a problem connecting to Thoth. Please try again later, or "
-"contact your system administrator."
+msgstr "There was a problem connecting to Thoth. Please try again later."
 
 msgid "plugins.generic.thoth.status.registered"
 msgstr "Registered"
@@ -130,9 +128,7 @@ msgid "plugins.generic.thoth.register.success.log"
 msgstr "Submission metadata registered in Thoth."
 
 msgid "plugins.generic.thoth.register.error"
-msgstr ""
-"There was a problem sending the submission metadata to Thoth. Please try again later, or "
-"contact your system administrator."
+msgstr "There was a problem sending the submission metadata to Thoth. Please try again later."
 
 msgid "plugins.generic.thoth.register.error.log"
 msgstr "Error registering metadata in Thoth: {$reason}"
@@ -147,9 +143,7 @@ msgid "plugins.generic.thoth.update.success.log"
 msgstr "Submission metadata updated in Thoth."
 
 msgid "plugins.generic.thoth.update.error"
-msgstr ""
-"There was a problem updating metadata in Thoth. Please try again later, or "
-"contact your system administrator."
+msgstr "There was a problem updating metadata in Thoth. Please try again later."
 
 msgid "plugins.generic.thoth.update.error.log"
 msgstr "Error updating metadata in Thoth: {$reason}"
