@@ -197,9 +197,6 @@ class ThothSubjectClassifier
         if ($this->themaValidator !== null) {
             return (bool) call_user_func($this->themaValidator, $code);
         }
-        if (!preg_match('/^[A-Y][A-Z0-9]{0,5}$/', $code)) {
-            return false;
-        }
 
         if ($this->themaCodes === null && !$this->loadThemaCodes()) {
             return null;
