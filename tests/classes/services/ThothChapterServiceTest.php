@@ -159,7 +159,8 @@ class ThothChapterServiceTest extends PKPTestCase
         $this->assertSame('fed8b9ee-2537-4a66-a1a1-eeadf4001c59', $thothChapterId);
     }
 
-    public function testUpdateChapterAndItsMetadata()
+    /** @dataProvider existingChapterStatuses */
+    public function testUpdateChapterAndItsMetadata($status, $precomputed)
     {
         $publication = $this->getMockBuilder(Publication::class)
             ->setMethods(['getData'])
@@ -193,11 +194,11 @@ class ThothChapterServiceTest extends PKPTestCase
             ->method('setData')
             ->with('thothChapterId', 'chapter-id');
 
-        $desiredWork = new ThothWork();
+        $desiredWork = new ThothWork(['workStatus' => 'FORTHCOMING', 'imprintId' => 'imprint-id']);
         $factory = $this->getMockBuilder(ThothChapterFactory::class)
             ->setMethods(['createFromChapter'])
             ->getMock();
-        $factory->expects($this->once())
+        $factory->expects($precomputed ? $this->never() : $this->once())
             ->method('createFromChapter')
             ->with($chapter)
             ->willReturn($desiredWork);
@@ -209,7 +210,8 @@ class ThothChapterServiceTest extends PKPTestCase
             ->method('edit')
             ->with($this->callback(function (ThothWork $work) {
                 return $work->getWorkId() === 'chapter-id'
-                    && $work->getImprintId() === 'imprint-id';
+                    && $work->getImprintId() === 'imprint-id'
+                    && !$work->hasWorkStatus();
             }));
 
         $titleService = $this->createMock(ThothTitleService::class);
@@ -233,7 +235,7 @@ class ThothChapterServiceTest extends PKPTestCase
                 $chapter,
                 'chapter-id',
                 [['publicationId' => 'publication-id']],
-                'FORTHCOMING'
+                $status
             )
             ->willReturn(true);
 
@@ -248,11 +250,18 @@ class ThothChapterServiceTest extends PKPTestCase
 
         $this->assertTrue($service->update($chapter, [
             'workId' => 'chapter-id',
-            'workStatus' => 'FORTHCOMING',
+            'workStatus' => $status,
             'titles' => [['titleId' => 'title-id']],
             'abstracts' => [['abstractId' => 'abstract-id']],
             'contributions' => [['contributionId' => 'contribution-id']],
             'publications' => [['publicationId' => 'publication-id']],
-        ], 'imprint-id'));
+        ], 'imprint-id', $precomputed ? $desiredWork : null));
+    }
+    public function existingChapterStatuses(): array
+    {
+        return [
+            'active' => ['ACTIVE', false], 'forthcoming' => ['FORTHCOMING', false],
+            'precomputed active' => ['ACTIVE', true], 'precomputed forthcoming' => ['FORTHCOMING', true],
+        ];
     }
 }

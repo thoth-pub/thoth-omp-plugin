@@ -64,15 +64,11 @@ class ThothBookRegistrationService
         $thothBook = $this->factory->createFromPublication($publication);
         $thothBook->setImprintId($thothImprintId);
 
-        $bookToActivate = null;
-        if ($thothBook->getWorkStatus() === WorkStatus::ACTIVE) {
-            $bookToActivate = clone $thothBook;
-            $thothBook->setWorkStatus(WorkStatus::FORTHCOMING);
-        }
+        $thothBook->setWorkStatus(WorkStatus::FORTHCOMING);
 
         $thothBookId = $this->repository->add($thothBook);
         $publication->setData('thothBookId', $thothBookId);
-        $registrationResult = new ThothBookRegistrationResult($thothBookId, $bookToActivate);
+        $registrationResult = new ThothBookRegistrationResult($thothBookId);
 
         try {
             $this->registerMetadata($publication, $thothBookId);
@@ -97,18 +93,6 @@ class ThothBookRegistrationService
     public function deleteRegisteredEntry($registrationResult)
     {
         $this->repository->delete($registrationResult->getWorkId());
-    }
-
-    public function setActive($registrationResult)
-    {
-        if (!$registrationResult->shouldActivate()) {
-            return;
-        }
-
-        $thothBook = $registrationResult->getBookToActivate();
-        $thothBook->setWorkId($registrationResult->getWorkId());
-        $thothBook->setWorkStatus(WorkStatus::ACTIVE);
-        $this->repository->edit($thothBook);
     }
 
     private function registerMetadata($publication, $thothBookId)

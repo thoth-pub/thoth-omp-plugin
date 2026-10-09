@@ -45,7 +45,7 @@ class ThothBookFactoryTest extends PKPTestCase
         return ['request'];
     }
 
-    private function setUpMockEnvironment($emptyOptionalMetadata = false)
+    private function setUpMockEnvironment($emptyOptionalMetadata = false, $datePublished = '2020-01-01')
     {
         $mockSubmission = $this->getMockBuilder(Submission::class)
             ->setMethods(['getData', 'getBestId', '_getContextLicenseFieldValue'])
@@ -110,7 +110,7 @@ class ThothBookFactoryTest extends PKPTestCase
             ->method('getData')
             ->will($this->returnValueMap([
                 ['version', null, 1],
-                ['datePublished', null, '2020-01-01'],
+                ['datePublished', null, $datePublished],
                 ['place', null, $emptyOptionalMetadata ? '' : 'Salvador, BR'],
                 ['pageCount', null, 64],
                 ['imageCount', null, 32],
@@ -145,6 +145,21 @@ class ThothBookFactoryTest extends PKPTestCase
         $this->mocks['publication'] = $mockPublication;
     }
 
+    /** @dataProvider publicationDates */
+    public function testRegistersAsForthcomingRegardlessOfPublicationDate($datePublished)
+    {
+        $this->setUpMockEnvironment(false, $datePublished);
+        $work = (new ThothBookFactory())->createFromPublication($this->mocks['publication']);
+
+        $this->assertSame(WorkStatus::FORTHCOMING, $work->getWorkStatus());
+        $this->assertSame($datePublished, $work->getPublicationDate());
+    }
+
+    public function publicationDates(): array
+    {
+        return ['unpublished' => [null], 'published' => ['2020-01-01'], 'scheduled' => ['2050-01-01']];
+    }
+
     public function testCreateThothBookFromPublication()
     {
         $this->setUpMockEnvironment();
@@ -155,7 +170,7 @@ class ThothBookFactoryTest extends PKPTestCase
 
         $this->assertEquals(new ThothWork([
             'workType' => WorkType::MONOGRAPH,
-            'workStatus' => WorkStatus::ACTIVE,
+            'workStatus' => WorkStatus::FORTHCOMING,
             'edition' => 1,
             'publicationDate' => '2020-01-01',
             'place' => 'Salvador, BR',
@@ -190,16 +205,6 @@ class ThothBookFactoryTest extends PKPTestCase
 
         $workType = $factory->getWorkTypeBySubmissionWorkType(WORK_TYPE_EDITED_VOLUME);
         $this->assertEquals(WorkType::EDITED_BOOK, $workType);
-    }
-
-    public function testGetWorkStatusByDatePublished()
-    {
-        $factory = new ThothBookFactory();
-        $workStatus = $factory->getWorkStatusByDatePublished('2020-01-01');
-        $this->assertEquals(WorkStatus::ACTIVE, $workStatus);
-
-        $workStatus = $factory->getWorkStatusByDatePublished('2050-12-12');
-        $this->assertEquals(WorkStatus::FORTHCOMING, $workStatus);
     }
 
     public function testGetDoiFromPublication()

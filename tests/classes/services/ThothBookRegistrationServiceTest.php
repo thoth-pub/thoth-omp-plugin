@@ -61,7 +61,9 @@ class ThothBookRegistrationServiceTest extends PKPTestCase
             ->getMock();
         $mockRepository->expects($this->once())
             ->method('add')
-            ->with($this->isInstanceOf(ThothWork::class))
+            ->with($this->callback(function (ThothWork $work) {
+                return $work->getWorkStatus() === WorkStatus::FORTHCOMING;
+            }))
             ->willReturn('d8fa2e63-5513-45e5-84c1-e9c2d89f99d3');
 
         $mockAbstractService = $this->createMock(ThothAbstractService::class);
@@ -118,7 +120,7 @@ class ThothBookRegistrationServiceTest extends PKPTestCase
         );
     }
 
-    public function testSetActiveUsesOnlyTheGivenRegistrationResult()
+    public function testRegistersEveryBookAsForthcoming()
     {
         $firstBook = new ThothWork();
         $firstBook->setWorkStatus(WorkStatus::ACTIVE);
@@ -146,7 +148,9 @@ class ThothBookRegistrationServiceTest extends PKPTestCase
             ->getMock();
         $mockRepository->expects($this->exactly(2))
             ->method('add')
-            ->with($this->isInstanceOf(ThothWork::class))
+            ->with($this->callback(function (ThothWork $work) {
+                return $work->getWorkStatus() === WorkStatus::FORTHCOMING;
+            }))
             ->willReturnOnConsecutiveCalls(
                 'first-work-id',
                 'second-work-id'
@@ -167,9 +171,10 @@ class ThothBookRegistrationServiceTest extends PKPTestCase
             $this->createMock(ThothWorkRelationService::class)
         );
 
-        $service->register($mockPublication, 'f740cf4e-16d1-487c-9a92-615882a591e9');
+        $firstRegistrationResult = $service->register($mockPublication, 'f740cf4e-16d1-487c-9a92-615882a591e9');
         $secondRegistrationResult = $service->register($mockPublication, 'f740cf4e-16d1-487c-9a92-615882a591e9');
 
-        $service->setActive($secondRegistrationResult);
+        $this->assertSame('first-work-id', $firstRegistrationResult->getWorkId());
+        $this->assertSame('second-work-id', $secondRegistrationResult->getWorkId());
     }
 }

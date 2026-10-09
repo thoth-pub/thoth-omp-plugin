@@ -21,6 +21,7 @@ describe('Thoth registration on publication', function () {
 		// Publish through OMP with explicit consent to register in Thoth.
 		cy.get('.pkpPublication').contains('button', /^\s*Publish\s*$/).click();
 		cy.get('.pkpWorkflow__publishModal').should('be.visible').within(() => {
+			cy.contains('Please note that these titles are being marked as "Forthcoming" in Thoth').should('be.visible');
 			cy.get('input[name="registerConfirmation"]').check();
 			cy.get('select[name="thothImprintId"]').select('Cypress Imprint');
 			cy.route('POST', `**/publications/${this.book.publicationId}/publish`).as('publish');
@@ -32,15 +33,15 @@ describe('Thoth registration on publication', function () {
 		cy.get('.pkpPublication__thoth').contains('a', 'View').should('be.visible');
 		cy.reload();
 		cy.get('.pkpPublication__thoth')
-			.contains('span', /^\s*Active\s*$/).scrollIntoView();
+			.contains('span', /^\s*Forthcoming\s*$/).scrollIntoView();
 		cy.get('.pkpPublication__thoth')
-			.contains('span', /^\s*Active\s*$/).should('be.visible');
+			.contains('span', /^\s*Forthcoming\s*$/).should('be.visible');
 
 		// The publish hook must persist the link, not merely report OMP publication success.
 		readRegisteredWork(this.book.key).then((work) => {
 			expect(work.title).to.eq(this.book.title);
 			expect(work.imprintId).to.eq(this.book.imprintId);
-			expect(work.workStatus).to.eq('ACTIVE');
+			expect(work.workStatus).to.eq('FORTHCOMING');
 		});
 		readBookState(this.book.key).its('status').should('eq', 3);
 	});

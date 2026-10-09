@@ -176,7 +176,8 @@ class ThothBookServiceTest extends PKPTestCase
         $this->assertSame('d8fa2e63-5513-45e5-84c1-e9c2d89f99d3', $thothBookId);
     }
 
-    public function testUpdateOnlySynchronizesWorkMetadata()
+    /** @dataProvider workStatuses */
+    public function testUpdatesMetadataWithoutChangingThothStatus($status)
     {
         $mockTitleService = $this->createMock(ThothTitleService::class);
         $mockTitleService->expects($this->never())
@@ -184,24 +185,15 @@ class ThothBookServiceTest extends PKPTestCase
         $mockAbstractService = $this->createMock(ThothAbstractService::class);
         $mockAbstractService->expects($this->never())
             ->method('updateByPublication');
-        $oldThothBook = new class () {
-            public function toArray()
-            {
-                return [
-                    'workId' => '9f65f147-1d9d-4dd1-9f78-89b58d088a2c',
-                    'workType' => WorkType::MONOGRAPH,
-                    'workStatus' => WorkStatus::ACTIVE,
-                    'fullTitle' => 'Old title',
-                    'title' => 'Old title',
-                    'subtitle' => 'Old subtitle',
-                    'titles' => [['titleId' => 'title-id']],
-                    'abstracts' => [['abstractId' => 'abstract-id']],
-                ];
-            }
-        };
+        $oldThothBook = new \ThothApi\GraphQL\Schemas\Work([
+            'workId' => '9f65f147-1d9d-4dd1-9f78-89b58d088a2c',
+            'workType' => WorkType::MONOGRAPH,
+            'workStatus' => $status,
+        ]);
 
         $newThothBook = new ThothWork([
             'doi' => 'https://doi.org/10.12345/updated',
+            'workStatus' => WorkStatus::FORTHCOMING,
         ]);
 
         $mockFactory = $this->getMockBuilder(ThothBookFactory::class)
@@ -213,23 +205,22 @@ class ThothBookServiceTest extends PKPTestCase
 
         $mockRepository = $this->getMockBuilder(ThothBookRepository::class)
             ->setConstructorArgs([$this->getMockBuilder(ThothClient::class)->getMock()])
-            ->setMethods(['get', 'new', 'edit'])
+            ->setMethods(['get', 'edit'])
             ->getMock();
         $mockRepository->expects($this->once())
             ->method('get')
             ->with('9f65f147-1d9d-4dd1-9f78-89b58d088a2c')
             ->willReturn($oldThothBook);
         $mockRepository->expects($this->once())
-            ->method('new')
-            ->with([
-                'workId' => '9f65f147-1d9d-4dd1-9f78-89b58d088a2c',
-                'workType' => WorkType::MONOGRAPH,
-                'workStatus' => WorkStatus::ACTIVE,
-                'doi' => 'https://doi.org/10.12345/updated',
-            ])
-            ->willReturn(new ThothWork());
-        $mockRepository->expects($this->once())
-            ->method('edit');
+            ->method('edit')
+            ->with($this->callback(function (ThothWork $work) {
+                $this->assertSame([
+                    'workId' => '9f65f147-1d9d-4dd1-9f78-89b58d088a2c',
+                    'workType' => WorkType::MONOGRAPH,
+                    'doi' => 'https://doi.org/10.12345/updated',
+                ], $work->getAllData());
+                return true;
+            }));
 
         $mockPublication = $this->getMockBuilder(Publication::class)
             ->setMethods(['getData'])
@@ -246,6 +237,14 @@ class ThothBookServiceTest extends PKPTestCase
             $mockAbstractService
         );
         $service->update($mockPublication, '9f65f147-1d9d-4dd1-9f78-89b58d088a2c');
+    }
+
+    public function workStatuses(): array
+    {
+        return [
+            'active' => ['ACTIVE'], 'forthcoming' => ['FORTHCOMING'], 'withdrawn' => ['WITHDRAWN'],
+            'superseded' => ['SUPERSEDED'], 'postponed' => ['POSTPONED_INDEFINITELY'], 'cancelled' => ['CANCELLED'],
+        ];
     }
 
     public function testUpdateIncludesTitlesAndAbstractsWhenRequested()

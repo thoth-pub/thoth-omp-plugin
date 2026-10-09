@@ -11,9 +11,7 @@
  *
  *}
 
-<span
-    v-if="submission.status === getConstant('STATUS_PUBLISHED') || submission.thothWorkId" class="pkpPublication__thoth"
->
+<span class="pkpPublication__thoth">
     <strong>Thoth Status:</strong>
     <span v-if="submission.thothWorkId">
         <spinner v-if="!$.pkp.plugins.generic.thothplugin.workflow.workStatusLoaded"></spinner>

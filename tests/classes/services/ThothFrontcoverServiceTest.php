@@ -188,7 +188,6 @@ class ThothFrontcoverServiceTest extends PKPTestCase
             ->with([
                 'workId' => 'work-id',
                 'workType' => WorkType::MONOGRAPH,
-                'workStatus' => WorkStatus::ACTIVE,
                 'coverUrl' => $cdnUrl,
             ])
             ->willReturn(new PatchWork([
