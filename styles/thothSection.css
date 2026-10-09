@@ -32,7 +32,8 @@
     background: #d00a0a;
 }
 
-.thothWorkStatus__indicator--superseded {
+.thothWorkStatus__indicator--superseded,
+.thothWorkStatus__indicator--unregistered {
     background: #777;
 }
 
