@@ -41,7 +41,7 @@ class ThothMenuHandler
                 'name' => __('plugins.generic.thoth.navigation.thoth'),
                 'url' => $router->url($request, null, 'thoth'),
                 'isCurrent' => $router->getRequestedPage($request) === 'thoth',
-                'icon' => 'Book',
+                'class' => 'thoth-menu',
             ];
         } else {
             $menu = array_slice($menu, 0, $offset, true) +
@@ -50,7 +50,7 @@ class ThothMenuHandler
                         'name' => __('plugins.generic.thoth.navigation.thoth'),
                         'url' => $router->url($request, null, 'thoth'),
                         'isCurrent' => $router->getRequestedPage($request) === 'thoth',
-                        'icon' => 'Book',
+                        'class' => 'thoth-menu',
                     ]
                 ] +
                 array_slice($menu, $offset, null, true);

@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="639" height="812" viewBox="0 0 639 812" fill="none">
+  <defs>
+    <clipPath id="wings-clip">
+      <rect x="4.5" y="245.5" width="630" height="523" rx="65"/>
+    </clipPath>
+    <clipPath id="wings-visible">
+      <path clip-rule="evenodd" d="M0 0H639V812H0Z M174 142C174 65 236 5 320 5C402 5 465 66 465 142V244C465 280 439 306 402 306H237C200 306 174 280 174 244Z M245 307H393C453 307 503 353 503 416V666C503 721 471 759 429 770H209C165 759 136 721 136 666V416C136 353 184 307 245 307Z"/>
+    </clipPath>
+    <clipPath id="face-visible">
+      <path clip-rule="evenodd" d="M0 0H639V812H0Z M281 507H357C403 507 439 543 439 589V723C439 770 408 807 362 807H277C230 807 199 770 199 723V589C199 543 235 507 281 507Z"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#face-visible)">
+  <g id="wings" clip-path="url(#wings-visible)">
+    <g clip-path="url(#wings-clip)">
+      <path d="M4 295H635M4 342H635M4 389H635M4 437H635M4 483H635M4 531H635M4 578H635M4 626H635M4 673H635M4 720H635" stroke="#575757" stroke-width="13.5"/>
+    </g>
+    <rect x="4.5" y="245.5" width="630" height="523" rx="65" stroke="#575757" stroke-width="14"/>
+  </g>
+  </g>
+  <g id="headdress" stroke="#66695f" stroke-width="13.5" stroke-linejoin="round">
+    <path d="M174 142C174 65 236 5 320 5C402 5 465 66 465 142V244C465 280 439 306 402 306H237C200 306 174 280 174 244Z"/>
+    <ellipse cx="319.5" cy="142.5" rx="138" ry="138"/>
+    <circle cx="370" cy="91" r="36"/>
+  </g>
+  <g id="face">
+    <path d="M245 307H393C453 307 503 353 503 416V666C503 721 471 759 429 770H209C165 759 136 721 136 666V416C136 353 184 307 245 307Z" stroke="#6b6c62" stroke-width="13.5" clip-path="url(#face-visible)"/>
+    <g id="eyes" stroke="#707166" stroke-width="13" stroke-linejoin="round">
+      <path d="M220 387H250C264 387 273 396 273 410V431L261 417C257 412 251 409 245 412C238 415 237 426 242 432L249 438H220C207 438 198 429 198 417V409C198 396 207 387 220 387Z"/>
+      <path d="M387 387H417C431 387 440 396 440 410V431L428 417C424 412 418 409 412 412C405 415 404 426 409 432L416 438H387C374 438 365 429 365 417V409C365 396 374 387 387 387Z"/>
+    </g>
+  </g>
+  <g id="muzzle" stroke="#717267" stroke-width="13.5" stroke-linejoin="round">
+    <path d="M281 507H357C403 507 439 543 439 589V723C439 770 408 807 362 807H277C230 807 199 770 199 723V589C199 543 235 507 281 507Z"/>
+    <rect id="left-nostril" x="252" y="537" width="55" height="50" rx="20"/>
+    <rect id="right-nostril" x="334" y="537" width="55" height="50" rx="20"/>
+    <rect id="mouth" x="217" y="674" width="204" height="47" rx="17"/>
+  </g>
+</svg>
