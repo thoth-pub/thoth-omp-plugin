@@ -45,13 +45,6 @@ pkp.registry.storeExtend('workflow', (piniaContext) => {
 
 			const {submission, selectedPublicationId} = args;
 
-			if (
-				submission.status !== pkp.const.STATUS_PUBLISHED &&
-				!submission.thothWorkId
-			) {
-				return primaryControlsLeft;
-			}
-
 			const thothData = pkp.plugins?.generic?.thoth?.workflow || {};
 
 			const workStatusUrl = (thothData.workStatusUrl || '')

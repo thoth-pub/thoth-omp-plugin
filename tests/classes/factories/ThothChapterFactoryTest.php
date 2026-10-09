@@ -37,6 +37,7 @@ class ThothChapterFactoryTest extends PKPTestCase
             'landingPage' => 'https://publisher.example/book/1',
         ]);
 
+        self::assertSame('FORTHCOMING', $work->getWorkStatus());
         self::assertSame('2020-01-01', $work->getPublicationDate());
         self::assertSame('31', $work->getFirstPage());
         self::assertSame('50', $work->getLastPage());

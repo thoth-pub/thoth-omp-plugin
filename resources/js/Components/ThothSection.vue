@@ -122,7 +122,7 @@ const statusLabel = computed(() => {
 
 const statusColor = computed(() => {
 	if (!props.submission.thothWorkId) {
-		return 'bg-stage-declined';
+		return 'thothWorkStatus__indicator--unregistered';
 	}
 
 	if (fetchError.value) {

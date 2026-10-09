@@ -15,6 +15,7 @@
   "plugins.generic.thoth.imprint",
   "plugins.generic.thoth.imprint.required",
   "plugins.generic.thoth.register",
+  "plugins.generic.thoth.register.forthcomingNotice",
   "plugins.generic.thoth.status.notFound",
   "plugins.generic.thoth.status.unregistered",
   "plugins.generic.thoth.unlink",

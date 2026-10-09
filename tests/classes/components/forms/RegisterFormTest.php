@@ -1,0 +1,27 @@
+<?php
+
+/**
+ * @file plugins/generic/thoth/tests/classes/components/forms/RegisterFormTest.php
+ *
+ * Copyright (c) 2024-2026 Lepidus Tecnologia
+ * Copyright (c) 2024-2026 Thoth
+ * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+ */
+
+namespace APP\plugins\generic\thoth\tests\classes\components\forms;
+
+use APP\plugins\generic\thoth\classes\components\forms\RegisterForm;
+use APP\submission\Submission;
+use PKP\tests\PKPTestCase;
+
+class RegisterFormTest extends PKPTestCase
+{
+    public function testConfirmationIncludesForthcomingNotice(): void
+    {
+        $form = new RegisterForm('/register', [], Submission::WORK_TYPE_AUTHORED_WORK, []);
+        $confirmation = $form->fields[0]->getConfig();
+
+        self::assertStringContainsString(__('plugins.generic.thoth.register.confirmation'), $confirmation['description']);
+        self::assertStringContainsString(__('plugins.generic.thoth.register.forthcomingNotice'), $confirmation['description']);
+    }
+}

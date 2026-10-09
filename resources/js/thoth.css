@@ -1,3 +1,18 @@
+.thoth-menu > div > a::before,
+.thoth-menu > div > div > a::before {
+	content: "";
+	display: inline-block;
+	flex-shrink: 0;
+	width: 20px;
+	height: 20px;
+	background-color: currentColor;
+	mask: url('../images/thoth-menu.svg') center / contain no-repeat;
+}
+
+.thothWorkStatus__indicator--unregistered {
+	background: #777;
+}
+
 .thothAccessibilityHeader {
 	align-items: center;
 	display: flex;
