@@ -21,12 +21,19 @@ build_thoth_environment:
       --frontend dockerfile.v0
       --local context=tests/environment
       --local dockerfile=tests/environment
+      --metadata-file build-metadata.json
       --output type=image,name=$CI_REGISTRY_IMAGE/test-environment:$CI_COMMIT_SHA,push=true
+    - sh tests/environment/export-image-reference.sh build-metadata.json "$CI_REGISTRY_IMAGE/test-environment" build.env
+  artifacts:
+    reports:
+      dotenv: build.env
   after_script:
     - rm -f "$HOME/.docker/config.json"
 
 .thoth_environment:
-  needs: [build_thoth_environment]
+  needs:
+    - job: build_thoth_environment
+      artifacts: true
   image: lepidustecnologia/omp:3.4.0-head-forUnitTests@sha256:af234816596e4cd87e5889a319aefe7f5e1b51187d883d4118e3d1ddac60efd5
   tags: [atualizacoes2]
   timeout: 10m
@@ -80,14 +87,14 @@ build_thoth_environment:
         POSTGRES_DB: zitadel
         POSTGRES_USER: zitadel
         POSTGRES_PASSWORD: isolated-test-only
-    - name: $CI_REGISTRY_IMAGE/test-environment:$CI_COMMIT_SHA
+    - name: $THOTH_ENVIRONMENT_IMAGE
       alias: zitadel
       entrypoint: [python3, /environment/zitadel.py]
       variables:
         HEALTHCHECK_TCP_PORT: "8080"
       docker:
         user: "0:0"
-    - name: $CI_REGISTRY_IMAGE/test-environment:$CI_COMMIT_SHA
+    - name: $THOTH_ENVIRONMENT_IMAGE
       alias: thoth api
       variables:
         HEALTHCHECK_TCP_PORT: "8000"

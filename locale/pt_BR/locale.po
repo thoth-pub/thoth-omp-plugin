@@ -339,3 +339,6 @@ msgstr "Adiado Indefinidamente"
 
 msgid "plugins.generic.thoth.workStatus.cancelled"
 msgstr "Cancelado"
+
+msgid "plugins.generic.thoth.register.forthcomingNotice"
+msgstr "Observe que estes títulos serão marcados como \"Forthcoming\" na Thoth para permitir que a editora revise os metadados atuais no painel da Thoth. Os títulos ainda precisam ser definidos como \"Active\" na Thoth para serem incluídos nos fluxos de trabalho relacionados."

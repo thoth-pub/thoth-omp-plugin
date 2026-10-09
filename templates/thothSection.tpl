@@ -11,9 +11,7 @@
  *
  *}
 
-<span
-    v-if="submission.status === getConstant('STATUS_PUBLISHED') || submission.thothWorkId" class="pkpPublication__thoth"
->
+<span class="pkpPublication__thoth">
     <strong>Thoth Status:</strong>
     <span v-if="submission.thothWorkId">
         <spinner v-if="!$.pkp.plugins.generic.thothplugin.workflow.workStatusLoaded"></spinner>
@@ -53,6 +51,13 @@
         </template>
     </span>
     <span v-else>
+        <span class="thothWorkStatus">
+            <span
+                class="thothWorkStatus__indicator thothWorkStatus__indicator--unregistered"
+                aria-hidden="true"
+            ></span>
+            {translate key="plugins.generic.thoth.status.unregistered"}
+        </span>
         <a
             href="#"
             @click.prevent="$.pkp.plugins.generic.thothplugin.workflow.openRegister(workingPublication.id)"
