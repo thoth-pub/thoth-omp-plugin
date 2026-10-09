@@ -3,7 +3,9 @@ plugin_integration_tests_omp:
   interruptible: true
   extends: [.integration_tests_template, .thoth_environment]
   image: !reference [.thoth_environment, image]
-  needs: [build_thoth_environment]
+  needs:
+    - job: build_thoth_environment
+      artifacts: true
   services:
     - !reference [.thoth_environment, services]
     - name: mysql:8.4@sha256:b3b90af2a6552ae30c266fdb7d5dd55f3afb72404bb78d37fe8a23eb857fd3fb
