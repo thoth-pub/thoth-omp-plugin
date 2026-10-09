@@ -336,3 +336,6 @@ msgstr "Some publication formats exist only in Thoth and could not be removed be
 
 msgid "plugins.generic.thoth.synchronize.ambiguousMetadata"
 msgstr "The metadata could not be synchronized because more than one Thoth record matches it. Review the records in Thoth and try again."
+
+msgid "plugins.generic.thoth.register.forthcomingNotice"
+msgstr "Please note that these titles are being marked as \"Forthcoming\" in Thoth to enable the publisher to review the current metadata set in the Thoth backend. Titles still need to be set to \"Active\" in Thoth to be picked up by related workflows."

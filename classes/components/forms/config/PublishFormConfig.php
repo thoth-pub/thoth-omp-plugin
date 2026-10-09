@@ -87,6 +87,7 @@ class PublishFormConfig
 
         $form->addField(new \PKP\components\forms\FieldOptions('registerConfirmation', [
             'label' => __('plugins.generic.thoth.register.label'),
+            'description' => __('plugins.generic.thoth.register.forthcomingNotice'),
             'options' => [
                 ['value' => true, 'label' => __('plugins.generic.thoth.register.confirmation')]
             ],

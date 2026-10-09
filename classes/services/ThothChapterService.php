@@ -75,6 +75,7 @@ class ThothChapterService
     ): bool {
         $thothChapter = $thothChapter ?? $this->getDesiredWork($chapter, $thothImprintId);
         $thothChapterId = $existingChapter['workId'];
+        $thothChapter->setWorkStatus($existingChapter['workStatus']);
         $thothChapter->setWorkId($thothChapterId);
         $this->repository->edit($thothChapter);
         $chapter->setData('thothChapterId', $thothChapterId);

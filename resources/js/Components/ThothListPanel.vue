@@ -280,9 +280,12 @@ function updateItem(updatedItem) {
 
 function openRegister() {
 	const title = t('plugins.generic.thoth.actions.register.label');
-	const message = t('plugins.generic.thoth.actions.register.prompt', {
-		count: selected.value.length,
-	});
+	const message =
+		t('plugins.generic.thoth.actions.register.prompt', {
+			count: selected.value.length,
+		}) +
+		' ' +
+		t('plugins.generic.thoth.register.forthcomingNotice');
 
 	if (!imprintValue.value) {
 		pkp.eventBus.$emit(

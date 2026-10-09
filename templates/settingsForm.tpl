@@ -29,7 +29,7 @@
 
 	{fbvFormArea id="thothSettings"}
 		{fbvFormSection title="plugins.generic.thoth.settings.token"}
-			{fbvElement type="text" password="true" id="token" label="plugins.generic.thoth.settings.token" value=$token required="true" size=$fbvStyles.size.SMALL}
+			{fbvElement type="text" password="true" id="token" label="plugins.generic.thoth.settings.token" value=$token required="true" size=$fbvStyles.size.MEDIUM}
 		{/fbvFormSection}
 
 		{fbvFormSection list="true" title="plugins.generic.thoth.settings.customThothApi"}
@@ -37,7 +37,7 @@
 		{/fbvFormSection}
 
 		{fbvFormSection title="plugins.generic.thoth.settings.customThothApiUrl"}
-			{fbvElement type="text" id="customThothApiUrl" label="plugins.generic.thoth.settings.customThothApiUrl" value=$customThothApiUrl size=$fbvStyles.size.SMALL}
+			{fbvElement type="text" id="customThothApiUrl" label="plugins.generic.thoth.settings.customThothApiUrl" value=$customThothApiUrl size=$fbvStyles.size.MEDIUM}
 		{/fbvFormSection}
 	{/fbvFormArea}
 

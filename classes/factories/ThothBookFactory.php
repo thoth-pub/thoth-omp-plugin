@@ -17,7 +17,6 @@
 namespace APP\plugins\generic\thoth\classes\factories;
 
 use APP\submission\Submission;
-use PKP\core\Core;
 use PKP\doi\Doi;
 use ThothApi\GraphQL\Enums\WorkStatus;
 use ThothApi\GraphQL\Enums\WorkType;
@@ -29,7 +28,7 @@ class ThothBookFactory
     {
         $workData = [
             'workType' => $workType ?? $this->getWorkTypeBySubmissionWorkType($context['submissionWorkType']),
-            'workStatus' => $this->getWorkStatusByDatePublished($publication->getData('datePublished')),
+            'workStatus' => WorkStatus::FORTHCOMING,
             'edition' => $publication->getData('version'),
             'publicationDate' => $publication->getData('datePublished'),
             'pageCount' => $publication->getData('pageCount'),
@@ -61,15 +60,6 @@ class ThothBookFactory
         ];
 
         return $workTypeMapping[$submissionWorkType] ?? WorkType::MONOGRAPH;
-    }
-
-    public function getWorkStatusByDatePublished($datePublished)
-    {
-        if ($datePublished && $datePublished <= Core::getCurrentDate()) {
-            return WorkStatus::ACTIVE;
-        }
-
-        return WorkStatus::FORTHCOMING;
     }
 
     public function getDoi($publication, ?string $fallbackDoi = null): ?string

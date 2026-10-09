@@ -18,7 +18,6 @@ namespace APP\plugins\generic\thoth\tests\classes\pkp;
 
 require_once(__DIR__ . '/../../../vendor/autoload.php');
 
-use APP\monograph\Chapter;
 use APP\plugins\generic\thoth\classes\factories\ThothChapterFactory;
 use APP\publication\Repository as PublicationRepository;
 use APP\submission\Repository as SubmissionRepository;
@@ -167,7 +166,7 @@ class OmpChapterMetadataSourceTest extends PKPTestCase
 
         $this->assertEquals(new ThothWork([
             'workType' => WorkType::BOOK_CHAPTER,
-            'workStatus' => WorkStatus::ACTIVE,
+            'workStatus' => WorkStatus::FORTHCOMING,
             'publicationDate' => '2024-01-01',
             'doi' => 'https://doi.org/10.12345/11112222',
             'firstPage' => '31',
@@ -175,31 +174,6 @@ class OmpChapterMetadataSourceTest extends PKPTestCase
             'pageInterval' => '31 - 50',
             'landingPage' => 'https://omp.publicknowledgeproject.org/index.php/press/catalog/book/17'
         ]), $thothChapter);
-    }
-
-    public function testGetWorkStatusByDatePublished()
-    {
-        $mockChapter = $this->getMockBuilder(Chapter::class)
-            ->onlyMethods(['getDatePublished'])
-            ->getMock();
-
-        $mockChapter->expects($this->any())
-            ->method('getDatePublished')
-            ->willReturnOnConsecutiveCalls('2024-01-01', '2050-01-01');
-
-        $factory = new ThothChapterFactory();
-        $source = new \APP\plugins\generic\thoth\classes\pkp\OmpMetadataSource(
-            \APP\facades\Repo::submission(),
-            \APP\facades\Repo::publication(),
-            \APP\core\Application::getContextDAO(),
-            \PKP\db\DAORegistry::getDAO('PublicationFormatDAO'),
-            \APP\core\Application::get()->getRequest()
-        );
-        $workStatus = $factory->getWorkStatusByDatePublished($mockChapter, null);
-        $this->assertEquals(WorkStatus::ACTIVE, $workStatus);
-
-        $workStatus = $factory->getWorkStatusByDatePublished($mockChapter, null);
-        $this->assertEquals(WorkStatus::FORTHCOMING, $workStatus);
     }
 
     public function testCreateThothChapterOmitsEmptyOptionalMetadata()

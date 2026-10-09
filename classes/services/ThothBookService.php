@@ -88,6 +88,8 @@ class ThothBookService
             $this->metadataSource->getBookContext($publication)
         );
 
+        $newThothBook->unsetWorkStatus();
+
         $thothBook = $this->repository->new(array_merge(
             $this->getPatchWorkData($oldThothBook),
             $newThothBook->getAllData()

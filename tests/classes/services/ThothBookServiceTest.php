@@ -29,18 +29,18 @@ use ThothApi\GraphQL\Inputs\PatchWork as ThothWork;
 
 class ThothBookServiceTest extends PKPTestCase
 {
-    public function testUpdateOnlySynchronizesWorkMetadata(): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('workStatuses')]
+    public function testUpdatesMetadataWithoutChangingThothStatus(string $status): void
     {
-        $oldThothBook = new class () {
-            public function toArray(): array
-            {
-                return [
-                    'workId' => '9f65f147-1d9d-4dd1-9f78-89b58d088a2c',
-                ];
-            }
-        };
+        $oldThothBook = new \ThothApi\GraphQL\Schemas\Work([
+            'workId' => '9f65f147-1d9d-4dd1-9f78-89b58d088a2c',
+            'workType' => 'MONOGRAPH',
+            'workStatus' => $status,
+            'imprintId' => 'imprint-id',
+        ]);
         $newThothBook = new ThothWork([
             'doi' => 'https://doi.org/10.12345/updated',
+            'workStatus' => 'FORTHCOMING',
         ]);
 
         $mockFactory = $this->getMockBuilder(ThothBookFactory::class)
@@ -52,22 +52,23 @@ class ThothBookServiceTest extends PKPTestCase
 
         $mockRepository = $this->getMockBuilder(ThothBookRepository::class)
             ->setConstructorArgs([$this->createMock(ThothClient::class)])
-            ->onlyMethods(['get', 'new', 'edit'])
+            ->onlyMethods(['get', 'edit'])
             ->getMock();
         $mockRepository->expects($this->once())
             ->method('get')
             ->with('9f65f147-1d9d-4dd1-9f78-89b58d088a2c')
             ->willReturn($oldThothBook);
         $mockRepository->expects($this->once())
-            ->method('new')
-            ->with([
-                'workId' => '9f65f147-1d9d-4dd1-9f78-89b58d088a2c',
-                'doi' => 'https://doi.org/10.12345/updated',
-            ])
-            ->willReturn($newThothBook);
-        $mockRepository->expects($this->once())
             ->method('edit')
-            ->with($newThothBook);
+            ->with($this->callback(function (ThothWork $work) use ($status) {
+                $variables = \ThothApi\GraphQL\Mutations\UpdateWorkMutation::operation([
+                    'data' => $work->getAllData(),
+                ])->getVariables();
+                self::assertSame($status, $variables['data']['workStatus']);
+                self::assertSame('9f65f147-1d9d-4dd1-9f78-89b58d088a2c', $variables['data']['workId']);
+                self::assertSame('https://doi.org/10.12345/updated', $variables['data']['doi']);
+                return true;
+            }));
 
         $mockTitleService = $this->createMock(ThothTitleService::class);
         $mockTitleService->expects($this->never())->method('updateByPublication');
@@ -90,6 +91,18 @@ class ThothBookServiceTest extends PKPTestCase
         );
 
         $service->update($publication, '9f65f147-1d9d-4dd1-9f78-89b58d088a2c');
+    }
+
+    public static function workStatuses(): array
+    {
+        return [
+            'active' => ['ACTIVE'],
+            'forthcoming' => ['FORTHCOMING'],
+            'withdrawn' => ['WITHDRAWN'],
+            'superseded' => ['SUPERSEDED'],
+            'postponed' => ['POSTPONED_INDEFINITELY'],
+            'cancelled' => ['CANCELLED'],
+        ];
     }
 
     public function testUpdateIncludesTitlesAndAbstractsWhenRequested(): void
