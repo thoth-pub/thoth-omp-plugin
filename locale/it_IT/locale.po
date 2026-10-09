@@ -338,3 +338,6 @@ msgstr "Rinviato a tempo indeterminato"
 
 msgid "plugins.generic.thoth.workStatus.cancelled"
 msgstr "Annullato"
+
+msgid "plugins.generic.thoth.register.forthcomingNotice"
+msgstr "Questi titoli saranno contrassegnati come \"Forthcoming\" in Thoth per consentire all’editore di rivedere i metadati attuali nel pannello di Thoth. I titoli devono ancora essere impostati su \"Active\" in Thoth per essere inclusi nei relativi flussi di lavoro."

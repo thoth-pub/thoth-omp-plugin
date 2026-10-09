@@ -33,7 +33,7 @@
         </h3>
 
 		{fbvFormSection}
-			{fbvElement type="text" password="true" id="token" label="plugins.generic.thoth.settings.token" value=$token required="true"}
+			{fbvElement type="text" password="true" id="token" size=$fbvStyles.size.MEDIUM label="plugins.generic.thoth.settings.token" value=$token required="true"}
 		{/fbvFormSection}
 
 		{fbvFormSection list="true" title="plugins.generic.thoth.settings.customThothApi"}
@@ -41,7 +41,7 @@
 		{/fbvFormSection}
 
 		{fbvFormSection}
-			{fbvElement type="text" id="customThothApiUrl" label="plugins.generic.thoth.settings.customThothApiUrl" value=$customThothApiUrl}
+			{fbvElement type="text" id="customThothApiUrl" size=$fbvStyles.size.MEDIUM label="plugins.generic.thoth.settings.customThothApiUrl" value=$customThothApiUrl}
 		{/fbvFormSection}
 	{/fbvFormArea}
 

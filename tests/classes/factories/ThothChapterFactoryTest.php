@@ -158,7 +158,7 @@ class ThothChapterFactoryTest extends PKPTestCase
 
         $this->assertEquals(new ThothWork([
             'workType' => WorkType::BOOK_CHAPTER,
-            'workStatus' => WorkStatus::ACTIVE,
+            'workStatus' => WorkStatus::FORTHCOMING,
             'publicationDate' => '2024-01-01',
             'doi' => 'https://doi.org/10.12345/11112222',
             'pageInterval' => '31 - 50',
@@ -166,24 +166,6 @@ class ThothChapterFactoryTest extends PKPTestCase
             'lastPage' => '50',
             'landingPage' => 'https://omp.publicknowledgeproject.org/index.php/press/catalog/book/17'
         ]), $thothChapter);
-    }
-
-    public function testGetWorkStatusByDatePublished()
-    {
-        $mockChapter = $this->getMockBuilder(Chapter::class)
-            ->setMethods(['getDatePublished'])
-            ->getMock();
-
-        $mockChapter->expects($this->any())
-            ->method('getDatePublished')
-            ->will($this->onConsecutiveCalls('2024-01-01', '2050-01-01'));
-
-        $factory = new ThothChapterFactory();
-        $workStatus = $factory->getWorkStatusByDatePublished($mockChapter, null);
-        $this->assertEquals(WorkStatus::ACTIVE, $workStatus);
-
-        $workStatus = $factory->getWorkStatusByDatePublished($mockChapter, null);
-        $this->assertEquals(WorkStatus::FORTHCOMING, $workStatus);
     }
 
     public function testCreateThothChapterOmitsEmptyOptionalMetadata()

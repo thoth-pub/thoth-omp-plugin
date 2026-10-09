@@ -147,7 +147,6 @@ class ThothEndpoint
         try {
             $thothBookRegistrationService = ThothService::bookRegistration();
             $registrationResult = $thothBookRegistrationService->register($publication, $thothImprintId);
-            $thothBookRegistrationService->setActive($registrationResult);
             $thothBookId = $registrationResult->getWorkId();
             $submission = Services::get('submission')->edit($submission, ['thothWorkId' => $thothBookId], $request);
             $this->handleNotification(

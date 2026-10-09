@@ -261,7 +261,7 @@ pkp.Vue.component('thoth-list-panel', {
 			const title = this.__('plugins.generic.thoth.actions.register.label');
 			const message = this.__('plugins.generic.thoth.actions.register.prompt', {
 				count: this.selected.length,
-			});
+			}) + ' ' + this.__('plugins.generic.thoth.register.forthcomingNotice');
 
 			if (!this.selectedImprint) {
 				pkp.eventBus.$emit('notify',this.__('plugins.generic.thoth.imprint.required'),'warning');

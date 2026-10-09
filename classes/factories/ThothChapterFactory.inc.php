@@ -32,7 +32,7 @@ class ThothChapterFactory
 
         $workData = [
             'workType' => WorkType::BOOK_CHAPTER,
-            'workStatus' => $this->getWorkStatusByDatePublished($chapter, $publication),
+            'workStatus' => WorkStatus::FORTHCOMING,
             'publicationDate' => $chapter->getDatePublished() ?? $publication->getData('datePublished'),
             'landingPage' => $request->getDispatcher()->url(
                 $request,
@@ -81,14 +81,4 @@ class ThothChapterFactory
         ];
     }
 
-    public function getWorkStatusByDatePublished($chapter, $publication)
-    {
-        $dataPublished = $chapter->getDatePublished() ?? $publication->getData('datePublished');
-
-        if ($dataPublished && $dataPublished <= \Core::getCurrentDate()) {
-            return WorkStatus::ACTIVE;
-        }
-
-        return WorkStatus::FORTHCOMING;
-    }
 }
