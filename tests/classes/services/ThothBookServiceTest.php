@@ -34,7 +34,9 @@ class ThothBookServiceTest extends PKPTestCase
     {
         $oldThothBook = new \ThothApi\GraphQL\Schemas\Work([
             'workId' => '9f65f147-1d9d-4dd1-9f78-89b58d088a2c',
+            'workType' => 'MONOGRAPH',
             'workStatus' => $status,
+            'imprintId' => 'imprint-id',
         ]);
         $newThothBook = new ThothWork([
             'doi' => 'https://doi.org/10.12345/updated',
@@ -58,11 +60,13 @@ class ThothBookServiceTest extends PKPTestCase
             ->willReturn($oldThothBook);
         $mockRepository->expects($this->once())
             ->method('edit')
-            ->with($this->callback(function (ThothWork $work): bool {
-                self::assertSame([
-                    'workId' => '9f65f147-1d9d-4dd1-9f78-89b58d088a2c',
-                    'doi' => 'https://doi.org/10.12345/updated',
-                ], $work->getAllData());
+            ->with($this->callback(function (ThothWork $work) use ($status) {
+                $variables = \ThothApi\GraphQL\Mutations\UpdateWorkMutation::operation([
+                    'data' => $work->getAllData(),
+                ])->getVariables();
+                self::assertSame($status, $variables['data']['workStatus']);
+                self::assertSame('9f65f147-1d9d-4dd1-9f78-89b58d088a2c', $variables['data']['workId']);
+                self::assertSame('https://doi.org/10.12345/updated', $variables['data']['doi']);
                 return true;
             }));
 
