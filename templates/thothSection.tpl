@@ -51,6 +51,13 @@
         </template>
     </span>
     <span v-else>
+        <span class="thothWorkStatus">
+            <span
+                class="thothWorkStatus__indicator thothWorkStatus__indicator--unregistered"
+                aria-hidden="true"
+            ></span>
+            {translate key="plugins.generic.thoth.status.unregistered"}
+        </span>
         <a
             href="#"
             @click.prevent="$.pkp.plugins.generic.thothplugin.workflow.openRegister(workingPublication.id)"
