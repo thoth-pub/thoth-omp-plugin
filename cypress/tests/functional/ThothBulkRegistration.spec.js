@@ -36,6 +36,7 @@ describe('Thoth bulk registration', function () {
 		cy.route({method: 'POST', url: `**/submissions/${this.unselectedBook.submissionId}/register`,
 			onRequest: () => { otherRegistrations++; }});
 		cy.contains('[role="dialog"]', 'Register Submissions').within(() => {
+			cy.contains('Please note that these titles are being marked as "Forthcoming" in Thoth').should('be.visible');
 			cy.contains('button', /^\s*Register Submissions\s*$/).click();
 		});
 		cy.wait(['@registerFirst', '@registerSecond']).each(({status, responseBody}) => {
@@ -51,7 +52,7 @@ describe('Thoth bulk registration', function () {
 			readRegisteredWork(book.key).then((work) => {
 				expect(work.title).to.eq(book.title);
 				expect(work.imprintId).to.eq(book.imprintId);
-				expect(work.workStatus).to.eq('ACTIVE');
+				expect(work.workStatus).to.eq('FORTHCOMING');
 			});
 		});
 		cy.get(`input[name="submissions[]"][value="${this.unselectedBook.submissionId}"]`).closest('.listPanel__itemSummary').within(() => {

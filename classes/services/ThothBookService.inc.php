@@ -93,6 +93,7 @@ class ThothBookService
     {
         $oldThothBook = $this->repository->get($thothBookId);
         $newThothBook = $this->factory->createFromPublication($publication);
+        $newThothBook->unsetWorkStatus();
 
         $thothBook = $this->repository->new(array_merge(
             $this->getPatchWorkData($oldThothBook),

@@ -30,7 +30,7 @@ class ThothBookFactory
 
         $workData = [
             'workType' => $thothWorkType ?? $this->getWorkTypeBySubmissionWorkType($submission->getData('workType')),
-            'workStatus' => $this->getWorkStatusByDatePublished($publication->getData('datePublished')),
+            'workStatus' => WorkStatus::FORTHCOMING,
             'edition' => $publication->getData('version'),
             'publicationDate' => $publication->getData('datePublished'),
             'pageCount' => $publication->getData('pageCount'),
@@ -87,15 +87,6 @@ class ThothBookFactory
         ];
 
         return $workTypeMapping[$submissionWorkType] ?? WorkType::MONOGRAPH;
-    }
-
-    public function getWorkStatusByDatePublished($datePublished)
-    {
-        if ($datePublished && $datePublished <= \Core::getCurrentDate()) {
-            return WorkStatus::ACTIVE;
-        }
-
-        return WorkStatus::FORTHCOMING;
     }
 
     public function getDoi($publication)
