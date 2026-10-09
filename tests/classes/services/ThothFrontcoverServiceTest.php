@@ -36,6 +36,14 @@ import('plugins.generic.thoth.classes.services.ThothFrontcoverService');
 
 class ThothFrontcoverServiceTest extends PKPTestCase
 {
+    public static function existingWorkStatuses(): array
+    {
+        return [
+            'active' => [WorkStatus::ACTIVE],
+            'forthcoming' => [WorkStatus::FORTHCOMING],
+        ];
+    }
+
     private $temporaryFiles = [];
 
     protected function getMockedContainerKeys(): array
@@ -204,7 +212,8 @@ class ThothFrontcoverServiceTest extends PKPTestCase
         $this->assertNull($metadata['thothFrontcoverUrl']);
     }
 
-    public function testUploadsFrontcoverAndUpdatesWorkCoverUrl()
+    /** @dataProvider existingWorkStatuses */
+    public function testUploadsFrontcoverAndUpdatesWorkCoverUrl($status)
     {
         $frontcoverPath = $this->createTemporaryJpeg();
         $frontcoverSha256 = hash_file('sha256', $frontcoverPath);
@@ -252,36 +261,32 @@ class ThothFrontcoverServiceTest extends PKPTestCase
             ->with($newFrontcoverFileUpload)
             ->willReturn($fileUploadResponse);
 
-        $workRepository = $this->createMock(ThothWorkRepository::class);
+        $workRepository = $this->getMockBuilder(ThothWorkRepository::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['get', 'edit'])
+            ->getMock();
         $workRepository->expects($this->once())
             ->method('get')
             ->with('work-id')
-            ->willReturn(new class () {
-                public function toArray()
-                {
-                    return [
-                        'workId' => 'work-id',
-                        'workType' => WorkType::MONOGRAPH,
-                        'workStatus' => WorkStatus::ACTIVE,
-                        'fullTitle' => 'Ignored title',
-                        'coverUrl' => 'https://old.example/cover.png',
-                    ];
-                }
-            });
-        $workRepository->expects($this->once())
-            ->method('new')
-            ->with([
+            ->willReturn(new \ThothApi\GraphQL\Schemas\Work([
                 'workId' => 'work-id',
                 'workType' => WorkType::MONOGRAPH,
-                'workStatus' => WorkStatus::ACTIVE,
-                'coverUrl' => $cdnUrl,
-            ])
-            ->willReturn(new PatchWork([
-                'workId' => 'work-id',
-                'coverUrl' => $cdnUrl,
+                'workStatus' => $status,
+                'imprintId' => 'imprint-id',
+                'fullTitle' => 'Ignored title',
+                'coverUrl' => 'https://old.example/cover.png',
             ]));
         $workRepository->expects($this->once())
-            ->method('edit');
+            ->method('edit')
+            ->with($this->callback(function (PatchWork $work) use ($cdnUrl, $status) {
+                $variables = \ThothApi\GraphQL\Mutations\UpdateWorkMutation::operation([
+                    'data' => $work->getAllData(),
+                ])->getVariables();
+                self::assertSame($status, $variables['data']['workStatus']);
+                self::assertSame($cdnUrl, $variables['data']['coverUrl']);
+                self::assertArrayNotHasKey('fullTitle', $variables['data']);
+                return true;
+            }));
 
         $fileUploadService = $this->createMock(ThothFileUploadService::class);
         $fileUploadService->expects($this->once())

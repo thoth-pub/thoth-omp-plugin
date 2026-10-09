@@ -141,6 +141,7 @@ class ThothListPanel extends ListPanel
             'plugins.generic.thoth.status.unregistered',
             'plugins.generic.thoth.actions.register.label',
             'plugins.generic.thoth.actions.register.prompt',
+            'plugins.generic.thoth.register.forthcomingNotice',
         ]);
 
         return $config;
