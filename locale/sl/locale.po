@@ -347,3 +347,6 @@ msgstr "Odloženo za nedoločen čas"
 
 msgid "plugins.generic.thoth.workStatus.cancelled"
 msgstr "Preklicano"
+
+msgid "plugins.generic.thoth.register.forthcomingNotice"
+msgstr "Ti naslovi bodo v Thoth označeni kot \"Forthcoming\", da lahko založnik pregleda trenutne metapodatke v zaledju Thoth. Naslove je treba v Thoth nastaviti na \"Active\", da bodo vključeni v povezane delovne procese."

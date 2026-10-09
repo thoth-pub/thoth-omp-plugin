@@ -339,3 +339,6 @@ msgstr "Postponed Indefinitely"
 
 msgid "plugins.generic.thoth.workStatus.cancelled"
 msgstr "Cancelled"
+
+msgid "plugins.generic.thoth.register.forthcomingNotice"
+msgstr "Please note that these titles are being marked as \"Forthcoming\" in Thoth to enable the publisher to review the current metadata set in the Thoth backend. Titles still need to be set to \"Active\" in Thoth to be picked up by related workflows."
