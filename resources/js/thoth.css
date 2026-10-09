@@ -1,3 +1,7 @@
+.thothWorkStatus__indicator--unregistered {
+	background: #777;
+}
+
 .thothAccessibilityHeader {
 	align-items: center;
 	display: flex;
