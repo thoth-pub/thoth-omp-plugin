@@ -83,11 +83,7 @@ class ThothBookRegistrationService
         );
         $thothBook->setImprintId($thothImprintId);
 
-        $bookToActivate = null;
-        if ($thothBook->getWorkStatus() === WorkStatus::ACTIVE) {
-            $bookToActivate = clone $thothBook;
-            $thothBook->setWorkStatus(WorkStatus::FORTHCOMING);
-        }
+        $thothBook->setWorkStatus(WorkStatus::FORTHCOMING);
 
         $previousBookId = $publication->getData('thothBookId');
         $thothBookId = $this->repository->add($thothBook);
@@ -103,10 +99,6 @@ class ThothBookRegistrationService
             $this->referenceService->registerByPublication($publication);
             $this->workRelationService->registerByPublication($publication, $thothImprintId);
             $warning = $this->frontcoverService->sync($publication, $thothBookId);
-            if ($bookToActivate !== null) {
-                $bookToActivate->setWorkId($thothBookId);
-                $this->repository->edit($bookToActivate);
-            }
             $this->connection->transaction(function () use ($submission, $thothBookId): void {
                 $this->submissionRepository->edit($submission, ['thothWorkId' => $thothBookId]);
             });

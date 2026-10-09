@@ -60,7 +60,8 @@ class RegisterForm extends FormComponent
             ];
         }
 
-        $msg = __('plugins.generic.thoth.register.confirmation');
+        $msg = '<p>' . __('plugins.generic.thoth.register.confirmation') . '</p>'
+            . '<p>' . __('plugins.generic.thoth.register.forthcomingNotice') . '</p>';
         $submitLabel = __('plugins.generic.thoth.register');
         $this->addPage([
             'id' => 'default',

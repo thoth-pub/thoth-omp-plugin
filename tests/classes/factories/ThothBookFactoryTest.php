@@ -22,10 +22,34 @@ use APP\plugins\generic\thoth\classes\factories\ThothBookFactory;
 use APP\publication\Publication;
 use APP\submission\Submission;
 use PKP\tests\PKPTestCase;
+use ThothApi\GraphQL\Enums\WorkStatus;
 use ThothApi\GraphQL\Enums\WorkType;
 
 class ThothBookFactoryTest extends PKPTestCase
 {
+    #[\PHPUnit\Framework\Attributes\DataProvider('publicationDates')]
+    public function testRegistersAsForthcomingRegardlessOfPublicationDate(?string $date): void
+    {
+        $publication = new Publication();
+        $publication->setData('datePublished', $date);
+        $book = (new ThothBookFactory())->createFromPublication($publication, [
+            'submissionWorkType' => Submission::WORK_TYPE_AUTHORED_WORK,
+            'landingPage' => 'https://publisher.example/book/1',
+            'license' => null,
+            'copyrightHolder' => null,
+            'coverUrl' => null,
+            'fallbackDoi' => null,
+        ]);
+
+        self::assertSame(WorkStatus::FORTHCOMING, $book->getWorkStatus());
+        self::assertSame($date, $book->getPublicationDate());
+    }
+
+    public static function publicationDates(): array
+    {
+        return ['unpublished' => [null], 'published' => ['2020-01-01'], 'scheduled' => ['2050-01-01']];
+    }
+
     public function testCreatesBookFromExplicitMetadataWithoutRequestOrDatabase(): void
     {
         $publication = new Publication();

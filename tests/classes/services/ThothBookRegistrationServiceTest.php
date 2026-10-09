@@ -57,7 +57,7 @@ class ThothBookRegistrationServiceTest extends PKPTestCase
         $this->steps = [];
     }
 
-    public function testRegistersMetadataActivatesAndPersistsLink(): void
+    public function testRegistersMetadataWithoutActivationAndPersistsLink(): void
     {
         $service = $this->createService();
 
@@ -65,7 +65,7 @@ class ThothBookRegistrationServiceTest extends PKPTestCase
 
         self::assertSame('work-id', $result->getWorkId());
         self::assertSame(['cover-warning'], $result->getWarnings());
-        self::assertSame(['create', 'metadata', 'activate', 'persist'], $this->steps);
+        self::assertSame(['create', 'metadata', 'persist'], $this->steps);
     }
 
     public function testForthcomingBookDoesNotNeedActivation(): void
@@ -99,8 +99,7 @@ class ThothBookRegistrationServiceTest extends PKPTestCase
         return [
             'creation' => ['create', ['create']],
             'metadata' => ['metadata', ['create', 'metadata', 'delete']],
-            'activation' => ['activate', ['create', 'metadata', 'activate', 'delete']],
-            'local persistence' => ['persist', ['create', 'metadata', 'activate', 'persist', 'delete']],
+            'local persistence' => ['persist', ['create', 'metadata', 'persist', 'delete']],
         ];
     }
 
@@ -138,7 +137,7 @@ class ThothBookRegistrationServiceTest extends PKPTestCase
         } catch (RuntimeException $exception) {
             self::assertSame($failure, $exception);
             self::assertSame(0, $connection->table('thoth_registration_test_work_links')->count());
-            self::assertSame(['create', 'metadata', 'activate', 'persist', 'delete'], $this->steps);
+            self::assertSame(['create', 'metadata', 'persist', 'delete'], $this->steps);
         } finally {
             $connection->statement('DROP TEMPORARY TABLE thoth_registration_test_work_links');
         }
@@ -166,11 +165,7 @@ class ThothBookRegistrationServiceTest extends PKPTestCase
             $recordStep('create');
             return 'work-id';
         });
-        $repository->method('edit')->willReturnCallback(function ($work) use ($recordStep) {
-            self::assertSame(WorkStatus::ACTIVE, $work->getWorkStatus());
-            self::assertSame('work-id', $work->getWorkId());
-            $recordStep('activate');
-        });
+        $repository->expects($this->never())->method('edit');
         $repository->method('delete')->willReturnCallback(function ($id) use ($cleanupFailure) {
             self::assertSame('work-id', $id);
             $this->steps[] = 'delete';

@@ -192,7 +192,7 @@ class OmpBookMetadataSourceTest extends PKPTestCase
 
         $this->assertEquals(new ThothWork([
             'workType' => WorkType::MONOGRAPH,
-            'workStatus' => WorkStatus::ACTIVE,
+            'workStatus' => WorkStatus::FORTHCOMING,
             'edition' => 1,
             'publicationDate' => '2020-01-01',
             'place' => 'Salvador, BR',
@@ -288,23 +288,6 @@ class OmpBookMetadataSourceTest extends PKPTestCase
 
         $workType = $factory->getWorkTypeBySubmissionWorkType(Submission::WORK_TYPE_EDITED_VOLUME);
         $this->assertEquals(WorkType::EDITED_BOOK, $workType);
-    }
-
-    public function testGetWorkStatusByDatePublished()
-    {
-        $factory = new ThothBookFactory();
-        $source = new \APP\plugins\generic\thoth\classes\pkp\OmpMetadataSource(
-            \APP\facades\Repo::submission(),
-            \APP\facades\Repo::publication(),
-            \APP\core\Application::getContextDAO(),
-            \PKP\db\DAORegistry::getDAO('PublicationFormatDAO'),
-            \APP\core\Application::get()->getRequest()
-        );
-        $workStatus = $factory->getWorkStatusByDatePublished('2020-01-01');
-        $this->assertEquals(WorkStatus::ACTIVE, $workStatus);
-
-        $workStatus = $factory->getWorkStatusByDatePublished('2050-12-12');
-        $this->assertEquals(WorkStatus::FORTHCOMING, $workStatus);
     }
 
     public function testGetDoiFromPublication()

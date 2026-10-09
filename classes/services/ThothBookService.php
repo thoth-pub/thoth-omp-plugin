@@ -33,7 +33,6 @@ class ThothBookService
     private const PATCH_WORK_FIELDS = [
         'workId' => true,
         'workType' => true,
-        'workStatus' => true,
         'reference' => true,
         'edition' => true,
         'imprintId' => true,
@@ -87,6 +86,8 @@ class ThothBookService
             $publication,
             $this->metadataSource->getBookContext($publication)
         );
+
+        $newThothBook->unsetWorkStatus();
 
         $thothBook = $this->repository->new(array_merge(
             $this->getPatchWorkData($oldThothBook),
