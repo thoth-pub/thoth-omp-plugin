@@ -29,6 +29,7 @@ class ThothBookService
     private const PATCH_WORK_FIELDS = [
         'workId' => true,
         'workType' => true,
+        'workStatus' => true,
         'reference' => true,
         'edition' => true,
         'imprintId' => true,

@@ -194,7 +194,11 @@ class ThothChapterServiceTest extends PKPTestCase
             ->method('setData')
             ->with('thothChapterId', 'chapter-id');
 
-        $desiredWork = new ThothWork(['workStatus' => 'FORTHCOMING', 'imprintId' => 'imprint-id']);
+        $desiredWork = new ThothWork([
+            'workType' => 'BOOK_CHAPTER',
+            'workStatus' => 'FORTHCOMING',
+            'imprintId' => 'imprint-id',
+        ]);
         $factory = $this->getMockBuilder(ThothChapterFactory::class)
             ->setMethods(['createFromChapter'])
             ->getMock();
@@ -208,10 +212,14 @@ class ThothChapterServiceTest extends PKPTestCase
             ->getMock();
         $repository->expects($this->once())
             ->method('edit')
-            ->with($this->callback(function (ThothWork $work) {
-                return $work->getWorkId() === 'chapter-id'
-                    && $work->getImprintId() === 'imprint-id'
-                    && !$work->hasWorkStatus();
+            ->with($this->callback(function (ThothWork $work) use ($status) {
+                $variables = \ThothApi\GraphQL\Mutations\UpdateWorkMutation::operation([
+                    'data' => $work->getAllData(),
+                ])->getVariables();
+                self::assertSame($status, $variables['data']['workStatus']);
+                self::assertSame('chapter-id', $variables['data']['workId']);
+                self::assertSame('imprint-id', $variables['data']['imprintId']);
+                return true;
             }));
 
         $titleService = $this->createMock(ThothTitleService::class);
